@@ -1,0 +1,52 @@
+[
+{
+"id": "p090-01",
+"grade": "Bad",
+"reason": "NHS directory link dead: springgroveclinic.com (no www) SSL protocol error; www site exists"
+},
+{
+"id": "p090-02",
+"grade": "Good",
+"reason": "Modern site, Book online/Contact/Emergencies buttons, phone in header; new NHS patients welcome"
+},
+{
+"id": "p090-03",
+"grade": "Good",
+"reason": "Redirects to Millarbank Dental: modern, Book Online and Call Us Today in header"
+},
+{
+"id": "p090-04",
+"grade": "Average",
+"reason": "Plain Bootstrap starter template with stock photo, ©2020, phone-only booking, no book button"
+},
+{
+"id": "p090-05",
+"grade": "Good",
+"reason": "Modern site, Book Appointment in header and hero, hours shown; accepting new NHS patients"
+},
+{
+"id": "p090-06",
+"grade": "Good",
+"reason": "Current site, Book Now in header and on mobile, phone and address in top bar"
+},
+{
+"id": "p090-07",
+"grade": "Average",
+"reason": "Plain Elementor page, stray breadcrumb text, Refer a Patient only, no booking or tappable call CTA"
+},
+{
+"id": "p090-08",
+"grade": "Good",
+"reason": "Scottish Dental Care group page — group-owned; Book Appointment button"
+},
+{
+"id": "p090-09",
+"grade": "Good",
+"reason": "Portman Dental group practice (portmandental email) — group-owned; Book Online button"
+},
+{
+"id": "p090-10",
+"grade": "Bad",
+"reason": "Site down: SSL connection closed (ERR_CONNECTION_CLOSED) in both views, confirmed on retry"
+}
+]

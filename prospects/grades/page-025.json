@@ -1,0 +1,12 @@
+[
+{"id":"p025-01","grade":"Bad","reason":"No website listed in NHS directory"},
+{"id":"p025-02","grade":"Good","reason":"Modern site, Make an Appointment hero button; mobile hero text overlaps photo slightly"},
+{"id":"p025-03","grade":"Average","reason":"Homepage is a logo over a photo with only an Enquiry Form button; no phone or booking up top"},
+{"id":"p025-04","grade":"Average","reason":"Clean but plain private site, phone in top bar, no booking button or strong CTA"},
+{"id":"p025-05","grade":"Good","reason":"Scottish Dental Care group page — group-owned; Book Appointment in header"},
+{"id":"p025-06","grade":"Good","reason":"Current template, phone, hours and Book an Appointment in header; Christmas hero photo, ©2023"},
+{"id":"p025-07","grade":"Average","reason":"Pleasant template but only a 'Contact Us' button, no booking; phone in top bar"},
+{"id":"p025-08","grade":"Good","reason":"Infinity Smiles orthodontic group location page — group-owned; Free Consultation CTA"},
+{"id":"p025-09","grade":"Bad","reason":"Wix holding page: 'New website coming soon', contact form only (Cumnock & Drongan)"},
+{"id":"p025-10","grade":"Average","reason":"Dated blue template, Contact Us Today only, no online booking; new NHS child/private adult patients"}
+]

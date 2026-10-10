@@ -1,0 +1,12 @@
+[
+{"id":"p060-01","grade":"Bad","reason":"Site down: WordPress 'There has been a critical error on this website' (HTTP 500)"},
+{"id":"p060-02","grade":"Average","reason":"Dated slider template, phone in header but no booking; empty gap on mobile; new patients welcome"},
+{"id":"p060-03","grade":"Average","reason":"Dated stock-photo layout with Google+ icon, but big Book Online button; accepting new NHS patients"},
+{"id":"p060-04","grade":"Bad","reason":"No website, only an active Facebook page"},
+{"id":"p060-05","grade":"Good","reason":"Clyde Munro group page — group-owned"},
+{"id":"p060-06","grade":"Bad","reason":"No website, only a Facebook page behind a login wall"},
+{"id":"p060-07","grade":"Good","reason":"Clyde Munro group-owned; NHS directory link broken (404 page not found)"},
+{"id":"p060-08","grade":"Good","reason":"M-Brace multi-practice ortho site, Book A Consultation and Call buttons (same site as Bathgate)"},
+{"id":"p060-09","grade":"Good","reason":"Modern M-Brace site, Book A Free Consultation and Call buttons on mobile"},
+{"id":"p060-10","grade":"Good","reason":"Same M-Brace site as Bathgate: modern, Book A Consultation and Call buttons"}
+]

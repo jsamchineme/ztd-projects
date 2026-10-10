@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p086-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site (Alba Medical Group): online request button + task tiles on phone (desktop Cloudflare)"
+ },
+ {
+  "id": "p086-02",
+  "grade": "Average",
+  "reason": "Newer My Surgery Website template: plain blue text tiles over stock photo; dated, amateur look"
+ },
+ {
+  "id": "p086-03",
+  "grade": "Good",
+  "reason": "gp.scot NHS Scotland template: Make an appointment / Repeat prescription / Contact cards"
+ },
+ {
+  "id": "p086-04",
+  "grade": "Good",
+  "reason": "Modern site: 'How can we help you?' panel with appointments, prescriptions, join the practice"
+ },
+ {
+  "id": "p086-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Appointments / Prescriptions / Register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p086-06",
+  "grade": "Good",
+  "reason": "Directory link (gp.scot) shows a bare login box; real site is fine \u2014 same as Strathgryffe (Bridge of Weir)"
+ },
+ {
+  "id": "p086-07",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template (Croyard Medical Practice), clean on phone"
+ },
+ {
+  "id": "p086-08",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404); homepage is My Surgery Website NHS Scotland-style template"
+ },
+ {
+  "id": "p086-09",
+  "grade": "Average",
+  "reason": "Cluttered NHS-branded template; big 'Important' results/prescriptions pop-up covers homepage"
+ },
+ {
+  "id": "p086-10",
+  "grade": "Average",
+  "reason": "'Important' pop-up covers homepage; same site as Strathpeffer Medical Centre"
+ }
+]

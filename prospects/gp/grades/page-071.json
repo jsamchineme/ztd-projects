@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p071-01",
+  "grade": "Average",
+  "reason": "Amateur custom look, non-HTTPS; big stock-image cards, cramped 2-row nav; same site as Jesmond Surgery"
+ },
+ {
+  "id": "p071-02",
+  "grade": "Average",
+  "reason": "gpsurgery.net site; desktop logo and contact banner images broken (alt text shown); illustrated task tiles"
+ },
+ {
+  "id": "p071-03",
+  "grade": "Average",
+  "reason": "My Surgery Website: tiles are island branches, tasks only in menu; shared Orcades site (maybe NHS Orkney-run)"
+ },
+ {
+  "id": "p071-04",
+  "grade": "Average",
+  "reason": "My Surgery Website: tiles are island branches, tasks only in menu; shared Orcades site (maybe NHS Orkney-run)"
+ },
+ {
+  "id": "p071-05",
+  "grade": "Average",
+  "reason": "My Surgery Website: tiles are island branches, tasks only in menu; shared Orcades site (maybe NHS Orkney-run)"
+ },
+ {
+  "id": "p071-06",
+  "grade": "Average",
+  "reason": "My Surgery Website: tiles are island branches, tasks only in menu; shared Orcades site (maybe NHS Orkney-run)"
+ },
+ {
+  "id": "p071-07",
+  "grade": "Average",
+  "reason": "My Surgery Website: tiles are island branches, tasks only in menu; shared Orcades site (maybe NHS Orkney-run)"
+ },
+ {
+  "id": "p071-08",
+  "grade": "Average",
+  "reason": "My Surgery Website: tiles are island branches, tasks only in menu; shared Orcades site (maybe NHS Orkney-run)"
+ },
+ {
+  "id": "p071-09",
+  "grade": "Good",
+  "reason": "Directory link (index.aspx) blocked on both views; root site is gpsurgery.net with task tiles on phone"
+ },
+ {
+  "id": "p071-10",
+  "grade": "Average",
+  "reason": "gpsurgery.net site; desktop logo image broken (alt text shown), map image broken; illustrated task tiles"
+ }
+]

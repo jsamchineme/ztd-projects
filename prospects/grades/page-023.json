@@ -1,0 +1,12 @@
+[
+{"id":"p023-01","grade":"Average","reason":"Basic builder-style site, phone number pasted over building photo, no booking; 2023 NHS notice up top"},
+{"id":"p023-02","grade":"Bad","reason":"Site down: comistondental.co.uk domain does not resolve (ERR_NAME_NOT_RESOLVED)"},
+{"id":"p023-03","grade":"Average","reason":"Bare 4-page site, homepage is just a giant logo; no booking, 'please call us to book'"},
+{"id":"p023-04","grade":"Average","reason":"Dated template (glasgowdentalcare.co.uk), phones prominent but no Book button; tool screenshot failed"},
+{"id":"p023-05","grade":"Average","reason":"Same dated site as Complete Dental Care Cambuslang; no Book button, large dark image block on page"},
+{"id":"p023-06","grade":"Average","reason":"Clean template but no booking or phone in header, only Contact Us; new patients on waiting list"},
+{"id":"p023-07","grade":"Bad","reason":"No website, only a Facebook page behind a login wall"},
+{"id":"p023-08","grade":"Good","reason":"Modern site, Book Now hero button, phone in header, WhatsApp"},
+{"id":"p023-09","grade":"Bad","reason":"Pre-2015 fixed layout, not responsive (tiny unreadable text on phone), booking link as raw URL"},
+{"id":"p023-10","grade":"Average","reason":"Decade-old look (Google+ icon) but big Book Online button; accepting new NHS patients"}
+]

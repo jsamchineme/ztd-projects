@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p051-01",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404 \"Are you lost?\"); root site modern with full task-tile grid"
+ },
+ {
+  "id": "p051-02",
+  "grade": "Average",
+  "reason": "My Surgery Website template, dated; 2025 newsletter ticker, long intro text, tasks only in menu"
+ },
+ {
+  "id": "p051-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site with task tiles on phone (desktop Cloudflare check); dismissible announcements alert"
+ },
+ {
+  "id": "p051-04",
+  "grade": "Average",
+  "reason": "Speyside-style template: long staff-behaviour text, garish red/green tiles; works on phone"
+ },
+ {
+  "id": "p051-05",
+  "grade": "Good",
+  "reason": "My Surgery Website template, task tiles (Appointments, Prescriptions) on hero (retry after 503)"
+ },
+ {
+  "id": "p051-06",
+  "grade": "Good",
+  "reason": "gp.scot NHS Scotland template: appointment/prescription/contact cards, clean on phone"
+ },
+ {
+  "id": "p051-07",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p051-08",
+  "grade": "Average",
+  "reason": "Photo-hero WordPress site, no prescription/appointment shortcuts up front; phone layout looked shifted"
+ },
+ {
+  "id": "p051-09",
+  "grade": "Good",
+  "reason": "Modern site with grid of task tiles (Appointments, Prescriptions, Register) on phone (desktop Cloudflare)"
+ },
+ {
+  "id": "p051-10",
+  "grade": "Bad",
+  "reason": "Very old design: tiny grey text, clip-art phone, \"check our Facebook page for up to date information\""
+ }
+]

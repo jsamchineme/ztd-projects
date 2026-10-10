@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font:'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --canvas:#E8EBEF; --chrome:#FCFCFB; --chrome-2:#EEF0F3; --ink:#1E232B; --muted:#5F6773; --edge:#D5DAE1;
+  --accent:#3346C8; --on-accent:#FFFFFF; --accent-soft:rgba(51,70,200,.13); --paper:#FFFFFF; --col:#F3F5F7; --danger:#B42318;
+  --bad:#FBD3CF; --bad-ink:#8A1F14; --avg:#FDE2BF; --avg-ink:#7A4A06; --good:#CDEFD9; --good-ink:#145C33;
+  --ai:#E3DEFB; --ai-ink:#4630A8; --human:#D6E9FB; --human-ink:#11558C; --any:#E6E9ED; --any-ink:#3B4350;
+  --shadow:0 1px 2px rgba(20,24,31,.06), 0 10px 28px -10px rgba(20,24,31,.22);
+  --card-shadow:0 1px 2px rgba(20,24,31,.08);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --canvas:#16181C; --chrome:#202329; --chrome-2:#2B2F36; --ink:#E6E8EB; --muted:#9AA2AE; --edge:#363B44;
+    --accent:#8C9BFF; --on-accent:#12152B; --accent-soft:rgba(140,155,255,.17); --paper:#2A2E35; --col:#1C1F24; --danger:#FF8A7A;
+    --bad:#4A2522; --bad-ink:#FFB4AA; --avg:#46351C; --avg-ink:#FFD59A; --good:#1E3D2B; --good-ink:#9BE3B5;
+    --ai:#2F2A4D; --ai-ink:#C7BDFF; --human:#1D3347; --human-ink:#A8D4FF; --any:#2E333B; --any-ink:#C4CAD3;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 30px -10px rgba(0,0,0,.6); --card-shadow:0 1px 2px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --canvas:#16181C; --chrome:#202329; --chrome-2:#2B2F36; --ink:#E6E8EB; --muted:#9AA2AE; --edge:#363B44;
+  --accent:#8C9BFF; --on-accent:#12152B; --accent-soft:rgba(140,155,255,.17); --paper:#2A2E35; --col:#1C1F24; --danger:#FF8A7A;
+  --bad:#4A2522; --bad-ink:#FFB4AA; --avg:#46351C; --avg-ink:#FFD59A; --good:#1E3D2B; --good-ink:#9BE3B5;
+  --ai:#2F2A4D; --ai-ink:#C7BDFF; --human:#1D3347; --human-ink:#A8D4FF; --any:#2E333B; --any-ink:#C4CAD3;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 30px -10px rgba(0,0,0,.6); --card-shadow:0 1px 2px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--canvas);color:var(--ink);font:14px/1.4 var(--font);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+a{color:var(--accent)}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--chrome);border-bottom:1px solid var(--edge);flex-wrap:wrap}
+.brand{font-weight:700;font-size:16px;margin-right:6px}
+.tabs{display:flex;background:var(--chrome-2);border-radius:10px;padding:3px}
+.tabs button{height:30px;padding:0 12px;border-radius:8px;font-weight:600;font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.tabs button[aria-selected="true"]{background:var(--chrome);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.tabs .n{font-variant-numeric:tabular-nums;font-weight:500;color:var(--muted);font-size:12.5px}
+.grow{flex:1}
+#q{height:34px;width:min(240px,100%);padding:0 12px;border:1px solid var(--edge);border-radius:9px;background:var(--paper)}
+.btn{height:34px;padding:0 14px;border-radius:9px;font-weight:600;font-size:13.5px;border:1px solid var(--edge);background:var(--paper);white-space:nowrap}
+.btn:hover{background:var(--chrome-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08);background:var(--accent)}
+.btn.sm{height:28px;padding:0 10px;font-size:12.5px;border-radius:8px}
+.btn:disabled{opacity:.45;cursor:default}
+.live{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:#2F9E5B}
+.live[data-off]::before{background:var(--danger)}
+
+/* board */
+.board{flex:1;display:flex;gap:12px;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));overflow-x:auto;overflow-y:hidden;align-items:stretch}
+.col{flex:0 0 272px;min-width:0;display:flex;flex-direction:column;background:var(--col);border:1px solid var(--edge);border-radius:14px;min-height:0;max-height:100%}
+.col.terminal{flex-basis:220px;opacity:.88}
+.col.drop{outline:2px dashed var(--accent);outline-offset:-2px}
+.col.alert{border-color:var(--bad-ink)}
+.col.alert .ch h2,.col.alert .ch .cnt{color:var(--bad-ink)}
+.ch{padding:12px 12px 8px;border-bottom:1px solid var(--edge)}
+.ch .r{display:flex;align-items:center;gap:6px}
+.ch h2{font-size:14px;font-weight:700;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch .cnt{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600;font-size:13px}
+.ch p{margin:6px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
+.ch .act{margin-top:8px;display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.who{font-size:11px;font-weight:700;letter-spacing:.02em;padding:2px 7px;border-radius:999px;text-transform:uppercase}
+.who.ai{background:var(--ai);color:var(--ai-ink)} .who.human{background:var(--human);color:var(--human-ink)} .who.any{background:var(--any);color:var(--any-ink)}
+.cards{padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;flex:1;min-height:60px}
+.empty{color:var(--muted);font-size:12.5px;text-align:center;padding:14px 6px}
+.card{display:block;width:100%;text-align:left;background:var(--paper);border:1px solid var(--edge);border-radius:10px;padding:10px 11px;box-shadow:var(--card-shadow)}
+.card:hover{border-color:var(--accent)}
+.card{position:relative;overflow:hidden;flex:none}
+/* AI worker status */
+.card.ai-working{border-color:var(--accent);background:linear-gradient(var(--accent-soft),var(--accent-soft)),var(--paper)}
+.card.ai-working::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+  background:linear-gradient(90deg,transparent 0%,var(--accent) 35%,var(--accent) 65%,transparent 100%) no-repeat;background-size:40% 100%;
+  animation:sweep 1.4s ease-in-out infinite}
+@keyframes sweep{from{background-position:-60% 0}to{background-position:160% 0}}
+.card.ai-failed{border-left:3px solid var(--bad-ink)}
+.chip.ai{background:var(--accent);color:var(--on-accent);display:inline-flex;align-items:center;gap:5px}
+.chip.ok{background:var(--good);color:var(--good-ink)}
+.chip.fail{background:var(--bad);color:var(--bad-ink)}
+.spin{width:9px;height:9px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){ .card.ai-working::before{animation:none;background-size:100% 100%} .spin{animation:none;border-right-color:currentColor;opacity:.7} }
+.card[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.card .r1{display:flex;gap:8px;align-items:flex-start}
+.card .nm{font-weight:600;flex:1;min-width:0;overflow-wrap:anywhere}
+.card .dom{color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.card .meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.card .meta:empty{display:none}
+.chip{font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--chrome-2);color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.chip.claim{background:var(--accent-soft);color:var(--accent)}
+.chip.stale{background:var(--chrome-2);color:var(--muted);text-decoration:line-through}
+.chip.pri{background:var(--bad);color:var(--bad-ink)}
+.score{flex:none;min-width:30px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;padding:0 6px}
+.r-bad{background:var(--bad);color:var(--bad-ink)} .r-average{background:var(--avg);color:var(--avg-ink)} .r-good{background:var(--good);color:var(--good-ink)}
+
+/* detail panel */
+#scrim{position:fixed;inset:0;background:rgba(10,12,16,.28);z-index:39}
+#panel{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:var(--chrome);border-left:1px solid var(--edge);z-index:40;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .2s ease;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#panel.open{transform:none}
+@media (prefers-reduced-motion: reduce){ #panel{transition:none} }
+.ph{display:flex;align-items:flex-start;gap:8px;padding:16px 16px 12px;border-bottom:1px solid var(--edge)}
+.ph .t{flex:1;min-width:0}
+.ph h2{margin:0;font-size:18px;font-weight:700;overflow-wrap:anywhere}
+.ph .sub{color:var(--muted);font-size:12.5px;margin-top:3px}
+.x{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:20px;color:var(--muted);flex:none}
+.x:hover{background:var(--chrome-2);color:var(--ink)}
+.pb{flex:1;overflow-y:auto;padding:14px 16px 24px;display:flex;flex-direction:column;gap:16px}
+.box{background:var(--paper);border:1px solid var(--edge);border-radius:12px;padding:12px}
+.box h3{margin:0 0 8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.links a{display:inline-flex;align-items:center;gap:4px;font-weight:600;font-size:13px;text-decoration:none;padding:6px 10px;border-radius:8px;background:var(--chrome-2);color:var(--ink)}
+.links a:hover{background:var(--accent-soft);color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hint{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.hint.warn{color:var(--danger)}
+.instr{font-size:13px;line-height:1.5;margin:0;white-space:pre-wrap}
+details summary{cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:600;margin-top:10px}
+label.f{display:block;margin-bottom:10px}
+label.f:last-child{margin-bottom:0}
+label.f span{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:4px}
+label.f span b{color:var(--danger);font-weight:700}
+.in{width:100%;border:1px solid var(--edge);border-radius:8px;background:var(--chrome);padding:7px 9px;font-size:13.5px}
+textarea.in{resize:vertical;min-height:64px;line-height:1.45}
+select.in{height:34px}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:12.5px}
+.hist li{display:flex;gap:8px}
+.hist .when{color:var(--muted);flex:none;width:62px;font-variant-numeric:tabular-nums}
+.hist .what{flex:1;min-width:0;overflow-wrap:anywhere}
+.hist .note{display:block;color:var(--ink);background:var(--chrome-2);border-radius:6px;padding:5px 8px;margin-top:3px;white-space:pre-wrap}
+.danger{color:var(--danger)}
+
+/* dialogs */
+dialog{border:1px solid var(--edge);border-radius:14px;background:var(--chrome);color:var(--ink);padding:18px;width:min(480px,calc(100vw - 32px));box-shadow:var(--shadow)}
+dialog::backdrop{background:rgba(10,12,16,.35)}
+dialog h2{margin:0 0 6px;font-size:17px}
+dialog p{margin:0 0 12px;color:var(--muted);font-size:13px}
+dialog .row{justify-content:flex-end;margin-top:14px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--chrome);
+  padding:9px 14px;border-radius:10px;font-size:13px;font-weight:500;z-index:60;box-shadow:var(--shadow);max-width:calc(100vw - 32px)}
+#toast[data-kind="err"]{background:var(--danger);color:#fff}
+#offline{margin:auto;max-width:420px;text-align:center;color:var(--muted);padding:24px}
+#offline strong{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+/* workflows */
+#wf{position:fixed;top:0;left:0;bottom:0;width:min(540px,100vw);background:var(--chrome);border-right:1px solid var(--edge);z-index:40;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;transform:translateX(-102%);transition:transform .2s ease;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#wf.open{transform:none}
+@media (prefers-reduced-motion: reduce){ #wf{transition:none} }
+.wfi .r1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wfi .r1 b{font-size:15px;flex:1;min-width:0;overflow-wrap:anywhere}
+.flow{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.flow .stp{background:var(--chrome-2);color:var(--ink);border-radius:6px;padding:2px 7px;font-weight:600}
+.pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;background:var(--chrome-2);color:var(--muted)}
+.pill.running{background:var(--accent-soft);color:var(--accent)} .pill.finished{background:var(--good);color:var(--good-ink)}
+.runtbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+.runtbl th{text-align:left;color:var(--muted);font-weight:600;padding:4px 6px 4px 0;border-bottom:1px solid var(--edge)}
+.runtbl td{padding:6px 6px 6px 0;border-bottom:1px solid var(--edge);vertical-align:top}
+.runtbl td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.wk{display:block}
+.wk .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;background:var(--muted);vertical-align:1px}
+.wk.working .dot{background:var(--accent)} .wk.waiting .dot{background:var(--avg-ink)} .wk.stopped .dot{background:var(--danger)}
+.lnk{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.runlog{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px;max-height:140px;overflow:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){ .grid2{grid-template-columns:1fr} }
+.step .r1{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.step .r1 b{font-size:13px;white-space:nowrap}
+.step .r1 select{flex:1;min-width:0}
+.ib2{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--muted);flex:none;font-size:15px}
+.ib2:hover:not(:disabled){background:var(--chrome-2);color:var(--ink)} .ib2:disabled{opacity:.3;cursor:default}
+.route{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12.5px}
+.route .lbl{font-weight:600;min-width:90px}
+.route select{width:auto;flex:1;min-width:140px}
+.route .hint{margin:0;flex-basis:100%}
+.act.ai{color:var(--accent);font-weight:600}
+.act.ai::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent)}
+@media (max-width:640px){ .brand{display:none} #q{order:9;width:100%} .col{flex-basis:84vw} }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">Pipeline</div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="grow"></div>
+  <input type="search" id="q" placeholder="Search sites" aria-label="Search sites">
+  <button class="btn" id="meBtn" title="Your name on claims and history"></button>
+  <button class="btn" id="wfBtn" aria-expanded="false">Workflows</button>
+  <button class="btn primary" id="addBtn">Add sites</button>
+  <span class="live" id="live">Live</span>
+</header>
+<main class="board" id="board"></main>
+<div id="scrim" hidden></div>
+<aside id="panel" aria-label="Card details" aria-hidden="true"></aside>
+<aside id="wf" aria-label="Workflows" aria-hidden="true"></aside>
+
+<dialog id="addDlg">
+  <form method="dialog" id="addForm">
+    <h2>Add sites to Targets</h2>
+    <p>One per line: a URL, or a URL then a comma and the business name. Sites already on the board are skipped.</p>
+    <textarea class="in" id="addText" rows="8" placeholder="joesplumbing.com, Joe's Plumbing&#10;https://smiledental.co.uk"></textarea>
+    <label class="f" style="margin-top:10px"><span>Priority (higher is worked first)</span><input class="in" id="addPri" type="number" value="0" style="width:120px"></label>
+    <div class="row"><button class="btn" value="cancel" formnovalidate>Cancel</button><button class="btn primary" id="addGo" value="ok">Add</button></div>
+  </form>
+</dialog>
+<dialog id="meDlg">
+  <form method="dialog" id="meForm">
+    <h2>Who are you?</h2>
+    <p>Your name goes on cards you take and on everything you change.</p>
+    <input class="in" id="meName" maxlength="40" required>
+    <div class="row"><button class="btn primary" value="ok">Save</button></div>
+  </form>
+</dialog>
+<div id="toast" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : null;
+const domain = u => String(u || '').replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
+const LS = { get(k, d){ try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
+
+let cfg, stages = {}, cards = [], workflows = [], wfOpen = false, wfEdit = null, tab = LS.get('pipeline.tab', 'production'), openId = null, me = LS.get('pipeline.me', '');
+
+// ---------- api ----------
+async function api(method, path, body){
+  const res = await fetch('/api' + path, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify({ by: me, ...body }) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
+}
+async function act(fn, ok){
+  try { const r = await fn(); if (ok) toast(ok); await load(); return r; }
+  catch (e){ toast(e.message, 'err'); }
+}
+let toastT;
+function toast(msg, kind = ''){
+  const t = $('#toast'); t.textContent = msg; t.dataset.kind = kind; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, kind === 'err' ? 5000 : 2200);
+}
+
+// ---------- helpers ----------
+const claimMs = () => (cfg.claimMinutes || 90) * 60000;
+const claimed = c => c.claim && Date.now() - Date.parse(c.claim.at) < claimMs();
+function ago(t){
+  const m = Math.max(0, Math.round((Date.now() - Date.parse(t)) / 60000));
+  return m < 1 ? 'just now' : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago`;
+}
+const whoLabel = w => w === 'ai' ? 'AI' : w === 'human' ? 'Human' : 'AI · Human';
+const sortCards = list => [...list].sort((a, b) => (claimed(b) ? 1 : 0) - (claimed(a) ? 1 : 0) || b.priority - a.priority || (a.fields.score || 11) - (b.fields.score || 11) || a.enteredAt.localeCompare(b.enteredAt));
+function matches(c){
+  const q = $('#q').value.trim().toLowerCase();
+  return !q || (c.name + ' ' + c.url + ' ' + (c.fields.template || '')).toLowerCase().includes(q);
+}
+
+// ---------- board ----------
+function renderTabs(){
+  $('#tabs').innerHTML = cfg.pipelines.map(p => {
+    const n = cards.filter(c => stages[c.stage].pipeline === p.id && !stages[c.stage].terminal).length;
+    return `<button role="tab" data-tab="${p.id}" aria-selected="${p.id === tab}">${esc(p.name)} <span class="n">${n}</span></button>`;
+  }).join('');
+}
+// What an AI worker is doing with a card, if anything: working on it now, just finished it, or gave it back.
+const isAi = by => /^AI /.test(by || '');
+function aiStatus(c){
+  if (claimed(c) && c.claim.run) return { kind: 'working', who: c.claim.by, at: c.claim.at };
+  const h = c.history[c.history.length - 1];
+  if (!h || !isAi(h.by)) return null;
+  const parked = h.action === 'move' && h.to === cfg.attentionStage;
+  if (parked || (h.action === 'release' && h.note && h.note !== 'Workflow stopped')) return { kind: 'failed', who: h.by, at: h.at, note: h.note || '' };
+  if (h.action === 'move' && Date.now() - Date.parse(h.at) < 10 * 60000) return { kind: 'done', who: h.by, at: h.at, note: h.note };
+  return null;
+}
+const short = t => ago(t).replace(' ago', '').replace('just now', 'now');
+function aiChip(a){
+  if (a.kind === 'working') return `<span class="chip ai" title="${esc(a.who)}"><span class="spin" aria-hidden="true"></span>AI working · ${short(a.at)}</span>`;
+  if (a.kind === 'done') return `<span class="chip ok" title="${esc(a.who)}: ${esc(a.note || '')}">AI done · ${short(a.at)}</span>`;
+  return `<span class="chip fail" title="${esc(a.note)}">AI couldn’t finish</span>`;
+}
+function cardHtml(c){
+  const f = c.fields, cl = claimed(c), ai = aiStatus(c);
+  const meta = [
+    ai ? aiChip(ai) : '',
+    c.history.some(h => h.outcome === 'new_site') ? `<span class="chip" title="No working website: planned as a brand-new site">New site</span>` : '',
+    c.priority > 0 ? `<span class="chip pri">Priority ${c.priority}</span>` : '',
+    c.claim && ai?.kind !== 'working' ? `<span class="chip ${cl ? 'claim' : 'stale'}" title="${cl ? 'Being worked on' : 'Claim expired'}">${esc(c.claim.by)} · ${ago(c.claim.at)}</span>` : '',
+    f.template ? `<span class="chip">${esc(f.template)}</span>` : '',
+    safeUrl(f.previewUrl) ? `<span class="chip">Preview ready</span>` : ''
+  ].join('');
+  return `<button class="card${ai ? ` ai-${ai.kind}` : ''}" draggable="true" data-id="${c.id}" aria-current="${c.id === openId}"${ai?.kind === 'working' ? ' aria-busy="true"' : ''}>
+    <div class="r1"><span class="nm">${esc(c.name)}</span>${f.score ? `<span class="score r-${esc(f.rating)}" title="${esc(f.rating)}">${esc(f.score)}</span>` : ''}</div>
+    <div class="dom">#${c.id} · ${esc(domain(c.url))}</div>
+    <div class="meta">${meta}</div></button>`;
+}
+function render(){
+  renderTabs();
+  const p = cfg.pipelines.find(p => p.id === tab) || cfg.pipelines[0];
+  const scroll = $('#board').scrollLeft, colScroll = {};
+  document.querySelectorAll('.col').forEach(el => colScroll[el.dataset.stage] = el.querySelector('.cards').scrollTop);
+  $('#board').innerHTML = p.stages.map(s => {
+    const here = sortCards(cards.filter(c => c.stage === s.id));
+    const shown = here.filter(matches);
+    const waiting = [s.id, ...(s.pullFrom || [])].reduce((n, id) => n + cards.filter(c => c.stage === id && !claimed(c)).length, 0);
+    const canTake = s.outcomes.length && !s.terminal;
+    const act = s.feeds ? `<div class="act">Feeds ${esc(stages[s.feeds].name)}</div>`
+      : canTake ? `<div class="act"><button class="btn sm" data-take="${s.id}" ${waiting ? '' : 'disabled'}>Take next</button>${s.pullFrom ? `<span>from ${s.pullFrom.map(id => esc(stages[id].name)).join(', then ')}</span>` : ''}</div>` : '';
+    const ai = aiOn(s.id);
+    const aiLine = ai.total ? `<div class="act ai">${ai.total} AI worker${ai.total > 1 ? 's' : ''} · ${ai.working} working</div>` : '';
+    return `<section class="col${s.terminal ? ' terminal' : ''}${s.parking && here.length ? ' alert' : ''}" data-stage="${s.id}" aria-label="${esc(s.name)}">
+      <div class="ch"><div class="r"><h2 title="${esc(s.name)}">${esc(s.name)}</h2><span class="who ${s.who}">${whoLabel(s.who)}</span><span class="cnt">${here.length}</span></div>
+        <p>${esc(s.description || '')}</p>${act}${aiLine}</div>
+      <div class="cards">${shown.map(cardHtml).join('') || `<div class="empty">${here.length ? 'No matches' : 'Empty'}</div>`}</div></section>`;
+  }).join('');
+  $('#board').scrollLeft = scroll;
+  document.querySelectorAll('.col').forEach(el => el.querySelector('.cards').scrollTop = colScroll[el.dataset.stage] || 0);
+}
+
+// ---------- panel ----------
+function fieldInput(f, v){
+  const id = `f_${f.key}`;
+  if (f.type === 'text') return `<textarea class="in" id="${id}" data-field="${f.key}" rows="3">${esc(v)}</textarea>`;
+  if (f.type === 'select' || f.type === 'template'){
+    const opts = f.type === 'template' ? cfg.templates : f.options;
+    const extra = v && !opts.includes(v) ? [v] : [];
+    return `<select class="in" id="${id}" data-field="${f.key}"><option value="">—</option>${[...opts, ...extra].map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+  }
+  return `<input class="in" id="${id}" data-field="${f.key}" type="${f.type === 'number' ? 'number' : f.type === 'url' ? 'url' : 'text'}" ${f.type === 'number' ? 'min="1" max="10"' : ''} value="${esc(v)}">`;
+}
+function histLine(h){
+  const n = id => esc(stages[id]?.name || id);
+  const what = h.action === 'move' ? `moved ${n(h.from)} → <b>${n(h.to)}</b>${h.outcome && h.outcome !== 'done' ? ` (${esc(h.outcome)})` : ''}`
+    : h.action === 'update' ? `updated ${esc(h.fields.join(', '))}` : h.action === 'add' ? `added to ${n(h.to)}`
+    : h.action === 'claim' ? 'took it' : h.action === 'release' ? 'gave it back' : h.action === 'comment' ? 'commented' : esc(h.action);
+  return `<li><span class="when" title="${esc(new Date(h.at).toLocaleString())}">${ago(h.at).replace(' ago', '')}</span>
+    <span class="what"><b>${esc(h.by)}</b> ${what}${h.note ? `<span class="note">${esc(h.note)}</span>` : ''}</span></li>`;
+}
+function stageBox(c){
+  const s = stages[c.stage], f = c.fields, cl = claimed(c), aiBusy = aiStatus(c)?.kind === 'working';
+  const missing = (s.requires || []).filter(k => f[k] == null || f[k] === '');
+  const work = s.outcomes.length && !s.feeds;
+  const allStages = cfg.pipelines.map(p => `<optgroup label="${esc(p.name)}">${p.stages.map(x => `<option value="${x.id}" ${x.id === c.stage ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</optgroup>`).join('');
+  return `
+        <h3>${esc(s.name)}</h3>
+        ${(a => a?.kind === 'working' ? `<p class="hint" style="margin:0 0 10px;display:flex;gap:7px;align-items:center;color:var(--accent)"><span class="spin" aria-hidden="true"></span><span><b>${esc(a.who)}</b> is working on this, started ${ago(a.at)}. Its results appear here when it finishes.</span></p>`
+          : a?.kind === 'failed' ? `<p class="hint warn" style="margin:0 0 10px"><b>${esc(a.who)}</b>: ${esc(a.note)}</p>`
+          : c.claim ? `<p class="hint" style="margin:0 0 10px">${cl ? 'Being worked on by' : 'Claim expired for'} <b>${esc(c.claim.by)}</b>, taken ${ago(c.claim.at)}.</p>` : '')(aiStatus(c))}
+        <div class="row">
+          ${work && !cl ? `<button class="btn" data-claim>Take it</button>` : ''}
+          ${c.claim ? `<button class="btn" data-release>${aiBusy ? 'Take it back from AI' : 'Give back'}</button>` : ''}
+          ${work ? s.outcomes.map(o => `<button class="btn primary" data-outcome="${o.id}" ${missing.length || aiBusy ? 'disabled' : ''}>${esc(`${o.label} → ${stages[o.to].name}`)}</button>`).join('') : ''}
+        </div>
+        ${missing.length && work && !aiBusy ? `<p class="hint warn">Fill in ${missing.map(k => esc(cfg.fields.find(x => x.key === k).label)).join(', ')} to finish this stage.</p>` : ''}
+        ${s.feeds ? `<p class="hint" style="margin-top:0">Waiting in this bucket. ${esc(stages[s.feeds].name)} picks it up next.</p>` : ''}
+        ${s.terminal ? `<p class="hint" style="margin-top:0">Final bucket.</p>` : ''}
+        ${s.parking ? `<p class="hint" style="margin-top:0">AI workers leave cards here when they can’t finish them. Sort out what’s needed, then use <b>Move to</b> to send it on. Moving it back into a queue lets AI workers try again.</p>` : ''}
+        ${s.instructions ? `<details><summary>Instructions for this stage</summary><p class="instr">${esc(s.instructions)}</p></details>` : ''}
+        <label class="f" style="margin-top:12px"><span>Move to</span><select class="in" id="moveTo">${allStages}</select></label>`;
+}
+const histHtml = c => [...c.history].reverse().map(histLine).join('');
+// While someone is typing in the panel, refresh only its status parts so their input isn't wiped.
+function refreshPanelParts(){
+  const c = cards.find(c => c.id === openId); if (!c) return closePanel();
+  if (c.stage !== $('#panel').dataset.stage) return renderPanel();
+  if (!$('#stageBox').contains(document.activeElement)) $('#stageBox').innerHTML = stageBox(c);
+  $('#hist').innerHTML = histHtml(c);
+}
+function renderPanel(){
+  const c = cards.find(c => c.id === openId);
+  if (!c){ closePanel(); return; }
+  const s = stages[c.stage], f = c.fields;
+  const req = new Set(s.requires || []);
+  const fields = [...cfg.fields].sort((a, b) => (req.has(b.key) ? 1 : 0) - (req.has(a.key) ? 1 : 0));
+  $('#panel').dataset.stage = c.stage;
+  $('#panel').innerHTML = `
+    <div class="ph"><div class="t"><h2>${esc(c.name)}</h2><div class="sub">#${c.id} · ${esc(s.name)} · <span class="who ${s.who}">${whoLabel(s.who)}</span></div></div>
+      <button class="x" id="pClose" aria-label="Close">×</button></div>
+    <div class="pb">
+      <div class="links">${safeUrl(c.url) ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">Before: current site ↗</a>` : ''}${safeUrl(f.previewUrl) ? `<a href="${esc(f.previewUrl)}" target="_blank" rel="noopener">After: redesign ↗</a>` : ''}</div>
+      <div class="box" id="stageBox">${stageBox(c)}</div>
+      <div class="box">
+        <h3>Work</h3>
+        ${fields.map(x => `<label class="f" for="f_${x.key}"><span>${esc(x.label)}${req.has(x.key) ? ' <b>*</b>' : ''}</span>${fieldInput(x, f[x.key] ?? '')}</label>`).join('')}
+      </div>
+      <div class="box">
+        <h3>Details</h3>
+        <label class="f"><span>Name</span><input class="in" data-prop="name" value="${esc(c.name)}"></label>
+        <label class="f"><span>Website</span><input class="in" data-prop="url" type="url" value="${esc(c.url)}"></label>
+        <label class="f"><span>Priority (higher is worked first)</span><input class="in" data-prop="priority" type="number" value="${c.priority}" style="width:120px"></label>
+        <label class="f"><span>Notes</span><textarea class="in" data-prop="notes" rows="2">${esc(c.notes)}</textarea></label>
+      </div>
+      <div class="box">
+        <h3>History</h3>
+        <form id="cmt" class="row" style="margin-bottom:12px"><input class="in" id="cmtText" placeholder="Add a comment" style="flex:1;min-width:0"><button class="btn sm">Post</button></form>
+        <ul class="hist" id="hist">${histHtml(c)}</ul>
+      </div>
+      <button class="btn danger" data-delete style="align-self:flex-start">Delete card</button>
+    </div>`;
+}
+function openPanel(id){
+  openId = id; renderPanel();
+  $('#panel').classList.add('open'); $('#panel').setAttribute('aria-hidden', 'false'); $('#scrim').hidden = false;
+  render();
+}
+function closePanel(){
+  openId = null;
+  $('#panel').classList.remove('open'); $('#panel').setAttribute('aria-hidden', 'true'); $('#scrim').hidden = !wfOpen;
+  document.querySelectorAll('.card[aria-current="true"]').forEach(el => el.setAttribute('aria-current', 'false'));
+}
+
+// ---------- data ----------
+let loading = null, again = false;
+async function load(){
+  if (loading){ again = true; return loading; }
+  loading = (async () => {
+    try {
+      const [r, w] = await Promise.all([api('GET', '/cards'), api('GET', '/workflows')]);
+      cards = r.cards; workflows = w.workflows;
+      render();
+      renderWfButton();
+      if (wfOpen && !wfEdit) renderWf();
+      // Don't redraw the panel under someone who's typing in it.
+      if (openId != null) $('#panel').contains(document.activeElement) ? refreshPanelParts() : renderPanel();
+    } finally { loading = null; if (again){ again = false; load(); } }
+  })();
+  return loading;
+}
+function connect(){
+  const es = new EventSource('/api/events');
+  es.onmessage = () => { $('#live').removeAttribute('data-off'); $('#live').textContent = 'Live'; load(); };
+  es.onerror = () => { $('#live').dataset.off = ''; $('#live').textContent = 'Reconnecting'; };
+}
+
+// ---------- events ----------
+function needMe(){ if (me) return true; $('#meName').value = ''; $('#meDlg').showModal(); return false; }
+function setMe(name){ me = name.trim(); LS.set('pipeline.me', me); $('#meBtn').textContent = me ? `You: ${me}` : 'Set your name'; }
+
+$('#tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-tab]'); if (!b) return;
+  tab = b.dataset.tab; LS.set('pipeline.tab', tab); $('#board').scrollLeft = 0; render();
+});
+$('#q').addEventListener('input', render);
+$('#board').addEventListener('click', async e => {
+  const take = e.target.closest('[data-take]');
+  if (take){
+    if (!needMe()) return;
+    const r = await act(() => api('POST', '/claim', { stage: take.dataset.take }));
+    if (r && r.card) openPanel(r.card.id); else if (r) toast('Nothing waiting');
+    return;
+  }
+  const c = e.target.closest('.card'); if (c) openPanel(Number(c.dataset.id));
+});
+// drag a card onto another bucket to move it
+$('#board').addEventListener('dragstart', e => { const c = e.target.closest('.card'); if (c) e.dataTransfer.setData('text/x-card', c.dataset.id); });
+$('#board').addEventListener('dragover', e => { const col = e.target.closest('.col'); if (!col || !e.dataTransfer.types.includes('text/x-card')) return; e.preventDefault(); document.querySelectorAll('.col.drop').forEach(x => x !== col && x.classList.remove('drop')); col.classList.add('drop'); });
+$('#board').addEventListener('dragleave', e => { const col = e.target.closest('.col'); if (col && !col.contains(e.relatedTarget)) col.classList.remove('drop'); });
+$('#board').addEventListener('drop', e => {
+  const col = e.target.closest('.col'); if (!col) return;
+  e.preventDefault(); col.classList.remove('drop');
+  const id = e.dataTransfer.getData('text/x-card'), c = cards.find(c => String(c.id) === id);
+  if (!c || c.stage === col.dataset.stage || !needMe()) return;
+  act(() => api('POST', `/cards/${id}/move`, { to: col.dataset.stage }), `Moved to ${stages[col.dataset.stage].name}`);
+});
+
+$('#panel').addEventListener('click', async e => {
+  const t = e.target;
+  if (t.closest('#pClose')) return closePanel();
+  if (!t.closest('button') || t.closest('#cmt')) return;
+  if (!needMe()) return;
+  if (t.closest('[data-claim]')){
+    const c = cards.find(c => c.id === openId);
+    return act(() => api('POST', '/claim', { stage: c.stage, id: c.id }), 'It’s yours');
+  }
+  if (t.closest('[data-release]')) return act(() => api('POST', `/cards/${openId}/release`, {}), 'Given back');
+  const o = t.closest('[data-outcome]');
+  if (o){
+    const c = cards.find(c => c.id === openId);
+    const r = await act(() => api('POST', `/cards/${openId}/complete`, { outcome: o.dataset.outcome, force: true }));
+    if (r) toast(`Moved to ${stages[r.card.stage].name}`);
+    return;
+  }
+  const del = t.closest('[data-delete]');
+  if (del){
+    if (del.dataset.confirm){ closePanel(); return act(() => api('DELETE', `/cards/${del.dataset.confirm}`), 'Deleted'); }
+    del.dataset.confirm = openId; del.textContent = 'Click again to delete for good';
+  }
+});
+$('#panel').addEventListener('change', e => {
+  const t = e.target;
+  if (!needMe()) return;
+  if (t.id === 'moveTo') return act(() => api('POST', `/cards/${openId}/move`, { to: t.value }), `Moved to ${stages[t.value].name}`).then(() => renderPanel());
+  const body = t.dataset.field ? { fields: { [t.dataset.field]: t.value } } : t.dataset.prop ? { [t.dataset.prop]: t.value } : null;
+  if (!body) return;
+  act(() => api('PATCH', `/cards/${openId}`, body));
+});
+$('#panel').addEventListener('submit', e => {
+  e.preventDefault();
+  const text = $('#cmtText').value.trim(); if (!text || !needMe()) return;
+  act(() => api('POST', `/cards/${openId}/comment`, { text })).then(() => renderPanel());
+});
+$('#scrim').addEventListener('click', () => { closePanel(); closeWf(); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || document.querySelector('dialog[open]')) return;
+  if (openId != null) closePanel(); else if (wfOpen) closeWf();
+});
+
+$('#addBtn').addEventListener('click', () => { if (!needMe()) return; $('#addText').value = ''; $('#addDlg').showModal(); $('#addText').focus(); });
+$('#addForm').addEventListener('submit', e => {
+  if (e.submitter?.value !== 'ok') return;
+  const list = $('#addText').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => {
+    const [url, ...name] = l.split(/\s*[,\t]\s*/); return { url, name: name.join(', '), priority: Number($('#addPri').value) || 0 };
+  });
+  if (!list.length) return;
+  act(async () => {
+    const r = await api('POST', '/cards', { cards: list });
+    toast(`Added ${r.added.length}${r.duplicates.length ? `, ${r.duplicates.length} already on the board` : ''}${r.errors.length ? `, ${r.errors.length} couldn’t be added` : ''}`);
+  });
+});
+$('#meBtn').addEventListener('click', () => { $('#meName').value = me; $('#meDlg').showModal(); });
+$('#meForm').addEventListener('submit', () => setMe($('#meName').value));
+
+// ---------- workflows ----------
+const MODELS = { sonnet: 'Sonnet (balanced)', opus: 'Opus (most capable)', haiku: 'Haiku (fastest, cheapest)' };
+const TOOLSETS = { research: 'Research the web and read the card’s files', files: 'Research the web and build files' };
+const workStages = () => cfg.pipelines.flatMap(p => p.stages).filter(s => s.outcomes.length && !s.feeds && !s.terminal && s.who !== 'human');
+const allStageOptions = sel => cfg.pipelines.map(p => `<optgroup label="${esc(p.name)}">${p.stages.map(x => `<option value="${x.id}" ${x.id === sel ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</optgroup>`).join('');
+function newStep(stageId){
+  const s = stages[stageId];
+  return { stage: stageId, workers: 1, limit: 5, model: 'sonnet', tools: (s.requires || []).includes('previewUrl') ? 'files' : 'research', budget: 2, instructions: '', routes: {} };
+}
+// Which AI workers are on a stage right now, across running workflows.
+function aiOn(stageId){
+  let total = 0, working = 0;
+  for (const w of workflows) if (w.run?.status === 'running') for (const st of w.run.steps) if (st.stage === stageId)
+    for (const k of st.workers) if (k.state === 'working' || k.state === 'waiting' || k.state === 'starting'){ total++; if (k.state === 'working') working++; }
+  return { total, working };
+}
+function renderWfButton(){
+  const n = workflows.filter(w => w.run?.status === 'running').length;
+  $('#wfBtn').textContent = n ? `Workflows · ${n} running` : 'Workflows';
+}
+// Where a step's outcome sends a card, and whether a later step in the same workflow picks it up.
+function routeHint(steps, dest){
+  const picker = steps.find(st => st.stage === dest || (stages[st.stage].pullFrom || []).includes(dest));
+  if (!picker) return `Stops in ${stages[dest].name}${stages[dest].who === 'human' ? ' for a person' : ''}.`;
+  return picker.stage === dest ? `Picked up by this workflow’s ${stages[dest].name} step.` : `Waits in ${stages[dest].name}, then this workflow’s ${stages[picker.stage].name} step takes it.`;
+}
+function flowHtml(w){
+  return w.steps.map(st => `<span class="stp">${esc(stages[st.stage].name)}${st.workers > 1 ? ` ×${st.workers}` : ''}</span>`).join('<span>→</span>');
+}
+function runHtml(run){
+  const waitFor = st => [st.stage, ...(stages[st.stage].pullFrom || [])].reduce((n, id) => n + cards.filter(c => c.stage === id && !claimed(c)).length, 0);
+  const rows = run.steps.map(st => `<tr>
+    <td><b>${esc(stages[st.stage].name)}</b>${run.status === 'running' ? `<br><span class="hint" style="margin:0">${waitFor(st)} waiting</span>` : ''}</td>
+    <td>${st.workers.map(k => `<span class="wk ${k.state}"><span class="dot"></span>${k.state === 'working' && k.card ? `<a href="#" class="lnk" data-open="${k.card}">#${k.card} ${esc(k.cardName || '')}</a>` : esc(k.state)}</span>`).join('')}</td>
+    <td class="num">${st.done} done${st.failed ? `<br>${st.failed} given back` : ''}${st.limit ? `<br>${st.taken} of ${st.limit} taken` : ''}</td></tr>`).join('');
+  const meta = [run.status === 'running' ? `Started ${ago(run.startedAt)}` : `Ended ${ago(run.endedAt || run.startedAt)}`, run.cost ? `$${run.cost.toFixed(2)} spent` : ''].filter(Boolean).join(' · ');
+  return `<p class="hint">${meta}</p>
+    <table class="runtbl"><thead><tr><th>Step</th><th>Workers</th><th>Progress</th></tr></thead><tbody>${rows}</tbody></table>
+    <ul class="runlog">${[...run.log].reverse().slice(0, 12).map(l => `<li>${ago(l.at).replace(' ago', '')} · ${esc(l.msg)}</li>`).join('')}</ul>`;
+}
+function wfListHtml(){
+  const items = workflows.map(w => {
+    const run = w.run, on = run?.status === 'running';
+    const nWorkers = w.steps.reduce((n, s) => n + s.workers, 0);
+    const limit = w.steps[0].limit;
+    return `<div class="box wfi" data-wf="${w.id}">
+      <div class="r1"><b>${esc(w.name)}</b>${run ? `<span class="pill ${run.status}">${esc(run.status)}</span>` : ''}
+        ${on ? '' : `<button class="btn sm" data-wf-edit="${w.id}">Edit</button>`}
+        ${on ? `<button class="btn sm danger" data-wf-stop="${w.id}">Stop</button>` : `<button class="btn sm primary" data-wf-run="${w.id}" title="Starts ${nWorkers} AI worker${nWorkers > 1 ? 's' : ''}">Run</button>`}</div>
+      <div class="flow">${flowHtml(w)}</div>
+      ${!on ? `<p class="hint" data-confirm-text="${w.id}" hidden>Starts ${nWorkers} Claude worker${nWorkers > 1 ? 's' : ''} on your local claude login${limit ? `, taking up to ${limit} card${limit > 1 ? 's' : ''} into ${esc(stages[w.steps[0].stage].name)}` : ''}. Press Run again to start.</p>` : ''}
+      ${run ? runHtml(run) : ''}
+    </div>`;
+  }).join('');
+  return `<div class="ph"><div class="t"><h2>Workflows</h2><div class="sub">AI workers move cards through the queues you choose.</div></div><button class="x" data-wf-close aria-label="Close">×</button></div>
+    <div class="pb">
+      <button class="btn primary" data-wf-new style="align-self:flex-start">New workflow</button>
+      ${items || `<p class="hint" style="margin:0">No workflows yet. A workflow is a list of steps: each step runs Claude workers on one queue, and when a worker finishes a card it moves to the next bucket, where the next step picks it up.</p>`}
+    </div>`;
+}
+function wfEditorHtml(){
+  const d = wfEdit, ws = workStages();
+  const used = new Set(d.steps.map(s => s.stage));
+  const steps = d.steps.map((st, i) => {
+    const s = stages[st.stage];
+    const routes = s.outcomes.map(o => {
+      const dest = st.routes[o.id] || o.to;
+      return `<div class="route"><span class="lbl">${esc(o.label)} →</span><select class="in" data-route="${i}" data-outcome="${o.id}">${allStageOptions(dest)}</select><p class="hint">${esc(routeHint(d.steps, dest))}</p></div>`;
+    }).join('');
+    return `<div class="box step" data-i="${i}">
+      <div class="r1"><b>Step ${i + 1}</b>
+        <select class="in" data-s="stage" data-i="${i}">${ws.map(x => `<option value="${x.id}" ${x.id === st.stage ? 'selected' : ''} ${used.has(x.id) && x.id !== st.stage ? 'disabled' : ''}>${esc(x.name)}</option>`).join('')}</select>
+        <button class="ib2" data-up="${i}" ${i ? '' : 'disabled'} aria-label="Move up">↑</button>
+        <button class="ib2" data-down="${i}" ${i < d.steps.length - 1 ? '' : 'disabled'} aria-label="Move down">↓</button>
+        <button class="ib2" data-rm="${i}" aria-label="Remove step">×</button></div>
+      ${s.pullFrom ? `<p class="hint" style="margin:-4px 0 10px">Takes cards from ${[s.id, ...s.pullFrom].map(id => esc(stages[id].name)).join(', then ')}.</p>` : ''}
+      <div class="grid2">
+        <label class="f"><span>AI workers</span><input class="in" type="number" min="1" max="5" data-s="workers" data-i="${i}" value="${st.workers}"></label>
+        <label class="f"><span>Card limit (0 = no limit)</span><input class="in" type="number" min="0" data-s="limit" data-i="${i}" value="${st.limit}"></label>
+        <label class="f"><span>Model</span><select class="in" data-s="model" data-i="${i}">${Object.entries(MODELS).map(([k, v]) => `<option value="${k}" ${k === st.model ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+        <label class="f"><span>Max $ per card</span><input class="in" type="number" min="0" step="0.5" data-s="budget" data-i="${i}" value="${st.budget ?? ''}" placeholder="No cap"></label>
+      </div>
+      <label class="f"><span>Workers can</span><select class="in" data-s="tools" data-i="${i}">${Object.entries(TOOLSETS).map(([k, v]) => `<option value="${k}" ${k === st.tools ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label class="f"><span>Extra instructions (added to the stage’s own)</span><textarea class="in" rows="2" data-s="instructions" data-i="${i}" placeholder="e.g. These are dental practices in Scotland. Use the Clinic Clean template.">${esc(st.instructions)}</textarea></label>
+      ${s.instructions ? `<details><summary>The stage’s own instructions</summary><p class="instr">${esc(s.instructions)}</p></details>` : ''}
+      <div style="margin-top:10px"><span class="hint" style="margin:0;font-weight:600">Then</span>${routes}</div>
+    </div>`;
+  }).join('');
+  const left = ws.filter(x => !used.has(x.id));
+  return `<div class="ph"><div class="t"><h2>${d.id ? 'Edit workflow' : 'New workflow'}</h2></div><button class="x" data-wf-close aria-label="Close">×</button></div>
+    <div class="pb">
+      <label class="f"><span>Name</span><input class="in" id="wfName" value="${esc(d.name)}" placeholder="e.g. Dental redesigns" maxlength="60"></label>
+      ${steps}
+      ${left.length ? `<div class="row"><select class="in" id="wfAddStage" style="width:auto;flex:1">${left.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select><button class="btn" data-add-step>Add step</button></div>` : ''}
+      <div class="row">
+        <button class="btn primary" data-wf-save>Save</button><button class="btn" data-wf-cancel>Cancel</button>
+        ${d.id ? `<span class="grow"></span><button class="btn danger" data-wf-del>Delete</button>` : ''}
+      </div>
+    </div>`;
+}
+function renderWf(){
+  const el = $('#wf'), top = el.querySelector('.pb')?.scrollTop || 0;
+  el.innerHTML = wfEdit ? wfEditorHtml() : wfListHtml();
+  const pb = el.querySelector('.pb'); if (pb) pb.scrollTop = top;
+}
+function openWf(){
+  wfOpen = true; renderWf();
+  $('#wf').classList.add('open'); $('#wf').setAttribute('aria-hidden', 'false'); $('#wfBtn').setAttribute('aria-expanded', 'true'); $('#scrim').hidden = false;
+}
+function closeWf(){
+  wfOpen = false; wfEdit = null;
+  $('#wf').classList.remove('open'); $('#wf').setAttribute('aria-hidden', 'true'); $('#wfBtn').setAttribute('aria-expanded', 'false');
+  if (openId == null) $('#scrim').hidden = true;
+}
+$('#wfBtn').addEventListener('click', () => wfOpen ? closeWf() : openWf());
+$('#wf').addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'wfName') wfEdit.name = t.value;
+  else if (t.dataset.s && t.tagName !== 'SELECT'){
+    const st = wfEdit.steps[t.dataset.i];
+    st[t.dataset.s] = t.type === 'number' ? (t.value === '' ? null : Number(t.value)) : t.value;
+  }
+});
+$('#wf').addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.s && t.tagName === 'SELECT'){
+    const i = Number(t.dataset.i);
+    if (t.dataset.s === 'stage') wfEdit.steps[i] = { ...newStep(t.value), workers: wfEdit.steps[i].workers, limit: wfEdit.steps[i].limit };
+    else wfEdit.steps[i][t.dataset.s] = t.value;
+    renderWf();
+  } else if (t.dataset.route != null){
+    const st = wfEdit.steps[t.dataset.route], o = stages[st.stage].outcomes.find(o => o.id === t.dataset.outcome);
+    if (t.value === o.to) delete st.routes[o.id]; else st.routes[o.id] = t.value;
+    renderWf();
+  }
+});
+$('#wf').addEventListener('click', async e => {
+  const t = e.target, b = sel => t.closest(sel);
+  if (b('[data-wf-close]')) return closeWf();
+  const open = b('[data-open]');
+  if (open){ e.preventDefault(); return openPanel(Number(open.dataset.open)); }
+  if (b('[data-wf-new]')){
+    const first = workStages().find(s => s.id === 'study') || workStages()[0];
+    wfEdit = { name: '', steps: [newStep(first.id)] }; return renderWf();
+  }
+  const edit = b('[data-wf-edit]');
+  if (edit){ wfEdit = JSON.parse(JSON.stringify(workflows.find(w => String(w.id) === edit.dataset.wfEdit))); delete wfEdit.run; return renderWf(); }
+  if (b('[data-wf-cancel]')){ wfEdit = null; return renderWf(); }
+  if (b('[data-add-step]')){ wfEdit.steps.push(newStep($('#wfAddStage').value)); return renderWf(); }
+  const mv = b('[data-up]') || b('[data-down]');
+  if (mv){
+    const i = Number(mv.dataset.up ?? mv.dataset.down), j = mv.dataset.up != null ? i - 1 : i + 1;
+    [wfEdit.steps[i], wfEdit.steps[j]] = [wfEdit.steps[j], wfEdit.steps[i]]; return renderWf();
+  }
+  const rm = b('[data-rm]');
+  if (rm){ wfEdit.steps.splice(Number(rm.dataset.rm), 1); return renderWf(); }
+  if (b('[data-wf-save]')){
+    const d = wfEdit;
+    const r = await act(() => d.id ? api('PATCH', `/workflows/${d.id}`, d) : api('POST', '/workflows', d), 'Workflow saved');
+    if (r){ wfEdit = null; renderWf(); }
+    return;
+  }
+  const del = b('[data-wf-del]');
+  if (del){
+    if (!del.dataset.sure){ del.dataset.sure = '1'; del.textContent = 'Click again to delete'; return; }
+    const id = wfEdit.id; wfEdit = null;
+    return act(() => api('DELETE', `/workflows/${id}`), 'Workflow deleted');
+  }
+  const run = b('[data-wf-run]');
+  if (run){
+    const hint = $(`[data-confirm-text="${run.dataset.wfRun}"]`);
+    if (hint.hidden){ hint.hidden = false; run.textContent = 'Start workers'; return; }
+    return act(() => api('POST', `/workflows/${run.dataset.wfRun}/run`, {}), 'Workflow started');
+  }
+  const stop = b('[data-wf-stop]');
+  if (stop) return act(() => api('POST', `/workflows/${stop.dataset.wfStop}/stop`, {}), 'Stopping workers');
+});
+
+// ---------- start ----------
+(async () => {
+  try { cfg = await api('GET', '/config'); }
+  catch {
+    $('#board').innerHTML = `<div id="offline"><strong>Can’t reach the Pipeline server</strong>Start it with <code>make pipeline</code> (or <code>node pipeline/server.mjs</code>), then reload this page.</div>`;
+    return;
+  }
+  for (const p of cfg.pipelines) for (const s of p.stages) stages[s.id] = s;
+  if (!cfg.pipelines.some(p => p.id === tab)) tab = cfg.pipelines[0].id;
+  setMe(me);
+  await load();
+  connect();
+  // Keep "12m ago" fresh; tick faster while AI workers are busy so their timers move.
+  let ticks = 0;
+  setInterval(() => { ticks++; if (cards.some(c => aiStatus(c)?.kind === 'working') || ticks % 4 === 0) render(); }, 15000);
+})();
+</script>
+</body>
+</html>

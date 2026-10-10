@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p033-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net Radnor Street Surgery site: task tiles on phone; same site as Dr Melrose and Dr Sharp"
+ },
+ {
+  "id": "p033-02",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p033-03",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p033-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: eConsult button and task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p033-05",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p033-06",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p033-07",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p033-08",
+  "grade": "Bad",
+  "reason": "Old My Surgery Website design (Govanhill Group A), not responsive: phone shows shrunken page"
+ },
+ {
+  "id": "p033-09",
+  "grade": "Good",
+  "reason": "My Surgery Website site with tiles: Appointments / Prescriptions / Join the surgery"
+ },
+ {
+  "id": "p033-10",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404); root site is My Surgery Website NHS-style with Appointments/Prescriptions"
+ }
+]

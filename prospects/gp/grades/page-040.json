@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p040-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template, row of task buttons (Appointments, Prescriptions, Join) on hero"
+ },
+ {
+  "id": "p040-02",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: engageconsult banner and clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p040-03",
+  "grade": "Bad",
+  "reason": "Broken: gp.scot address shows only a bare unstyled Username/Password login form, no practice site"
+ },
+ {
+  "id": "p040-04",
+  "grade": "Good",
+  "reason": "Alba Medical Group site with full grid of task tiles; dismissible holiday alert; same site as Hallpark/Kersiebank"
+ },
+ {
+  "id": "p040-05",
+  "grade": "Good",
+  "reason": "Alba Medical Group site with full grid of task tiles; same site as Bannockburn/Kersiebank"
+ },
+ {
+  "id": "p040-06",
+  "grade": "Good",
+  "reason": "Alba Medical Group site with full grid of task tiles; same site as Bannockburn/Hallpark"
+ },
+ {
+  "id": "p040-07",
+  "grade": "Good",
+  "reason": "Link goes to Kinneil Medical Practice site: modern task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p040-08",
+  "grade": "Average",
+  "reason": "My Surgery Website template, dated header and big photo; tasks only in long menu, red text notices"
+ },
+ {
+  "id": "p040-09",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404); practice's own MSW NHS-style site works; same site as Lanfine Way"
+ },
+ {
+  "id": "p040-10",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, clean nav; same site as Frew Terrace (main)"
+ }
+]

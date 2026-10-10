@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p077-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, Appointments/Prescriptions in nav, clean on phone"
+ },
+ {
+  "id": "p077-02",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p077-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: prescription/appointment/register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p077-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site (Oakview Medical Practice): askmyGP / repeat prescription tiles, phone numbers up top"
+ },
+ {
+  "id": "p077-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: prescription/appointment/register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p077-06",
+  "grade": "Good",
+  "reason": "Islay Medical Services \u2014 likely NHS Highland board-run (same as Bowmore); check"
+ },
+ {
+  "id": "p077-07",
+  "grade": "Good",
+  "reason": "gp.scot NHS Scotland template (Bydand Medical Group): appointment / prescription / contact cards"
+ },
+ {
+  "id": "p077-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, Appointments/Prescriptions in nav, MenB notice"
+ },
+ {
+  "id": "p077-09",
+  "grade": "Average",
+  "reason": "Cluttered NHS-branded template: long welcome text, 2-row menu, tiles pushed down on phone"
+ },
+ {
+  "id": "p077-10",
+  "grade": "Average",
+  "reason": "Cluttered NHS-branded template, tiles pushed down on phone; same site as Rinnes (Dufftown)"
+ }
+]

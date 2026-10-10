@@ -1,0 +1,53 @@
+[
+ {
+  "id": "p021-01",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory; same practice as Strichen Surgery"
+ },
+ {
+  "id": "p021-02",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory; same practice as Maud Surgery"
+ },
+ {
+  "id": "p021-03",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory (specialist Challenging Patients Service, likely board-run)"
+ },
+ {
+  "id": "p021-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p021-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p021-06",
+  "grade": "Bad",
+  "reason": "Directory links only to NHS Fife listing page, no practice website (desktop blocked by Cloudflare)"
+ },
+ {
+  "id": "p021-07",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p021-08",
+  "grade": "Average",
+  "reason": "gpfusion NHS-style template; on phone the tasks sit below a column of third-party ads (MRI, plans)",
+  "reviewed": true
+ },
+ {
+  "id": "p021-09",
+  "grade": "Good",
+  "reason": "My Surgery Website site with clear task tiles: Appointments / Prescriptions / Join the surgery"
+ },
+ {
+  "id": "p021-10",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ }
+]

@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p069-01",
+  "grade": "Good",
+  "reason": "Modern custom site: Order Your Prescription button, phone numbers up top; works on phone"
+ },
+ {
+  "id": "p069-02",
+  "grade": "Good",
+  "reason": "Links to Station Road Medical Practice: My Surgery Website NHS-style, Appointments / Prescriptions in nav"
+ },
+ {
+  "id": "p069-03",
+  "grade": "Average",
+  "reason": "NHS-style site, but a big green \"Self check-in\" notice block leads the page; COVID-19 still in nav"
+ },
+ {
+  "id": "p069-04",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout; Appointments / Prescriptions in nav"
+ },
+ {
+  "id": "p069-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Appointments / Prescriptions / Register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p069-06",
+  "grade": "Bad",
+  "reason": "Very old WordPress layout, tiny text; not responsive, phone shows shrunken desktop page; \"Masks aff!\" news"
+ },
+ {
+  "id": "p069-07",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p069-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net site (Northwood Surgery): Appointments / Registration / Prescriptions tiles on phone"
+ },
+ {
+  "id": "p069-09",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website theme, shouty red notices, clip-art icons; phone shows shrunken desktop page"
+ },
+ {
+  "id": "p069-10",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style site, Appointments / Prescriptions in nav"
+ }
+]

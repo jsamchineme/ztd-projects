@@ -1,0 +1,12 @@
+[
+{"id":"p071-01","grade":"Bad","reason":"No website listed in NHS directory (Lochcarron branch links only to an NHS Highland page)"},
+{"id":"p071-02","grade":"Good","reason":"Saint Visage Dental Group practice — group-owned; Book Appointment and phone in header"},
+{"id":"p071-03","grade":"Good","reason":"Saint Visage Dental Group practice — group-owned (desktop view rate-limited, mobile fine)"},
+{"id":"p071-04","grade":"Good","reason":"Current site, Book Now button and Call Today phone in header on desktop and mobile"},
+{"id":"p071-05","grade":"Average","reason":"Dated 4-practice template (Google+ icon), map as hero, request form only; accepting new private patients"},
+{"id":"p071-06","grade":"Average","reason":"Same One Dental Care site as Beith: dated template, Google+ icon, map hero, appointment request form only"},
+{"id":"p071-07","grade":"Average","reason":"Same One Dental Care site as Beith: dated template, Google+ icon, map hero, appointment request form only"},
+{"id":"p071-08","grade":"Average","reason":"Same One Dental Care site as Beith: dated template, map hero, request form; accepting new private patients"},
+{"id":"p071-09","grade":"Good","reason":"Modern clean site with Book Your Appointment button in hero"},
+{"id":"p071-10","grade":"Good","reason":"Modern site, tappable phones in header and hero call button; outlook.com email a minor weakness"}
+]

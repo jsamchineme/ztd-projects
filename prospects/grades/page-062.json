@@ -1,0 +1,12 @@
+[
+{"id": "p062-01", "grade": "Good", "reason": "Modern site, Book Consultation button in header on desktop and mobile, 4.9 Google rating"},
+{"id": "p062-02", "grade": "Good", "reason": "NHS board-run clinic — not a private prospect"},
+{"id": "p062-03", "grade": "Good", "reason": "Clean builder site with Book Appointment button and phone under logo"},
+{"id": "p062-04", "grade": "Bad", "reason": "Very old 2000s design: pinstripe background, tiny text, gradient banner; Call Us only on mobile"},
+{"id": "p062-05", "grade": "Good", "reason": "Modern dark design with Book Appointment buttons in header and hero"},
+{"id": "p062-06", "grade": "Average", "reason": "Dated template, ©2014, Google+ icon, dropdown nav on mobile; has appointment link and form"},
+{"id": "p062-07", "grade": "Average", "reason": "Slow-loading (36s) dated slider template; tap-to-call and Contact Us buttons but no booking"},
+{"id": "p062-08", "grade": "Good", "reason": "Modern Mint Dental Care site, Book an appointment and call buttons (same site as Kingseat)"},
+{"id": "p062-09", "grade": "Good", "reason": "Modern site, Book an appointment button, phone and enquiry chat"},
+{"id": "p062-10", "grade": "Bad", "reason": "Unfinished template: homepage still shows placeholder copy 'Provide a general summary of the services'"}
+]

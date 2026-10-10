@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p020-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p020-02",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p020-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: eConsult banner and task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p020-04",
+  "grade": "Bad",
+  "reason": "Site down: My Surgery Website 'Splat :( temporarily offline' maintenance page"
+ },
+ {
+  "id": "p020-05",
+  "grade": "Average",
+  "reason": "Clean but plain; phone opens on welcome text walls, no clear prescription/appointment buttons"
+ },
+ {
+  "id": "p020-06",
+  "grade": "Average",
+  "reason": "Wix site (c.2018), tiny logo, sparse; phone shows empty header gap, no task buttons"
+ },
+ {
+  "id": "p020-07",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p020-08",
+  "grade": "Average",
+  "reason": "Basic dated template, small text, menu of branches/holidays; no prescription/appointment links"
+ },
+ {
+  "id": "p020-09",
+  "grade": "Average",
+  "reason": "Icon font fails (empty squares in header/tiles); eConsult hero dominates, tasks below fold"
+ },
+ {
+  "id": "p020-10",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ }
+]

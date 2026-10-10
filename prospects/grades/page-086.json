@@ -1,0 +1,52 @@
+[
+{
+"id": "p086-01",
+"grade": "Average",
+"reason": "Modern-looking template but only Contact Us / Find Out More, no booking or phone CTA"
+},
+{
+"id": "p086-02",
+"grade": "Good",
+"reason": "Modern site, Book Online, Emergency and Contact buttons in header, finance offers"
+},
+{
+"id": "p086-03",
+"grade": "Average",
+"reason": "Old-style plain site with hand-drawn sketch image; Call to Book phone, no online booking; NHS"
+},
+{
+"id": "p086-04",
+"grade": "Bad",
+"reason": "No website listed in NHS directory"
+},
+{
+"id": "p086-05",
+"grade": "Average",
+"reason": "Dated Divi template ©2018, blurry mobile hero, no booking button; registering NHS patients"
+},
+{
+"id": "p086-06",
+"grade": "Bad",
+"reason": "No website listed in NHS directory"
+},
+{
+"id": "p086-07",
+"grade": "Good",
+"reason": "Clyde Munro group practice page — group-owned"
+},
+{
+"id": "p086-08",
+"grade": "Bad",
+"reason": "NHS directory link dead: 404 on sdcgroup.co.uk/shotts, blank page on desktop and mobile"
+},
+{
+"id": "p086-09",
+"grade": "Good",
+"reason": "Current site, Book Online in top bar, phone, contact form and WhatsApp chat"
+},
+{
+"id": "p086-10",
+"grade": "Bad",
+"reason": "No website listed in NHS directory"
+}
+]

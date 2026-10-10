@@ -1,0 +1,12 @@
+[
+ {"id": "p075-01", "grade": "Good", "reason": "gpsurgery.net site, task tiles on phone (desktop Cloudflare); same site as Portland (Hurlford Surgery)"},
+ {"id": "p075-02", "grade": "Average", "reason": "Newer My Surgery Website template: icon links for times/appointments/prescriptions, plain serif, dated"},
+ {"id": "p075-03", "grade": "Bad", "reason": "No website listed in NHS directory"},
+ {"id": "p075-04", "grade": "Good", "reason": "gpsurgery.net site: eConsult button + prescription/appointment tiles on phone (desktop Cloudflare)"},
+ {"id": "p075-05", "grade": "Average", "reason": "Cluttered NHS-branded site, colour tiles pushed below long header on phone; nhsh admin email (board-run?)"},
+ {"id": "p075-06", "grade": "Average", "reason": "Cluttered NHS-branded site, tiles below long header on phone; same site as Portree (Fancy Hill)"},
+ {"id": "p075-07", "grade": "Average", "reason": "Cluttered NHS-branded site, tiles below long header on phone; same site as Portree (Fancy Hill)"},
+ {"id": "p075-08", "grade": "Bad", "reason": "Bare WordPress.com blog theme: just a doctor list and 'click the tabs' — no phone, hours or task links"},
+ {"id": "p075-09", "grade": "Good", "reason": "Modern site with Appointments / Prescriptions / Sick note / New patients cards, good on phone"},
+ {"id": "p075-10", "grade": "Good", "reason": "My Surgery Website NHS Scotland-style template, prescriptions/appointments/new patients in nav"}
+]

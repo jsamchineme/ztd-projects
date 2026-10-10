@@ -1,0 +1,54 @@
+[
+ {
+  "id": "p005-01",
+  "grade": "Bad",
+  "reason": "Holding page only: logo, address and 'see our Facebook page'; tiny unreadable text on mobile"
+ },
+ {
+  "id": "p005-02",
+  "grade": "Good",
+  "reason": "Modern, Book Appointment button and phone bar, chat widget; taking new NHS patients"
+ },
+ {
+  "id": "p005-03",
+  "grade": "Good",
+  "reason": "Clean current design, Contact Us/patient portal, tappable phone; NHS & private welcome"
+ },
+ {
+  "id": "p005-04",
+  "grade": "Good",
+  "reason": "Modern, Book a Visit form and button, phone in header; not accepting new NHS patients",
+  "reviewed": true
+ },
+ {
+  "id": "p005-05",
+  "grade": "Good",
+  "reason": "Book Now/Book Online buttons and Google reviews widget, works on mobile"
+ },
+ {
+  "id": "p005-06",
+  "grade": "Bad",
+  "reason": "Logo cut off on mobile, dated small-caps template, no booking button or tappable phone"
+ },
+ {
+  "id": "p005-07",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p005-08",
+  "grade": "Good",
+  "reason": "Clyde Munro group page \u2014 group-owned"
+ },
+ {
+  "id": "p005-09",
+  "grade": "Good",
+  "reason": "Modern, Book Now and Get Registered buttons, call link (earlier capture looked blank)",
+  "reviewed": true
+ },
+ {
+  "id": "p005-10",
+  "grade": "Good",
+  "reason": "Book online and Call buttons in header on both views; private implant clinic"
+ }
+]

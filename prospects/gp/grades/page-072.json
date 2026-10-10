@@ -1,0 +1,12 @@
+[
+ {"id": "p072-01", "grade": "Good", "reason": "NHS Scotland-style template: Appointments / Prescriptions / Video consultation tiles, clean on phone"},
+ {"id": "p072-02", "grade": "Good", "reason": "gp.scot NHS Scotland template: Make an appointment / Repeat prescription / Contact cards up front"},
+ {"id": "p072-03", "grade": "Good", "reason": "gpsurgery.net site: clear task tiles (prescription, see a GP, hours) on phone (desktop Cloudflare check)"},
+ {"id": "p072-04", "grade": "Average", "reason": "gpsurgery.net site; big ALERT news pop-up (incl. mask notice) covers phone homepage on arrival"},
+ {"id": "p072-05", "grade": "Bad", "reason": "Site down — parkroad.gpsurgery.net domain does not resolve (DNS error)"},
+ {"id": "p072-06", "grade": "Good", "reason": "gpsurgery.net site: prescription/appointment/register tiles on phone (desktop Cloudflare check)"},
+ {"id": "p072-07", "grade": "Bad", "reason": "Homepage redirects to a staff login (wp-login / Clarity Practice365) — site not viewable by patients"},
+ {"id": "p072-08", "grade": "Average", "reason": "Template site with Kelpies hero; icons render as empty boxes, tasks below a huge hero on phone"},
+ {"id": "p072-09", "grade": "Average", "reason": "Icons render as empty boxes, tasks below huge hero on phone; same site as Parkhill Medical Practice"},
+ {"id": "p072-10", "grade": "Good", "reason": "gp.scot NHS Scotland template: appointment / prescription / contact cards, practice updates bar"}
+]

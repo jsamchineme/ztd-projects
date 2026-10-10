@@ -1,0 +1,33 @@
+[
+ {
+  "id": "p104-01",
+  "page": 104,
+  "pos": 1,
+  "name": "Ythan Bridge Dental Centre",
+  "nhsUrl": "https://www.nhsinform.scot/scotlands-service-directory/dental-services/3288 1abs1116/",
+  "website": "https://clydemunrodental.com/practice/ythan-bridge-dental-centre/",
+  "address": "2 Ythan Terrace, Ellon, AB41 9LJ",
+  "town": "Ellon",
+  "postcode": "AB41 9LJ",
+  "site": {
+   "url": "https://clydemunrodental.com/practice/ythan-bridge-dental-centre/",
+   "desktopLoadS": 4.3,
+   "status": 200,
+   "finalUrl": "https://clydemunrodental.com/practice/ythan-bridge-dental-centre/",
+   "title": "Ythan Bridge Dental Centre | Dentist in Ellon | Clyde Munro",
+   "copyrightYear": 2026,
+   "telLink": true,
+   "phone": "01358 724494",
+   "bookingCta": false,
+   "builder": null,
+   "textLength": 3755,
+   "desktopErrors": 0,
+   "desktopRefused": 0,
+   "mobileLoadS": 4.1,
+   "mobileOverflowPx": 0,
+   "mobileErrors": 0,
+   "mobileRefused": 0
+  },
+  "shot": "shots/p104-01.jpg"
+ }
+]

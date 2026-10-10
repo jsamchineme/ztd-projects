@@ -1,0 +1,52 @@
+[
+{
+"id": "p080-01",
+"grade": "Good",
+"reason": "NHS board-run clinic — not a private prospect; NHS directory link broken (404)"
+},
+{
+"id": "p080-02",
+"grade": "Good",
+"reason": "NHS board-run clinic — not a private prospect; NHS directory link broken (404)"
+},
+{
+"id": "p080-03",
+"grade": "Bad",
+"reason": "No website, only a Facebook page behind a login wall"
+},
+{
+"id": "p080-04",
+"grade": "Average",
+"reason": "Dated template ©2016, broken phone icon glyph, low-res slider; has Book Appointment; registering NHS"
+},
+{
+"id": "p080-05",
+"grade": "Bad",
+"reason": "Site down: 403 Forbidden (nginx) on desktop, empty response on mobile"
+},
+{
+"id": "p080-06",
+"grade": "Good",
+"reason": "Modern site, Book a Consultation button, chat widget; referral practice"
+},
+{
+"id": "p080-07",
+"grade": "Good",
+"reason": "Clyde Munro group practice page — group-owned"
+},
+{
+"id": "p080-08",
+"grade": "Average",
+"reason": "Clean but generic stock-smile hero, only 'Get in touch', no booking or phone in header"
+},
+{
+"id": "p080-09",
+"grade": "Good",
+"reason": "Current site, Book Now and phone in header, real patient photos"
+},
+{
+"id": "p080-10",
+"grade": "Bad",
+"reason": "No website, only a Facebook page behind a login wall"
+}
+]

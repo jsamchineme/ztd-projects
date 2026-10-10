@@ -1,0 +1,12 @@
+[
+{"id":"p073-01","grade":"Bad","reason":"Homepage is a 'Coming Soon' placeholder — site under rebuild, only address and phone"},
+{"id":"p073-02","grade":"Bad","reason":"No website, only a Facebook page behind a login wall"},
+{"id":"p073-03","grade":"Bad","reason":"Site down: connection closed (ERR_CONNECTION_CLOSED) on desktop and mobile"},
+{"id":"p073-04","grade":"Bad","reason":"Google Sites page: empty image placeholder box, hero text cut off on mobile, no booking"},
+{"id":"p073-05","grade":"Bad","reason":"Very old fixed-width site, not responsive (tiny unreadable text on phone), no booking"},
+{"id":"p073-06","grade":"Average","reason":"Stylish but minimal template, no phone, booking or CTA above the fold"},
+{"id":"p073-07","grade":"Average","reason":"Functional but plain template, only an About Us button in hero, no booking CTA; phone in header"},
+{"id":"p073-08","grade":"Bad","reason":"Directory link dead: 404 'File not found' on wp.parkdentalcompany.com"},
+{"id":"p073-09","grade":"Good","reason":"Modern site with new-patient booking form popup, chat, phone in nav; accepting new private patients"},
+{"id":"p073-10","grade":"Good","reason":"Modern site, Make an Appointment and Call buttons; NHS waiting list open"}
+]

@@ -1,0 +1,53 @@
+[
+ {
+  "id": "p004-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, clear Appointments/Prescriptions nav; same site as Invergordon"
+ },
+ {
+  "id": "p004-02",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template; same site as Alness"
+ },
+ {
+  "id": "p004-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p004-04",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, clear Appointments/Prescriptions/Registration nav"
+ },
+ {
+  "id": "p004-05",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear appointment / repeat prescription / contact cards"
+ },
+ {
+  "id": "p004-06",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear task cards; separate site from Aberchirder branch"
+ },
+ {
+  "id": "p004-07",
+  "grade": "Good",
+  "reason": "Modern NHS Scotland-style site, Online Services button, phone number prominent"
+ },
+ {
+  "id": "p004-08",
+  "grade": "Average",
+  "reason": "Plain basic site, homepage is a wall of grey text about the partners; tasks only in menu"
+ },
+ {
+  "id": "p004-09",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p004-10",
+  "grade": "Average",
+  "reason": "Dated template, small-text menu; eConsult widget covers most of the homepage on arrival"
+ }
+]

@@ -1,0 +1,12 @@
+[
+{"id":"p050-01","grade":"Average","reason":"Dated slider template, tiny grey nav, empty slide area on mobile, no visible booking button"},
+{"id":"p050-02","grade":"Good","reason":"Functional current site, Call and New Patient Registration in header; accepting new NHS patients"},
+{"id":"p050-03","grade":"Average","reason":"Image slider only above the fold, no phone or booking CTA on homepage"},
+{"id":"p050-04","grade":"Average","reason":"Plain old template with left text menu, ©2016, no booking, phone not tappable; new patients welcome"},
+{"id":"p050-05","grade":"Good","reason":"Modern site with chat, callback form and phone in header; new patients welcome (£88 offer)"},
+{"id":"p050-06","grade":"Bad","reason":"Site down: 'We're Currently Under Construction' placeholder page"},
+{"id":"p050-07","grade":"Average","reason":"Stylish splash hero but no phone, booking or nav visible above the fold"},
+{"id":"p050-08","grade":"Bad","reason":"Site down: blank white homepage on desktop and mobile (no title, no content)"},
+{"id":"p050-09","grade":"Bad","reason":"Outdated: COVID-19 Nov 2020 update still on homepage, stock photo, no booking or phone CTA"},
+{"id":"p050-10","grade":"Good","reason":"Clyde Munro group practice page — group-owned"}
+]

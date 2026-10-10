@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p024-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style site, big task buttons; same site as Cove Bay; host gave 503 on first captures"
+ },
+ {
+  "id": "p024-02",
+  "grade": "Bad",
+  "reason": "Very old boxed design, 3-row tab menu; phone view mostly empty white space"
+ },
+ {
+  "id": "p024-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p024-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p024-05",
+  "grade": "Average",
+  "reason": "My Surgery Website; homepage is a wall of red all-caps closure notices, tasks only in menus"
+ },
+ {
+  "id": "p024-06",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p024-07",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p024-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style site (The Glen MP) with task buttons; host gave 503 on first captures"
+ },
+ {
+  "id": "p024-09",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: task tiles on phone behind a closure alert pop-up (desktop Cloudflare check)"
+ },
+ {
+  "id": "p024-10",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ }
+]

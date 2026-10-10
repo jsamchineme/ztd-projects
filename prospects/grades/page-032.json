@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p032-01",
+  "grade": "Good",
+  "reason": "Modern design, Book Your Appointment panel with phone, verified reviews badge"
+ },
+ {
+  "id": "p032-02",
+  "grade": "Good",
+  "reason": "Clyde Munro group page \u2014 group-owned; accepting new patients"
+ },
+ {
+  "id": "p032-03",
+  "grade": "Good",
+  "reason": "Modern, Book Now in header and hero, phone prominent, booking widget"
+ },
+ {
+  "id": "p032-04",
+  "grade": "Bad",
+  "reason": "Header booking button cut off at right edge on desktop, hero is just a stock photo with no text"
+ },
+ {
+  "id": "p032-05",
+  "grade": "Good",
+  "reason": "Scottish Dental Care group clinic page \u2014 group-owned; Book Appointment button"
+ },
+ {
+  "id": "p032-06",
+  "grade": "Bad",
+  "reason": "Site down: Wix 'domain isn't connected to a site' page"
+ },
+ {
+  "id": "p032-07",
+  "grade": "Good",
+  "reason": "Modern, Book Online button in header and hero, tappable phone"
+ },
+ {
+  "id": "p032-08",
+  "grade": "Bad",
+  "reason": "No own website; directory links an NHS Fife listing page (independent practice)"
+ },
+ {
+  "id": "p032-09",
+  "grade": "Good",
+  "reason": "Modern, Booking and Registration buttons, phone in header"
+ },
+ {
+  "id": "p032-10",
+  "grade": "Bad",
+  "reason": "Site down: easterrossdental.com domain does not resolve"
+ }
+]

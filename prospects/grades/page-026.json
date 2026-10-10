@@ -1,0 +1,12 @@
+[
+{"id":"p026-01","grade":"Bad","reason":"Mobile hero heading cut off at left edge; desktop header overlaps hours box; phone-only CTA"},
+{"id":"p026-02","grade":"Bad","reason":"No website listed in NHS directory"},
+{"id":"p026-03","grade":"Average","reason":"Decent-looking site but only 'Contact Us Today', no booking; desktop hit a Cloudflare bot check"},
+{"id":"p026-04","grade":"Average","reason":"Dated template with flyer-graphic hero and shop cart icon, ©2019, no booking; now taking NHS patients"},
+{"id":"p026-05","grade":"Good","reason":"Clyde Munro group page — group-owned"},
+{"id":"p026-06","grade":"Average","reason":"Plain basic template, stock mouth photo, no phone or booking on homepage"},
+{"id":"p026-07","grade":"Good","reason":"Modern site, Book Now, WhatsApp and phone in header"},
+{"id":"p026-08","grade":"Good","reason":"Modern template (same as Crown Dental Group), Make an Appointment button, phone in top bar"},
+{"id":"p026-09","grade":"Good","reason":"Clyde Munro group page — group-owned"},
+{"id":"p026-10","grade":"Good","reason":"NHS Dumfries & Galloway hospital dental department — public service, not a prospect"}
+]

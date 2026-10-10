@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p084-01",
+  "grade": "Good",
+  "reason": "NHS Scotland-style template: Online Services button, Appointments/Prescriptions/New Patients tiles"
+ },
+ {
+  "id": "p084-02",
+  "grade": "Average",
+  "reason": "Older My Surgery Website layout: header address text overflows, slider; tasks hidden in menu on phone"
+ },
+ {
+  "id": "p084-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Appointments / Prescriptions / Register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p084-04",
+  "grade": "Good",
+  "reason": "Modern tile grid: appointments, online triage, prescriptions, register; clean on phone"
+ },
+ {
+  "id": "p084-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: prescription/appointment/register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p084-06",
+  "grade": "Good",
+  "reason": "gpsurgery.net site, task tiles on phone; same site as St Margaret's Health Centre (Auchterarder)"
+ },
+ {
+  "id": "p084-07",
+  "grade": "Good",
+  "reason": "Modern Squarespace site: Consultations & Prescriptions button, Register in nav, phone/hours top bar"
+ },
+ {
+  "id": "p084-08",
+  "grade": "Good",
+  "reason": "NHS Borders page links own gpsurgery.net site stronanspractice.co.uk: clear task tiles on phone"
+ },
+ {
+  "id": "p084-09",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template: New Patients / Appointments / Prescriptions buttons on hero"
+ },
+ {
+  "id": "p084-10",
+  "grade": "Bad",
+  "reason": "Old My Surgery Website layout (2000s glossy buttons) shrunk onto phone \u2014 unreadable on mobile"
+ }
+]

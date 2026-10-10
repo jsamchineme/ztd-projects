@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p094-01",
+  "grade": "Average",
+  "reason": "Branch of Lomond Practice (Glenrothes): newer My Surgery Website template; directory links NHS Fife listing"
+ },
+ {
+  "id": "p094-02",
+  "grade": "Average",
+  "reason": "Newer My Surgery Website template; long menu, tasks only in nav; works on phone but dated"
+ },
+ {
+  "id": "p094-03",
+  "grade": "Good",
+  "reason": "NHS Scotland-style site with Online Services button and clear nav; mobile-friendly"
+ },
+ {
+  "id": "p094-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p094-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site with tiles for Appointments, Repeat Prescriptions, New Patients"
+ },
+ {
+  "id": "p094-06",
+  "grade": "Bad",
+  "reason": "Old My Surgery Website layout with clip-art icons; desktop page just shrinks onto the phone"
+ },
+ {
+  "id": "p094-07",
+  "grade": "Good",
+  "reason": "Modern site with task tiles (Appointments, Prescriptions, Register); short closure alert only"
+ },
+ {
+  "id": "p094-08",
+  "grade": "Good",
+  "reason": "My Surgery Website tile template: eConsult/Appointments/Prescriptions tiles; shared with Tweed Practice"
+ },
+ {
+  "id": "p094-09",
+  "grade": "Bad",
+  "reason": "Site down: homepage returns 404 with only an NHS Scotland logo on a blank page"
+ },
+ {
+  "id": "p094-10",
+  "grade": "Bad",
+  "reason": "Site down: homepage returns 404, blank NHS Scotland page; same site as Kilmacolm"
+ }
+]

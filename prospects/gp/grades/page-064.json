@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p064-01",
+  "grade": "Bad",
+  "reason": "No link in NHS directory; practice site (Beith listing) is very old My Surgery Website, not responsive"
+ },
+ {
+  "id": "p064-02",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website theme, clip-art icons, wall of text; phone shows shrunken desktop page"
+ },
+ {
+  "id": "p064-03",
+  "grade": "Average",
+  "reason": "Squarespace site led by a big eConsult panel; no appointments/prescriptions in nav, cookie box covers phone"
+ },
+ {
+  "id": "p064-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Appointments / Prescriptions / Register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p064-05",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style site, Appointments / Prescriptions in nav"
+ },
+ {
+  "id": "p064-06",
+  "grade": "Good",
+  "reason": "NHS Scotland-style site: Appointments / Repeat Prescriptions / New Patient photo tiles up front"
+ },
+ {
+  "id": "p064-07",
+  "grade": "Average",
+  "reason": "My Surgery Website; homepage is a wall of \"Right Care, Right Place\" text with red caps notice, tasks in menu"
+ },
+ {
+  "id": "p064-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style site, Appointments / Prescriptions in nav"
+ },
+ {
+  "id": "p064-09",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p064-10",
+  "grade": "Average",
+  "reason": "gpsurgery.net NHS GGC-style site; logo image broken (alt text shown); tasks only in nav, cookie box dominates"
+ }
+]

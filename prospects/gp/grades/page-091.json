@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p091-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone incl. Order a Prescription (desktop Cloudflare check)"
+ },
+ {
+  "id": "p091-02",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: big Phone / Prescriptions / Registration buttons on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p091-03",
+  "grade": "Good",
+  "reason": "NHS Scotland-style site with task cards for prescriptions, appointments, new patients"
+ },
+ {
+  "id": "p091-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); same site as Walmer Crescent"
+ },
+ {
+  "id": "p091-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); same site as Hillington"
+ },
+ {
+  "id": "p091-06",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template; Appointments/Prescriptions in main nav"
+ },
+ {
+  "id": "p091-07",
+  "grade": "Average",
+  "reason": "My Surgery Website template; homepage is tiny-text walls of paragraphs, tasks only in menus"
+ },
+ {
+  "id": "p091-08",
+  "grade": "Bad",
+  "reason": "Website down: directory domain saracenmedicalcentre.co.uk does not resolve"
+ },
+ {
+  "id": "p091-09",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p091-10",
+  "grade": "Good",
+  "reason": "National gp.scot template: appointment / repeat prescription / contact cards up front"
+ }
+]

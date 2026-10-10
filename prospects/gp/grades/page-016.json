@@ -1,0 +1,56 @@
+[
+ {
+  "id": "p016-01",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website layout; not responsive on phone; same site as Brora"
+ },
+ {
+  "id": "p016-02",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p016-03",
+  "grade": "Average",
+  "reason": "My Surgery Website template, stock-photo tiles; dated and cluttered on phone"
+ },
+ {
+  "id": "p016-04",
+  "grade": "Good",
+  "reason": "Modern site with clear task tiles (Prescription, Appointments, Register) on desktop and phone"
+ },
+ {
+  "id": "p016-05",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p016-06",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p016-07",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website layout, Covid-19 noticeboard; not responsive, tiny page on phone"
+ },
+ {
+  "id": "p016-08",
+  "grade": "Average",
+  "reason": "My Surgery Website template, long two-row menu, stock hero; tasks not up front on phone"
+ },
+ {
+  "id": "p016-09",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p016-10",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ }
+]

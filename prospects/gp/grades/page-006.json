@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p006-01",
+  "grade": "Average",
+  "reason": "Task-tile layout but every tile icon fails to load (empty squares); stale eConsult-paused banner"
+ },
+ {
+  "id": "p006-02",
+  "grade": "Average",
+  "reason": "gpsurgery.net NHS GGC-style site; desktop logo image broken; tasks only in nav, cookie box dominates"
+ },
+ {
+  "id": "p006-03",
+  "grade": "Good",
+  "reason": "Modern NHS Scotland domain site with clear task tiles on desktop and phone"
+ },
+ {
+  "id": "p006-04",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p006-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net-style site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p006-06",
+  "grade": "Bad",
+  "reason": "Only an NHS Highland listing page, no own website (possibly board-run — check)"
+ },
+ {
+  "id": "p006-07",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory; branch of Armadale (only NHS Highland listing page)"
+ },
+ {
+  "id": "p006-08",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory; branch of Armadale (only NHS Highland listing page)"
+ },
+ {
+  "id": "p006-09",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); same site as Lamlash"
+ },
+ {
+  "id": "p006-10",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); same site as Brodick"
+ }
+]

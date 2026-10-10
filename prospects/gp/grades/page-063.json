@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p063-01",
+  "grade": "Average",
+  "reason": "My Surgery Website template, stock photo hero; small icon links for tasks, dated and cluttered"
+ },
+ {
+  "id": "p063-02",
+  "grade": "Good",
+  "reason": "Modern task-tile grid: Appointments / Prescriptions / Register on desktop and phone"
+ },
+ {
+  "id": "p063-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: eConsult banner + Appointments / Prescriptions tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p063-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Prescription / Appointments / Register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p063-05",
+  "grade": "Average",
+  "reason": "My Surgery Website template, dated hand-drawn logo banner and text intro; tasks only in long menu"
+ },
+ {
+  "id": "p063-06",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template (Dr R. Afuakwah): appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p063-07",
+  "grade": "Average",
+  "reason": "Task-tile site, but big \"Annual review reminder\" ALERT pop-up covers homepage on arrival"
+ },
+ {
+  "id": "p063-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Register / Appointments / Prescription tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p063-09",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p063-10",
+  "grade": "Average",
+  "reason": "Older gpsurgery.net theme: cramped 3-line nav, text welcome, no task tiles; map image broken"
+ }
+]

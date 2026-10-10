@@ -1,0 +1,12 @@
+[
+ {"id": "p083-01", "grade": "Good", "reason": "gp.scot NHS Scotland template: Make an appointment / Repeat prescription / Contact cards"},
+ {"id": "p083-02", "grade": "Good", "reason": "gpsurgery.net site: Appointments / Prescriptions / Register tiles on phone (desktop Cloudflare check)"},
+ {"id": "p083-03", "grade": "Bad", "reason": "No website listed in NHS directory"},
+ {"id": "p083-04", "grade": "Bad", "reason": "No website listed in NHS directory; same practice as Southern Machars (Port William)"},
+ {"id": "p083-05", "grade": "Good", "reason": "Modern tile grid: prescription, appointments, register; phone + 111 in top bar"},
+ {"id": "p083-06", "grade": "Average", "reason": "Plain My Surgery Website template; homepage is a wall of holiday/111 notice text, no task tiles"},
+ {"id": "p083-07", "grade": "Average", "reason": "Cluttered NHS-branded template: long welcome text, long menu, tiles pushed down on phone"},
+ {"id": "p083-08", "grade": "Good", "reason": "My Surgery Website NHS Scotland-style template, Appointments/Prescriptions in nav, clean on phone"},
+ {"id": "p083-09", "grade": "Average", "reason": "Newer My Surgery Website template, grey building photo, icon links; dated look"},
+ {"id": "p083-10", "grade": "Average", "reason": "Newer My Surgery Website template with photo tiles for appointments/prescriptions; dated stock photos"}
+]

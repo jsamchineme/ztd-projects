@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p101-01",
+  "grade": "Good",
+  "reason": "My Surgery Website tile template: Appointments / Prescriptions / Opening Times tiles"
+ },
+ {
+  "id": "p101-02",
+  "grade": "Good",
+  "reason": "Health board-run practice — not a target (NHS Shetland page under Community Health > General Practice)"
+ },
+ {
+  "id": "p101-03",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p101-04",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory; same practice as Mill Hill Centre"
+ },
+ {
+  "id": "p101-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p101-06",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); NHS Fife notice banner"
+ },
+ {
+  "id": "p101-07",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: engageconsult button plus task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p101-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template; Appointments/Prescriptions in main nav"
+ },
+ {
+  "id": "p101-09",
+  "grade": "Average",
+  "reason": "Home-made purple template, plain '+' tiles and big text links; works on phone but amateur look"
+ },
+ {
+  "id": "p101-10",
+  "grade": "Average",
+  "reason": "Home-made purple template, plain '+' tiles; amateur look; same site as Denside Surgery"
+ }
+]

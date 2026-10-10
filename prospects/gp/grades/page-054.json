@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p054-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout: big Appointments / Prescriptions / Contact tiles up front"
+ },
+ {
+  "id": "p054-02",
+  "grade": "Good",
+  "reason": "NHS Scotland-style site: Appointments / Repeat Prescriptions photo tiles up front"
+ },
+ {
+  "id": "p054-03",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p054-04",
+  "grade": "Average",
+  "reason": "My Surgery Website tiles but filled with news items (MenB, CVD, funding); dated sketch logo, tasks in menu"
+ },
+ {
+  "id": "p054-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p054-06",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p054-07",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout: Register / Appointments / Prescriptions icon tiles up front"
+ },
+ {
+  "id": "p054-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); same site as Carloway & Gravir"
+ },
+ {
+  "id": "p054-09",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); same site as Borve & Gravir"
+ },
+ {
+  "id": "p054-10",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); same site as Borve & Carloway"
+ }
+]

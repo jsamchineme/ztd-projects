@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p027-01",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p027-02",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p027-03",
+  "grade": "Good",
+  "reason": "Modern WordPress site: opening hours, 111/999 and Make an Appointment cards up front"
+ },
+ {
+  "id": "p027-04",
+  "grade": "Average",
+  "reason": "Dated logo, 11-item two-row menu; homepage leads with travel-vaccine promo, no task buttons"
+ },
+ {
+  "id": "p027-05",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style site, Appointments / Prescriptions in nav"
+ },
+ {
+  "id": "p027-06",
+  "grade": "Good",
+  "reason": "Modern NHS-style site with task cards: appointment, repeat prescription, new patients"
+ },
+ {
+  "id": "p027-07",
+  "grade": "Good",
+  "reason": "My Surgery Website site with task tiles: Appointments / Prescriptions / Services"
+ },
+ {
+  "id": "p027-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: task tiles for registration / repeat prescriptions, registering new patients"
+ },
+ {
+  "id": "p027-09",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p027-10",
+  "grade": "Average",
+  "reason": "eConsult panel pops open over the homepage on both views, hiding the practice content"
+ }
+]

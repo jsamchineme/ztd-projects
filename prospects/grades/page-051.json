@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p051-01",
+  "grade": "Good",
+  "reason": "Modern site, Book Online and New Patients buttons, tappable phone on mobile"
+ },
+ {
+  "id": "p051-02",
+  "grade": "Average",
+  "reason": "Basic builder-style layout with oversized pink text; phone and Bookings button present"
+ },
+ {
+  "id": "p051-03",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p051-04",
+  "grade": "Good",
+  "reason": "Modern site, Book Now and Book Your Appointment buttons; NHS and private patients"
+ },
+ {
+  "id": "p051-05",
+  "grade": "Good",
+  "reason": "Modern private site with Book an Appointment form, phone in header and chat"
+ },
+ {
+  "id": "p051-06",
+  "grade": "Good",
+  "reason": "Dental Studios Scotland multi-site group page, modern, Book Online/Call/WhatsApp bar"
+ },
+ {
+  "id": "p051-07",
+  "grade": "Average",
+  "reason": "Generic stock-photo slider template, phone only, no online booking button"
+ },
+ {
+  "id": "p051-08",
+  "grade": "Good",
+  "reason": "Clyde Munro group-owned; NHS directory link broken (404 page not found)"
+ },
+ {
+  "id": "p051-09",
+  "grade": "Bad",
+  "reason": "No own website; directory links an NHS Fife listing page (independent practice)"
+ },
+ {
+  "id": "p051-10",
+  "grade": "Bad",
+  "reason": "No website, only a Facebook page behind a login wall"
+ }
+]

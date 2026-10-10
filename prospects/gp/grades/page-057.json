@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p057-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p057-02",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout: New Patient / Appointments / Prescriptions / Sick note tiles up front"
+ },
+ {
+  "id": "p057-03",
+  "grade": "Average",
+  "reason": "gpsurgery.net site: big \"Appointments Information\" ALERT pop-up covers phone on arrival (desktop Cloudflare)"
+ },
+ {
+  "id": "p057-04",
+  "grade": "Average",
+  "reason": "gpsurgery.net NHS-style site; logo image broken (alt text shown); tasks only in nav, cookie box dominates"
+ },
+ {
+  "id": "p057-05",
+  "grade": "Average",
+  "reason": "My Surgery Website template, washed-out stock-photo tiles under big MIA banner; dated look"
+ },
+ {
+  "id": "p057-06",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: triage form + Prescriptions / Appointments / Register tiles on phone; same site as St Serf's"
+ },
+ {
+  "id": "p057-07",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: triage form + Prescriptions / Appointments / Register tiles on phone; same site as Orwell"
+ },
+ {
+  "id": "p057-08",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p057-09",
+  "grade": "Average",
+  "reason": "Dated, cluttered layout: bird-photo carousel, garish colour tiles, scrolling ticker; works on phone"
+ },
+ {
+  "id": "p057-10",
+  "grade": "Average",
+  "reason": "My Surgery Website on generic mysurgerywebsite.co.uk URL; red-text notices and WhatsApp links, tasks only in menu"
+ }
+]

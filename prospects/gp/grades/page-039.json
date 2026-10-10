@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p039-01",
+  "grade": "Good",
+  "reason": "Modern site with grid of task tiles (Appointments, Prescriptions, Register) on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p039-02",
+  "grade": "Average",
+  "reason": "Plain WordPress theme, homepage is photo plus holiday-hours text; no task shortcuts, tasks in menu only"
+ },
+ {
+  "id": "p039-03",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website theme, still leads with Coronavirus news; phone shows shrunken desktop page"
+ },
+ {
+  "id": "p039-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop showed Cloudflare check)"
+ },
+ {
+  "id": "p039-05",
+  "grade": "Good",
+  "reason": "Modern site with task tiles on phone (desktop Cloudflare check); dismissible holiday alert on arrival"
+ },
+ {
+  "id": "p039-06",
+  "grade": "Good",
+  "reason": "gp.scot NHS Scotland template: appointment/prescription/contact cards, clean on phone"
+ },
+ {
+  "id": "p039-07",
+  "grade": "Good",
+  "reason": "Modern site with full grid of task tiles (Appointments, Prescriptions, Register) on desktop and phone"
+ },
+ {
+  "id": "p039-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop showed Cloudflare check)"
+ },
+ {
+  "id": "p039-09",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop showed Cloudflare check)"
+ },
+ {
+  "id": "p039-10",
+  "grade": "Bad",
+  "reason": "Site dead: directory link gives \"404 - File or directory not found\"; root says \"Website Not Found\""
+ }
+]

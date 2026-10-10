@@ -1,0 +1,53 @@
+[
+ {
+  "id": "p003-01",
+  "grade": "Good",
+  "reason": "Modern design, Book an Appointment and Register buttons, phone in top bar; accepting NHS patients"
+ },
+ {
+  "id": "p003-02",
+  "grade": "Good",
+  "reason": "Page on Airthrey Park Medical Centre (Univ. of Stirling) site \u2014 owner doesn't control; phone-only booking"
+ },
+ {
+  "id": "p003-03",
+  "grade": "Good",
+  "reason": "Modern site (Alderman/Knightswood Dental), Book Appointment in header and hero, WhatsApp chat"
+ },
+ {
+  "id": "p003-04",
+  "grade": "Good",
+  "reason": "Clyde Munro group page \u2014 group-owned"
+ },
+ {
+  "id": "p003-05",
+  "grade": "Good",
+  "reason": "Mearns Dental: modern, Book Online button, Google reviews, call bar on mobile"
+ },
+ {
+  "id": "p003-06",
+  "grade": "Good",
+  "reason": "Modern site, call button in header, dental plans from \u00a325/month (earlier capture was rate-limited)",
+  "reviewed": true
+ },
+ {
+  "id": "p003-07",
+  "grade": "Good",
+  "reason": "Modern multi-clinic site, Book a Consultation button; small group with Stewart Dental Care"
+ },
+ {
+  "id": "p003-08",
+  "grade": "Good",
+  "reason": "Clyde Munro group page \u2014 group-owned"
+ },
+ {
+  "id": "p003-09",
+  "grade": "Average",
+  "reason": "Dated Wix template, washed-out hero, no booking, phone number not tappable"
+ },
+ {
+  "id": "p003-10",
+  "grade": "Good",
+  "reason": "Current design, Call Us button in header on desktop and mobile"
+ }
+]

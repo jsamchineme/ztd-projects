@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Live board: cards, workflows and AI-built preview sites (back up separately)
+pipeline/data/
+
+# Prospect screenshots (large; regenerate from the grading task)
+prospects/shots/
+prospects/gp/shots/
+
+# Dependencies and logs
+node_modules/
+*.log

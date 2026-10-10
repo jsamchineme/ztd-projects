@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p065-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style site, Appointments / Prescriptions in nav"
+ },
+ {
+  "id": "p065-02",
+  "grade": "Average",
+  "reason": "gpsurgery.net site: big \"Important Patient Notice\" ALERT pop-up covers phone on arrival (desktop Cloudflare)"
+ },
+ {
+  "id": "p065-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Phone / Prescriptions / Appointments / Registrations tiles on phone; same site as branch"
+ },
+ {
+  "id": "p065-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Phone / Prescriptions / Appointments / Registrations tiles on phone; same site as main"
+ },
+ {
+  "id": "p065-05",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p065-06",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: task cards up front; same site as other Mull and Iona branches"
+ },
+ {
+  "id": "p065-07",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: task cards up front; same site as other Mull and Iona branches"
+ },
+ {
+  "id": "p065-08",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: task cards up front; same site as other Mull and Iona branches"
+ },
+ {
+  "id": "p065-09",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: task cards up front; same site as other Mull and Iona branches"
+ },
+ {
+  "id": "p065-10",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ }
+]

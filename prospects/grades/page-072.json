@@ -1,0 +1,52 @@
+[
+{
+"id": "p072-01",
+"grade": "Good",
+"reason": "Same site as One Eighty Dental Bishopbriggs: modern, tappable phones in header and hero call button"
+},
+{
+"id": "p072-02",
+"grade": "Good",
+"reason": "Current site, Book Appointment and Membership buttons in header, text-us chat widget"
+},
+{
+"id": "p072-03",
+"grade": "Good",
+"reason": "Modern site, New Patient Consultation button in header, enquiry widget"
+},
+{
+"id": "p072-04",
+"grade": "Good",
+"reason": "Modern site, Book an appointment button, phone in top bar, New Patient Registration CTA"
+},
+{
+"id": "p072-05",
+"grade": "Good",
+"reason": "Modern site, Book Now and phone in top bar, patient photo hero"
+},
+{
+"id": "p072-06",
+"grade": "Good",
+"reason": "NHS board-run clinic — not a private prospect"
+},
+{
+"id": "p072-07",
+"grade": "Good",
+"reason": "Clyde Munro group practice page — group-owned"
+},
+{
+"id": "p072-08",
+"grade": "Bad",
+"reason": "No own website; directory links an NHS Highland listing page (address and phone only)"
+},
+{
+"id": "p072-09",
+"grade": "Average",
+"reason": "Modern look but no booking button or phone in header; locations buried below hero (4-site orthodontist)"
+},
+{
+"id": "p072-10",
+"grade": "Average",
+"reason": "Same site as Orthodontic Lounge: modern look but no booking button or phone CTA above the fold"
+}
+]

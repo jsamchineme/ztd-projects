@@ -1,0 +1,52 @@
+[
+{
+"id": "p079-01",
+"grade": "Average",
+"reason": "Dated slider design with 2019 award badge, spaced-out buttons, no booking button; phone tappable"
+},
+{
+"id": "p079-02",
+"grade": "Bad",
+"reason": "No website listed in NHS directory"
+},
+{
+"id": "p079-03",
+"grade": "Average",
+"reason": "Clean but no booking button, only Contact Us; phone in header; patient photo hero"
+},
+{
+"id": "p079-04",
+"grade": "Good",
+"reason": "Modern site, Book Online and phone in header, Call us button, AI chat"
+},
+{
+"id": "p079-05",
+"grade": "Bad",
+"reason": "Domain parked: 123 Reg 'parked free' page with ad links — no practice website"
+},
+{
+"id": "p079-06",
+"grade": "Bad",
+"reason": "Very dated builder site, comic-style header text, 'Informations' nav, stock photo, no booking"
+},
+{
+"id": "p079-07",
+"grade": "Average",
+"reason": "Plain template, phone in top bar but no booking button above the fold"
+},
+{
+"id": "p079-08",
+"grade": "Good",
+"reason": "Modern site, Book a Consultation button, Book Online in nav, phone in top bar"
+},
+{
+"id": "p079-09",
+"grade": "Good",
+"reason": "Directory links Facebook; site prodentalcupar.com is current with Book an Appointment button"
+},
+{
+"id": "p079-10",
+"grade": "Good",
+"reason": "NHS board-run clinic — not a private prospect; NHS directory link broken (404)"
+}
+]

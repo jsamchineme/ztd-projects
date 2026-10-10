@@ -1,0 +1,54 @@
+[
+ {
+  "id": "p085-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, Appointments/Prescriptions in nav, clean on phone"
+ },
+ {
+  "id": "p085-02",
+  "grade": "Average",
+  "reason": "gpfusion NHS-style template; on phone the tasks sit below a column of third-party ads (MRI, plans)",
+  "reviewed": true
+ },
+ {
+  "id": "p085-03",
+  "grade": "Average",
+  "reason": "gpfusion NHS-style template; on phone the tasks sit below a column of third-party ads (MRI, plans)",
+  "reviewed": true
+ },
+ {
+  "id": "p085-04",
+  "grade": "Bad",
+  "reason": "Old My Surgery Website layout shrunk onto phone (unreadable); clip-art header, walls of notice text"
+ },
+ {
+  "id": "p085-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: prescription/appointment/register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p085-06",
+  "grade": "Average",
+  "reason": "Decent custom site but large eConsult widget covers homepage on arrival (desktop and phone)"
+ },
+ {
+  "id": "p085-07",
+  "grade": "Average",
+  "reason": "eConsult widget covers homepage on arrival; same site as Stonehaven Medical Group"
+ },
+ {
+  "id": "p085-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, appointments/prescriptions/new patients in nav"
+ },
+ {
+  "id": "p085-09",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404); homepage fine \u2014 same NHS-style site as Stow & Lauder (Lauder)"
+ },
+ {
+  "id": "p085-10",
+  "grade": "Bad",
+  "reason": "Blogger-built site, desktop page shrunk onto phone (tiny text), broken image, YouTube logo clutter"
+ }
+]

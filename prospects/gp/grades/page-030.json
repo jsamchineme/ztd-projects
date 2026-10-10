@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p030-01",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p030-02",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p030-03",
+  "grade": "Bad",
+  "reason": "Lapsed domain: parked 'This domain may be for sale' page"
+ },
+ {
+  "id": "p030-04",
+  "grade": "Bad",
+  "reason": "Old My Surgery Website design (Cartside MP), clip-art icons, not responsive: phone shows shrunken page"
+ },
+ {
+  "id": "p030-05",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p030-06",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory (Arran Surgery branch links to drfergusonandpartners.co.uk)"
+ },
+ {
+  "id": "p030-07",
+  "grade": "Good",
+  "reason": "My Surgery Website site with task tiles: Appointments / Prescriptions / Join the Practice"
+ },
+ {
+  "id": "p030-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p030-09",
+  "grade": "Average",
+  "reason": "Clean WordPress site with hours/NHS 24 boxes, but no prescription/appointment/register links up front"
+ },
+ {
+  "id": "p030-10",
+  "grade": "Bad",
+  "reason": "Broken: gp.scot address shows only a bare unstyled Login form on both captures, no practice content"
+ }
+]

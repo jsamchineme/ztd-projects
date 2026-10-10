@@ -1,0 +1,12 @@
+[
+{"id":"p045-01","grade":"Average","reason":"Plain sparse template, small light text, big logo block; Book button but no tappable phone"},
+{"id":"p045-02","grade":"Bad","reason":"No website, only a Facebook page behind a login wall (last post 2023)"},
+{"id":"p045-03","grade":"Good","reason":"Modern site, phone in header, AI chat; accepting new private patients"},
+{"id":"p045-04","grade":"Good","reason":"Modern full-bleed hero with Book Now button online on desktop and mobile"},
+{"id":"p045-05","grade":"Average","reason":"Dated stock-lips slider template, ©2016, no booking button; phone shown"},
+{"id":"p045-06","grade":"Good","reason":"Clean modern site with Book an Appointment button and Book in nav"},
+{"id":"p045-07","grade":"Bad","reason":"No website listed in NHS directory"},
+{"id":"p045-08","grade":"Average","reason":"Washed-out blue overlay hero, no booking button, weak calls to action"},
+{"id":"p045-09","grade":"Good","reason":"Modern site, phone in header, online NHS registration; accepting new NHS patients"},
+{"id":"p045-10","grade":"Bad","reason":"No website, only Facebook; dentist retiring per latest post"}
+]

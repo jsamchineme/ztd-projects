@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p022-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout; New Patients/Appointments/Prescriptions in nav; same site as Kincardine"
+ },
+ {
+  "id": "p022-02",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout; New Patients/Appointments/Prescriptions in nav; same site as Clackmannan"
+ },
+ {
+  "id": "p022-03",
+  "grade": "Average",
+  "reason": "Washed-out purple theme, homepage led by a long wall of text about Patient Services; tasks in menus"
+ },
+ {
+  "id": "p022-04",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p022-05",
+  "grade": "Good",
+  "reason": "Silicon Practice NHS-style site: Appointments / Prescriptions / Register tiles"
+ },
+ {
+  "id": "p022-06",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style site, Appointments/Prescriptions in nav; same site as Pittenweem"
+ },
+ {
+  "id": "p022-07",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style site, Appointments/Prescriptions in nav; same site as Elie"
+ },
+ {
+  "id": "p022-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net NHS-style site, Appointments / Prescriptions in nav (desktop logo image failed to load)"
+ },
+ {
+  "id": "p022-09",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p022-10",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ }
+]

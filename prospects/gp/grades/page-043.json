@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p043-01",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, clear nav (retry: first captures hit 503)"
+ },
+ {
+  "id": "p043-02",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404 index.aspx); root MSW NHS-style site works; same site as Laurel Street"
+ },
+ {
+  "id": "p043-03",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404 index.aspx); root MSW NHS-style site works; same site as Dumbarton Rd"
+ },
+ {
+  "id": "p043-04",
+  "grade": "Good",
+  "reason": "My Surgery Website template, big task tiles (Prescriptions, New Patients, Appointments) (retry after 503)"
+ },
+ {
+  "id": "p043-05",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p043-06",
+  "grade": "Bad",
+  "reason": "No own website: directory links to NHSGGC health centre building page (address/switchboard only)"
+ },
+ {
+  "id": "p043-07",
+  "grade": "Bad",
+  "reason": "Site dead: domain glenburnmedicalpractice.co.uk does not resolve (DNS failure)"
+ },
+ {
+  "id": "p043-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template (Glencairn Practice), clear nav (retry after 503)"
+ },
+ {
+  "id": "p043-09",
+  "grade": "Good",
+  "reason": "gp.scot NHS Scotland template: appointment/prescription/contact cards, clean on phone"
+ },
+ {
+  "id": "p043-10",
+  "grade": "Good",
+  "reason": "Modern site with grid of task tiles (Appointments, Prescriptions, Register) on phone (desktop Cloudflare check)"
+ }
+]

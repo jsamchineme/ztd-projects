@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p048-01",
+  "grade": "Bad",
+  "reason": "Site down: MSW \"Splat :( temporarily offline\" holding page on 3 checks over ~2 hours"
+ },
+ {
+  "id": "p048-02",
+  "grade": "Good",
+  "reason": "Clear task tiles (Appointments, Order Prescriptions), NHS-style; works on phone; dated sketch logo"
+ },
+ {
+  "id": "p048-03",
+  "grade": "Good",
+  "reason": "gp.scot NHS Scotland template: appointment/prescription/contact cards, clean on phone"
+ },
+ {
+  "id": "p048-04",
+  "grade": "Average",
+  "reason": "My Surgery Website template, dated; COVID-19 Resource Pack in menu and COVID-era poster on homepage"
+ },
+ {
+  "id": "p048-05",
+  "grade": "Good",
+  "reason": "Modern site with grid of task tiles (Prescription, Appointments, Register) on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p048-06",
+  "grade": "Good",
+  "reason": "Modern site with full grid of task tiles on desktop and phone; same site as Inverkeithing branch"
+ },
+ {
+  "id": "p048-07",
+  "grade": "Good",
+  "reason": "Modern site with full grid of task tiles on desktop and phone; same site as Dalgety Bay branch"
+ },
+ {
+  "id": "p048-08",
+  "grade": "Average",
+  "reason": "Modern task tiles underneath, but a long \"Treating our team with respect\" pop-up fills the phone screen"
+ },
+ {
+  "id": "p048-09",
+  "grade": "Average",
+  "reason": "Same site as Inverurie Medical Group: long alert pop-up covers the page on arrival"
+ },
+ {
+  "id": "p048-10",
+  "grade": "Good",
+  "reason": "Link goes to Oakley Medical Practice MSW NHS Scotland-style site, clear nav (retry after timeouts)"
+ }
+]

@@ -1,0 +1,12 @@
+[
+{"id":"p092-01","grade":"Average","reason":"Plain team-photo template, ©2021, phone at top but no booking button"},
+{"id":"p092-02","grade":"Good","reason":"Scottish Dental Care group — group-owned; NHS directory link broken (404 page not found)"},
+{"id":"p092-03","grade":"Good","reason":"Modern site, Book an Appointment and Call Us buttons in hero, booking chat"},
+{"id":"p092-04","grade":"Bad","reason":"No website, only a Facebook page behind a login wall"},
+{"id":"p092-05","grade":"Good","reason":"Clean modern site, Make Appointment button in header, phone link"},
+{"id":"p092-06","grade":"Good","reason":"Modern site, Book Now and phone in header, chat bot (hero video embed blocked for capture bot)"},
+{"id":"p092-07","grade":"Good","reason":"Current Elementor site, Online Booking tab and Book An Appointment on mobile, phone bar"},
+{"id":"p092-08","grade":"Bad","reason":"Site down: domain does not resolve (ERR_NAME_NOT_RESOLVED)"},
+{"id":"p092-09","grade":"Bad","reason":"Site down: 'This website has been deactivated' page (403)"},
+{"id":"p092-10","grade":"Good","reason":"Modern site, Book Now and Call Us in hero and header, booking chat"}
+]

@@ -1,0 +1,12 @@
+[
+{"id":"p091-01","grade":"Bad","reason":"Dead link: free Google business.site page returns 404 (page not found) — no real website"},
+{"id":"p091-02","grade":"Average","reason":"Plain template, Contact button only, no booking CTA; phone link in header"},
+{"id":"p091-03","grade":"Bad","reason":"Very old purple table-style layout with clip-art croc, not responsive — cut off on phone"},
+{"id":"p091-04","grade":"Good","reason":"Modern multi-brand site (Stewart/Allander), Book a Consultation on mobile"},
+{"id":"p091-05","grade":"Average","reason":"Dated slider template, grey small nav, no booking or call CTA; only NHS register online link"},
+{"id":"p091-06","grade":"Good","reason":"Clyde Munro group page — group-owned"},
+{"id":"p091-07","grade":"Good","reason":"Modern design, Book Appointment button in header on desktop and mobile"},
+{"id":"p091-08","grade":"Bad","reason":"Very old bubbly blue 2010-era template, captcha contact form, no booking; not accepting new NHS patients"},
+{"id":"p091-09","grade":"Bad","reason":"No website listed in NHS directory"},
+{"id":"p091-10","grade":"Good","reason":"Current site, Book Your Appointment hero button, Call Now bar on mobile"}
+]

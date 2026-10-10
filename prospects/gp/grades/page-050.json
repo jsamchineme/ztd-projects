@@ -1,0 +1,53 @@
+[
+ {
+  "id": "p050-01",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website theme, clip-art buttons, wall of text; phone shows shrunken desktop page"
+ },
+ {
+  "id": "p050-02",
+  "grade": "Good",
+  "reason": "My Surgery Website template with Appointments/Prescriptions/Join buttons on hero (retry after 503)"
+ },
+ {
+  "id": "p050-03",
+  "grade": "Average",
+  "reason": "Squarespace site with amateur look: giant rainbow WELCOME graphic, 3-row menu, email-first contact"
+ },
+ {
+  "id": "p050-04",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404 index.aspx); root My Surgery Website NHS-style site works"
+ },
+ {
+  "id": "p050-05",
+  "grade": "Good",
+  "reason": "My Surgery Website template, big green task tiles, phone numbers up front (retry after 503)"
+ },
+ {
+  "id": "p050-06",
+  "grade": "Average",
+  "reason": "gpfusion NHS-style template; on phone the tasks sit below a column of third-party ads (MRI, plans)",
+  "reviewed": true
+ },
+ {
+  "id": "p050-07",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop showed Cloudflare check)"
+ },
+ {
+  "id": "p050-08",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p050-09",
+  "grade": "Good",
+  "reason": "gp.scot NHS Scotland template: appointment/prescription/contact cards, clean on phone"
+ },
+ {
+  "id": "p050-10",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template with Appointments/Prescriptions nav (retry after 503)"
+ }
+]

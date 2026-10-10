@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p070-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Appointments / Prescriptions / Register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p070-02",
+  "grade": "Average",
+  "reason": "gpsurgery.net site; desktop logo image broken (alt text shown), \"No posts found\" news box; illustrated tiles"
+ },
+ {
+  "id": "p070-03",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout: Appointments / Prescriptions icon tiles up front"
+ },
+ {
+  "id": "p070-04",
+  "grade": "Average",
+  "reason": "My Surgery Website template, stock hero, red caps closure notice and long text; tasks only in menu"
+ },
+ {
+  "id": "p070-05",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p070-06",
+  "grade": "Good",
+  "reason": "Modern site (King's Medical Practice): engageconsult + Prescription / Appointments / Register tiles"
+ },
+ {
+  "id": "p070-07",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Appointments / Prescriptions / Register tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p070-08",
+  "grade": "Good",
+  "reason": "Directory link (index.aspx) blocked on both views; root site is gpsurgery.net with task tiles (same as main)"
+ },
+ {
+  "id": "p070-09",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout: Join / Fit Note / Prescription Requests tiles up front"
+ },
+ {
+  "id": "p070-10",
+  "grade": "Average",
+  "reason": "Amateur custom look, non-HTTPS; big stock-image cards (eConsult / Prescription form), cramped 2-row nav"
+ }
+]

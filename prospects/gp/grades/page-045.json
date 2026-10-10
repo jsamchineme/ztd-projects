@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p045-01",
+  "grade": "Good",
+  "reason": "Modern site with task tiles on phone (desktop Cloudflare check); same site as Grantley (Clarkston Road)"
+ },
+ {
+  "id": "p045-02",
+  "grade": "Good",
+  "reason": "OneMedical Group site: big Appointments / Prescriptions / Register tiles, works on phone"
+ },
+ {
+  "id": "p045-03",
+  "grade": "Good",
+  "reason": "Modern site with grid of task tiles (Appointments, Prescriptions, Register) on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p045-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: eConsult banner and clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p045-05",
+  "grade": "Good",
+  "reason": "Alba Medical Group Lanarkshire site: online request button and task tiles on phone (desktop Cloudflare)"
+ },
+ {
+  "id": "p045-06",
+  "grade": "Bad",
+  "reason": "Domain hijacked: greenlawsurgery.co.uk now shows a casino \"300 free spins\" page"
+ },
+ {
+  "id": "p045-07",
+  "grade": "Bad",
+  "reason": "Homepage redirects public visitors to a WordPress/Clarity staff login; no patient content viewable"
+ },
+ {
+  "id": "p045-08",
+  "grade": "Average",
+  "reason": "Wix site with outline-icon tiles; big holiday pop-up and cookie bar cover page on arrival; dated"
+ },
+ {
+  "id": "p045-09",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p045-10",
+  "grade": "Good",
+  "reason": "NHS directory link broken (404 index.aspx); root My Surgery Website NHS-style site works"
+ }
+]

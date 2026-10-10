@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p002-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); Tarland branch of Aboyne"
+ },
+ {
+  "id": "p002-02",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear appointment / repeat prescription / contact cards"
+ },
+ {
+  "id": "p002-03",
+  "grade": "Average",
+  "reason": "Dark faded hero photo, tasks hidden in menus; duplicate hamburger buttons on phone"
+ },
+ {
+  "id": "p002-04",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website design, clip-art header; not responsive, tiny shrunken text on phone"
+ },
+ {
+  "id": "p002-05",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p002-06",
+  "grade": "Average",
+  "reason": "My Surgery Website template, dated; task icons below hero, cluttered on phone"
+ },
+ {
+  "id": "p002-07",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, clean header with Appointments/Prescriptions links"
+ },
+ {
+  "id": "p002-08",
+  "grade": "Good",
+  "reason": "Modern NHS Scotland domain site with big Appointments / Prescriptions / Register tiles"
+ },
+ {
+  "id": "p002-09",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check); Fallin, Cowie & Airth site"
+ },
+ {
+  "id": "p002-10",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ }
+]

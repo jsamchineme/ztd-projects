@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p005-01",
+  "grade": "Average",
+  "reason": "NHS Scotland-style site but phone header broken: search icon overlaps address/phone; tasks not up top"
+ },
+ {
+  "id": "p005-02",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Engage Consult banner and clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p005-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p005-04",
+  "grade": "Good",
+  "reason": "Modern site with task tiles (Prescriptions, Appointments, Register) on desktop and phone"
+ },
+ {
+  "id": "p005-05",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear appointment / repeat prescription / contact cards"
+ },
+ {
+  "id": "p005-06",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template, clear Appointments/Prescriptions nav"
+ },
+ {
+  "id": "p005-07",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear appointment / repeat prescription / contact cards"
+ },
+ {
+  "id": "p005-08",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website layout; not responsive, tiny shrunken desktop page on phone"
+ },
+ {
+  "id": "p005-09",
+  "grade": "Good",
+  "reason": "Modern NHS Scotland-style site, Online Services button, phone number prominent"
+ },
+ {
+  "id": "p005-10",
+  "grade": "Average",
+  "reason": "My Surgery Website template, dated; menu still has Coronavirus section, cluttered on phone"
+ }
+]

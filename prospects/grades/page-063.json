@@ -1,0 +1,12 @@
+[
+{"id":"p063-01","grade":"Good","reason":"Modern site with Book an Appointment form in hero, phone and chat; short NHS waiting period"},
+{"id":"p063-02","grade":"Good","reason":"NHS board-run clinic — not a private prospect"},
+{"id":"p063-03","grade":"Average","reason":"Dated early-2010s slider template, 'Go to...' dropdown nav on mobile, no booking"},
+{"id":"p063-04","grade":"Average","reason":"Dated boxed layout with clip-art style banner, phone only; not registering new NHS patients"},
+{"id":"p063-05","grade":"Average","reason":"Generic stock-photo slider, Call Now phone only, no booking button"},
+{"id":"p063-06","grade":"Good","reason":"Modern site, Book An Appointment and phone buttons; NHS referrals with no waiting list"},
+{"id":"p063-07","grade":"Average","reason":"Dated template with bullet-icon nav, Contact Us button; booking only as a menu link"},
+{"id":"p063-08","grade":"Bad","reason":"Placeholder page: 'Our new website is under construction', contact details only"},
+{"id":"p063-09","grade":"Bad","reason":"Site blocked: Cloudflare 'Suspected Phishing' warning shown instead of motdental.com"},
+{"id":"p063-10","grade":"Bad","reason":"Site blocked: Cloudflare 'Suspected Phishing' warning on motdental.com (same as other MOT Dental)"}
+]

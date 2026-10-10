@@ -1,0 +1,56 @@
+[
+ {
+  "id": "p017-01",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website layout; not responsive, tiny shrunken desktop page on phone"
+ },
+ {
+  "id": "p017-02",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear appointment / repeat prescription / contact cards"
+ },
+ {
+  "id": "p017-03",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear appointment / repeat prescription / contact cards"
+ },
+ {
+  "id": "p017-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net-style site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p017-05",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p017-06",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p017-07",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p017-08",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website layout, COVID-19 text on homepage; not responsive on phone"
+ },
+ {
+  "id": "p017-09",
+  "grade": "Bad",
+  "reason": "Very old My Surgery Website layout; not responsive on phone; same site as Creetown"
+ },
+ {
+  "id": "p017-10",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ }
+]

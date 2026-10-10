@@ -1,0 +1,12 @@
+[
+ {"id": "p076-01", "grade": "Good", "reason": "gpsurgery.net site: prescription/appointment/register tiles on phone (desktop Cloudflare check)"},
+ {"id": "p076-02", "grade": "Good", "reason": "My Surgery Website NHS Scotland-style template, Appointments/Prescriptions in nav, clean on phone"},
+ {"id": "p076-03", "grade": "Good", "reason": "gp.scot NHS Scotland template: appointment / prescription / contact cards, practice updates bar"},
+ {"id": "p076-04", "grade": "Bad", "reason": "No website listed in NHS directory"},
+ {"id": "p076-05", "grade": "Bad", "reason": "Domain expired — drsglekinandsutherland.co.uk is a parked 'may be for sale' page"},
+ {"id": "p076-06", "grade": "Good", "reason": "gpsurgery.net site: Phone / Prescriptions / Appointments / Registration tiles on phone (desktop Cloudflare)"},
+ {"id": "p076-07", "grade": "Average", "reason": "Newer My Surgery Website template: plain blue text tiles, line-drawing logo; amateur look"},
+ {"id": "p076-08", "grade": "Good", "reason": "Modern site: emergency/out-of-hours help plus prescription, appointment, register cards"},
+ {"id": "p076-09", "grade": "Average", "reason": "Cluttered NHS-branded template, loud colour tiles below long header on phone, news ticker"},
+ {"id": "p076-10", "grade": "Average", "reason": "Older My Surgery Website layout, long text menu and welcome text; tasks hidden in menu on phone"}
+]

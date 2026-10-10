@@ -1,0 +1,52 @@
+[
+{
+"id": "p078-01",
+"grade": "Average",
+"reason": "Generic 3D-teeth stock hero, Register With Us link only, no phone or booking in header"
+},
+{
+"id": "p078-02",
+"grade": "Bad",
+"reason": "No website listed in NHS directory"
+},
+{
+"id": "p078-03",
+"grade": "Bad",
+"reason": "No website, only a Facebook page behind a login wall"
+},
+{
+"id": "p078-04",
+"grade": "Good",
+"reason": "Modern site, Patient Portal and New Patient Registration CTAs, phone in top bar"
+},
+{
+"id": "p078-05",
+"grade": "Bad",
+"reason": "Very old design ©2015, separate dated mobile site with empty widget box, no booking"
+},
+{
+"id": "p078-06",
+"grade": "Bad",
+"reason": "No website listed in NHS directory"
+},
+{
+"id": "p078-07",
+"grade": "Average",
+"reason": "Wix-style collage layout, logo box empty on mobile (also on retry), only 'Call to book' text link"
+},
+{
+"id": "p078-08",
+"grade": "Average",
+"reason": "Plain template with sign photo hero, no booking button; phone and email in header; NHS new patients"
+},
+{
+"id": "p078-09",
+"grade": "Good",
+"reason": "Modern site, Book Now, Get Registered and Call buttons (Pollok Dental at Silverburn)"
+},
+{
+"id": "p078-10",
+"grade": "Good",
+"reason": "Modern clean site with Book now button in header"
+}
+]

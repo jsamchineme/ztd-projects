@@ -1,0 +1,55 @@
+[
+ {
+  "id": "p018-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p018-02",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p018-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p018-04",
+  "grade": "Average",
+  "reason": "My Surgery Website template; mismatched serif heading font, stale Dec 2025 notice; tasks below fold"
+ },
+ {
+  "id": "p018-05",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p018-06",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Engage Consult banner + clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p018-07",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p018-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style template with clear task tiles (earlier 503s were host overload)",
+  "reviewed": true
+ },
+ {
+  "id": "p018-09",
+  "grade": "Average",
+  "reason": "My Surgery Website template, dated stock hero; task icons partly below fold, cluttered"
+ },
+ {
+  "id": "p018-10",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: clear appointment / repeat prescription / contact cards"
+ }
+]

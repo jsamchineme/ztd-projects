@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p061-01",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front; site for all Mallaig branches"
+ },
+ {
+  "id": "p061-02",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p061-03",
+  "grade": "Average",
+  "reason": "Dated, cluttered layout: long header, ticker, big building-works notice; tasks only in nav bar"
+ },
+ {
+  "id": "p061-04",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Patchs banner + Prescription / Appointments tiles on phone (desktop Cloudflare); same as London Rd"
+ },
+ {
+  "id": "p061-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: Patchs banner + Prescription / Appointments tiles on phone (desktop Cloudflare); same as Kilmaurs"
+ },
+ {
+  "id": "p061-06",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p061-07",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout: Prescriptions / New Patients / Appointments tiles; same site as Rothes"
+ },
+ {
+  "id": "p061-08",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS-style layout: Prescriptions / New Patients / Appointments tiles; same site as Elgin"
+ },
+ {
+  "id": "p061-09",
+  "grade": "Bad",
+  "reason": "NHS directory link broken (404 on NHS Grampian site); homeless practice, possibly board-run — check"
+ },
+ {
+  "id": "p061-10",
+  "grade": "Average",
+  "reason": "Plain dated theme on phone: big text welcome paragraph, no task buttons up top (desktop Cloudflare check)"
+ }
+]

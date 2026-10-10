@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p062-01",
+  "grade": "Good",
+  "reason": "gpsurgery.net site (Carrick Medical Practice): clear task tiles on phone (desktop Cloudflare check)"
+ },
+ {
+  "id": "p062-02",
+  "grade": "Good",
+  "reason": "Redirects to The Village Practice: modern phone layout, \"How can we help?\" appointment/prescription cards"
+ },
+ {
+  "id": "p062-03",
+  "grade": "Bad",
+  "reason": "Broken: gp.scot address shows only a bare unstyled Login form, no practice content"
+ },
+ {
+  "id": "p062-04",
+  "grade": "Good",
+  "reason": "NHS Scotland-style site (Portland & Meadowgreen): Appointments / Repeat Prescriptions photo tiles up front"
+ },
+ {
+  "id": "p062-05",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p062-06",
+  "grade": "Average",
+  "reason": "Modern task-tile grid, but big \"Closed for training\" ALERT pop-up covers homepage on arrival"
+ },
+ {
+  "id": "p062-07",
+  "grade": "Bad",
+  "reason": "No own website — only an NHS Fife listing page (desktop blocked by Cloudflare)"
+ },
+ {
+  "id": "p062-08",
+  "grade": "Good",
+  "reason": "Silicon Practice NHS-style site: Appointments / Prescriptions / Sick Lines tiles up front"
+ },
+ {
+  "id": "p062-09",
+  "grade": "Good",
+  "reason": "Modern new design, Appointments / Prescriptions in nav and Consultation button; same site as Carstairs"
+ },
+ {
+  "id": "p062-10",
+  "grade": "Good",
+  "reason": "Modern new design, Appointments / Prescriptions in nav and Consultation button; same site as Carnwath"
+ }
+]

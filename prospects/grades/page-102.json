@@ -1,0 +1,52 @@
+[
+{
+"id": "p102-01",
+"grade": "Average",
+"reason": "Dated ~2016 template (Google+ icon) though big Book Online button; new NHS patients welcome"
+},
+{
+"id": "p102-02",
+"grade": "Average",
+"reason": "Older template, ©2018, Appointments link but no online booking; phone in top bar"
+},
+{
+"id": "p102-03",
+"grade": "Average",
+"reason": "Stylish but no booking or call CTA, mobile hero mostly empty; not accepting new patients"
+},
+{
+"id": "p102-04",
+"grade": "Average",
+"reason": "Generic Divi stock-family template, phone in top bar, no booking button"
+},
+{
+"id": "p102-05",
+"grade": "Average",
+"reason": "Dated boxed layout with 2013 awards and left text menu, no booking CTA"
+},
+{
+"id": "p102-06",
+"grade": "Average",
+"reason": "Older template, ©2016, Call us bar but no booking; not accepting new patients"
+},
+{
+"id": "p102-07",
+"grade": "Bad",
+"reason": "Dated site with stale COVID popup 'temporarily stopped accepting new patients', cramped mobile text"
+},
+{
+"id": "p102-08",
+"grade": "Bad",
+"reason": "Old Wix layout: cut-off side logos, stray 'Error Page' text, COVID-19 in nav"
+},
+{
+"id": "p102-09",
+"grade": "Good",
+"reason": "Modern site (graded from mobile; desktop 403 to bot): Call, Book Now, Request Appointment"
+},
+{
+"id": "p102-10",
+"grade": "Bad",
+"reason": "Site down: connection refused (ERR_CONNECTION_REFUSED) in both views, confirmed on retry"
+}
+]

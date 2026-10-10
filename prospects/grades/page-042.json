@@ -1,0 +1,12 @@
+[
+{"id":"p042-01","grade":"Bad","reason":"Site down: Wix 'This domain isn't connected to a site' page on both views"},
+{"id":"p042-02","grade":"Good","reason":"Modern, Book an Appointment in header and hero, phone in header, verified reviews"},
+{"id":"p042-03","grade":"Bad","reason":"No website listed in NHS directory"},
+{"id":"p042-04","grade":"Average","reason":"Dated stock-photo slider, stale COVID-19 notice, no booking button; only Contact Us"},
+{"id":"p042-05","grade":"Good","reason":"Clyde Munro group page — group-owned (desktop render blank)"},
+{"id":"p042-06","grade":"Good","reason":"Modern photo grid, Book Now and phone in top bar"},
+{"id":"p042-07","grade":"Bad","reason":"Very old pre-2015 design, tiny text, gradient nav bar, no booking; text-heavy notices"},
+{"id":"p042-08","grade":"Good","reason":"Modern, Book an Appointment in header, NHS Register Now; offering free NHS exams"},
+{"id":"p042-09","grade":"Bad","reason":"No website listed in NHS directory"},
+{"id":"p042-10","grade":"Bad","reason":"No website listed in NHS directory"}
+]

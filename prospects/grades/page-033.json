@@ -1,0 +1,12 @@
+[
+{"id":"p033-01","grade":"Bad","reason":"No website listed in NHS directory"},
+{"id":"p033-02","grade":"Bad","reason":"Free Wix site on wixsite.com subdomain with Wix ad banner, no booking button"},
+{"id":"p033-03","grade":"Average","reason":"Dated layout, faint grey bullet list, yahoo email, no booking; paused new patient registration"},
+{"id":"p033-04","grade":"Good","reason":"Modern, Book Now + WhatsApp in header, phone on mobile"},
+{"id":"p033-05","grade":"Good","reason":"Clean modern template, Book Online and phone buttons, Register as Patient on mobile"},
+{"id":"p033-06","grade":"Good","reason":"Modern design, free e-consultation CTA, call/email bar on mobile"},
+{"id":"p033-07","grade":"Good","reason":"Modern, Book Now in header, phone and WhatsApp chat"},
+{"id":"p033-08","grade":"Average","reason":"Dated ~2012 banner design, select-menu navigation on mobile, no tappable phone"},
+{"id":"p033-09","grade":"Good","reason":"Modern design, Call Us Now and Register buttons; NHS & private welcome"},
+{"id":"p033-10","grade":"Average","reason":"Generic builder template, no phone or booking on homepage, sparse content"}
+]

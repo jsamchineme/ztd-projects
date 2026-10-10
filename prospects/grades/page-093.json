@@ -1,0 +1,12 @@
+[
+{"id":"p093-01","grade":"Average","reason":"Basic Wix-style Teethscene group page: photo + info block, phone and hours, no booking button"},
+{"id":"p093-02","grade":"Bad","reason":"Very old hand-built layout with clip art, stale COVID 'unable to register new patients' notice"},
+{"id":"p093-03","grade":"Average","reason":"Wix-style site, tiny grey nav bar, no booking or call CTA; now accepting Denplan & private patients"},
+{"id":"p093-04","grade":"Average","reason":"Dated purple bokeh template, Book Online only as small nav link; big phone number in header"},
+{"id":"p093-05","grade":"Average","reason":"Referral-only oral surgery clinic; stock-photo template, functional but dated, no CTA"},
+{"id":"p093-06","grade":"Bad","reason":"No website: directory links NHS Highland page which points to the practice's Facebook"},
+{"id":"p093-07","grade":"Average","reason":"Generic template, only Meet the team/Contact buttons, no booking; phone icon on mobile"},
+{"id":"p093-08","grade":"Good","reason":"Modern site, callback form, booking chat; accepting NHS & private patients"},
+{"id":"p093-09","grade":"Good","reason":"Modern site, booking chat, phone in header; new registrations paused — waiting list"},
+{"id":"p093-10","grade":"Bad","reason":"No website, only a Facebook page behind a login wall"}
+]

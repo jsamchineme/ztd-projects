@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p067-01",
+  "grade": "Good",
+  "reason": "NHS Scotland-style site: Appointments / Repeat Prescriptions photo tiles up front, Online Services button"
+ },
+ {
+  "id": "p067-02",
+  "grade": "Average",
+  "reason": "gpsurgery.net site: big \"Texting service\" ALERT pop-up covers phone on arrival (desktop Cloudflare)"
+ },
+ {
+  "id": "p067-03",
+  "grade": "Good",
+  "reason": "Modern custom site: eConsult button and Order a Prescription / Registration buttons up front"
+ },
+ {
+  "id": "p067-04",
+  "grade": "Average",
+  "reason": "gpsurgery.net site: notice bar plus big \"Practice Update\" ALERT pop-up cover phone on arrival (desktop Cloudflare)"
+ },
+ {
+  "id": "p067-05",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: illustrated tiles for Appointments / Repeat Prescriptions / Online Services"
+ },
+ {
+  "id": "p067-06",
+  "grade": "Good",
+  "reason": "NHS Scotland gp.scot template: appointment/prescription/contact cards up front"
+ },
+ {
+  "id": "p067-07",
+  "grade": "Average",
+  "reason": "Older gpsurgery.net theme: text panels, no task tiles up front; map image broken"
+ },
+ {
+  "id": "p067-08",
+  "grade": "Good",
+  "reason": "gpsurgery.net site (Newbattle Medical Group): eConsult + task tiles on phone (desktop Cloudflare); same as Mayfield"
+ },
+ {
+  "id": "p067-09",
+  "grade": "Good",
+  "reason": "gpsurgery.net site: eConsult + task tiles on phone (desktop Cloudflare check); same site as Newbattle"
+ },
+ {
+  "id": "p067-10",
+  "grade": "Average",
+  "reason": "Old 2011-style WordPress theme, 20-item menu still including COVID-19; works on phone; same site as Abernethy"
+ }
+]

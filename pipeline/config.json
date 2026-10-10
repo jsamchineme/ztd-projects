@@ -1,0 +1,136 @@
+{
+  "claimMinutes": 90,
+  "attentionStage": "attention",
+  "ratingBands": { "bad": [1, 4], "average": [5, 7], "good": [8, 10] },
+  "templates": [
+    "Clinic Clean",
+    "Local Service Bold",
+    "Professional Minimal",
+    "Restaurant Warm",
+    "Retail Showcase"
+  ],
+  "fields": [
+    { "key": "score", "label": "Score (1–10)", "type": "number" },
+    { "key": "rating", "label": "Rating", "type": "select", "options": ["bad", "average", "good"] },
+    { "key": "analysis", "label": "Analysis notes", "type": "text" },
+    { "key": "findings", "label": "What needs fixing", "type": "text" },
+    { "key": "template", "label": "Template", "type": "template" },
+    { "key": "plan", "label": "Redesign plan", "type": "text" },
+    { "key": "previewUrl", "label": "Redesign preview (after)", "type": "url" },
+    { "key": "review", "label": "Review notes", "type": "text" },
+    { "key": "contact", "label": "Contact", "type": "text" },
+    { "key": "pitchNotes", "label": "Pitch notes", "type": "text" }
+  ],
+  "pipelines": [
+    {
+      "id": "production",
+      "name": "Production",
+      "stages": [
+        {
+          "id": "targets", "name": "Targets", "who": "ai",
+          "description": "Websites found by the discovery task, waiting to be analysed.",
+          "feeds": "analysis",
+          "instructions": "Discovery: find websites that fit the target market and add them with `node pipeline/cli.mjs add <url> --name \"<business>\"` (or `import <file>` for a list). Duplicates are skipped automatically. You don't claim cards here; Analysis pulls from this bucket."
+        },
+        {
+          "id": "analysis", "name": "Analysis", "who": "ai", "pullFrom": ["targets"],
+          "description": "Study each site and score it 1–10.",
+          "requires": ["score", "analysis"],
+          "outcomeField": "rating",
+          "outcomes": [
+            { "id": "bad", "label": "Bad", "to": "bad" },
+            { "id": "average", "label": "Average", "to": "average" },
+            { "id": "good", "label": "Good", "to": "good" }
+          ],
+          "instructions": "Open the site and judge it as a potential redesign client. Score it 1–10 on design, mobile layout, speed, clarity of offer, calls to action, trust signals and how dated it looks (1 = very poor, 10 = excellent). Set `score` and write `analysis` (3–6 short bullet points backing the score). Rating follows the score (1–4 bad, 5–7 average, 8–10 good) unless you set `rating` yourself. Then complete the card; it moves to the matching bucket."
+        },
+        {
+          "id": "bad", "name": "Bad sites", "who": "any",
+          "description": "Highest-priority sales targets. Redesign study pulls from here first.",
+          "feeds": "study"
+        },
+        {
+          "id": "average", "name": "Average sites", "who": "any",
+          "description": "Second-priority targets. Pulled once Bad sites is empty.",
+          "feeds": "study"
+        },
+        {
+          "id": "good", "name": "Good sites", "who": "any", "terminal": true,
+          "description": "Not targeted. Parked here for reference."
+        },
+        {
+          "id": "attention", "name": "Needs attention", "who": "human", "parking": true,
+          "description": "Cards an AI worker couldn't finish. Read why on the card, sort it out, then drag it to the right bucket."
+        },
+        {
+          "id": "study", "name": "Redesign study", "who": "any", "pullFrom": ["bad", "average"],
+          "description": "Work out what needs to change and which template to use.",
+          "requires": ["findings", "template", "plan"],
+          "outcomes": [
+            { "id": "done", "label": "Redesign planned", "to": "ready" },
+            { "id": "new_site", "label": "New site planned", "to": "ready" }
+          ],
+          "instructions": "Study the site in depth. Write `findings`: the concrete problems (layout, content, mobile, speed, branding, missing pages, weak calls to action). Choose a `template` from the template list that best fits the business. Write `plan`: section-by-section how the redesign maps the existing content onto the template, what to keep (logo, colours, copy, images) and what to add. Then complete with outcome `done`.\n\nIf the business has no working website (the site is down, doesn't load, is only a Facebook page, or the card links to its NHS listing), don't give up: this is a prospect for a brand-new site. Gather what you can from the NHS listing link in the notes, the Facebook page and a web search: practice name, address, phone, opening hours, services, NHS or private, team and photos. In `findings`, say there's no working website and list what you found. Choose a `template` and write a `plan` for a new site built from those details. Then complete with outcome `new_site`."
+        },
+        {
+          "id": "ready", "name": "Ready to build", "who": "any",
+          "description": "Site, findings and redesign plan, waiting for a builder.",
+          "feeds": "build"
+        },
+        {
+          "id": "build", "name": "Build", "who": "any", "pullFrom": ["ready"],
+          "description": "Design the new site on the chosen template.",
+          "requires": ["previewUrl"],
+          "next": "ai_review",
+          "instructions": "Build the redesign on the chosen `template`, following `findings` and `plan`. Reuse the business's real content, logo and brand colours. If the card was planned as a new site (there's no working website), build it from the details gathered in `findings`, `plan` and the notes, and never invent services, prices, staff or reviews. Deploy a preview and set `previewUrl`. If the card came back from review, address everything in `review` first. Then complete the card."
+        },
+        {
+          "id": "ai_review", "name": "AI review", "who": "ai",
+          "description": "An agent checks the build against the plan and template.",
+          "requires": ["review"],
+          "outcomes": [
+            { "id": "pass", "label": "Pass", "to": "human_review" },
+            { "id": "changes", "label": "Needs changes", "to": "build" }
+          ],
+          "instructions": "Compare `previewUrl` with the original `url`, the `findings`, the `plan` and the chosen `template`. Check every planned section exists, the real content was carried over, the layout works on mobile, links and forms work, and nothing is placeholder text. Write `review` (what you checked and anything wrong). Complete with outcome `pass`, or `changes` to send it back to Build."
+        },
+        {
+          "id": "human_review", "name": "Human review", "who": "human",
+          "description": "Final sign-off before the site goes to sales.",
+          "outcomes": [
+            { "id": "approve", "label": "Approve for sales", "to": "to_pitch" },
+            { "id": "changes", "label": "Needs changes", "to": "build" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sales",
+      "name": "Sales",
+      "stages": [
+        {
+          "id": "to_pitch", "name": "Ready to pitch", "who": "human",
+          "description": "Approved redesigns. Pitch with the before and after.",
+          "outcomes": [{ "id": "pitched", "label": "Pitched", "to": "pitched" }],
+          "instructions": "Contact the business and show the original site (`url`) next to the redesign (`previewUrl`). Record who you spoke to in `contact` and what you said in `pitchNotes`."
+        },
+        {
+          "id": "pitched", "name": "Pitched", "who": "human",
+          "description": "Waiting to hear back.",
+          "outcomes": [
+            { "id": "interested", "label": "Interested", "to": "interested" },
+            { "id": "not_interested", "label": "Not interested", "to": "not_interested" }
+          ]
+        },
+        {
+          "id": "interested", "name": "Interested", "who": "human", "terminal": true,
+          "description": "Wants to go ahead. Hand over to closing."
+        },
+        {
+          "id": "not_interested", "name": "Not interested", "who": "human", "terminal": true,
+          "description": "Declined for now."
+        }
+      ]
+    }
+  ]
+}

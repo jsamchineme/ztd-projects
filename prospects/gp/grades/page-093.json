@@ -1,0 +1,52 @@
+[
+ {
+  "id": "p093-01",
+  "grade": "Good",
+  "reason": "Modern NHS-style site; Appointments / Prescriptions / New Patients in clear nav, mobile-friendly"
+ },
+ {
+  "id": "p093-02",
+  "grade": "Good",
+  "reason": "My Surgery Website NHS Scotland-style template; Appointments/Prescriptions in main nav"
+ },
+ {
+  "id": "p093-03",
+  "grade": "Good",
+  "reason": "gpsurgery.net site with picture tiles: Online Services, Appointments, Repeat Prescriptions"
+ },
+ {
+  "id": "p093-04",
+  "grade": "Average",
+  "reason": "gpsurgery.net site, but a KLINIK alert pop-up fills the phone screen on arrival (desktop Cloudflare)"
+ },
+ {
+  "id": "p093-05",
+  "grade": "Average",
+  "reason": "KLINIK alert pop-up fills phone screen on arrival (desktop Cloudflare); same site as Croftfoot"
+ },
+ {
+  "id": "p093-06",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p093-07",
+  "grade": "Average",
+  "reason": "Reasonably modern theme but thin grey text; tasks only in nav, no task tiles up front"
+ },
+ {
+  "id": "p093-08",
+  "grade": "Bad",
+  "reason": "No website listed in NHS directory"
+ },
+ {
+  "id": "p093-09",
+  "grade": "Good",
+  "reason": "Modern site: booking box, Register card, today's opening hours, mobile-friendly"
+ },
+ {
+  "id": "p093-10",
+  "grade": "Average",
+  "reason": "Newer My Surgery Website template with photo tiles for Appointments/Prescriptions; dated look"
+ }
+]
