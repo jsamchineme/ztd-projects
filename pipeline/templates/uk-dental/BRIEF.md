@@ -1,0 +1,209 @@
+# Front Desk Dental
+
+> Pipeline name: **Front Desk Dental** (folder `templates/uk-dental/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Front Desk", it means this template.
+
+A website template for UK dental practices (NHS, private or mixed), adaptable for GP surgeries.
+
+**The idea in one line:** the homepage does what a good receptionist does in the first ten seconds. It tells you whether the practice is open, how to get through, whether you can join, what to do if you're in pain and what it costs. Then it reassures you.
+
+Front Desk is not a "concept" site. It is a calm, well-made NHS-grade service page with the finish of a private clinic. The premium comes from precision (type, spacing, colour, real faces, live information that's right), not from decoration. It should look like the practice paid for a serious website, and it should feel as trustworthy as NHS.UK.
+
+## 1. Files
+
+| File | What it is | Edit it? |
+| --- | --- | --- |
+| `styles.css` | The whole design system. Tokens at the top (section 1), components below. | Tokens only. |
+| `frontdesk.js` | About 120 lines of plain JS: the phone menu and the live open or closed status. Reads the hours from the page. | No. |
+| `fonts/` | Figtree variable woff2 (weights 300 to 900), latin and latin-ext, plus `OFL.txt`. Referenced from `styles.css` by relative path. | No. |
+| `retheme.mjs` | Prints contrast-safe brand tokens from a logo colour. `node retheme.mjs "#13ABC3" "#B8902F"` | No. |
+| `example/index.html` | The worked homepage for Musselburgh Dental Care. Copy it for each practice. | Yes, for each practice. |
+| `example/img/` | That practice's images and `CREDITS.txt`. | Replace for each practice. |
+
+The example links `../styles.css` and `../frontdesk.js`. Keep that layout: one template folder, one `example/` (or practice) folder inside it.
+
+## 2. Why the earlier rounds were rejected (and what Front Desk does instead)
+
+I looked at `atelier/`, `civic/` and `haven/`. Each is skilful, and each is the wrong kind of skilful for this buyer.
+
+- **Atelier** is a design magazine. A 90px italic serif slogan ("Calm, careful dentistry") takes the first screen, and a patient's tasks start below the fold. The practice's amateur headshots are blown up to fashion-shoot size, which exposes them. It reads as a boutique brand, not a healthcare provider.
+- **Civic** is GOV.UK with a wayfinding gimmick. It is credible but austere, and it looks like a public body, not a business that a practice owner would be proud of. The big numerals are decoration that patients have to learn.
+- **Haven** is a hotel. A coastal landscape fills the hero and the practice floats on it in a card. Place comes before the practice, and the status line is small print.
+- **What they share:** each starts from a mood ("magazine", "transit signage", "Highland retreat") rather than from what patients came to do. Each makes the h1 a slogan. None puts the live status, the Call button, joining and the emergency route together in the first screen.
+
+**Front Desk starts from the patient's task list**, uses the patterns NHS patients already know (care cards, plain task links, yellow focus), and spends its craft on making those feel finished: one confident typeface, the practice's own colour, real faces at a sensible size, and live information.
+
+## 3. Research → design decisions
+
+| Decision | Research it comes from |
+| --- | --- |
+| The first screen holds the live status, the h1, how to join, the Call button and the emergency route. A "How can we help?" panel lists the five top tasks as links. | NHS England's GP website guide: patients come with a task (appointments, registering, phone number, opening times, address). The brief's dental tasks: book, register, phone, hours, address, emergency, costs. NHS design principle "Do the hard work to make it simple". |
+| The h1 says what the practice is and where ("NHS and private dentist in Musselburgh"), not a slogan. The practice name is in the header. | NHS service manual: users need to confirm they're in the right place; headings describe content. A slogan answers nothing. |
+| The Call button carries the number ("Call 0131 665 2786") in the header and the hero. On phones the header button says "Call" and stays visible (sticky header). | Phoning is the only way to book or register here. A Call button visible on a 390px phone without scrolling is a hard requirement. |
+| Live "Open now / Closed for lunch / Closed now · opens tomorrow at 9am" pill at the top of the hero and the hours section. It also shows whether the emergency phone line is open now, and today's hours in the task panel. | "Are you open?" is a top task. NHS England lists opening times among the top 9 patient tasks. |
+| Emergency route in the hero (red-edged, compact) and a full urgent care card in the hours section. 111 and 999 are plain text. | NHS.UK care cards: testing found users scanning a page stopped to read them and understood the action. NHS inform: out of hours, phone NHS 24 on 111. |
+| No pop-ups, cookie walls, chat widgets, carousels or auto-play. | 27% of research participants were stopped by overlays and pop-ups. |
+| Plain English at reading age 9 to 11. Sentences under 20 words, paragraphs under 3 sentences. Times as "9am to 5:30pm"; ranges with "to", not dashes. Links start with a verb ("Join the dental plan online", "Read about dental costs on NHS inform"). | NHS service manual content guide ("How we write"; "Numbers, measurements, dates and time"). NHS England GP guide: reading age 9 to 11, verb-first links that say where they go. |
+| "Join as a new patient" is the first section: two routes side by side (NHS waiting list, dental plan), each as numbered "what happens next" steps. | Access to an NHS dentist is the main worry in Scotland now. Anxious users need to know what happens next. The first check-up step uses NHS inform's description of the registration examination. |
+| "Nervous about the dentist?" callout, a nervous-patient quote in the hero, and real reviews with names. | Trust and anxiety research in the brief. Three of the four real reviews are from nervous patients, so the page leads with them instead of claiming it. |
+| The NHS charges for Scotland are shown as three plain cards (free check-ups, who gets free treatment, 80% up to £384) with a link to the source. | Clarity about NHS and private costs builds trust. Figures quoted from nhsinform.scot/dentist. |
+| The team: every person with role, GDC number where known and one factual line, plus a link to check the GDC register. | Trust comes from real people with registration numbers. |
+| One typeface, Figtree, at 17px (phone) to 19px (desktop) body, with plain numerals. | NHS.UK uses one family at 16 to 19px body. Figtree has a large x-height and open shapes. I tested Atkinson Hyperlegible Next first, but its slashed zero turns "0131" into "Ø131" in the most important element on the page, the phone number. |
+| NHS.UK yellow focus style on every link and control. | NHS.UK frontend focus pattern. Familiar to NHS users, and it shows on light and dark grounds. |
+| No NHS logo or NHS blue as the brand colour. The practice's own logo colour is the brand. | Independent contractors may not use the NHS identity without permission. The practice is a business with its own brand. |
+
+Sources: [NHS service manual](https://service-manual.nhs.uk/) (design principles, content style guide, typography, care cards), [NHS England: step-by-step guide to improving GP website online journeys](https://www.england.nhs.uk/long-read/step-by-step-guide-to-improving-general-practice-website-online-journeys/), [NHS inform: dentist](https://www.nhsinform.scot/dentist).
+
+## 4. Rules (every build, no exceptions)
+
+1. **Never invent facts.** Every name, GDC or GMC number, qualification, year, treatment, hour, price, plan detail and review comes from the practice's current site, its NHS listing (NHS inform in Scotland, nhs.uk in England) or the job card. Do not add online booking, finance, prices, awards, statistics, "years established", star ratings, team members or treatments. If a fact is missing (for example a GDC number), leave the line out. Do not write a placeholder.
+2. **Write facts you can't confirm as an action.** "Phone us to ask about the plan's cost", not a cost. "Ask us for the price before you start", not "affordable".
+3. **The first screen on a 390px phone shows:** the live status, the h1, how to join (with the waiting time), the Call button with the number, and the start of the emergency box. The header Call button is always visible.
+4. **No pop-ups, overlays, cookie banners, chat widgets, carousels, auto-play video, map embeds or third-party scripts.** Link to Google Maps for directions. If you ever must embed a map, give the iframe `tabindex="-1"` and put a text "Get directions" link beside it.
+5. **Accessibility is WCAG 2.2 AA.** Text contrast at least 4.5:1 (3:1 for text 24px and up, and for UI components). Visible focus on everything (built in). A skip link, `header`, `nav`, `main`, `footer`, one `h1`, and `h2` then `h3` in order. Tap targets at least 44×44px on phones, including footer links, inline links (`.inline-tap`) and contact links. Keyboard only works, including the menu: the toggle has `aria-expanded` and `aria-controls`, and Escape closes it. `prefers-reduced-motion` turns off the only animation. Text resizes to 200% and the page reflows at 320px.
+6. **Short numbers (111, 999) are plain text**, never `tel:` links. Full numbers are `tel:+44…` links.
+7. **Images:** inline SVG for icons and marks (never `<img src=".svg">`). Photos are JPEG at quality 72 to 80, sized to how they show, with `width` and `height`, and `loading="lazy"` below the first screen. Never stock photos of people. A Creative Commons photo of the town is allowed if it is downloaded locally, credited on the page and listed in `img/CREDITS.txt`.
+8. **Performance:** fonts self-hosted (no Google Fonts or any CDN, for GDPR). Plain HTML, CSS and JS. No framework, no build step. Keep the homepage under 1.5 MB. The example is about 480 KB on desktop and 250 KB on a phone.
+9. **NHS facts come from the official source,** quoted plainly, with a link to the source page.
+
+## 5. Writing rules
+
+- Say "you" and "we". Active voice. Sentences under 20 words, paragraphs of 1 to 3 sentences.
+- Times: `9am`, `5:30pm`, `midday`. Ranges: "9am to 1pm", "Monday to Friday". Never "09:00–13:00".
+- Plain word first, then the clinical term: "Gum treatment (periodontal treatment)".
+- Links start with a verb and say where they go: "Join the dental plan online", "Read our privacy notice", "Check a dentist or nurse on the GDC register". Never "click here", "learn more" or "find out more" on its own.
+- Each treatment gets one plain line on what it is. No promises ("pain-free", "perfect smile").
+- Quote reviews exactly, including the reviewer's own spelling and punctuation, with their name as published. Lead with nervous-patient reviews if there are any.
+- Use curly apostrophes and quotes (’ “ ”).
+
+## 6. Homepage structure
+
+Follow this order and reuse the class names. Sections are `<section class="section" id="…" aria-labelledby="…">` wrapping `.wrap`. Alternate the grounds as shown, so the page has rhythm without decoration.
+
+1. **Icon sprite** (`svg.sprite`), then the **skip link** (`.skip-link` → `#main`).
+2. **Header** (`.site-header`).
+   - Row 1 (`.site-header__bar`): `.brand` (logo PNG or inline SVG, name, tagline), `.header-meta` (address, wide screens only), `.btn.btn--primary.header-call` (the number on wide screens, "Call" on phones), `.menu-toggle` (phones only).
+   - Row 2: `nav.nav#site-nav` with **6 or fewer** items, named for tasks: New patients, NHS costs, Treatments, (signature service), Our team, Hours and contact.
+3. **Hero** (`.hero`, tint ground, 4px brand edge at the top).
+   - Left (`.hero__main`): `.status` pill (live); `h1` "[NHS / private / NHS and private] dentist in [Town]"; `.hero__lead` of 1 to 2 sentences that answers "can I join?" with the real waiting position; `.btn-row` with the Call button and an arrow link to `#join`; `.urgent-line` (emergency rule and NHS 24 on 111, with a link to `#emergency`); `.trust` (one real review, then the partners' faces and a line linking to `#team`).
+   - Right: `aside.desk` "How can we help?". Five `.task` links: join, book (a `tel:` link), toothache (`.task--urgent`), costs, opening hours. `.desk__foot` has today's hours (`[data-today-hours]`) and the address with a directions link.
+4. **Join as a new patient** (`#join`, page ground). `.grid-2` of two `.card.card--feature`: NHS route and plan or private route. Each has a `.card__label`, `h3`, one sentence and `ol.steps` ("what happens next"), then its action. Below: `.callout` for nervous patients.
+   - If the practice is not taking NHS patients, say so plainly in the NHS card and the hero lead, and give the NHS inform link for finding a dentist. Never hide it.
+5. **NHS costs** (`#costs`, white). `.costs` of three `.card.cost`: free check-ups, who gets free treatment, what everyone else pays. Then `.costs-note` with the private-price line and the source link. In England, swap in the nhs.uk band charges.
+6. **Reviews** (`#reviews`, page ground). `ul.quotes` of `figure.quote`. The first is `.quote--lead` (dark). 2 to 4 reviews. If there are no real reviews, drop the section and the hero quote.
+7. **Treatments** (`#treatments`, white). `.treatments` of `.treat-group` (icon, `h3`, `dl.treat-list`). Group by what the patient wants, not by specialty: Fillings, Saving teeth, Repairing and replacing teeth, How your teeth look, Children, plus a group that points to the signature service. 3 to 6 groups. List only treatments the source names.
+8. **Signature service** (`#aesthetics` here, page ground). `.feature`: portrait in `figure.feature__media` with a factual caption, then the section head, `ul.ticks`, how to book and a Call button. Drop this section if the practice has no signature service.
+9. **Our team** (`#team`, white). `ul.team` of `li.person`: 4:5 photo, name (`h3`), `.person__role`, `.person__gdc` (only if known), `.person__bio` (one factual line). Dentists first (partners, then associates by length of service), then nurses and the manager. End with the GDC register link.
+10. **Opening hours and how to find us** (`#visit`, page ground). Section head with a second `.status` pill. `.visit` with: the hours card (`table.hours`, one `tr[data-day]` per day, with the lunch note) and a right column of the address card (`address`, Call, Get directions, Email) and the urgent care card (`.care-card#emergency`: when we're open, when we're closed, life-threatening). Then `figure.place` (town photo and credit) if you have one.
+11. **Footer** (`.site-footer`, brand-deep). Brand, one-line description and address. Columns: Contact us, New patients, Information (privacy notice, FOI or complaints pages, NHS source). Legal line with the year and the out-of-hours rule.
+12. **The hours JSON** (`script#practice-hours`), then `<script src="../frontdesk.js">`.
+
+### The hours JSON (the single source of the live status)
+
+```json
+{
+  "timeZone": "Europe/London",
+  "open": {
+    "mon": [["09:00", "13:00"], ["14:00", "17:30"]],
+    "sat": [],
+    "sun": []
+  },
+  "emergency": { "mon": [["09:00", "11:00"]] }
+}
+```
+
+- Every day `mon` to `sun` must appear in `open`. Use 24-hour `HH:MM`. Split a day into sessions around lunch. An empty list means closed.
+- `emergency` is optional: the phone-in windows for urgent calls. It drives "The emergency phone line is open now, until 11am."
+- Keep the visible `table.hours` and the JSON-LD `openingHoursSpecification` in the `<head>` in step with it. They are written by hand, so check all three.
+- `frontdesk.js` works in Europe/London time whatever the visitor's clock, says times NHS-style (9am, 5:30pm, midday), marks today's row, and refreshes every minute. Without JS, the pill reads "Open Monday to Friday · Closed at weekends". Write that fallback text for each practice.
+
+## 7. Tokens and re-theming
+
+Re-theme a practice by changing only the **Brand** block at the top of `styles.css`. Leave the neutrals, status colours, type and spacing alone.
+
+| Token | Use | Rule | Musselburgh |
+| --- | --- | --- | --- |
+| `--brand` | Logo colour exactly. Decoration only: hero edge, quote marks, menu hover underline. | Never text on a light ground. | `#13ABC3` (2.75:1, so decoration only) |
+| `--brand-text` | Links, primary button fill, icons, card top edges, roles. | At least 4.5:1 on `#FFFFFF`, `--page` and `--brand-tint` (aim for 5:1). White text on it at least 4.5:1. | `#0A6B7A` (6.2:1) |
+| `--brand-text-hover` | Hover and pressed states. | About 6 lightness points darker than `--brand-text`. | `#085A67` |
+| `--brand-deep` | Footer, task panel foot, nervous callout, lead review, step numbers. | White on it at least 7:1. | `#0B3B43` (12.2:1) |
+| `--brand-on-deep` | Brand-coloured text and icons on `--brand-deep`. | At least 4.5:1 on `--brand-deep` (aim for 7:1). | `#7FD9E6` (7.5:1) |
+| `--brand-tint` | Hero ground, task icon circles, today's row. | Lightness about 95%. | `#EAF6F8` |
+| `--accent` | Second logo colour. The short rule above each h2 and before review names. | Decoration only. If the logo has one colour, use `--brand-text`. | `#B8902F` |
+| `--accent-on-deep` | Footer headings on `--brand-deep`. | At least 4.5:1 on `--brand-deep`. | `#E6C46A` (7.3:1) |
+| `--on-deep-soft` | Body text on `--brand-deep`. | Keep near-white. | `#E3ECEE` |
+| `--ink`, `--ink-soft`, `--page`, `--surface`, `--line`, `--line-strong` | Neutrals. | Don't change. | |
+| `--ok`, `--warn`, `--urgent`, `--urgent-tint`, `--focus`, `--focus-ink` | Fixed meanings: open, lunch or closing soon, urgent, focus. | Never re-theme. | NHS.UK values |
+| `--font`, `--fs-*`, `--lh-*`, `--measure` | Type. | Don't change. | Figtree |
+| `--radius`, `--radius-sm`, `--max`, `--gutter`, `--section`, `--tap`, `--shadow` | Shape and space. | `--tap` stays 44px. | |
+
+### How to re-theme from a logo
+
+1. Sample the logo's main colour exactly (from the SVG or PNG, not by eye). Sample a second colour if the logo has one.
+2. Run `node retheme.mjs "#MAIN" "#SECOND"`. It keeps the logo's hue and prints all eight brand tokens, with a contrast check line.
+3. Paste the output over the Brand block. Small hand adjustments are fine if the check line stays at or above the rules in the table.
+4. **Special cases:**
+   - **A red or pink brand:** the urgent card must still stand out, so keep `--urgent` as NHS red and don't use the brand on anything alarming.
+   - **A very light or yellow brand:** `--brand-text` will come out dark and muddy. Raise its saturation by hand, or use a dark neutral of the same hue.
+   - **A navy or near-black brand:** `--brand-text` can equal `--brand`. Keep `--brand-tint` clearly visible against `--page`.
+5. Logo: use the practice's real logo. Show it as a transparent PNG at 3× its display size (144px for a 48px display) or as inline SVG. A text-only SVG logo must be inlined, not used with `<img>`.
+
+## 8. Components quick reference
+
+`.btn--primary` (filled, the one action per block), `.btn--secondary` (outline), `.arrow-link` (verb-first text link with an arrow), `.inline-tap` (adds a 44px tap height to a link inside text without changing the line height), `.status[data-status]` (live pill: `.status__dot`, `.status__state`, `.status__detail`), `.urgent-line`, `.desk` and `.task`, `.card` (`.card--feature`, `.card__label`), `ol.steps`, `.callout`, `.quote` (`.quote--lead`), `.cost`, `.treat-group`, `.feature`, `.person`, `table.hours`, `.care-card`, `.place`, `.contact-line`.
+
+**Icons:** a sprite of `<symbol>`s at the top of the body. Use one with `<svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>`. Icons are always decorative, with the meaning in text beside them. The available icons are phone, arrow, chevron, pin, clock, mail, join, alert, tag, menu, close, check, external, heart, tooth, shield, layers, star, smile, face and quote.
+
+## 9. Adapting Front Desk for a GP practice
+
+NHS England's benchmark asks for top tasks first, plain English, and urgent help that's easy to find. Changes:
+
+1. **h1:** "GP surgery in [Town]" or "[Practice name], [Town]". Lead: how to contact the practice today (phone and online form, with the times each is open).
+2. **Task panel (5 to 6 tasks, verb-first):** Request an appointment (the online consultation link or phone), Order a repeat prescription, Get test results, Get a fit note (sick note), Register with the practice, See opening hours. Booking is the first task.
+3. **Urgent help:** replace the dental emergency box with care cards. "Phone 111 if you need help urgently and we're closed" (urgent), and "Call 999 if someone is seriously ill or injured, or their life is at risk" (emergency, `--urgent` head on dark). In Scotland, "phone NHS 24 on 111". Keep both visible in the first screen on a phone.
+4. **Menu, 7 items or fewer:** Appointments, Prescriptions, Test results, Register, Opening hours, Our team, Contact us.
+5. **Sections in order:** Appointments (how to ask, by phone and online, with times and what happens next) → Prescriptions → Test results → Register (online form or paper; catchment area) → Opening hours and contact (with the `emergency` JSON key used for the duty doctor or call-back window, or dropped) → Team (GPs with GMC numbers, nurses, manager) → Footer (practice policies, complaints, privacy, accessibility statement, NHS app link).
+6. **Drop:** NHS dental costs, treatments, the signature feature and the "nervous" callout. Keep reviews only if the practice publishes them.
+7. Point Scottish practices to NHS inform and English practices to nhs.uk.
+8. Check against the [GP website benchmark tool](https://www.england.nhs.uk/long-read/step-by-step-guide-to-improving-general-practice-website-online-journeys/) before handover.
+
+## 10. Pre-handover checklist
+
+**Facts**
+- [ ] Every fact on the page traces to the practice site, its NHS listing or the job card. Nothing is invented. List any you couldn't confirm in your report.
+- [ ] Phone number checked digit by digit in the header, hero, task panel, address card, emergency card and footer. `tel:` links use `+44` and no spaces.
+- [ ] Hours match in the visible table, the hours JSON and the JSON-LD.
+- [ ] Reviews are quoted exactly, with names.
+- [ ] NHS cost figures match the current official page, and the link works.
+- [ ] GDC or GMC numbers checked on the register. Lines without a known number are left out.
+
+**First screen (390 × 844 phone)**
+- [ ] Status pill, h1, join answer, Call button and emergency box are visible without scrolling. The header Call button is visible.
+- [ ] Test the live status at three times (open, lunch and closed). In the browser console, `new Date()` must give London time. Or use the audit's screenshots plus one manual check.
+
+**Accessibility and quality**
+- [ ] `node pipeline/audit.mjs <url> <out>` shows 0 blockers, 0 major and 0 minor issues.
+- [ ] Tab through the whole page. Focus is always visible, the skip link works, and the menu opens with Enter and closes with Escape.
+- [ ] Zoom to 200% and check at 320px wide: no sideways scrolling, nothing cut off.
+- [ ] Turn on reduced motion: nothing animates.
+- [ ] Every image has the right `alt` (a person's name, a description of a place, or `alt=""` for decorative logos next to the name).
+- [ ] Headings in order: one h1, then h2s, then h3s.
+
+**Performance and licences**
+- [ ] Page weight under 1.5 MB (check the Network panel after scrolling to the bottom).
+- [ ] No request leaves the site except the links patients click. No fonts, scripts or maps from a CDN.
+- [ ] Every Creative Commons photo is credited on the page and in `img/CREDITS.txt`. `fonts/OFL.txt` is present.
+- [ ] `<title>` and meta description name the practice, the town and "NHS" or "private" as appropriate.
+
+## 11. The worked example: Musselburgh Dental Care
+
+`example/index.html` uses only the facts in the job card. These are the judgement calls:
+
+- **"Run by Dr Martin Chan and Dr Caroline McArdle, the practice partners."** This comes from their role (partners).
+- **"These are not NHS treatments" (facial aesthetics).** Anti-wrinkle injections, fillers and botulinum toxin aren't part of NHS dental treatment in Scotland. Confirm the wording with the practice.
+- **The NHS first check-up step** uses NHS inform's description of the registration examination. It is not a practice claim.
+- **"Phone us between 9am and 11am, Monday to Friday" for emergencies.** The practice is closed at weekends, so the 9am to 11am rule applies on weekdays.
+- **"Call 999" for life-threatening problems** is standard NHS advice, not a practice claim.
+- **Anna Maguire and Lynsey Ogilvie** have no GDC number in the source, so none is shown. Lynsey Ogilvie's year of qualification isn't given.
+- **The dental plan's cost and cover** aren't published, so the page asks patients to email or phone.
+
+Licences: Figtree © The Figtree Project Authors, SIL OFL 1.1. Icons adapted from Feather (MIT). High Street photo © Barbara Carr, CC BY-SA 2.0, via Geograph and Wikimedia Commons.

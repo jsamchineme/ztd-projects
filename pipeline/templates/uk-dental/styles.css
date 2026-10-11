@@ -1,0 +1,491 @@
+/* ==========================================================================
+   Front Desk: a website template for UK dental practices
+   --------------------------------------------------------------------------
+   1. TOKENS        Re-theme a practice by editing ONLY this block.
+   2. Fonts         Self-hosted, OFL. Do not load fonts from a CDN.
+   3. Base
+   4. Layout
+   5. Components    Header, buttons, hero, status, cards, sections, footer
+   6. Motion        Only inside prefers-reduced-motion: no-preference
+   See BRIEF.md for the rules, the homepage structure and the checklist.
+   ========================================================================== */
+
+/* 1. TOKENS ================================================================ */
+:root {
+  /* Brand: taken from the practice logo. See BRIEF.md "Re-theme" for how to
+     derive each one and the contrast each must pass. */
+  --brand: #13ABC3;            /* Logo colour exactly. Decoration only: dots, rules, the hero edge. Never text on white. */
+  --brand-text: #0A6B7A;       /* Brand darkened to >= 4.5:1 on --surface, --page and --brand-tint. Links, primary buttons, icons. */
+  --brand-text-hover: #085A67; /* About 15% darker than --brand-text. Hover and pressed states. */
+  --brand-deep: #0B3B43;       /* Near-black in the brand hue. Footer and dark panels. White text on it >= 7:1. */
+  --brand-on-deep: #7FD9E6;    /* Brand colour for text and icons on --brand-deep, >= 4.5:1. */
+  --brand-tint: #EAF6F8;       /* Very light brand wash. Hero ground and highlighted rows. */
+  --accent: #B8902F;           /* Second logo colour (gold here). Decoration only: the short rule above h2. */
+  --accent-on-deep: #E6C46A;   /* Second logo colour for use on --brand-deep, >= 4.5:1. */
+  --on-deep-soft: #E3ECEE;     /* Body text on --brand-deep. Keep near-white. */
+
+  /* Neutrals: do not change unless the practice brand demands warmth. */
+  --ink: #1C2B2F;              /* Body text. 13.7:1 on --page. */
+  --ink-soft: #4B5B5F;         /* Secondary text. >= 6.4:1 on every light ground. */
+  --page: #F5F8F8;             /* Page ground. */
+  --surface: #FFFFFF;          /* Cards, header, panels. */
+  --line: #D3DDDF;             /* Hairlines and card borders (decorative). */
+  --line-strong: #8597A0;      /* Borders that carry meaning, such as table rules. >= 3:1 on white. */
+
+  /* Status and urgency: fixed meanings, never re-themed. Based on NHS.UK colours. */
+  --ok: #007F3B;               /* "Open now". 5.1:1 on white. */
+  --warn: #8A5300;             /* "Closed for lunch" and "closing soon". 6.3:1 on white. */
+  --urgent: #D5281B;           /* NHS red. Urgent care card edge and heading. 5:1 on white. */
+  --urgent-tint: #FDF1F0;
+  --focus: #FFEB3B;            /* NHS.UK focus yellow. */
+  --focus-ink: #1C2B2F;        /* Paired with --focus so the ring shows on any ground. */
+
+  /* Type: one family, as NHS.UK does. Chosen for legibility and plain numerals (see BRIEF.md). */
+  --font: "Figtree", Arial, Helvetica, sans-serif;
+  --fs-body: clamp(1.0625rem, 1rem + .25vw, 1.1875rem);   /* 17px phone to 19px desktop, as NHS.UK */
+  --fs-small: 1rem;
+  --fs-label: .875rem;
+  --fs-lead: clamp(1.1875rem, 1.05rem + .55vw, 1.4375rem);
+  --fs-h1: clamp(2.125rem, 1.55rem + 2.4vw, 3.375rem);
+  --fs-h2: clamp(1.625rem, 1.3rem + 1.3vw, 2.375rem);
+  --fs-h3: clamp(1.1875rem, 1.1rem + .4vw, 1.375rem);
+  --lh-body: 1.55;
+  --lh-head: 1.15;
+  --measure: 38em;
+
+  /* Shape and space */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --max: 75rem;                /* 1200px content width */
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --section: clamp(3.5rem, 7vw, 6rem);
+  --tap: 44px;                 /* Minimum tap target, WCAG 2.2 and NHS.UK */
+  --shadow: 0 1px 2px rgba(16, 24, 32, .06), 0 8px 24px -12px rgba(16, 24, 32, .2);
+}
+
+/* 2. FONTS ================================================================= */
+/* Figtree, variable weight 300 to 900. SIL OFL 1.1, see fonts/OFL.txt. Plain (unslashed) zero, so phone numbers read cleanly. */
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url("fonts/Figtree-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url("fonts/Figtree-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* 3. BASE ================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  background: var(--page);
+  font-variant-numeric: lining-nums;
+}
+img { max-width: 100%; height: auto; display: block; }
+h1, h2, h3 { overflow-wrap: break-word; line-height: var(--lh-head); font-weight: 750; letter-spacing: -.012em; margin: 0 0 .5em; text-wrap: balance; }
+h1 { font-size: var(--fs-h1); letter-spacing: -.02em; }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); letter-spacing: -.005em; }
+p, ul, ol, dl { margin: 0 0 1em; }
+p { max-width: var(--measure); text-wrap: pretty; }
+strong { font-weight: 700; }
+a { color: var(--brand-text); text-decoration-thickness: 1px; text-underline-offset: .18em; }
+a:hover { color: var(--brand-text-hover); text-decoration-thickness: 3px; }
+.icon { width: 1.25em; height: 1.25em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Focus: the NHS.UK pattern. Yellow fill and a dark bar for links; a yellow and ink ring for controls. */
+:focus { outline: none; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: 0 0 0 6px var(--focus-ink); }
+a:focus-visible { background: var(--focus); color: var(--focus-ink); outline: none; box-shadow: 0 -2px var(--focus), 0 4px var(--focus-ink); text-decoration: none; border-radius: 0; }
+a:focus-visible .icon, a:focus-visible * { color: var(--focus-ink); }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; left: -9999px; top: .5rem; z-index: 100;
+  padding: .75rem 1rem; min-height: var(--tap);
+  background: var(--focus); color: var(--focus-ink); font-weight: 700;
+}
+.skip-link:focus { left: .5rem; }
+
+/* 4. LAYOUT ================================================================ */
+.wrap { width: 100%; max-width: calc(var(--max) + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: var(--section); scroll-margin-top: 5rem; }
+.section--white { background: var(--surface); border-block: 1px solid var(--line); }
+.section--tint { background: var(--brand-tint); }
+[id] { scroll-margin-top: 5.5rem; }
+
+.section-head { margin-bottom: clamp(1.75rem, 3vw, 2.5rem); max-width: 46rem; }
+.section-head h2::before {
+  content: ""; display: block; width: 2.5rem; height: 4px; border-radius: 2px;
+  background: var(--accent); margin-bottom: .9rem;
+}
+.section-head p { color: var(--ink-soft); font-size: var(--fs-lead); line-height: 1.45; margin: 0; }
+.section-head .status { font-size: var(--fs-small); color: var(--ink); line-height: 1.3; margin-top: .25rem; }
+
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1rem, 2.5vw, 1.75rem); }
+@media (min-width: 52em) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+/* 5. COMPONENTS ============================================================ */
+
+/* Icon sprite holder */
+.sprite { display: none; }
+
+/* ---- Header ----
+   Row 1: brand, address (wide screens), Call button, Menu button (narrow screens).
+   Row 2: the main menu. Sticky only on narrow screens, where it is one short row. */
+.site-header { background: var(--surface); border-bottom: 1px solid var(--line); position: relative; z-index: 50; }
+.site-header__bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.5rem; min-height: 4.5rem; padding-block: .5rem; }
+.brand { display: flex; align-items: center; gap: .7rem; color: var(--ink); text-decoration: none; margin-right: auto; min-height: var(--tap); }
+.brand:hover { color: var(--ink); }
+.brand img { width: 3rem; height: 3rem; }
+.brand__name { font-weight: 800; font-size: 1.1875rem; line-height: 1.1; letter-spacing: -.015em; }
+.brand__tag { display: block; font-weight: 500; font-size: var(--fs-label); color: var(--ink-soft); letter-spacing: 0; margin-top: .2rem; }
+.header-meta { display: none; align-items: center; gap: .45rem; margin: 0; font-size: var(--fs-small); color: var(--ink-soft); }
+.header-meta .icon { color: var(--brand-text); }
+@media (min-width: 64em) { .header-meta { display: flex; } }
+
+.nav { border-top: 1px solid var(--line); }
+.nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 .25rem; margin-inline: -.75rem; }
+.nav a {
+  display: flex; align-items: center; min-height: 3.25rem; padding: .25rem .75rem;
+  color: var(--ink); text-decoration: none; font-weight: 600; font-size: 1.0625rem; white-space: nowrap;
+  box-shadow: inset 0 -3px 0 transparent;
+}
+.nav a:hover { color: var(--brand-text); box-shadow: inset 0 -3px 0 var(--brand); }
+
+.menu-toggle {
+  display: none; align-items: center; gap: .4rem; min-height: var(--tap); min-width: var(--tap);
+  padding: .5rem .7rem; border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 1rem; cursor: pointer;
+}
+.menu-toggle .icon-close { display: none; }
+.menu-toggle[aria-expanded="true"] .icon-open { display: none; }
+.menu-toggle[aria-expanded="true"] .icon-close { display: block; }
+
+/* Narrow screens: one sticky row; the menu drops down below it (only when JS runs). */
+@media (max-width: 47.99em) {
+  .site-header { position: sticky; top: 0; }
+  .site-header__bar { min-height: 4rem; gap: .5rem; }
+  .js .menu-toggle { display: inline-flex; }
+  .js .nav { display: none; }
+  .js .nav.is-open { display: block; }
+  .nav ul { flex-direction: column; margin: 0; padding-bottom: .5rem; }
+  .nav li + li { border-top: 1px solid var(--line); }
+  .nav a { padding-inline: 0; min-height: 3rem; }
+  .brand { gap: .55rem; }
+  .brand img { width: 2.5rem; height: 2.5rem; }
+  .brand__name { font-size: 1rem; max-width: 6.6em; }
+  .brand__tag { display: none; }
+  .header-call { padding-inline: .8rem; }
+  .header-call .btn__long { display: none; }
+}
+@media (min-width: 48em) { .header-call .btn__short { display: none; } }
+@media (max-width: 22.49em) { .brand img { width: 2rem; height: 2rem; } .brand { gap: .4rem; } .brand__name { font-size: .9375rem; } .site-header .header-call { padding-inline: .6rem; } }
+@media (max-width: 23.99em) { .menu-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+  min-height: 3rem; padding: .7rem 1.25rem;
+  border-radius: var(--radius-sm); border: 2px solid transparent;
+  font: inherit; font-weight: 700; font-size: 1.0625rem; line-height: 1.2; text-decoration: none; cursor: pointer;
+  max-width: 100%; text-align: center;
+}
+.btn--primary { background: var(--brand-text); color: #fff; box-shadow: 0 2px 0 var(--brand-deep); }
+.btn--primary:hover { background: var(--brand-text-hover); color: #fff; }
+.btn--primary:active { box-shadow: none; transform: translateY(2px); }
+.btn--secondary { background: var(--surface); color: var(--brand-text); border-color: var(--brand-text); }
+.btn--secondary:hover { background: var(--brand-tint); color: var(--brand-text-hover); }
+.btn--on-deep { background: var(--surface); color: var(--brand-deep); }
+.btn--on-deep:hover { background: var(--brand-tint); color: var(--brand-deep); }
+.btn:focus-visible { background: var(--focus); color: var(--focus-ink); border-color: var(--focus-ink); outline: none; box-shadow: 0 0 0 4px var(--focus-ink); }
+.header-call { min-height: var(--tap); padding: .5rem 1rem; font-size: 1rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: center; }
+
+/* Inline links that must still meet the 44px tap height on phones */
+/* Vertical padding on an inline link grows its tap area to 44px without changing the line height. */
+.inline-tap { padding-block: 14px; }
+
+/* Arrow link: verb-first text link with a trailing arrow */
+.arrow-link {
+  display: inline-flex; align-items: center; gap: .4rem; min-height: var(--tap);
+  font-weight: 700; color: var(--brand-text); text-decoration: underline; text-decoration-thickness: 1px;
+}
+.arrow-link .icon { width: 1.1em; height: 1.1em; }
+
+/* Live status pill */
+.status {
+  display: inline-flex; align-items: center; gap: .55rem; flex-wrap: wrap;
+  padding: .45rem .9rem .45rem .75rem; min-height: 2.5rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  font-size: var(--fs-small); font-weight: 600; color: var(--ink);
+}
+.status__dot { width: .7rem; height: .7rem; border-radius: 50%; background: var(--ink-soft); flex: none; }
+.status__state { font-weight: 800; }
+.status__detail::before { content: "·"; margin-right: .5rem; color: var(--ink-soft); font-weight: 400; }
+.status[data-state="open"] .status__dot { background: var(--ok); box-shadow: 0 0 0 4px rgba(0, 127, 59, .16); }
+.status[data-state="open"] .status__state { color: var(--ok); }
+.status[data-state="lunch"] .status__dot, .status[data-state="soon"] .status__dot { background: var(--warn); }
+.status[data-state="lunch"] .status__state, .status[data-state="soon"] .status__state { color: var(--warn); }
+
+/* ---- Hero ---- */
+.hero {
+  background: linear-gradient(180deg, var(--brand-tint) 0%, var(--page) 100%);
+  border-bottom: 1px solid var(--line);
+  padding-block: clamp(1.5rem, 4vw, 3.75rem) clamp(2rem, 5vw, 4rem);
+  position: relative;
+}
+.hero::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--brand); }
+.hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+@media (min-width: 60em) { .hero__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); } }
+.hero h1 { margin: 1rem 0 .9rem; max-width: 15em; }
+.hero__lead { font-size: var(--fs-lead); line-height: 1.45; color: var(--ink); margin-bottom: 1.5rem; max-width: 30em; }
+.hero .btn-row { margin-bottom: 1.5rem; }
+
+/* Urgent strip inside the hero: NHS urgent care card, compact */
+.urgent-line {
+  display: flex; gap: .85rem; align-items: flex-start;
+  padding: 1rem 1.15rem; max-width: 34rem;
+  background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--urgent); border-radius: var(--radius-sm);
+  font-size: var(--fs-small); line-height: 1.5;
+}
+.urgent-line .icon { color: var(--urgent); width: 1.5rem; height: 1.5rem; margin-top: .05rem; }
+.urgent-line p { margin: 0; }
+.urgent-line__title { display: block; font-size: 1.0625rem; }
+.urgent-line a { font-weight: 700; display: inline-flex; align-items: center; min-height: var(--tap); }
+
+/* Trust row under the hero: one real review, and the real people who run the practice */
+.trust { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); max-width: 36rem; display: grid; gap: 1.25rem; }
+.trust__quote { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0 .75rem; }
+.trust__mark { width: 1.75rem; height: 1.75rem; color: var(--brand); grid-row: span 2; }
+.trust blockquote { margin: 0; }
+.trust blockquote p { margin: 0 0 .25rem; font-weight: 600; font-size: 1.125rem; line-height: 1.4; }
+.trust figcaption { font-size: var(--fs-small); color: var(--ink-soft); }
+.trust__people { display: flex; align-items: center; gap: .9rem; }
+.trust__people p { margin: 0; font-size: var(--fs-small); color: var(--ink-soft); line-height: 1.4; }
+.faces { display: flex; flex: none; }
+.faces img { width: 3.25rem; height: 3.25rem; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--line); }
+.faces img + img { margin-left: -.85rem; }
+
+/* Front desk: the top-tasks panel */
+.desk {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.desk__head { padding: 1.25rem 1.5rem .75rem; }
+.desk__head h2 { font-size: var(--fs-h3); margin: 0; }
+.desk__head h2::before { display: none; }
+.tasks { list-style: none; margin: 0; padding: 0; }
+.tasks li + li { border-top: 1px solid var(--line); }
+.task {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .2rem 1rem; align-items: center;
+  padding: 1rem 1.5rem; min-height: 4.5rem; color: var(--ink); text-decoration: none;
+}
+.task:hover { background: var(--brand-tint); color: var(--ink); }
+.task:hover .task__title { text-decoration: underline; text-decoration-thickness: 2px; }
+.task__icon {
+  grid-row: span 2; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%;
+  background: var(--brand-tint); color: var(--brand-text);
+}
+.task__icon .icon { width: 1.35rem; height: 1.35rem; }
+.task__title { font-weight: 750; color: var(--brand-text); font-size: 1.0625rem; line-height: 1.3; }
+.task__text { grid-column: 2; font-size: var(--fs-small); color: var(--ink-soft); line-height: 1.4; }
+.task__chev { grid-row: 1 / span 2; grid-column: 3; color: var(--brand-text); }
+.task--urgent .task__icon { background: var(--urgent-tint); color: var(--urgent); }
+.desk__foot { background: var(--brand-deep); color: #fff; padding: 1.1rem 1.5rem .6rem; font-size: var(--fs-small); display: grid; gap: .6rem; }
+.desk__foot p { margin: 0; display: flex; gap: .6rem; align-items: flex-start; }
+.desk__foot .icon { color: var(--brand-on-deep); margin-top: .15rem; }
+.desk__foot a { color: #fff; font-weight: 700; display: inline-flex; align-items: center; min-height: var(--tap); }
+.desk__foot span { line-height: 1.45; }
+.desk__foot a:hover { color: var(--brand-on-deep); }
+
+/* ---- Cards (generic) ---- */
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+.card > :last-child { margin-bottom: 0; }
+.card__label {
+  display: inline-block; font-size: var(--fs-label); font-weight: 700; letter-spacing: .02em;
+  color: var(--brand-text); background: var(--brand-tint); border-radius: 999px; padding: .2rem .7rem; margin-bottom: .9rem;
+}
+.card h3 { margin-bottom: .6rem; }
+.card--feature { border-top: 4px solid var(--brand-text); }
+
+/* Numbered steps: "what happens next" */
+.steps { list-style: none; counter-reset: step; padding: 0; margin: 1.25rem 0 1.5rem; display: grid; gap: 1rem; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 2.25rem 1fr; gap: .9rem; align-items: start; }
+.steps li::before {
+  content: counter(step); display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%;
+  background: var(--brand-deep); color: #fff; font-weight: 800; font-size: 1rem;
+}
+.steps strong { display: block; }
+.steps p { margin: 0; color: var(--ink-soft); font-size: var(--fs-small); }
+
+.btn-row + .contact-line { margin-top: .75rem; }
+.contact-line { display: flex; flex-wrap: wrap; gap: .25rem .5rem; align-items: center; margin: 0; font-size: var(--fs-small); color: var(--ink-soft); }
+.contact-line a { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; word-break: break-word; }
+
+/* Callout: reassurance for nervous patients */
+.callout {
+  display: grid; gap: .25rem 1rem; grid-template-columns: auto 1fr; align-items: start;
+  margin-top: clamp(1rem, 2.5vw, 1.75rem); padding: 1.25rem 1.5rem;
+  background: var(--brand-deep); color: #fff; border-radius: var(--radius);
+}
+.callout .icon { color: var(--accent-on-deep); width: 1.75rem; height: 1.75rem; }
+.callout h3 { color: #fff; margin: 0 0 .35rem; font-size: 1.1875rem; }
+.callout p { margin: 0; color: var(--on-deep-soft); }
+.callout a { color: #fff; font-weight: 700; display: inline-flex; align-items: center; min-height: var(--tap); }
+
+/* ---- Reviews ---- */
+.quotes { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1rem, 2.5vw, 1.5rem); list-style: none; padding: 0; margin: 0; }
+@media (min-width: 48em) { .quotes { grid-template-columns: 1fr 1fr; } }
+.quote { margin: 0; height: 100%; display: flex; flex-direction: column; gap: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.25rem, 3vw, 1.75rem); }
+.quote__mark { width: 2rem; height: 2rem; color: var(--brand); }
+.quote blockquote { margin: 0; flex: 1; }
+.quote blockquote p { font-size: 1.1875rem; line-height: 1.5; margin: 0; }
+.quote figcaption { font-weight: 700; display: flex; align-items: center; gap: .6rem; color: var(--ink); }
+.quote figcaption::before { content: ""; width: 1.5rem; height: 2px; background: var(--accent); }
+.quote--lead { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; }
+.quote--lead blockquote p { font-size: clamp(1.3125rem, 1.15rem + .6vw, 1.625rem); line-height: 1.35; font-weight: 600; }
+.quote--lead figcaption { color: #fff; }
+.quote--lead figcaption::before { background: var(--accent-on-deep); }
+.quote--lead .quote__mark { color: var(--brand-on-deep); }
+.source-note { margin-top: 1.25rem; font-size: var(--fs-small); color: var(--ink-soft); }
+
+/* ---- Costs ---- */
+.costs { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1rem, 2.5vw, 1.5rem); }
+@media (min-width: 60em) { .costs { grid-template-columns: repeat(3, 1fr); } }
+.cost { display: flex; flex-direction: column; }
+.cost__figure { font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.5rem); font-weight: 800; line-height: 1; letter-spacing: -.02em; color: var(--brand-deep); margin: 0 0 .5rem; }
+.cost ul { padding-left: 1.2em; margin: .25rem 0 0; }
+.cost li + li { margin-top: .35rem; }
+.cost li::marker { color: var(--brand-text); }
+.costs-note { margin-top: 1.5rem; display: grid; gap: .25rem 2rem; }
+@media (min-width: 52em) { .costs-note { grid-template-columns: 1fr auto; align-items: center; } }
+.costs-note p { margin: 0; color: var(--ink-soft); }
+
+/* ---- Treatments ---- */
+.treatments { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem); }
+@media (min-width: 48em) { .treatments { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 70em) { .treatments { grid-template-columns: repeat(3, 1fr); } }
+.treat-group { padding-top: 1.25rem; border-top: 3px solid var(--brand-deep); }
+.treat-group h3 { display: flex; align-items: center; gap: .65rem; margin-bottom: .4rem; }
+.treat-group h3 .icon { color: var(--brand-text); width: 1.5rem; height: 1.5rem; }
+.treat-list { margin: 0; }
+.treat-list div { padding-block: .7rem; border-top: 1px solid var(--line); }
+.treat-list div:first-child { border-top: 0; }
+.treat-list dt { font-weight: 700; }
+.treat-list dd { margin: .1rem 0 0; color: var(--ink-soft); font-size: var(--fs-small); line-height: 1.45; }
+
+/* ---- Feature (facial aesthetics, or the practice's signature service) ---- */
+.feature { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
+@media (min-width: 56em) { .feature { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); } }
+.feature__media { position: relative; max-width: 26rem; }
+.feature__media img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius); }
+.feature__media { margin: 0; }
+/* Phones: the portrait becomes a byline beside its caption, so the heading stays near the top. */
+@media (max-width: 55.99em) {
+  .feature__media { display: flex; align-items: center; gap: 1rem; max-width: none; }
+  .feature__media img { width: 6.5rem; flex: none; border-radius: var(--radius-sm); }
+  .feature__caption { margin: 0; min-width: 0; }
+}
+.feature__caption { margin-top: .75rem; font-size: var(--fs-small); color: var(--ink-soft); }
+.ticks { list-style: none; padding: 0; margin: 1rem 0 1.5rem; display: grid; gap: .6rem; }
+@media (min-width: 36em) { .ticks--2 { grid-template-columns: 1fr 1fr; } }
+.ticks li { display: flex; gap: .6rem; align-items: flex-start; }
+.ticks .icon { color: var(--brand-text); margin-top: .2rem; }
+
+/* ---- Team ---- */
+.team { list-style: none; padding: 0; margin: 0; display: grid; gap: clamp(.75rem, 2.5vw, 1.75rem); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 48em) { .team { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 64em) { .team { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.person { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; height: 100%; }
+.person img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: var(--brand-tint); }
+.person__body { padding: clamp(.75rem, 2vw, 1rem) clamp(.75rem, 2vw, 1.15rem) clamp(1rem, 2vw, 1.25rem); display: flex; flex-direction: column; gap: .2rem; flex: 1; }
+.person h3 { font-size: clamp(1.0625rem, 1rem + .3vw, 1.1875rem); margin: 0; }
+.person__role { font-weight: 700; color: var(--brand-text); font-size: var(--fs-small); margin: 0; }
+.person__gdc { font-size: var(--fs-label); color: var(--ink-soft); margin: 0; letter-spacing: .01em; }
+.person__bio { font-size: var(--fs-small); color: var(--ink-soft); margin: .4rem 0 0; line-height: 1.45; }
+.team-note { margin-top: 1.5rem; }
+
+/* ---- Visit: hours, address, urgent care ---- */
+.visit { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2rem); }
+@media (min-width: 60em) { .visit { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: start; } }
+.hours { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--fs-small); overflow-wrap: anywhere; }
+.hours caption { text-align: left; font-weight: 750; font-size: var(--fs-h3); padding-bottom: .5rem; }
+.hours th, .hours td { text-align: left; padding: .75rem .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.hours th { font-weight: 700; width: 34%; }
+.hours tr.is-today { background: var(--brand-tint); }
+.hours tr.is-today th { box-shadow: inset 4px 0 0 var(--brand-text); }
+.today-tag { display: inline-block; margin-left: .5rem; padding: 0 .5rem; border-radius: 999px; background: var(--brand-text); color: #fff; font-size: .8125rem; font-weight: 700; }
+.hours-note { font-size: var(--fs-small); color: var(--ink-soft); margin: 1rem 0 0; }
+.address { font-style: normal; font-size: 1.125rem; line-height: 1.5; margin-bottom: 1rem; }
+.visit-actions { display: grid; gap: .75rem; margin-top: 1.25rem; }
+.visit-actions { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
+.visit-actions .btn { width: 100%; }
+
+/* Urgent care card: adapted from the NHS.UK care card (urgent) */
+.care-card { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: var(--surface); margin-top: clamp(1.25rem, 3vw, 2rem); }
+.care-card__head { background: var(--urgent); color: #fff; padding: 1rem 1.5rem; }
+.care-card__head h3 { margin: 0; color: #fff; font-size: var(--fs-h3); }
+.care-card__body { padding: 1.25rem 1.5rem 1.5rem; display: grid; gap: 1rem; }
+.care-card__body p { margin: 0; }
+.care-card__body .num { font-weight: 800; font-size: 1.25rem; }
+.care-card__row { display: grid; gap: .25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+.care-card__row:last-child { border-bottom: 0; padding-bottom: 0; }
+.care-card__row h4 { margin: 0; font-size: 1.0625rem; }
+.care-card__row a { font-weight: 700; }
+
+/* Place photograph */
+.place { margin: clamp(2rem, 5vw, 3.5rem) 0 0; }
+.place img { width: 100%; aspect-ratio: 21 / 8; object-fit: cover; border-radius: var(--radius); }
+@media (max-width: 40em) { .place img { aspect-ratio: 4 / 3; } }
+.place figcaption { margin-top: .25rem; font-size: var(--fs-label); color: var(--ink-soft); }
+
+/* ---- Footer ---- */
+.site-footer { background: var(--brand-deep); color: var(--on-deep-soft); padding-block: clamp(2.5rem, 5vw, 4rem) 1.5rem; font-size: var(--fs-small); }
+.site-footer a { color: #fff; display: inline-flex; align-items: center; min-height: var(--tap); }
+.site-footer a:hover { color: var(--brand-on-deep); }
+.footer-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 52em) { .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
+.footer-brand { display: flex; gap: .9rem; align-items: center; margin-bottom: 1rem; }
+.footer-brand img { width: 3.5rem; height: 3.5rem; }
+.footer-brand span { font-weight: 750; font-size: 1.1875rem; color: #fff; }
+.site-footer h2 { font-size: 1rem; color: var(--accent-on-deep); margin: 0 0 .5rem; letter-spacing: .02em; }
+.site-footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .25rem; }
+.site-footer li a { line-height: 1.35; padding-block: .3rem; }
+.site-footer p { margin: 0 0 .5rem; }
+.footer-legal { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .18); display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: space-between; color: var(--on-deep-soft); }
+.footer-legal p { margin: 0; max-width: none; }
+
+/* Print: patients print hours and directions */
+@media print {
+  .site-header, .menu-toggle, .desk, .place, .btn-row { display: none !important; }
+  body { background: #fff; }
+}
+
+/* 6. MOTION ================================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .btn, .task, .nav a, a { transition: background-color .15s ease, color .15s ease, text-decoration-thickness .15s ease; }
+  .task__chev { transition: transform .2s ease; }
+  .task:hover .task__chev { transform: translateX(3px); }
+  .status[data-state="open"] .status__dot { animation: breathe 2.4s ease-in-out infinite; }
+  @keyframes breathe { 50% { box-shadow: 0 0 0 7px rgba(0, 127, 59, .06); } }
+}

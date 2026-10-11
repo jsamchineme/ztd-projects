@@ -1,0 +1,13 @@
+river-ness-1600.webp, river-ness-1600.jpg
+
+"River Ness from Inverness Castle April 2026"
+By Lucas Kendall, own work, 19 March 2026
+Source: https://commons.wikimedia.org/wiki/File:River_Ness_from_Inverness_Castle_April_2026.jpg
+Licence: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+https://creativecommons.org/licenses/by-sa/4.0/
+
+Changes: resized and re-compressed (WebP and JPEG). The credit is shown on the
+hero photo (desktop) and in the page footer (all screen sizes).
+
+Not used, on purpose: the Geograph photos titled "Southside Road Surgery" show a
+different practice (Southside Road Surgery, 43 Southside Road), not Kingsmills.

@@ -3,15 +3,24 @@
   "attentionStage": "attention",
   "ratingBands": { "bad": [1, 4], "average": [5, 7], "good": [8, 10] },
   "templates": [
-    "Clinic Clean",
-    "Local Service Bold",
-    "Professional Minimal",
-    "Restaurant Warm",
-    "Retail Showcase"
+    "Front Desk GP",
+    "Front Desk Dental",
+    "Front Desk Local",
+    "Familiar Faces GP",
+    "Familiar Faces Dental",
+    "Doorway"
   ],
+  "templateFiles": {
+    "Front Desk GP": "templates/uk-gp",
+    "Front Desk Dental": "templates/uk-dental",
+    "Front Desk Local": "templates/uk-local",
+    "Familiar Faces GP": "templates/uk-people-gp",
+    "Familiar Faces Dental": "templates/uk-team",
+    "Doorway": "templates/uk-inside"
+  },
   "fields": [
     { "key": "score", "label": "Score (1–10)", "type": "number" },
-    { "key": "rating", "label": "Rating", "type": "select", "options": ["bad", "average", "good"] },
+    { "key": "rating", "label": "Rating", "type": "select", "options": ["bad", "average", "good"]},
     { "key": "analysis", "label": "Analysis notes", "type": "text" },
     { "key": "findings", "label": "What needs fixing", "type": "text" },
     { "key": "template", "label": "Template", "type": "template" },
@@ -70,7 +79,7 @@
             { "id": "done", "label": "Redesign planned", "to": "ready" },
             { "id": "new_site", "label": "New site planned", "to": "ready" }
           ],
-          "instructions": "Study the site in depth. Write `findings`: the concrete problems (layout, content, mobile, speed, branding, missing pages, weak calls to action). Choose a `template` from the template list that best fits the business. Write `plan`: section-by-section how the redesign maps the existing content onto the template, what to keep (logo, colours, copy, images) and what to add. Then complete with outcome `done`.\n\nIf the business has no working website (the site is down, doesn't load, is only a Facebook page, or the card links to its NHS listing), don't give up: this is a prospect for a brand-new site. Gather what you can from the NHS listing link in the notes, the Facebook page and a web search: practice name, address, phone, opening hours, services, NHS or private, team and photos. In `findings`, say there's no working website and list what you found. Choose a `template` and write a `plan` for a new site built from those details. Then complete with outcome `new_site`."
+          "instructions": "Study the site in depth. Write `findings`: the concrete problems (layout, content, mobile, speed, branding, missing pages, weak calls to action). Choose a `template` by practice type and by what real photos the practice has on its current site (its own published photos only; never stock): a GP practice with good staff portraits or team photos gets \"Familiar Faces GP\", otherwise \"Front Desk GP\". A dental practice with good, consistent team portraits and bios gets \"Familiar Faces Dental\"; one whose best photos show its building, reception and treatment rooms gets \"Doorway\"; a rural or small-town practice with mostly older or anxious patients, weak photos or a slow current site gets \"Front Desk Local\"; any other dental practice gets \"Front Desk Dental\". Say in `findings` which photos exist and why you chose the template. Read the template's BRIEF.md (you're given the path) so your plan follows its homepage structure, and list in `plan` which of the practice's photos to use where. Write `plan`: section-by-section how the redesign maps the existing content onto the template, what to keep (logo, colours, copy, images) and what to add. Then complete with outcome `done`.\n\nIf the business has no working website (the site is down, doesn't load, is only a Facebook page, or the card links to its NHS listing), don't give up: this is a prospect for a brand-new site. Gather what you can from the NHS listing link in the notes, the Facebook page and a web search: practice name, address, phone, opening hours, services, NHS or private, team and photos. In `findings`, say there's no working website and list what you found. Choose a `template` and write a `plan` for a new site built from those details. Then complete with outcome `new_site`."
         },
         {
           "id": "ready", "name": "Ready to build", "who": "any",
@@ -78,21 +87,21 @@
           "feeds": "build"
         },
         {
-          "id": "build", "name": "Build", "who": "any", "pullFrom": ["ready"],
+          "id": "build", "name": "Build", "who": "any", "pullFrom": ["ready"], "audit": true,
           "description": "Design the new site on the chosen template.",
           "requires": ["previewUrl"],
           "next": "ai_review",
-          "instructions": "Build the redesign on the chosen `template`, following `findings` and `plan`. Reuse the business's real content, logo and brand colours. If the card was planned as a new site (there's no working website), build it from the details gathered in `findings`, `plan` and the notes, and never invent services, prices, staff or reviews. Deploy a preview and set `previewUrl`. If the card came back from review, address everything in `review` first. Then complete the card."
+          "instructions": "Build the redesign on the chosen `template`, following `findings` and `plan`. Read the template's BRIEF.md and its worked example first (you're given the paths), copy its styles.css into the site unchanged except for the custom properties at the top, and follow the example's homepage structure and quality bar. Reuse the business's real content, logo and brand colours. If the card was planned as a new site (there's no working website), build it from the details gathered in `findings`, `plan` and the notes, and never invent services, prices, staff or reviews. Deploy a preview and set `previewUrl`. If the card came back from review, address everything in `review` first. Then complete the card."
         },
         {
-          "id": "ai_review", "name": "AI review", "who": "ai",
+          "id": "ai_review", "name": "AI review", "who": "ai", "audit": true,
           "description": "An agent checks the build against the plan and template.",
           "requires": ["review"],
           "outcomes": [
             { "id": "pass", "label": "Pass", "to": "human_review" },
             { "id": "changes", "label": "Needs changes", "to": "build" }
           ],
-          "instructions": "Compare `previewUrl` with the original `url`, the `findings`, the `plan` and the chosen `template`. Check every planned section exists, the real content was carried over, the layout works on mobile, links and forms work, and nothing is placeholder text. Write `review` (what you checked and anything wrong). Complete with outcome `pass`, or `changes` to send it back to Build."
+          "instructions": "A browser audit of the preview runs just before you start (every link clicked, axe accessibility to WCAG 2.1 AA, phone layout and tap targets, menu, forms, keyboard), and you get its report and screenshots. Treat its measurements as facts. Then judge what it can't: compare `previewUrl` with the original `url`, the `findings`, the `plan` and the chosen `template`'s BRIEF.md rules (you're given the path). Check every planned section exists, the business's real content (name, phone, address, hours, services, team) was carried over correctly, and nothing is invented or placeholder. Write `review`: one line on what you checked, then a numbered list of everything to fix, most important first, each specific enough for the builder (which page and element, and what to change). Complete with outcome `changes` if there is any audit blocker or major issue, a missing planned section, or invented or placeholder content; otherwise `pass`, listing any minor issues in the review. External links the audit couldn't verify aren't failures."
         },
         {
           "id": "human_review", "name": "Human review", "who": "human",

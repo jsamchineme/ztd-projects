@@ -8,6 +8,12 @@ import { dirname, join, resolve, sep, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRunner } from './workers.mjs';
 
+// The browser audit needs Playwright and axe-core (npm --prefix pipeline install). Without them the board still runs.
+const auditMod = await import('./audit.mjs').catch(e => {
+  console.warn(`Browser audit is off: ${e.message.split('\n')[0]}\nInstall it with: npm --prefix pipeline install`);
+  return null;
+});
+
 const PORT = Number(process.argv[2] || process.env.PORT || 4390);
 const HOST = '127.0.0.1';
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -27,6 +33,8 @@ for (const p of config.pipelines) for (const s of p.stages){
 for (const s of stages.values()) for (const ref of [...s.outcomes.map(o => o.to), ...(s.pullFrom || []), ...(s.feeds ? [s.feeds] : [])])
   if (!stages.has(ref)) throw new Error(`Stage "${s.id}" refers to unknown stage "${ref}"`);
 if (config.attentionStage && !stages.has(config.attentionStage)) throw new Error(`attentionStage "${config.attentionStage}" isn't a stage`);
+for (const [name, dir] of Object.entries(config.templateFiles || {}))
+  if (!existsSync(join(ROOT, dir, 'BRIEF.md'))) console.warn(`Template "${name}" has no BRIEF.md in ${dir}`);
 const firstStage = config.pipelines[0].stages[0].id;
 const fieldKeys = new Set(config.fields.map(f => f.key));
 const claimMs = (config.claimMinutes || 90) * 60000;
@@ -164,8 +172,9 @@ function complete(c, { outcome, note, fields, by, force, to }){
 }
 
 // ---------- workflows ----------
-const MODELS = ['sonnet', 'opus', 'haiku'];
+const MODELS = ['fable', 'opus', 'sonnet', 'haiku'];
 const workable = s => s && s.outcomes.length && !s.feeds && !s.terminal && !s.parking && s.who !== 'human';
+const TOOLSETS = ['research', 'files', 'browser'];
 function cleanWorkflow(b){
   const name = String(b.name || '').trim().slice(0, 60);
   if (!name) throw new ApiError(400, 'Give the workflow a name');
@@ -187,23 +196,47 @@ function cleanWorkflow(b){
       workers: Math.min(5, Math.max(1, Math.round(Number(st.workers) || 1))),
       limit: Math.max(0, Math.round(Number(st.limit) || 0)),
       model: MODELS.includes(st.model) ? st.model : 'sonnet',
-      tools: st.tools === 'files' ? 'files' : 'research',
+      tools: TOOLSETS.includes(st.tools) ? st.tools : 'research',
       budget: budget > 0 ? Math.min(budget, 50) : null,
       instructions: String(st.instructions || '').slice(0, 4000),
       routes
     };
   });
-  return { name, steps };
+  // Run limits: how long a run lasts and how much it may spend. 0 means no limit.
+  const runMinutes = Math.min(24 * 60, Math.max(0, Math.round(Number(b.runMinutes) || 0)));
+  const maxSpend = Math.min(1000, Math.max(0, Math.round((Number(b.maxSpend) || 0) * 100) / 100));
+  return { name, steps, runMinutes, maxSpend };
 }
 const workflow = id => {
   const w = db.workflows.find(w => String(w.id) === String(id));
   if (!w) throw new ApiError(404, `No workflow ${id}`);
   return w;
 };
+const previewUrl = id => `http://localhost:${PORT}/preview/${id}/`;
+const hasPreview = c => existsSync(join(WORK, String(c.id), 'site', 'index.html'));
+
+// ---------- browser audit ----------
+const auditing = new Set();
+async function auditCard(c, by){
+  if (!auditMod) throw new ApiError(503, 'The browser audit isn’t installed. Run: npm --prefix pipeline install');
+  if (!hasPreview(c)) throw new ApiError(400, `#${c.id} has no preview site to audit yet`);
+  if (auditing.has(c.id)) throw new ApiError(409, `#${c.id} is already being audited`);
+  auditing.add(c.id); broadcast();
+  try {
+    const r = await auditMod.runAudit(previewUrl(c.id), join(WORK, String(c.id), 'audit'));
+    const { blocker, major, minor, info, pages, links, clicked, ms } = r.summary;
+    c.audit = { at: r.at, blocker, major, minor, info, pages, links, clicked, ms };
+    log(c, by || 'someone', 'audit', { note: `${blocker} blocker${blocker === 1 ? '' : 's'}, ${major} major, ${minor} minor` });
+    save();
+    return r;
+  } finally { auditing.delete(c.id); broadcast(); }
+}
+
 const runner = createRunner({
-  stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter,
+  stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter, previewUrl,
   workDir: id => join(WORK, String(id)),
-  previewUrl: id => `http://localhost:${PORT}/preview/${id}/`
+  auditCard: auditMod && auditCard, hasPreview,
+  auditScript: join(ROOT, 'audit.mjs'), root: ROOT
 });
 
 // ---------- http ----------
@@ -226,7 +259,7 @@ function readJson(req, limit = 2e6){
   });
 }
 
-const publicConfig = () => ({ ...config, pipelines: config.pipelines.map(p => ({ ...p, stages: p.stages.map(s => stages.get(s.id)) })), claimMinutes: claimMs / 60000 });
+const publicConfig = () => ({ ...config, pipelines: config.pipelines.map(p => ({ ...p, stages: p.stages.map(s => stages.get(s.id)) })), claimMinutes: claimMs / 60000, auditAvailable: !!auditMod });
 const withInstructions = c => c && ({ ...c, stageInfo: (({ id, name, who, requires, outcomes, feeds, instructions }) => ({ id, name, who, requires, outcomes, feeds, instructions }))(stages.get(c.stage)), templates: config.templates });
 
 async function api(req, res, url){
@@ -264,10 +297,13 @@ async function api(req, res, url){
       }
     }
     if (parts[2] === 'run' && m === 'POST'){
-      try { runner.start(w); } catch (e){ throw new ApiError(409, e.message); }
+      const minutes = body.minutes ?? w.runMinutes, maxSpend = body.maxSpend ?? w.maxSpend;
+      try { runner.start(w, { minutes: Math.max(0, Number(minutes) || 0), maxSpend: Math.max(0, Number(maxSpend) || 0) }); }
+      catch (e){ throw new ApiError(409, e.message); }
       return send(res, 200, { workflow: withRun(w) });
     }
     if (parts[2] === 'stop' && m === 'POST'){ runner.stop(w.id); save(); return send(res, 200, { workflow: withRun(w) }); }
+    if (parts[2] === 'finish' && m === 'POST'){ runner.finishUp(w.id); return send(res, 200, { workflow: withRun(w) }); }
     throw new ApiError(404, 'Not found');
   }
   if (parts[0] === 'claim' && m === 'POST'){
@@ -283,7 +319,7 @@ async function api(req, res, url){
       let list = db.cards;
       if (stage) list = list.filter(c => c.stage === stage);
       if (q) list = list.filter(c => (c.name + ' ' + c.url).toLowerCase().includes(q));
-      return send(res, 200, { version, cards: list });
+      return send(res, 200, { version, cards: list, auditing: [...auditing] });
     }
     if (m === 'POST'){
       const items = Array.isArray(body.cards) ? body.cards : [body];
@@ -319,6 +355,7 @@ async function api(req, res, url){
     }
   }
   if (m !== 'POST') throw new ApiError(405, 'Method not allowed');
+  if (action === 'audit'){ await auditCard(c, by); return send(res, 200, { card: withInstructions(c) }); }
   if (action === 'move'){
     if (!stages.has(body.to)) throw new ApiError(400, `Unknown stage "${body.to}"`);
     if (body.to !== c.stage) enter(c, body.to, by, body.note);
@@ -334,16 +371,17 @@ async function api(req, res, url){
   return send(res, 200, { card: withInstructions(c) });
 }
 
-// AI-built preview sites. Sandboxed so their scripts run in an opaque origin and can't call this API.
+// AI-built preview sites (/preview/<card>/) and their audit reports (/audit/<card>/).
+// Sandboxed so their scripts run in an opaque origin and can't call this API.
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 async function preview(res, pathname){
-  const [, , id, ...rest] = pathname.split('/');
+  const [, kind, id, ...rest] = pathname.split('/');
   if (!/^\d+$/.test(id || '')) return send(res, 404, 'Not found', 'text/plain');
-  if (!rest.length) { res.writeHead(301, { Location: `/preview/${id}/` }); return res.end(); }
-  const root = join(WORK, id, 'site');
+  if (!rest.length) { res.writeHead(301, { Location: `/${kind}/${id}/` }); return res.end(); }
+  const root = join(WORK, id, kind === 'audit' ? 'audit' : 'site');
   let file;
-  try { file = resolve(root, decodeURIComponent(rest.join('/')) || 'index.html'); } catch { return send(res, 400, 'Bad path', 'text/plain'); }
+  try { file = resolve(root, decodeURIComponent(rest.join('/')) || (kind === 'audit' ? 'report.html' : 'index.html')); } catch { return send(res, 400, 'Bad path', 'text/plain'); }
   if (file !== root && !file.startsWith(root + sep)) return send(res, 403, 'Forbidden', 'text/plain');
   if (file.endsWith(sep) || file === root) file = join(file, 'index.html');
   try {
@@ -354,16 +392,34 @@ async function preview(res, pathname){
   } catch { send(res, 404, 'Not found', 'text/plain'); }
 }
 
+// Design templates and their worked examples (/templates/<name>/example/), for people to look at.
+async function template(res, pathname){
+  const root = join(ROOT, 'templates');
+  let file;
+  try { file = resolve(root, decodeURIComponent(pathname.slice('/templates/'.length))); } catch { return send(res, 400, 'Bad path', 'text/plain'); }
+  if (!file.startsWith(root + sep)) return send(res, 403, 'Forbidden', 'text/plain');
+  if (pathname.endsWith('/')) file = join(file, 'index.html');
+  try {
+    const body = await readFile(file);
+    res.writeHead(200, { 'Content-Type': extname(file) === '.md' ? 'text/plain; charset=utf-8' : TYPES[extname(file).toLowerCase()] || 'application/octet-stream',
+      'Cache-Control': 'no-store', 'Content-Security-Policy': 'sandbox allow-scripts allow-forms allow-popups', 'X-Content-Type-Options': 'nosniff' });
+    res.end(body);
+  } catch { send(res, 404, 'Not found', 'text/plain'); }
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${HOST}`);
   if (url.pathname.startsWith('/api/')){
     if (!sameOrigin(req)) return send(res, 403, { error: 'Forbidden' });
+    // Headless browsers here are AI workers testing previews; they must never drive the board.
+    if (/HeadlessChrome/.test(req.headers['user-agent'] || '')) return send(res, 403, { error: 'Forbidden' });
     try { await api(req, res, url); }
     catch (e){ send(res, e.status || 500, { error: e.message }); if (!e.status) console.error(e); }
     return;
   }
   if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed', 'text/plain');
-  if (url.pathname.startsWith('/preview/')) return preview(res, url.pathname);
+  if (url.pathname.startsWith('/preview/') || url.pathname.startsWith('/audit/')) return preview(res, url.pathname);
+  if (url.pathname.startsWith('/templates/')) return template(res, url.pathname);
   if (url.pathname !== '/' && url.pathname !== '/index.html') return send(res, 404, 'Not found', 'text/plain');
   try { send(res, 200, await readFile(join(ROOT, 'index.html')), 'text/html; charset=utf-8'); }
   catch { send(res, 500, 'index.html is missing', 'text/plain'); }

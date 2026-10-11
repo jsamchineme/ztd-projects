@@ -1,0 +1,200 @@
+# Familiar Faces Dental
+
+> Pipeline name: **Familiar Faces Dental** (folder `templates/uk-team/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Familiar Faces", it means this template.
+
+A people-led website template for UK dental practices (NHS, private or mixed), adaptable for GP surgeries.
+
+**The idea in one line:** patients choose people, not buildings. So the homepage shows the people they'll actually see, by name, face and personality, without ever making them hunt for the phone number, how to join or what to do in pain.
+
+Familiar Faces is the people-first sibling of the approved **Front Desk** family (`uk-dental/`, `uk-gp/`, `uk-local/`). It keeps Front Desk's discipline (tasks first, live status, plain English, no pop-ups) and moves the practice's own team from the bottom of the page to the centre of it.
+
+## 1. Files
+
+| File | What it is | Edit it? |
+| --- | --- | --- |
+| `styles.css` | The whole design system. Tokens at the top (section 1), components below, numbered. | Tokens only. |
+| `faces.js` | About 90 lines of plain JS: the phone menu (`aria-expanded`, `aria-controls`, Escape to close) and the live open or closed status. It reads the hours from the page's hours table, in Europe/London time. | No. |
+| `fonts/` | Red Hat Display and Red Hat Text variable woff2 (latin and latin-ext), plus `OFL.txt`. Self-hosted, no CDN. | No. |
+| `example/index.html` | The worked homepage for Kirriemuir Dental Practice. Copy it for each practice. | Yes, for each practice. |
+| `example/no-photos.html` | Demo of the fallback when a practice has only 1 or 2 photos. Not linked from the homepage. | Reference only. |
+| `example/img/` | That practice's own photos, optimised, and `CREDITS.txt` with every source URL. | Replace for each practice. |
+| `PHOTO-SHOTLIST.md` | One-page brief for the practice or a local photographer. Doubles as a paid add-on. | Hand it out. |
+
+The example links `../styles.css`, `../faces.js` and `../fonts/`. Keep that layout: one template folder, one practice folder inside it.
+
+## 2. The concept, and how it differs from what came before
+
+**The team is the brand.** A small practice's real advantage over a corporate chain is its people: the dentist who's been there 20 years, the hygienist who's brilliant with nervous patients. Most practice sites bury them on a "Meet the team" page with tiny thumbnails. Familiar Faces puts them on the homepage, in a consistent, dignified card with their own published story.
+
+**But tasks still come first.** On a 390px phone, the first screen holds the live status, "In pain? Phone NHS 24 on 111" when closed, the h1, a row of real faces, the Call button and four task links (join, emergency, costs, hours). The people are visible, and nothing is pushed below the fold to make room for them.
+
+How it stays distinct from the approved and rejected work:
+
+- **Front Desk** (approved) is task-led and light on imagery: faces appear at a sensible size near the bottom. Familiar Faces is portrait-led. It has a face pile in the hero, the reception team as the hero photo, portrait cards for every clinician as the second section, a "Meet Beverley" spotlight for nervous patients, and the nursing team as a full-width group photo. Different signature components, same discipline.
+- **Atelier, Civic, Haven** (rejected) started from a mood and made the h1 a slogan. Familiar Faces starts from two research findings: patients come to do a task, and they're told by NHS inform that they should know who will treat them. The h1 says what and where, the photos are the practice's own, and there's no decoration the patient has to decode.
+- **No trend devices.** No oversized italic serif, no full-bleed mood photo, no text over images, no gradient, no animation. The premium comes from consistent portraits, precise type and real information.
+
+## 3. Research and the decisions it drives
+
+| Decision | Research finding it comes from |
+| --- | --- |
+| **Photos of people are used, but only real ones, each with a job.** The reception photo answers "who will I speak to?" Portraits answer "who will treat me?" The spotlight answers "is anyone good with nervous patients?" No decorative stock, no smiling-model hero. | NHS service manual, Images component: "Use images only if there is a real user need. Avoid unnecessary decoration." NHS England GP website guide 1.7: "Avoid using images and banners unless essential." A recognisable clinician is a real need (below); a stock smile is not. |
+| **"Who you'll see" is the second section, with every dentist's name, role, qualification, GDC number and story.** The join section says "When you join, we'll tell you which dentist will look after you." | NHS inform, *Receiving NHS dental treatment in Scotland*: when you register "you should be given all the relevant information you need about your dentist including … who will carry out your dental treatment". The template makes that information public and pleasant. |
+| **No text on photos. Every caption is a solid panel below the image.** No words baked into images. | NHS service manual: "Do not use images that have words in them, because screen readers will not be able to read the words." NHS England GP guide repeats this for banners. WCAG 1.4.3 contrast can't be guaranteed over a photo. |
+| **Portraits sit in a single consistent grid, never a slider.** On phones, each card puts the photo beside the name badge so all eight dentists stay scannable. | NHS service manual: "gallery views (images side by side) confused users… users clicked images expecting them to appear larger in a pop-up modal." Our grid is people cards with names attached, not an image gallery. There's nothing to click to enlarge and no carousel. |
+| **Meaningful alt text for each person:** name plus a short visual description ("Michael Byrne, smiling, with curly hair, a red beard and navy practice scrubs."). Face-pile thumbnails are `aria-hidden` because the link beside them says "Meet our dentists". | NHS service manual, accessibility content: images "must have text alternatives that describe the information or function they represent". The pile is a visual preview of the linked section, so its function is carried by the link text. |
+| **Tasks first on the phone's first screen:** Call button in the sticky header and the hero, then Join, Toothache or emergency, What it costs and Opening hours as large task links. | NHS England GP guide 3.6: "the homepage is the first place that 80% of users will look… Put all key tasks high up on the homepage. Don't have paragraphs of text on the homepage." Top tasks include registering, the phone number and opening times. |
+| **Live "Open now / Closed now · opens tomorrow at 9am" status** in the hero, the emergency card and the hours section. "In pain? Phone NHS 24 on 111." appears only when closed. | GP guide 3.6: "Make sure useful information like opening times and the practice phone number are visible on the homepage." |
+| **Emergency card with three routes:** our patients (phone us), closed (NHS 24 on 111, as text), not registered (the health board's dental advice line). 999 as text. | NHS inform, *Dental emergencies*: "always phone the dental practice that you normally attend"; out of hours "phone the emergency dental service on 111"; unregistered patients use the local line (Angus: 01241 432 481). |
+| **"Join" not "Register"** in the menu and task links. | GP guide 3.3: "'Register' was often confused with other items you can register for." |
+| **Six menu items, no submenus, and the word "Menu"** (not a hamburger icon) on phones. | GP guide 3.4 and 3.5: no more than seven items, no submenus; users often don't understand hamburger icons, "use the word 'menu'". |
+| **No pop-ups, cookie walls, chat widgets, carousels or autoplay.** No map iframe: a text link to Google Maps instead (no third-party cookies, nothing to trap focus). | GP guide 1.7: 27% of participants who met an overlay first struggled to get past it. |
+| **Plain English, links that say where they go and start with a verb,** times as "9am to 5pm". | NHS service manual content guide ("How we write"; numbers and times). GP guide: verb-first calls to action. |
+
+## 4. Rules (every build, no exceptions)
+
+1. **Never invent facts, quotes, bios or reviews.** Use only what the practice has published or confirmed in writing. If something is unclear or might be stale, write "phone to check" (as we do for whether Kirriemuir is taking new NHS patients and for Clare Perez's GDC number).
+2. **Bios are the practice's words.** Quote them verbatim. You may shorten, and you may swap "she" for the person's first name so a quote stands alone. Never add an adjective. The team section says "in the practice's own words" so patients know the source.
+3. **The team's own words** (first-person quotes) appear only if the person wrote or approved them. Kirriemuir has none published, so the example uses no first-person quotes.
+4. **Tasks on the first phone screen** (390×844): status, Call, Join, Emergency. Check with a real phone before handover.
+5. **111 and 999 are text, never `tel:` links.** The practice number and health-board lines are `tel:` links with 44px tap height.
+6. **No text over photos.** Captions are solid panels.
+7. **No stock or AI-generated people, ever.** Nobody appears as staff who isn't. Group photos are captioned with the heading the practice used ("Our dental nursing team"). Don't name people the practice didn't name.
+8. **WCAG 2.2 AA.** Contrast of 4.5:1 or more (the tokens are mostly 7:1 or more), visible yellow focus, skip link, landmarks, headings in order, 44px tap targets including footer and inline links, works at 200% text and 320px reflow, respects `prefers-reduced-motion`.
+9. **Performance.** Self-hosted fonts, no CDNs. Portraits served at 360w and 520w via `srcset`, lazy-loaded below the hero. Budget: under 1.2 MB desktop and 700 KB phone. Kirriemuir with 17 photos measures 526 KB at desktop DPR 1, 729 KB at DPR 2 and 609 KB on a phone at DPR 3, all after a full scroll.
+
+## 5. Homepage structure
+
+| # | Section | Purpose | Phone behaviour |
+| --- | --- | --- | --- |
+| 1 | **Header** | Practice name, six links, Call button | Sticky. Brand, Call, Menu in one row. |
+| 2 | **Front of house** | Live status, 111 line when closed, h1 (what and where), face pile linking to the team, Call button, four task links. Right: the reception team photo with a solid caption ("They're who you'll speak to when you phone…"). | Everything down to the fourth task link sits on the first screen. The photo follows. |
+| 3 | **Meet your dentists** | One portrait card per dentist: photo, name, role, facts (qualified, joined, interests, GDC number), one personality line from the published bio, "More about [name]" disclosure with the rest. | Photo beside the name badge, story below. |
+| 4 | **Join as a new patient** | NHS route as numbered steps, the private plan with published prices, "phone to check" where unknown. | Stacked panels. |
+| 5 | **Spotlight** | One person matched to one patient need. Kirriemuir: Beverley, hygienist with anxiety-management training, for nervous patients. A large portrait plus a quote from her profile and a call to action. | Portrait (max 17rem) above the text. |
+| 6 | **Toothache or a dental emergency** | Red-edged urgent card with the live status and three routes, plus 999. | Stacked. |
+| 7 | **What it costs** | Official NHS Scotland rules beside a short list of the practice's published private fees. | Stacked. |
+| 8 | **Who else you'll meet** | Compact cards for hygienists, technicians and managers, then the nursing team group photo. | Compact cards stack. |
+| 9 | **Opening hours and how to find us** | Hours table (drives the live status), address, facilities, directions link, call and email, premises photo. | Stacked. |
+| 10 | **Footer** | Address, call, task links, NHS inform links. All links 44px tall. | |
+
+If the practice has a spotlight-worthy person for a different need (a children's dentist, a dentist who speaks Polish, a denture specialist), use the spotlight for that need instead. Use only one spotlight per page.
+
+## 6. Components quick reference
+
+- `.status[data-status]`: live pill. Put the static fallback text inside, which shows if JS fails.
+- `[data-when-closed]`: shown only when closed (starts `hidden`).
+- `table[data-hours]` with `tr[data-day][data-open][data-close]`: the single source of opening hours (0 = Sunday). Rows without `data-open` are closed days.
+- `.facepile`: up to 8 `-face.jpg` crops (112px squares), `aria-hidden`, plus one text link. Shows 4 on phones.
+- `.people > .person`: the portrait card, built from `.person__photo`, `.person__id` (h3 name, `.person__role`, `dl.person__facts`), and `.person__more` (`.person__words` with a `.label`, `details.story`).
+- `.people--compact > .person--compact`: small cards for the wider team.
+- `.spotlight`: one large portrait plus a `blockquote.quote` from the published bio.
+- `.group-photo`, `.front-photo`, `.place-photo`: figures with solid captions.
+- `.panel`, `.steps`, `.fees`, `.urgent`, `.tasks/.task`, `.action`, `.btn--call`, `.btn--quiet`.
+
+## 7. Tokens and re-theming a practice
+
+All tokens are custom properties at the top of `styles.css`. To re-theme, change these, and only these:
+
+| Token | What it does | Rule |
+| --- | --- | --- |
+| `--brand` | Buttons, links, card edges, step numbers | 7:1 or more against white (white text sits on it). Darken the practice's logo colour until it passes. Kirriemuir `#663399` became `#5c2e91` (9.3:1). |
+| `--brand-strong` | Hover and pressed states | About 15% darker than `--brand`. |
+| `--brand-tint`, `--brand-tint-2` | Portrait panels, quote boxes, the spotlight band | Very light, so `--ink-soft` keeps 7:1 on it. |
+| `--accent` | Small marks only: caption rules, chevrons | Never used for text. |
+| `--accent-ink` | Eyebrows and role lines | 7:1 on paper. Kirriemuir green `#669933` became `#3b5e1a`. |
+| `--font-display`, `--font-text` | Typefaces | Any OFL family, self-hosted in `fonts/`. Keep one family with two optical cuts or one family only. |
+| `--radius`, `--radius-photo` | Shape | Keep photos softly rounded (10 to 16px), never circles in cards. Circles are for the face pile only. |
+
+Leave the neutrals, status, urgent and focus tokens alone: they carry the accessibility guarantees. To check a new pair, run a contrast check (a short WCAG luminance script is enough). The example's ratios are: ink on paper 16.2, ink-soft on paper 8.6, white on brand 9.3, brand on tint 8.1, accent-ink on paper 7.2, open status 6.6, closed status 7.9, focus 14.6.
+
+For the inline SVG mark in the header, swap the initials and colours. Don't use an `<img src="logo.svg">` for a text logo: the in-house audit flags it as broken. Use inline SVG, or a PNG or WebP of the real logo.
+
+## 8. Photo rules
+
+**Source.** Use only the practice's own photos: from their current site, their social media (with permission) or a new shoot (see `PHOTO-SHOTLIST.md`). Never use stock or AI-generated people. Never show anyone as staff who isn't. Record every source URL in `example/img/CREDITS.txt`.
+
+**Consent.** Before launch, the practice confirms in writing that each person shown consents to their photo, name, role and bio appearing on the website. People who leave are removed within 5 working days. Withdrawn consent is honoured the same day. Patients never appear unless the practice holds their specific written consent for web use. If in doubt, leave the photo out and use the fallback.
+
+**Cropping and sizes.**
+- Portraits are 4:5. Head and shoulders, eyes about a third from the top. Make `-360.jpg` and `-520.jpg` (progressive JPEG, about quality 70, 15 to 35 KB each).
+- Face-pile crops are 112×112px squares from the same portrait (about 3 KB).
+- Group and premises photos are 480 or 720 and 800 or 1200 wide (25 to 85 KB).
+- Never upscale. Don't retouch faces, swap backgrounds or apply filters. If a portrait set is inconsistent (different backgrounds or light), keep them all the same crop and size, and recommend a reshoot as an add-on.
+- Use `width` and `height` attributes on every `<img>` (no layout shift), `loading="lazy"` on everything below the hero, and `fetchpriority="high"` on the hero photo.
+
+**Alt text.**
+- **Portraits:** "Name, a short visual description." Example: "Jane Leslie, smiling, with shoulder-length blonde hair and navy practice scrubs." Don't describe a person's age, body or ethnicity. Don't repeat the role (it's in the card).
+- **Group photos:** say who they are as a group, how many, and where. Example: "Eleven dental nurses in purple uniforms, smiling, gathered at the purple KDP wall in reception." Don't name people the practice hasn't named.
+- **Face pile:** `alt=""` inside an `aria-hidden` list, because the adjacent link carries the meaning.
+- **Captions:** a full sentence that adds to the alt text and doesn't repeat it.
+
+## 9. When a practice has only 1 or 2 photos, or none
+
+The layout is built so missing photos look intentional, not broken. See `example/no-photos.html`.
+
+| Photos available | What to do |
+| --- | --- |
+| **Group photo but few portraits** | Keep the group photo as the hero. In the team grid, people without portraits get an initials tile (`<div class="person__photo"><span class="initials" aria-hidden="true">AH</span></div>` on a `.person--no-photo` card). Same card, same rhythm. |
+| **1 or 2 portraits, no group photo** | Replace the hero `<figure class="front-photo">` with `<div class="front-card">` (address, hours, access). The face pile mixes real faces with initials circles. Put photographed people first in the grid. If one of them suits a patient need, use them in the spotlight. |
+| **No photos at all** | Use the hero `.front-card`, remove the face pile, keep the team grid with initials tiles (names, roles, facts and stories still carry the people-led idea), drop the spotlight's figure (the quote and text stand alone) and remove the group photo. Sell the photo shoot (`PHOTO-SHOTLIST.md`). |
+
+Never fill gaps with silhouettes, avatars, illustrations of people or stock.
+
+## 10. Adapting Familiar Faces for a GP practice
+
+- **h1:** "GP surgery in [Town]". **Tasks:** Request an appointment, Order a repeat prescription, Register with the surgery (research participants used both 'register' and 'join'; pick one and use it everywhere), Opening hours. Change the emergency card to "Urgent help": phone the surgery from 8am, NHS 24 on 111 when closed, 999 for emergencies.
+- **Menu (GP guide 3.4):** Home, Appointments, Prescriptions, Your health, About us, Contact us.
+- **People:** GPs, practice nurses, pharmacists and other clinicians get portrait cards. Use the GMC number for doctors and the NMC PIN for nurses, but only if the surgery wants them shown. For GPs, "Special interests" matters more than "Outside work". The spotlight suits, for example, a GP with a women's health or child health interest.
+- **Remove** "What it costs". Replace it with "How to contact us" (online form first, then phone, as the surgery's process says). Don't use the term "online consultation" (GP guide).
+- **Keep** the live status, reception team photo ("They're who you'll speak to when you phone…"), the no-pop-up rule and the hours table.
+- **Rotas change.** Never say who is "in today" unless the surgery maintains it daily. Say "Ask for a named GP when you book" only if the surgery offers that.
+
+## 11. Pre-handover checklist
+
+**Facts**
+- [ ] Every fact traces to the practice's site, NHS inform or written confirmation. Where it doesn't, the page says "phone to check".
+- [ ] NHS Scotland rules are correct: check-ups free; free treatment if under 26, pregnant or gave birth in the last 12 months, or exempt (for example HC2); others pay 80% up to £384; HC3 gives partial help; out of hours is NHS 24 on 111.
+- [ ] The health board's dental advice line is the right one for the practice's area (from NHS inform, *Dental emergencies*).
+- [ ] Names are spelled as the practice prints them. Check against the GDC register.
+- [ ] Prices are labelled with their source and "phone to check".
+
+**People and photos**
+- [ ] Written consent is held for every person shown.
+- [ ] `CREDITS.txt` lists every source URL.
+- [ ] Alt text is written for every portrait and group photo.
+- [ ] No stock, AI or unnamed patients appear.
+- [ ] Bios are verbatim (shortened only). No first-person quotes unless approved.
+
+**Behaviour**
+- [ ] On a 390px phone, the first screen shows the status, Call, Join and Emergency.
+- [ ] The live status is right for today, an evening, a Saturday and the moment of opening. Test by editing `data-open` temporarily.
+- [ ] Menu works by keyboard. Escape closes it. `aria-expanded` changes.
+- [ ] All `details` stories open with Enter or Space.
+- [ ] 111 and 999 are text. `tel:` links use `+44`.
+- [ ] Works at 200% text and at 320px width with no sideways scroll (tables scroll inside their wrapper).
+- [ ] Reduced motion: no transitions. No smooth scrolling anywhere (it also confuses the in-house audit).
+
+**Audit and weight**
+- [ ] `node pipeline/audit.mjs http://127.0.0.1:4484/example/ <out>` gives 0 blockers, 0 major and 0 minor.
+- [ ] Desktop is under 1.2 MB and phone under 700 KB after a full scroll.
+- [ ] No external CDN requests (fonts are local; Google Maps is a link, not an embed).
+
+## 12. The worked example: Kirriemuir Dental Practice
+
+**Why this practice.** Graded **Average** in the prospect data ("Dated colourful tile layout, phone only in top bar, no booking button"). The town starts with K. Its Meet the Team page has the best real team photography I found. I scanned about 360 Bad or Average A to L practices for team pages, then compared about 10 by eye: 14 consistent studio portraits, plus nursing team and reception team group shots. Its bios have genuine personality ("Michael is a bit of a petrol-head!", "Nicole is a Disney fan…", Beverley's anxiety-management training) and GDC numbers. That's exactly what a people-led template needs, and the current site hides it behind "» View Biog" pop-ups.
+
+**Sources (fetched 11 October 2026):**
+- kirriemuirdentalpractice.com: Meet the Team, About the Practice (opening times, 50+ years, 10,000+ patients, parking, wheelchair, wifi, premises since 2012), NHS Treatments, Private Fees Cost, KDP Membership Plan, Contact Us.
+- NHS inform service directory listing (hours match; "Please contact the dental surgery directly to enquire about joining").
+- NHS inform: *Receiving NHS dental treatment in Scotland* and *Dental emergencies* (Angus Dental Advice Line 01241 432 481, Monday to Friday 8:30am to 5:30pm).
+
+**Unsure, so marked "phone to check" or left out:**
+- Whether new NHS patients are being accepted (not published).
+- Clare Perez's GDC number (not published).
+- Spellings: the page prints "Clare Perez", "Clair Ruxton" and "Emma Millar", but the image files say "claire" and "miller". We use the printed names.
+- The plan is called both "KDP Membership Plan" and "Highland Dental Plan" on the site, so the page says "our dental plan". The price page doesn't state that prices are monthly, only that payment is by monthly direct debit.
+- Private fees and plan prices may be out of date.
+- Public holiday closures.
+- Sean Ward's GDC number (not published, so not shown).
+- Nursing and reception team members aren't named on the site, so they aren't named here.

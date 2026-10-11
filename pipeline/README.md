@@ -37,9 +37,36 @@ For each step you choose:
 - **Extra instructions:** added on top of the stage's own instructions from config.json.
 - **Then:** where each outcome sends the card. It defaults to the bucket in config.json. The editor shows whether a later step picks the card up or it stops there.
 
+Each workflow also has run limits, set in its editor:
+
+- **Run for:** minutes, for example 60. 0 means run until the queues are empty.
+- **Spend limit per run:** dollars, for example 20. 0 means no limit.
+
+When either limit is reached, the run winds down: workers finish the cards they're on and take no new ones. Each card can still spend up to its step's **Max $ per card**, so a run can end slightly over its spend limit. While a run is going, the workflow shows time left and spend so far. **Finish up** winds a run down the same way by hand; **Stop now** ends it at once and sends cards in progress back to their queues unfinished.
+
+For long runs, keep the Mac awake, for example with Amphetamine; a sleeping Mac pauses the workers.
+
 **Run** starts the workers and **Stop** ends them. Cards a stopped worker was holding go back to their queue. A run finishes on its own once nothing is left for any of its steps. Columns show how many AI workers are on them, and the workflow shows each worker's current card, progress, cost and a log.
 
 Workers run the local `claude` CLI, so they use the account `claude` is logged in with. If a worker can't finish a card, it moves it to **Needs attention** with the reason, and the card stays out of every AI queue until you move it on. A practice with no working website isn't a failure: Redesign study plans a brand-new site from its NHS listing, Facebook page and web search, and the card gets a **New site** label. After 3 failures in a row a worker stops. A card that comes back to the same step 3 times in one run, such as Build ↔ AI review, also goes to Needs attention.
+
+### Browser audit
+
+Build and AI review cards get a browser audit before a worker starts. It runs on your Mac with Playwright and your installed Chrome, at desktop (1280px) and phone (390px) width, and checks:
+
+- **Links:** crawls every page of the preview, clicks its links, checks section anchors, files, phone and email links, and checks external links once.
+- **Accessibility:** axe-core to WCAG 2.1 AA, covering contrast, labels, alt text, heading order and landmarks.
+- **Phone layout:** sideways scrolling, tap targets under 24px (with WCAG's spacing exception) or under the recommended 44px, and text under 12px.
+- **Menu:** that the phone menu exists and opens.
+- **Forms:** submit buttons, required fields, and that valid answers are accepted.
+- **Keyboard:** Tab reaches every control with a visible focus ring and never gets stuck.
+- **Content and errors:** placeholder text, missing titles, broken images, console errors and failed requests.
+
+Issues are graded blocker, major, minor or info. Cards show **Audit passed** or **Audit: N to fix**. The card panel has the counts, a **Run audit** button and the full report with screenshots (`/audit/<card>/`). AI review sends a card back to Build when there's any blocker or major issue. Build workers can run the audit themselves (`node pipeline/audit.mjs <preview url> <out dir>`, the only shell command they're allowed) and fix what it finds before handing over.
+
+On a workflow step, **Workers can → use a real browser** also gives workers Chrome through the Playwright MCP, so a reviewer can use the site like a patient (open the menu, follow the booking path, try forms). It's slower and costs more, so it's opt-in.
+
+`make pipeline` installs these the first time. To run an audit by hand: `node pipeline/audit.mjs http://localhost:4390/preview/12/ /tmp/audit-12`.
 
 Build workers write the new site into `pipeline/data/work/<card>/site/`. It's published at `http://localhost:4390/preview/<card>/` and saved as the card's redesign preview. Previews are sandboxed, so their scripts can't touch the board.
 

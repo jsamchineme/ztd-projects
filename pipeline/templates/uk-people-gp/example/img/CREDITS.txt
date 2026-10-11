@@ -1,0 +1,129 @@
+PHOTO CREDITS: Familiar Faces example (Linlithgow Group Medical Practice)
+Checked and downloaded on 11 October 2026.
+
+1. STAFF PORTRAITS
+Source: the practice's own published team page, https://lgmp.gpsurgery.net/team/
+Owner: Linlithgow Group Medical Practice. Used here only in a mock-up shown to that practice.
+Before go-live: get the practice's written confirmation that every person shown has consented
+to their photo being used on the new website (see PHOTO-SHOTLIST.md, consent).
+Each file was square-cropped and saved as WebP at 96px and 240px (doctors also at 400px).
+
+people/angus-campbell-*.webp  Dr Angus Campbell (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/IMG_0701-scaled-e1663235846953-811x1024.jpeg
+people/louisa-johnston-*.webp  Dr Louisa Johnston (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Louisa-scaled-e1772815598176-600x600.jpg
+people/neil-jamieson-*.webp  Dr Neil Jamieson (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/05/Neil-scaled-e1778507386591-600x600.jpg
+people/edward-napier-*.webp  Dr Edward Napier (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Ed-scaled-e1772645942659-600x600.jpg
+people/abhishek-kumar-*.webp  Dr Abhishek Kumar (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/IMG_0712-scaled-e1663235922304-829x1024.jpeg
+people/euan-hogarth-*.webp  Dr Euan Hogarth (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Euan-scaled-e1772816044119-600x600.jpg
+people/fergus-sengupta-*.webp  Dr Fergus Sengupta (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/IMG_0741-scaled-e1663235954445-869x1024.jpeg
+people/laura-forbes-*.webp  Dr Laura Forbes (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/IMG_0724-scaled-e1663235986253-878x1024.jpeg
+people/nikki-stevenson-*.webp  Dr Nikki Stevenson (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Nikki-S-scaled-e1772645640492-600x600.jpg
+people/becky-sedcole-*.webp  Dr Becky Sedcole (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/IMG_0710-scaled-e1674219142286-768x745.jpeg
+people/andrew-oneill-*.webp  Dr Andrew O’Neill (GP Partner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Andrew_-scaled-e1772645535456-600x600.jpg
+people/elizabeth-davies-*.webp  Dr Elizabeth Davies (Salaried GP)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Lizzy-scaled-e1772816112894-600x600.jpg
+people/tanat-chanrachakul-*.webp  Dr Tanat Chanrachakul (Salaried GP)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Tanat-scaled-e1772645582381-600x600.jpg
+people/bronwen-jacob-ramsdale-*.webp  Dr Bronwen Jacob-Ramsdale (GP Registrar)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Bronwyn-scaled-e1772645880759-600x600.jpg
+people/lynn-chambers-*.webp  Lynn Chambers (Practice Manager)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Lynn-C-scaled-e1772643695934-600x600.jpg
+people/alison-wallace-*.webp  Alison Wallace (Assistant Practice Manager)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Alison-scaled-e1772643788841-600x600.jpg
+people/hazel-*.webp  Hazel (Reception Supervisor)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Hazel-scaled-e1772645295664-600x600.jpg
+people/nicola-mills-*.webp  Nicola Mills (Practice Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/IMG_0684-scaled-e1674225093601-657x1024.jpeg
+people/sally-mcculloch-*.webp  Sally McCulloch (Practice Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Sally-scaled-e1772815546937-600x600.jpg
+people/briony-wilson-*.webp  Briony Wilson (Practice Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Briony-scaled-e1772816499965-600x600.jpg
+people/maria-*.webp  Maria (Health Care Assistant)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Maria-scaled-e1772642375116-600x600.jpg
+people/rebecca-*.webp  Rebecca (Admin Assistant)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Rebecca-scaled-e1772645990292-600x600.jpg
+people/lynn-*.webp  Lynn (Medical Secretary)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Lynn-J-300x300.jpg
+people/nicola-*.webp  Nicola (Medical Secretary)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Nicola-P-scaled-e1772644931311-600x600.jpg
+people/sandra-*.webp  Sandra (Practice Summariser)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Sandra_-scaled-e1772646043701-600x600.jpg
+people/jodi-*.webp  Jodi (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Jodi-scaled-e1772644864817-600x600.jpg
+people/nikki-*.webp  Nikki (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Nikki-N-scaled-e1772644987815-600x600.jpg
+people/vikki-*.webp  Vikki (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Vikki-scaled-e1772814431864-600x600.jpg
+people/susan-*.webp  Susan (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Susan-scaled-e1772642213837-600x600.jpg
+people/molly-*.webp  Molly (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Molly-scaled-e1772645400456-600x600.jpg
+people/pam-*.webp  Pam (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/05/Pam-300x300.jpg
+people/abbie-*.webp  Abbie (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Abbie-scaled-e1772644614179-600x600.jpg
+people/kim-louise-*.webp  Kim-Louise (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Kim-scaled-e1772814612932-600x600.jpg
+people/isabel-*.webp  Isabel (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Isobel-scaled-e1772644166975-600x600.jpg
+people/lois-*.webp  Lois (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Lois-300x300.jpg
+people/emily-*.webp  Emily (Medical Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Emily2-scaled-e1772644671378-600x600.jpg
+people/sheila-tett-*.webp  Sheila Tett (Community Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Sheila-scaled-e1772645228835-600x600.jpg
+people/roslyn-cairns-*.webp  Roslyn Cairns (Community Receptionist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Roslyn-scaled-e1772814901212-600x600.jpg
+people/sarah-anderson-*.webp  Sarah Anderson (Treatment Room Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Sarah-scaled-e1772645706425-600x600.jpg
+people/jane-johnston-*.webp  Jane Johnston (Treatment Room Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/thumbnail_image1-768x1024.jpg
+people/colin-hislop-*.webp  Colin Hislop (District Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Colin-scaled-e1772645162319-600x600.jpg
+people/chris-tunnock-*.webp  Chris Tunnock (Community Nurse Practitioner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Chris-scaled-e1772815783688-600x600.jpg
+people/emma-oliver-*.webp  Emma Oliver (Community Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2022/08/thumbnail_image0-768x1024.jpg
+people/megan-davidson-*.webp  Megan Davidson (Community Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Megan-scaled-e1772814970337-600x600.jpg
+people/jackie-hilton-*.webp  Jackie Hilton (Health Visitor)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Jackie-scaled-e1772815357639-600x600.jpg
+people/claire-finlay-*.webp  Claire Finlay (Health Visitor)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Claire-scaled-e1772816000634-600x600.jpg
+people/alyson-todd-*.webp  Alyson Todd (Health Visitor)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Alyson-scaled-e1772815177242-600x600.jpg
+people/kirsty-gibson-*.webp  Kirsty Gibson (Nursery Nurse)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Kirsty-scaled-e1772814555220-600x600.jpg
+people/cormac-gallen-*.webp  Cormac Gallen (Advanced Physio Practitioner)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Cormac-300x300.jpg
+people/gillian-martin-*.webp  Gillian Martin (Podiatrist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2015/08/IMG_0008.jpg
+people/laura-bradburn-*.webp  Laura Bradburn (Pharmacist)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Laura-B-scaled-e1772645354325-600x600.jpg
+people/rachel-bain-*.webp  Rachel Bain (Pharmacy Technician)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/03/Rachel-scaled-e1772644368308-600x600.jpg
+people/kevin-hanlon-*.webp  Kevin Hanlon (WL Drug & Alcohol Service)
+    https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/06/Kevin-300x300.jpg
+
+No photo published (shown as initials): Kayleigh Brown, Emma, Jacqueline Duff, Helen Boxall, Alison Reid, Sophie Beasley, Craig Philip, Irene Moore, Helen McElroy-Evans, Jude Burnett, Zenab Nazir, Lisa Laird, Claire Spillane, Aoibheann McKinley, Andrew Campbeltown, Laura McNab
+
+2. BUILDING
+health-centre-720.webp, health-centre-1200.webp
+    Linlithgow Health Centre, photo taken 3 April 2011 by Graeme Yuill.
+    Licence: CC BY-SA 2.0, https://creativecommons.org/licenses/by-sa/2.0/
+    Source: https://commons.wikimedia.org/wiki/File:Linlithgow_Health_Centre_-_geograph.org.uk_-_2338868.jpg
+    Original file: https://upload.wikimedia.org/wikipedia/commons/e/ed/Linlithgow_Health_Centre_-_geograph.org.uk_-_2338868.jpg
+    Changes: cropped to 16:10 and resized. Credited in the photo caption and the page footer.
+    The photo is from 2011. Ask the practice for a current photo (see PHOTO-SHOTLIST.md).
+
+No stock photos and no AI-generated images are used anywhere in this template.

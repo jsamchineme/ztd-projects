@@ -94,6 +94,11 @@ a{color:var(--accent)}
 .card.ai-failed{border-left:3px solid var(--bad-ink)}
 .chip.ai{background:var(--accent);color:var(--on-accent);display:inline-flex;align-items:center;gap:5px}
 .chip.ok{background:var(--good);color:var(--good-ink)}
+.atiles{display:flex;gap:8px}
+.atile{flex:1;background:var(--chrome-2);border-radius:9px;padding:7px 10px;font-size:12px;color:var(--muted)}
+.atile b{display:block;font-size:19px;color:var(--ink);font-variant-numeric:tabular-nums}
+.atile.bad{background:var(--bad);color:var(--bad-ink)} .atile.bad b{color:var(--bad-ink)}
+.atile.warn{background:var(--avg);color:var(--avg-ink)} .atile.warn b{color:var(--avg-ink)}
 .chip.fail{background:var(--bad);color:var(--bad-ink)}
 .spin{width:9px;height:9px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite;flex:none}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -180,6 +185,12 @@ dialog .row{justify-content:flex-end;margin-top:14px}
 .wk .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;background:var(--muted);vertical-align:1px}
 .wk.working .dot{background:var(--accent)} .wk.waiting .dot{background:var(--avg-ink)} .wk.stopped .dot{background:var(--danger)}
 .lnk{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.lim{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:8px;font-variant-numeric:tabular-nums}
+.lim > span:first-child{width:42px;font-weight:600}
+.lim > span:last-child{min-width:96px;text-align:right}
+.bar{flex:1;height:6px;border-radius:999px;background:var(--chrome-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}
+.bar.hot i{background:var(--bad-ink)}
 .runlog{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px;max-height:140px;overflow:auto}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:420px){ .grid2{grid-template-columns:1fr} }
@@ -239,7 +250,7 @@ const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : null;
 const domain = u => String(u || '').replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
 const LS = { get(k, d){ try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
 
-let cfg, stages = {}, cards = [], workflows = [], wfOpen = false, wfEdit = null, tab = LS.get('pipeline.tab', 'production'), openId = null, me = LS.get('pipeline.me', '');
+let cfg, stages = {}, cards = [], workflows = [], auditing = new Set(), wfOpen = false, wfEdit = null, tab = LS.get('pipeline.tab', 'production'), openId = null, me = LS.get('pipeline.me', '');
 
 // ---------- api ----------
 async function api(method, path, body){
@@ -296,10 +307,34 @@ function aiChip(a){
   if (a.kind === 'done') return `<span class="chip ok" title="${esc(a.who)}: ${esc(a.note || '')}">AI done · ${short(a.at)}</span>`;
   return `<span class="chip fail" title="${esc(a.note)}">AI couldn’t finish</span>`;
 }
+// The latest browser audit of a card's preview: running now, passed (no blockers or major issues), or problems to fix.
+const toFix = a => a.blocker + a.major;
+function auditChip(c){
+  if (auditing.has(c.id)) return `<span class="chip ai"><span class="spin" aria-hidden="true"></span>Auditing</span>`;
+  const a = c.audit; if (!a) return '';
+  const t = `Browser audit ${ago(a.at)}: ${a.blocker} blockers, ${a.major} major, ${a.minor} minor`;
+  return toFix(a) ? `<span class="chip fail" title="${t}">Audit: ${toFix(a)} to fix</span>` : `<span class="chip ok" title="${t}">Audit passed</span>`;
+}
+function auditBox(c){
+  const has = c.audit || /\/preview\/\d+\/?$/.test(c.fields.previewUrl || '');
+  if (!has) return '';
+  const a = c.audit, busy = auditing.has(c.id);
+  const tile = (n, label, cls) => `<div class="atile ${n ? cls : ''}"><b>${n}</b>${label}</div>`;
+  return `<div class="box"><h3>Browser audit</h3>
+    ${a ? `<div class="atiles">${tile(a.blocker, 'blockers', 'bad')}${tile(a.major, 'major', 'warn')}${tile(a.minor, 'minor', '')}</div>
+      <p class="hint" style="margin:8px 0 10px">Ran ${ago(a.at)} · ${a.pages} page${a.pages === 1 ? '' : 's'} · ${a.links} links, ${a.clicked} clicked · ${Math.round(a.ms / 1000)}s</p>`
+      : `<p class="hint" style="margin:0 0 10px">Clicks every link and checks accessibility, the phone layout, menu, forms and keyboard in a real browser on this computer.</p>`}
+    <div class="row">
+      ${cfg.auditAvailable ? `<button class="btn" data-audit ${busy ? 'disabled' : ''}>${busy ? '<span class="spin" aria-hidden="true" style="display:inline-block;margin-right:6px"></span>Auditing…' : a ? 'Run again' : 'Run audit'}</button>`
+        : `<span class="hint" style="margin:0">To turn it on, run <code>npm --prefix pipeline install</code> and restart the server.</span>`}
+      ${a ? `<a class="btn" href="/audit/${c.id}/report.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Full report ↗</a>` : ''}
+    </div></div>`;
+}
 function cardHtml(c){
   const f = c.fields, cl = claimed(c), ai = aiStatus(c);
   const meta = [
     ai ? aiChip(ai) : '',
+    auditChip(c),
     c.history.some(h => h.outcome === 'new_site') ? `<span class="chip" title="No working website: planned as a brand-new site">New site</span>` : '',
     c.priority > 0 ? `<span class="chip pri">Priority ${c.priority}</span>` : '',
     c.claim && ai?.kind !== 'working' ? `<span class="chip ${cl ? 'claim' : 'stale'}" title="${cl ? 'Being worked on' : 'Claim expired'}">${esc(c.claim.by)} · ${ago(c.claim.at)}</span>` : '',
@@ -341,7 +376,9 @@ function fieldInput(f, v){
   if (f.type === 'select' || f.type === 'template'){
     const opts = f.type === 'template' ? cfg.templates : f.options;
     const extra = v && !opts.includes(v) ? [v] : [];
-    return `<select class="in" id="${id}" data-field="${f.key}"><option value="">—</option>${[...opts, ...extra].map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+    const sel = `<select class="in" id="${id}" data-field="${f.key}"><option value="">—</option>${[...opts, ...extra].map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+    const dir = f.type === 'template' && cfg.templateFiles?.[v];
+    return dir ? sel + `<span class="hint" style="display:block;margin-top:6px"><a href="/${esc(dir)}/example/" target="_blank" rel="noopener">View template example ↗</a> · <a href="/${esc(dir)}/BRIEF.md" target="_blank" rel="noopener">Brief ↗</a></span>` : sel;
   }
   return `<input class="in" id="${id}" data-field="${f.key}" type="${f.type === 'number' ? 'number' : f.type === 'url' ? 'url' : 'text'}" ${f.type === 'number' ? 'min="1" max="10"' : ''} value="${esc(v)}">`;
 }
@@ -349,7 +386,7 @@ function histLine(h){
   const n = id => esc(stages[id]?.name || id);
   const what = h.action === 'move' ? `moved ${n(h.from)} → <b>${n(h.to)}</b>${h.outcome && h.outcome !== 'done' ? ` (${esc(h.outcome)})` : ''}`
     : h.action === 'update' ? `updated ${esc(h.fields.join(', '))}` : h.action === 'add' ? `added to ${n(h.to)}`
-    : h.action === 'claim' ? 'took it' : h.action === 'release' ? 'gave it back' : h.action === 'comment' ? 'commented' : esc(h.action);
+    : h.action === 'audit' ? 'ran a browser audit' : h.action === 'claim' ? 'took it' : h.action === 'release' ? 'gave it back' : h.action === 'comment' ? 'commented' : esc(h.action);
   return `<li><span class="when" title="${esc(new Date(h.at).toLocaleString())}">${ago(h.at).replace(' ago', '')}</span>
     <span class="what"><b>${esc(h.by)}</b> ${what}${h.note ? `<span class="note">${esc(h.note)}</span>` : ''}</span></li>`;
 }
@@ -382,6 +419,7 @@ function refreshPanelParts(){
   if (c.stage !== $('#panel').dataset.stage) return renderPanel();
   if (!$('#stageBox').contains(document.activeElement)) $('#stageBox').innerHTML = stageBox(c);
   $('#hist').innerHTML = histHtml(c);
+  if ($('#auditBox')) $('#auditBox').innerHTML = auditBox(c);
 }
 function renderPanel(){
   const c = cards.find(c => c.id === openId);
@@ -395,6 +433,7 @@ function renderPanel(){
       <button class="x" id="pClose" aria-label="Close">×</button></div>
     <div class="pb">
       <div class="links">${safeUrl(c.url) ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">Before: current site ↗</a>` : ''}${safeUrl(f.previewUrl) ? `<a href="${esc(f.previewUrl)}" target="_blank" rel="noopener">After: redesign ↗</a>` : ''}</div>
+      <div id="auditBox">${auditBox(c)}</div>
       <div class="box" id="stageBox">${stageBox(c)}</div>
       <div class="box">
         <h3>Work</h3>
@@ -433,7 +472,7 @@ async function load(){
   loading = (async () => {
     try {
       const [r, w] = await Promise.all([api('GET', '/cards'), api('GET', '/workflows')]);
-      cards = r.cards; workflows = w.workflows;
+      cards = r.cards; workflows = w.workflows; auditing = new Set(r.auditing || []);
       render();
       renderWfButton();
       if (wfOpen && !wfEdit) renderWf();
@@ -490,6 +529,13 @@ $('#panel').addEventListener('click', async e => {
     return act(() => api('POST', '/claim', { stage: c.stage, id: c.id }), 'It’s yours');
   }
   if (t.closest('[data-release]')) return act(() => api('POST', `/cards/${openId}/release`, {}), 'Given back');
+  if (t.closest('[data-audit]')){
+    const id = openId;
+    auditing.add(id); renderPanel(); render();
+    const r = await act(() => api('POST', `/cards/${id}/audit`, {}));
+    if (r){ const a = r.card.audit; toast(toFix(a) ? `Audit found ${toFix(a)} problem${toFix(a) > 1 ? 's' : ''} to fix` : 'Audit passed'); }
+    return;
+  }
   const o = t.closest('[data-outcome]');
   if (o){
     const c = cards.find(c => c.id === openId);
@@ -538,13 +584,15 @@ $('#meBtn').addEventListener('click', () => { $('#meName').value = me; $('#meDlg
 $('#meForm').addEventListener('submit', () => setMe($('#meName').value));
 
 // ---------- workflows ----------
-const MODELS = { sonnet: 'Sonnet (balanced)', opus: 'Opus (most capable)', haiku: 'Haiku (fastest, cheapest)' };
-const TOOLSETS = { research: 'Research the web and read the card’s files', files: 'Research the web and build files' };
+const MODELS = { fable: 'Fable (most capable, costs most)', opus: 'Opus (very capable)', sonnet: 'Sonnet (balanced)', haiku: 'Haiku (fastest, cheapest)' };
+const TOOLSETS = { research: 'Research the web and read the card’s files', files: 'Research the web and build files', browser: 'Research, read files and use a real browser (slower, costs more)' };
 const workStages = () => cfg.pipelines.flatMap(p => p.stages).filter(s => s.outcomes.length && !s.feeds && !s.terminal && s.who !== 'human');
 const allStageOptions = sel => cfg.pipelines.map(p => `<optgroup label="${esc(p.name)}">${p.stages.map(x => `<option value="${x.id}" ${x.id === sel ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</optgroup>`).join('');
 function newStep(stageId){
   const s = stages[stageId];
-  return { stage: stageId, workers: 1, limit: 5, model: 'sonnet', tools: (s.requires || []).includes('previewUrl') ? 'files' : 'research', budget: 2, instructions: '', routes: {} };
+  const builds = (s.requires || []).includes('previewUrl');
+  // Building a site on a template is the hardest step, so it gets the most capable model by default.
+  return { stage: stageId, workers: 1, limit: 5, model: builds ? 'fable' : 'sonnet', tools: builds ? 'files' : 'research', budget: builds ? 6 : 2, instructions: '', routes: {} };
 }
 // Which AI workers are on a stage right now, across running workflows.
 function aiOn(stageId){
@@ -577,6 +625,26 @@ function runHtml(run){
     <table class="runtbl"><thead><tr><th>Step</th><th>Workers</th><th>Progress</th></tr></thead><tbody>${rows}</tbody></table>
     <ul class="runlog">${[...run.log].reverse().slice(0, 12).map(l => `<li>${ago(l.at).replace(' ago', '')} · ${esc(l.msg)}</li>`).join('')}</ul>`;
 }
+const dur = m => m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ''}` : `${m} min`;
+const limitsText = w => [w.runMinutes ? `Runs for ${dur(w.runMinutes)}` : 'Runs until the queues are empty', w.maxSpend ? `spend limit $${w.maxSpend}` : 'no spend limit'].join(' · ');
+function left(iso){ const m = Math.max(0, Math.ceil((Date.parse(iso) - Date.now()) / 60000)); return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`; }
+function limitsHtml(run){
+  if (run.status !== 'running') return '';
+  if (run.winding){
+    const busy = run.steps.reduce((n, s) => n + s.workers.filter(k => k.state === 'working').length, 0);
+    return `<p class="hint warn" style="margin:8px 0 0">${esc(run.winding)}: finishing ${busy} card${busy === 1 ? '' : 's'} in progress, then stopping.</p>`;
+  }
+  const bars = [];
+  if (run.endsAt){
+    const total = Date.parse(run.endsAt) - Date.parse(run.startedAt), done = Math.min(1, (Date.now() - Date.parse(run.startedAt)) / total);
+    bars.push(`<div class="lim"><span>Time</span><div class="bar"><i style="width:${(done * 100).toFixed(1)}%"></i></div><span>${left(run.endsAt)} left</span></div>`);
+  }
+  if (run.maxSpend){
+    const done = Math.min(1, run.cost / run.maxSpend);
+    bars.push(`<div class="lim"><span>Spend</span><div class="bar${done > .85 ? ' hot' : ''}"><i style="width:${(done * 100).toFixed(1)}%"></i></div><span>$${run.cost.toFixed(2)} of $${run.maxSpend}</span></div>`);
+  }
+  return bars.join('');
+}
 function wfListHtml(){
   const items = workflows.map(w => {
     const run = w.run, on = run?.status === 'running';
@@ -585,10 +653,12 @@ function wfListHtml(){
     return `<div class="box wfi" data-wf="${w.id}">
       <div class="r1"><b>${esc(w.name)}</b>${run ? `<span class="pill ${run.status}">${esc(run.status)}</span>` : ''}
         ${on ? '' : `<button class="btn sm" data-wf-edit="${w.id}">Edit</button>`}
-        ${on ? `<button class="btn sm danger" data-wf-stop="${w.id}">Stop</button>` : `<button class="btn sm primary" data-wf-run="${w.id}" title="Starts ${nWorkers} AI worker${nWorkers > 1 ? 's' : ''}">Run</button>`}</div>
+        ${on ? `${run.winding ? '' : `<button class="btn sm" data-wf-finish="${w.id}" title="Workers finish the cards they’re on, then stop">Finish up</button>`}<button class="btn sm danger" data-wf-stop="${w.id}" title="Stops at once; cards in progress go back to their queues unfinished">Stop now</button>`
+          : `<button class="btn sm primary" data-wf-run="${w.id}" title="Starts ${nWorkers} AI worker${nWorkers > 1 ? 's' : ''}">Run</button>`}</div>
       <div class="flow">${flowHtml(w)}</div>
-      ${!on ? `<p class="hint" data-confirm-text="${w.id}" hidden>Starts ${nWorkers} Claude worker${nWorkers > 1 ? 's' : ''} on your local claude login${limit ? `, taking up to ${limit} card${limit > 1 ? 's' : ''} into ${esc(stages[w.steps[0].stage].name)}` : ''}. Press Run again to start.</p>` : ''}
-      ${run ? runHtml(run) : ''}
+      ${!on ? `<p class="hint">${limitsText(w)}</p>` : ''}
+      ${!on ? `<p class="hint" data-confirm-text="${w.id}" hidden>Starts ${nWorkers} Claude worker${nWorkers > 1 ? 's' : ''} on your local claude login${limit ? `, taking up to ${limit} card${limit > 1 ? 's' : ''} into ${esc(stages[w.steps[0].stage].name)}` : ''}${w.runMinutes ? `, for ${dur(w.runMinutes)}` : ''}${w.maxSpend ? `, spending up to $${w.maxSpend}` : ''}. Press Run again to start.</p>` : ''}
+      ${run ? limitsHtml(run) + runHtml(run) : ''}
     </div>`;
   }).join('');
   return `<div class="ph"><div class="t"><h2>Workflows</h2><div class="sub">AI workers move cards through the queues you choose.</div></div><button class="x" data-wf-close aria-label="Close">×</button></div>
@@ -629,6 +699,11 @@ function wfEditorHtml(){
   return `<div class="ph"><div class="t"><h2>${d.id ? 'Edit workflow' : 'New workflow'}</h2></div><button class="x" data-wf-close aria-label="Close">×</button></div>
     <div class="pb">
       <label class="f"><span>Name</span><input class="in" id="wfName" value="${esc(d.name)}" placeholder="e.g. Dental redesigns" maxlength="60"></label>
+      <div class="grid2">
+        <label class="f"><span>Run for (minutes, 0 = until done)</span><input class="in" type="number" min="0" max="1440" step="5" data-run="runMinutes" value="${d.runMinutes || 0}"></label>
+        <label class="f"><span>Spend limit per run ($, 0 = none)</span><input class="in" type="number" min="0" step="1" data-run="maxSpend" value="${d.maxSpend || 0}"></label>
+      </div>
+      <p class="hint" style="margin:-4px 0 0">When either limit is reached, workers finish the cards they’re on and stop. Each card can still spend up to its step’s Max $ per card, so a run can go slightly over.</p>
       ${steps}
       ${left.length ? `<div class="row"><select class="in" id="wfAddStage" style="width:auto;flex:1">${left.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select><button class="btn" data-add-step>Add step</button></div>` : ''}
       <div class="row">
@@ -655,6 +730,7 @@ $('#wfBtn').addEventListener('click', () => wfOpen ? closeWf() : openWf());
 $('#wf').addEventListener('input', e => {
   const t = e.target;
   if (t.id === 'wfName') wfEdit.name = t.value;
+  else if (t.dataset.run) wfEdit[t.dataset.run] = Number(t.value) || 0;
   else if (t.dataset.s && t.tagName !== 'SELECT'){
     const st = wfEdit.steps[t.dataset.i];
     st[t.dataset.s] = t.type === 'number' ? (t.value === '' ? null : Number(t.value)) : t.value;
@@ -680,7 +756,7 @@ $('#wf').addEventListener('click', async e => {
   if (open){ e.preventDefault(); return openPanel(Number(open.dataset.open)); }
   if (b('[data-wf-new]')){
     const first = workStages().find(s => s.id === 'study') || workStages()[0];
-    wfEdit = { name: '', steps: [newStep(first.id)] }; return renderWf();
+    wfEdit = { name: '', runMinutes: 60, maxSpend: 10, steps: [newStep(first.id)] }; return renderWf();
   }
   const edit = b('[data-wf-edit]');
   if (edit){ wfEdit = JSON.parse(JSON.stringify(workflows.find(w => String(w.id) === edit.dataset.wfEdit))); delete wfEdit.run; return renderWf(); }
@@ -711,6 +787,8 @@ $('#wf').addEventListener('click', async e => {
     if (hint.hidden){ hint.hidden = false; run.textContent = 'Start workers'; return; }
     return act(() => api('POST', `/workflows/${run.dataset.wfRun}/run`, {}), 'Workflow started');
   }
+  const fin = b('[data-wf-finish]');
+  if (fin) return act(() => api('POST', `/workflows/${fin.dataset.wfFinish}/finish`, {}), 'Workers will finish their cards, then stop');
   const stop = b('[data-wf-stop]');
   if (stop) return act(() => api('POST', `/workflows/${stop.dataset.wfStop}/stop`, {}), 'Stopping workers');
 });
@@ -729,7 +807,11 @@ $('#wf').addEventListener('click', async e => {
   connect();
   // Keep "12m ago" fresh; tick faster while AI workers are busy so their timers move.
   let ticks = 0;
-  setInterval(() => { ticks++; if (cards.some(c => aiStatus(c)?.kind === 'working') || ticks % 4 === 0) render(); }, 15000);
+  setInterval(() => {
+    ticks++;
+    if (cards.some(c => aiStatus(c)?.kind === 'working') || ticks % 4 === 0) render();
+    if (wfOpen && !wfEdit && workflows.some(w => w.run?.status === 'running')) renderWf(); // countdown and spend bars
+  }, 15000);
 })();
 </script>
 </body>

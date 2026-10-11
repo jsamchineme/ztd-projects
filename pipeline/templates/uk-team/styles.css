@@ -1,0 +1,462 @@
+/* ==========================================================================
+   Familiar Faces: a people-led website template for UK dental practices
+   --------------------------------------------------------------------------
+   1. Tokens. Re-theme a practice by editing this block only (BRIEF.md §7).
+   2. Fonts
+   3. Base and accessibility
+   4. Layout helpers
+   5. Header and menu
+   6. Front of house (hero)
+   7. Face pile
+   8. People: portrait cards, spotlight, compact cards, group photo
+   9. Task panels: join, emergency, costs
+   10. Visit: hours and finding us
+   11. Footer
+   12. No-photo fallback
+   13. Motion, print
+   ========================================================================== */
+
+/* 1. TOKENS ================================================================ */
+:root {
+  /* Practice colour. --brand must keep 7:1 or more with white text.
+     --brand-tint is the soft panel behind portraits and photo captions. */
+  --brand: #5c2e91;            /* Kirriemuir purple (from #663399, darkened for 9:1) */
+  --brand-strong: #44206d;     /* hover / pressed */
+  --brand-tint: #f2edf8;       /* portrait panel, face-pile ring */
+  --brand-tint-2: #e6ddf1;     /* borders on tint */
+  --on-brand: #ffffff;
+
+  /* Second practice colour. Used for small marks only, never for text. */
+  --accent: #669933;           /* Kirriemuir green */
+  --accent-ink: #3b5e1a;       /* the accent darkened for text: 7:1 on paper */
+
+  /* Neutrals */
+  --paper: #fbfaf7;            /* page */
+  --surface: #ffffff;          /* cards */
+  --ink: #1f1b24;              /* body text: 16:1 on paper */
+  --ink-soft: #4d4757;         /* secondary text: 8.5:1 on paper */
+  --line: #ddd7e3;             /* hairlines */
+  --line-strong: #8f8799;      /* control borders: 3.3:1 on surface */
+
+  /* Live status */
+  --open: #17602f;   --open-bg: #e5f2e8;
+  --closed: #8c1d18; --closed-bg: #fbeceb;
+
+  /* Urgent care (emergency panel). Mirrors NHS urgent care-card logic. */
+  --urgent: #b3261e; --urgent-bg: #fff4f3;
+
+  /* Focus: the yellow NHS and GOV.UK users already recognise */
+  --focus: #ffdd00; --focus-ink: #0b0c0c;
+
+  /* Type. Red Hat Display for names and headings, Red Hat Text for reading. */
+  --font-display: "Red Hat Display", "Segoe UI", Arial, sans-serif;
+  --font-text: "Red Hat Text", "Segoe UI", Arial, sans-serif;
+  --step--1: 0.9375rem;                         /* 15px: captions, labels */
+  --step-0: 1.0625rem;                          /* 17px: body */
+  --step-1: 1.25rem;                            /* 20px: lede, card names */
+  --step-2: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);   /* h3 large */
+  --step-3: clamp(1.625rem, 1.3rem + 1.4vw, 2.375rem);  /* h2 */
+  --step-4: clamp(2rem, 1.5rem + 2.2vw, 3.125rem);      /* h1 */
+  --leading: 1.55;
+
+  /* Space and shape */
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.5rem;  --space-6: 2rem;   --space-7: 3rem;    --space-8: 4.5rem;
+  --radius: 10px;
+  --radius-photo: 14px;        /* portraits: soft, not pill-shaped */
+  --shadow: 0 1px 2px rgb(31 27 36 / 0.06), 0 4px 16px rgb(31 27 36 / 0.06);
+  --measure: 38rem;            /* max line length for reading */
+  --page: 72rem;               /* max content width */
+  --header-h: 4rem;
+  --tap: 44px;                 /* minimum tap target */
+}
+
+/* 2. FONTS (self-hosted, SIL OFL 1.1, see fonts/OFL.txt) ==================== */
+@font-face { font-family: "Red Hat Display"; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url("fonts/RedHatDisplay-normal-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Red Hat Display"; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url("fonts/RedHatDisplay-normal-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Red Hat Text"; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url("fonts/RedHatText-normal-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Red Hat Text"; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url("fonts/RedHatText-normal-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+/* 3. BASE AND ACCESSIBILITY ================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + var(--space-4)); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--font-text); font-size: var(--step-0); line-height: var(--leading);
+  font-synthesis: none; text-rendering: optimizeLegibility;
+}
+img { max-width: 100%; height: auto; display: block; }
+h1, h2, h3, h4 { overflow-wrap: break-word; hyphens: auto; font-family: var(--font-display); line-height: 1.15; margin: 0 0 var(--space-3); color: var(--ink); letter-spacing: -0.01em; text-wrap: balance; }
+h1 { font-size: var(--step-4); font-weight: 750; letter-spacing: -0.02em; }
+h2 { font-size: var(--step-3); font-weight: 700; }
+h3 { font-size: var(--step-1); font-weight: 700; }
+p, ul, ol, dl { margin: 0 0 var(--space-4); }
+p { max-width: var(--measure); }
+strong { font-weight: 700; }
+a { color: var(--brand); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { color: var(--brand-strong); text-decoration-thickness: 3px; }
+
+/* One focus style everywhere: yellow block, dark underline (NHS / GOV.UK pattern) */
+:focus { outline: none; }
+:focus-visible {
+  outline: 3px solid transparent;          /* shows in Windows high contrast mode */
+  background-color: var(--focus) !important; color: var(--focus-ink) !important;
+  box-shadow: 0 -2px var(--focus), 0 4px var(--focus-ink) !important;
+  text-decoration: none;
+}
+.btn:focus-visible, .task:focus-visible, .menu-toggle:focus-visible, summary:focus-visible {
+  box-shadow: 0 0 0 4px var(--focus-ink) !important; border-color: var(--focus-ink) !important;
+}
+.btn:focus-visible *, .task:focus-visible * { color: var(--focus-ink) !important; }
+
+.skip-link {
+  position: absolute; left: var(--space-3); top: -10rem; z-index: 100;
+  padding: var(--space-3) var(--space-4); background: var(--focus); color: var(--focus-ink);
+  font-weight: 700; border-radius: 0 0 var(--radius) var(--radius);
+}
+.skip-link:focus { top: 0; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* 4. LAYOUT HELPERS ========================================================= */
+.wrap { width: min(100% - 2.5rem, var(--page)); margin-inline: auto; }
+.section { padding-block: clamp(3rem, 2rem + 4vw, var(--space-8)); }
+.section--tint { background: var(--brand-tint); }
+.section--surface { background: var(--surface); border-block: 1px solid var(--line); }
+.section__head { margin-bottom: var(--space-6); max-width: 46rem; }
+.eyebrow {
+  display: block; font-family: var(--font-display); font-size: var(--step--1); font-weight: 700;
+  color: var(--accent-ink); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-2);
+}
+.lede { font-size: var(--step-1); color: var(--ink-soft); line-height: 1.5; }
+.stack > * + * { margin-top: var(--space-4); }
+.small { font-size: var(--step--1); color: var(--ink-soft); }
+
+/* Buttons and action links: always at least 44px tall */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-height: 3.25rem; padding: var(--space-3) var(--space-5);
+  font-family: var(--font-display); font-size: var(--step-1); font-weight: 700; line-height: 1.2;
+  text-decoration: none; border-radius: var(--radius); border: 2px solid transparent; cursor: pointer;
+}
+.btn--call { background: var(--brand); color: var(--on-brand); }
+.btn--call:hover { background: var(--brand-strong); color: var(--on-brand); }
+.btn--quiet { background: var(--surface); color: var(--brand); border-color: var(--brand); }
+.btn--quiet:hover { background: var(--brand-tint); color: var(--brand-strong); }
+.btn svg { flex: none; width: 1.25rem; height: 1.25rem; }
+
+.action {                       /* a standalone link with a chevron, NHS "action link" style */
+  max-width: 100%; overflow-wrap: anywhere; display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap);
+  font-weight: 700; color: var(--brand); text-decoration: underline; text-decoration-thickness: 1px;
+}
+.action::before {
+  content: ""; flex: none; width: 0.55rem; height: 0.55rem; margin-right: 0.2rem;
+  border-right: 3px solid var(--accent); border-top: 3px solid var(--accent); transform: rotate(45deg);
+}
+.actions { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-1); }
+
+/* 5. HEADER AND MENU ======================================================== */
+.site-header {
+  position: sticky; top: 0; z-index: 50; background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.site-header__inner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); min-height: var(--header-h); padding-block: var(--space-2); }
+.brand {
+  min-width: 0; overflow-wrap: anywhere;
+  display: inline-flex; align-items: center; gap: var(--space-3); min-height: var(--tap);
+  text-decoration: none; color: var(--ink); margin-right: auto;
+}
+.brand svg { flex: none; width: 2.5rem; height: 2.5rem; }
+.brand__name { font-family: var(--font-display); font-weight: 750; font-size: 1.125rem; line-height: 1.1; }
+.brand__name small { display: block; font-family: var(--font-text); font-weight: 500; font-size: 0.875rem; color: var(--ink-soft); }
+.nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.nav a {
+  display: flex; align-items: center; min-height: var(--tap); padding: 0 var(--space-3);
+  font-weight: 600; color: var(--ink); text-decoration: none; border-radius: var(--radius);
+}
+.nav a:hover { background: var(--brand-tint); color: var(--brand-strong); }
+.nav a[aria-current="page"] { box-shadow: inset 0 -3px var(--accent); border-radius: 0; }
+.nav { order: 2; }
+.header-call { gap: 0.4rem; }
+.header-call { order: 3; min-height: var(--tap); padding: var(--space-2) var(--space-4); font-size: 1rem; }
+.header-call__num { white-space: nowrap; }
+.menu-toggle {
+  order: 4; display: none; min-height: var(--tap); min-width: var(--tap); padding: 0 var(--space-4);
+  font: 700 1rem/1 var(--font-display); color: var(--brand); background: var(--surface);
+  border: 2px solid var(--brand); border-radius: var(--radius); cursor: pointer;
+}
+.menu-toggle[aria-expanded="true"] { background: var(--brand); color: var(--on-brand); }
+
+@media (max-width: 60rem) {
+  .header-call__num { display: none; }
+  .js .menu-toggle { display: inline-flex; align-items: center; }
+  .js .nav { display: none; }
+  .js .nav.is-open {
+    display: block; position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  .nav { order: 5; }
+  .nav ul { flex-direction: column; padding: var(--space-2) 1.25rem var(--space-4); }
+  .nav a { min-height: 3rem; border-bottom: 1px solid var(--line); border-radius: 0; }
+  .site-header__inner { flex-wrap: wrap; }
+  html:not(.js) .nav { width: 100%; }
+  html:not(.js) .nav ul { flex-direction: row; flex-wrap: wrap; padding: 0 0 var(--space-2); }
+}
+@media (max-width: 40rem) {
+  .site-header__inner { gap: var(--space-2); }
+  .brand { gap: var(--space-2); }
+  .brand svg { width: 2.25rem; height: 2.25rem; }
+  .brand__name { font-size: 1rem; max-width: 8.5rem; }
+  .brand__name small { display: none; }
+  .header-call { padding-inline: var(--space-3); }
+  .menu-toggle { padding-inline: var(--space-3); }
+}
+
+/* 6. FRONT OF HOUSE (hero) ================================================== */
+.front { padding-block: var(--space-5) var(--space-7); background: var(--paper); }
+@media (max-width: 40rem) { .front { padding-block: var(--space-4) var(--space-6); } .front h1 { font-size: 2rem; } .front__call { margin-bottom: var(--space-4); } }
+.front__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); align-items: start; }
+@media (min-width: 60rem) { .front__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-7); } }
+.front h1 { margin-bottom: var(--space-3); }
+.front__lede { font-size: var(--step-1); color: var(--ink-soft); margin-bottom: var(--space-4); }
+
+.status {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-2);
+  margin: 0 0 var(--space-3); padding: var(--space-1) var(--space-3);
+  border-radius: 1.1rem; font-weight: 700; font-size: 1rem; background: var(--brand-tint); color: var(--ink);
+}
+.status::before { content: ""; width: 0.65rem; height: 0.65rem; border-radius: 50%; background: var(--ink-soft); flex: none; }
+.status[data-state="open"] { background: var(--open-bg); color: var(--open); }
+.status[data-state="open"]::before { background: var(--open); }
+.status[data-state="closed"] { background: var(--closed-bg); color: var(--closed); }
+.status[data-state="closed"]::before { background: var(--closed); }
+.status > span { min-width: 0; }
+.status { max-width: 100%; }
+.status__detail { font-weight: 500; color: var(--ink); }
+
+.front__call { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); margin-bottom: var(--space-5); }
+.front__call .btn { flex: 1 1 16rem; max-width: 24rem; }
+.front__call p { margin: 0; font-size: var(--step--1); color: var(--ink-soft); flex: 1 1 12rem; }
+
+/* Task list: the four things patients come for */
+.tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.task {
+  display: flex; align-items: center; gap: var(--space-3); min-height: 3.25rem; height: 100%;
+  padding: var(--space-3) var(--space-4); background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: var(--radius);
+  text-decoration: none; font-weight: 700; font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.25;
+}
+.task:hover { border-color: var(--brand); background: var(--brand-tint); color: var(--brand-strong); }
+.task__text { display: block; }
+.task small { display: block; margin-top: 0.1rem; font-family: var(--font-text); font-weight: 500; font-size: 0.9375rem; color: var(--ink-soft); }
+.task--urgent { border-left-color: var(--urgent); }
+.task::after {
+  content: ""; margin-left: auto; flex: none; width: 0.5rem; height: 0.5rem;
+  border-right: 2.5px solid currentColor; border-top: 2.5px solid currentColor; transform: rotate(45deg);
+}
+
+/* Hero photo: the people you reach when you call. Caption is a solid panel, never text on the photo. */
+.front-photo { margin: 0; background: var(--surface); border-radius: var(--radius-photo); overflow: hidden; box-shadow: var(--shadow); }
+.front-photo img { width: 100%; aspect-ratio: 5 / 4; object-fit: cover; object-position: 50% 30%; background: var(--brand-tint); }
+.front-photo figcaption { padding: var(--space-4) var(--space-5); border-top: 4px solid var(--accent); }
+.front-photo figcaption strong { display: block; font-family: var(--font-display); font-size: var(--step-1); }
+.front-photo figcaption p { margin: var(--space-1) 0 0; color: var(--ink-soft); }
+
+/* 7. FACE PILE: real faces, linked to the team ============================== */
+.facepile { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin: 0 0 var(--space-5); }
+.facepile__faces { display: flex; padding-left: 0.5rem; margin: 0; list-style: none; }
+.facepile__faces li { margin-left: -0.5rem; }
+.facepile__faces img, .facepile__faces .initials {
+  width: 3rem; height: 3rem; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--paper); background: var(--brand-tint);
+}
+.facepile__link { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
+@media (max-width: 26rem) {
+  .facepile { margin-bottom: var(--space-4); }
+  .facepile__faces li:nth-child(n+5) { display: none; }
+  .facepile__faces img, .facepile__faces .initials { width: 2.75rem; height: 2.75rem; }
+}
+
+/* 8. PEOPLE ================================================================= */
+/* Portrait card. Photo first, then a "name badge", then facts, then their story. */
+.people { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr)); }
+.person {
+  display: flex; flex-direction: column; height: 100%;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-photo); overflow: hidden;
+}
+.person__photo { margin: 0; background: var(--brand-tint); }
+.person__photo img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; }
+.person { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+.person__id { padding: var(--space-4) var(--space-4) 0; }
+.person__more { display: flex; flex-direction: column; padding: 0 var(--space-4) var(--space-3); }
+/* Phones: photo beside the name badge, story underneath. Keeps eight dentists scannable. */
+@media (max-width: 39.99rem) {
+  .people:not(.people--compact) .person { grid-template-columns: min(7.5rem, 34%) minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .people:not(.people--compact) .person__photo { margin: var(--space-4) 0 0 var(--space-4); border-radius: var(--radius); overflow: hidden; align-self: start; }
+  .people:not(.people--compact) .person__more { grid-column: 1 / -1; padding-top: var(--space-3); }
+}
+.person__body { display: flex; flex-direction: column; flex: 1; padding: var(--space-4) var(--space-4) var(--space-3); }
+.front__status { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-4); margin-bottom: var(--space-3); }
+.front__status .status { margin: 0; }
+.front__closed { margin: 0; padding-block: var(--space-2); font-weight: 600; }
+.nowrap { white-space: nowrap; }
+.person__name { font-size: var(--step-1); margin: 0; }
+.person__role { margin: 0 0 var(--space-3); font-weight: 600; color: var(--accent-ink); }
+.person__facts { margin: 0 0 var(--space-3); font-size: var(--step--1); display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr); gap: 0.15rem var(--space-3); }
+.person__facts dt { color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; }
+.person__facts dd { margin: 0; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.person__words {
+  margin: 0 0 var(--space-3); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  background: var(--brand-tint); border-radius: var(--radius); border-left: 4px solid var(--brand);
+  font-size: var(--step--1); line-height: 1.5;
+}
+.person__words p { margin: 0; }
+.person__words .label { display: block; font-weight: 700; color: var(--brand); margin-bottom: 0.15rem; font-family: var(--font-display); }
+.person__gdc { margin: auto 0 0; padding-top: var(--space-2); font-size: 0.9375rem; color: var(--ink-soft); }
+
+/* Full biography: native disclosure, keyboard and screen-reader friendly, no JS */
+.story { border-top: 1px solid var(--line); margin-top: var(--space-2); }
+.story summary {
+  display: flex; align-items: center; gap: var(--space-2); min-height: var(--tap); cursor: pointer;
+  font-weight: 700; color: var(--brand); list-style: none; text-decoration: underline; text-underline-offset: 0.18em;
+}
+.story summary::-webkit-details-marker { display: none; }
+.story summary::before {
+  content: ""; flex: none; width: 0.5rem; height: 0.5rem; margin: 0 0.2rem;
+  border-right: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: rotate(-45deg);
+}
+.story[open] summary::before { transform: rotate(45deg); }
+.story__text { padding-bottom: var(--space-3); font-size: var(--step--1); }
+.story__text p { margin-bottom: var(--space-3); }
+
+/* Spotlight: one person, large, for a specific patient need (here: nervous patients) */
+.spotlight { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); align-items: center; }
+@media (min-width: 52rem) {
+  .spotlight { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-7); } }
+.spotlight__photo { margin: 0; width: min(100%, 17rem); border-radius: var(--radius-photo); overflow: hidden; background: var(--surface); max-width: 26rem; box-shadow: var(--shadow); }
+.spotlight__photo img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; }
+@media (min-width: 52rem) { .spotlight__photo { width: 100%; justify-self: start; } }
+.spotlight__photo figcaption { padding: var(--space-3) var(--space-4); font-weight: 600; border-top: 4px solid var(--accent); }
+.spotlight__photo figcaption span { display: block; font-weight: 500; color: var(--ink-soft); font-size: var(--step--1); }
+.quote {
+  margin: 0 0 var(--space-5); padding-left: var(--space-5); border-left: 4px solid var(--brand);
+  font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; line-height: 1.3; max-width: 36rem;
+}
+.quote p { margin: 0; }
+.quote footer { margin-top: var(--space-2); font: 500 var(--step--1)/1.4 var(--font-text); color: var(--ink-soft); }
+
+/* Compact people: hygienists, technicians, managers */
+.people--compact { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: var(--space-4); }
+.person--compact { display: flex; flex-direction: row; align-items: flex-start; gap: var(--space-4); padding: var(--space-4); }
+.person--compact .person__body { min-width: 0; }
+.person--compact .person__photo { flex: none; width: min(6.5rem, 30%); border-radius: var(--radius); overflow: hidden; }
+.person--compact .person__body { padding: 0; }
+.person--compact .person__words { background: none; border: 0; padding: 0; }
+
+/* Group photo with a solid caption */
+.group-photo { margin: var(--space-7) 0 0; background: var(--surface); border-radius: var(--radius-photo); overflow: hidden; border: 1px solid var(--line); }
+.group-photo img { width: 100%; aspect-ratio: 1200 / 461; object-fit: cover; background: var(--brand-tint); }
+.group-photo figcaption { padding: var(--space-4) var(--space-5); border-top: 4px solid var(--accent); }
+.group-photo figcaption strong { font-family: var(--font-display); font-size: var(--step-1); display: block; }
+.group-photo figcaption p { margin: var(--space-1) 0 0; color: var(--ink-soft); }
+
+/* 9. TASK PANELS ============================================================ */
+.panels { display: grid; gap: var(--space-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.panel {
+  background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--brand);
+  border-radius: var(--radius); padding: var(--space-5);
+}
+.panel h3 { font-size: var(--step-2); }
+.panel > :last-child { margin-bottom: 0; }
+.steps { counter-reset: step; list-style: none; padding: 0; margin: 0 0 var(--space-4); }
+.steps li { counter-increment: step; position: relative; padding: 0 0 var(--space-3) 2.75rem; }
+.steps li::before {
+  content: counter(step); position: absolute; left: 0; top: -0.1rem; width: 2rem; height: 2rem; border-radius: 50%;
+  display: grid; place-items: center; background: var(--brand); color: var(--on-brand); font: 700 1rem/1 var(--font-display);
+}
+.price { font-family: var(--font-display); font-weight: 750; font-size: var(--step-2); color: var(--ink); }
+.note { padding: var(--space-3) var(--space-4); background: var(--brand-tint); border-radius: var(--radius); font-size: var(--step--1); max-width: none; }
+
+/* Emergency: red-edged like an NHS urgent care card. 111 and 999 are text, not links. */
+.urgent { background: var(--urgent-bg); border: 1px solid #f1c7c3; border-left: 8px solid var(--urgent); border-radius: var(--radius); padding: var(--space-5); }
+.urgent h2 { color: var(--ink); }
+.urgent__grid { display: grid; gap: var(--space-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); margin-top: var(--space-4); }
+.urgent__grid h3 { font-size: var(--step-1); }
+.urgent__grid p { margin-bottom: var(--space-3); }
+.big-number { font-family: var(--font-display); font-weight: 800; font-size: var(--step-2); color: var(--ink); }
+.tel-big { display: inline-flex; align-items: center; min-height: var(--tap); }
+
+/* Costs table */
+.table-wrap { overflow-x: auto; }
+.fees { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.fees caption { text-align: left; font: 700 var(--step-1)/1.3 var(--font-display); margin-bottom: var(--space-3); }
+.fees th, .fees td { text-align: left; padding: var(--space-3) var(--space-2); border-bottom: 1px solid var(--line); vertical-align: top; }
+.fees td:last-child, .fees th:last-child { text-align: right; white-space: nowrap; font-weight: 700; }
+.fees thead th { font-size: var(--step--1); color: var(--ink-soft); font-weight: 600; }
+.checklist { padding-left: 1.25rem; }
+.checklist li { margin-bottom: var(--space-2); }
+
+/* 10. VISIT ================================================================= */
+.visit { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.hours { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.hours th, .hours td { overflow-wrap: anywhere; }
+.hours th, .hours td { padding: var(--space-3) var(--space-2); border-bottom: 1px solid var(--line); text-align: left; }
+.hours td { text-align: right; }
+.hours tr.is-today { background: var(--brand-tint); }
+.hours tr.is-today th { box-shadow: inset 4px 0 var(--brand); padding-left: var(--space-4); }
+.address { font-style: normal; font-size: var(--step-1); line-height: 1.45; margin-bottom: var(--space-4); }
+.facilities { list-style: none; padding: 0; display: grid; gap: var(--space-2); }
+.facilities li { display: flex; gap: var(--space-3); align-items: center; }
+.facilities svg { flex: none; width: 1.5rem; height: 1.5rem; color: var(--accent-ink); }
+.place-photo { margin: 0; border-radius: var(--radius-photo); overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.place-photo img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.place-photo figcaption { padding: var(--space-3) var(--space-4); color: var(--ink-soft); font-size: var(--step--1); }
+
+/* 11. FOOTER ================================================================ */
+.site-footer { background: #241d2d; color: #f4f1f7; padding-block: var(--space-7) var(--space-6); font-size: 1rem; }
+.site-footer h2 { color: #fff; font-size: var(--step-1); margin-bottom: var(--space-3); }
+.site-footer a { color: #fff; }
+.site-footer a:hover { color: #fff; text-decoration-thickness: 3px; }
+.site-footer .footer__grid { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.site-footer ul { list-style: none; padding: 0; margin: 0; }
+.site-footer li a { display: inline-flex; align-items: center; min-height: var(--tap); }
+.site-footer p { color: #e3dde9; }
+.footer__legal { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid #4a4155; font-size: 0.9375rem; }
+.footer__legal p { max-width: none; color: #d9d2e0; }
+
+/* 12. NO-PHOTO FALLBACK ===================================================== */
+/* Use when a person has no consented photo. Never use a silhouette or a stock face. */
+.initials {
+  display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 5;
+  background: var(--brand-tint); color: var(--brand);
+  font: 750 clamp(2.5rem, 6vw, 3.5rem)/1 var(--font-display); letter-spacing: 0.02em;
+}
+.facepile__faces .initials { aspect-ratio: 1; font-size: 1rem; }
+.person--compact .initials { aspect-ratio: 1; font-size: 1.75rem; }
+.person--no-photo .person__photo { border-bottom: 4px solid var(--brand-tint-2); }
+/* Hero without a group photo: the right column becomes the practice card */
+.front-card { background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--brand); border-radius: var(--radius-photo); padding: var(--space-5); }
+.front-card h2 { font-size: var(--step-2); }
+
+/* 13. MOTION AND PRINT ====================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  .task, .btn, .nav a { transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media print {
+  .site-header, .skip-link, .front-photo, .story summary, .facepile__faces { display: none; }
+  .story > * { display: block !important; }
+  body { background: #fff; }
+}
