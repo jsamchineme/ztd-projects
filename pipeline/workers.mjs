@@ -96,7 +96,7 @@ async function capture(url, dir){
 }
 
 export function createRunner(ctx){
-  const { stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter, workDir, previewUrl, auditCard, auditScript, root } = ctx;
+  const { stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter, workDir, previewUrl, auditCard, auditScript, root, crawlCard } = ctx;
   const templatesDir = join(root, 'templates');
   // Where each design template's brief, styles and worked example live.
   function templateText(c){
@@ -153,6 +153,23 @@ export function createRunner(ctx){
     ].join('\n');
   }
 
+  // The study of the practice's current website, for planning (study), building (content and photos) and reviewing.
+  function sourceText(cwd){
+    const dir = join(cwd, 'source');
+    let md = '';
+    try { md = readFileSync(join(dir, 'SITE.md'), 'utf8'); } catch { return ''; }
+    if (md.length > 14000) md = md.slice(0, 14000) + `\n…(cut short; read ${join(dir, 'SITE.md')} for the rest)`;
+    return [
+      `The practice's current website has been crawled with a real browser: every page reachable from its links, its navigation, photos and documents. It's in ${dir}:`,
+      `- ${join(dir, 'SITE.md')}: the overview below.`,
+      `- ${join(dir, 'pages')}/NN-slug.md: the full text of each page in reading order (headings, paragraphs, lists, tables, footer). Read every page that has real content before you decide anything; the homepage alone misses most of it.`,
+      `- ${join(dir, 'img')}: the site's own photos and logo, with ${join(dir, 'img', 'INDEX.md')} (page, alt text, size). Open photos with the Read tool to judge them.`,
+      `- ${join(dir, 'docs')}: leaflets and PDFs linked from the site (the Read tool opens PDFs).`,
+      `- ${join(dir, 'shots')}: a screenshot of the top of each page.`,
+      `Source-site overview:\n<source-site>\n${md}\n</source-site>`
+    ].join('\n');
+  }
+
   function systemFor(stage, step, c, cwd, { shots = [], audit = null } = {}){
     const files = step.tools === 'files';
     const browser = step.tools === 'browser' && browserReady;
@@ -164,6 +181,7 @@ export function createRunner(ctx){
       stage.requires?.length && `Before you finish, these fields must have values: ${stage.requires.join(', ')}.`,
       `Templates you can choose from: ${config.templates.join(', ')}.`,
       templateText(c),
+      sourceText(cwd),
       `Outcomes: ${stage.outcomes.map(o => `${o.id} (${o.label})`).join(', ')}. Use "${RELEASE}" only if you can't do the work, and explain why in the note.`,
       files && `Your working folder is ${cwd}. Anything you save in ${join(cwd, 'site')} is published at ${previewUrl(c.id)} (index.html is the home page). Build the redesign there as static HTML, CSS and images, and set previewUrl to ${previewUrl(c.id)}.`,
       hasSite && [
@@ -235,6 +253,12 @@ export function createRunner(ctx){
     const cwd = workDir(c.id);
     await mkdir(join(cwd, 'site'), { recursive: true });
     // Stages marked "audit" get a full browser audit of the preview first; otherwise (or if it fails) plain screenshots.
+    // Stages marked "crawl" study the practice's current website first (reused for 7 days).
+    if (stage.crawl && crawlCard){
+      try { if (await crawlCard(c, w.name)) note(run, `Studied #${c.id}'s current site: ${c.source.pages} pages, ${c.source.photos} photos`); }
+      catch (e){ note(run, `Couldn't study #${c.id}'s current site, working from the web instead: ${e.message}`); }
+      if (run.status !== 'running') throw Object.assign(new Error('Workflow stopped'), { quiet: true });
+    }
     let audit = null, shots = [];
     if (existsSync(join(cwd, 'site', 'index.html'))){
       if (stage.audit && auditCard){

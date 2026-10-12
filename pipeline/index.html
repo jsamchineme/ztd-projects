@@ -301,7 +301,7 @@ const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : null;
 const domain = u => String(u || '').replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
 const LS = { get(k, d){ try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
 
-let cfg, stages = {}, cards = [], workflows = [], auditing = new Set(), wfOpen = false, wfEdit = null, tab = LS.get('pipeline.tab', 'production'), openId = null, me = LS.get('pipeline.me', '');
+let cfg, stages = {}, cards = [], workflows = [], auditing = new Set(), crawling = new Set(), wfOpen = false, wfEdit = null, tab = LS.get('pipeline.tab', 'production'), openId = null, me = LS.get('pipeline.me', '');
 
 // ---------- api ----------
 async function api(method, path, body){
@@ -379,6 +379,19 @@ function auditBox(c){
       ${cfg.auditAvailable ? `<button class="btn" data-audit ${busy ? 'disabled' : ''}>${busy ? '<span class="spin" aria-hidden="true" style="display:inline-block;margin-right:6px"></span>Auditing…' : a ? 'Run again' : 'Run audit'}</button>`
         : `<span class="hint" style="margin:0">To turn it on, run <code>npm --prefix pipeline install</code> and restart the server.</span>`}
       ${a ? `<a class="btn" href="/audit/${c.id}/report.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Full report ↗</a>` : ''}
+    </div></div>`;
+}
+// The study of the practice's current website: what the crawler found, a link to read it, and a button to run it.
+function sourceBox(c){
+  if (!cfg.crawlAvailable && !c.source) return '';
+  const s = c.source, busy = crawling.has(c.id);
+  return `<div class="box"><h3>Current website</h3>
+    ${s ? `<div class="atiles"><div class="atile"><b>${s.pages}</b>page${s.pages === 1 ? '' : 's'}</div><div class="atile"><b>${s.photos}</b>photos</div><div class="atile"><b>${s.documents}</b>documents</div></div>
+      <p class="hint" style="margin:8px 0 10px">Studied ${ago(s.at)} · ${s.words} words${s.singlePage ? ' · a directory or social page, so only that page was read' : ''}${s.errors ? ` · ${s.errors} page${s.errors > 1 ? 's' : ''} couldn’t be read` : ''}</p>`
+      : `<p class="hint" style="margin:0 0 10px">Reads every page of the practice’s current site in a real browser: its menu, text, photos and leaflets. Redesign study does this automatically.</p>`}
+    <div class="row">
+      ${cfg.crawlAvailable ? `<button class="btn" data-study-site ${busy ? 'disabled' : ''}>${busy ? '<span class="spin" aria-hidden="true" style="display:inline-block;margin-right:6px"></span>Studying… (a few minutes)' : s ? 'Study again' : 'Study the site'}</button>` : ''}
+      ${s ? `<a class="btn" href="/source/${c.id}/SITE.md" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Read the study ↗</a>` : ''}
     </div></div>`;
 }
 function cardHtml(c){
@@ -462,7 +475,7 @@ function histLine(h){
   const n = id => esc(stages[id]?.name || id);
   const what = h.action === 'move' ? `moved ${n(h.from)} → <b>${n(h.to)}</b>${h.outcome && h.outcome !== 'done' ? ` (${esc(h.outcome)})` : ''}`
     : h.action === 'update' ? `updated ${esc(h.fields.join(', '))}` : h.action === 'add' ? `added to ${n(h.to)}`
-    : h.action === 'audit' ? 'ran a browser audit' : h.action === 'claim' ? 'took it' : h.action === 'release' ? 'gave it back' : h.action === 'comment' ? 'commented' : esc(h.action);
+    : h.action === 'audit' ? 'ran a browser audit' : h.action === 'study-site' ? 'studied the current website' : h.action === 'claim' ? 'took it' : h.action === 'release' ? 'gave it back' : h.action === 'comment' ? 'commented' : esc(h.action);
   return `<li><span class="when" title="${esc(new Date(h.at).toLocaleString())}">${ago(h.at).replace(' ago', '')}</span>
     <span class="what"><b>${esc(h.by)}</b> ${what}${h.note ? `<span class="note">${esc(h.note)}</span>` : ''}</span></li>`;
 }
@@ -496,6 +509,7 @@ function refreshPanelParts(){
   if (!$('#stageBox').contains(document.activeElement)) $('#stageBox').innerHTML = stageBox(c);
   $('#hist').innerHTML = histHtml(c);
   if ($('#auditBox')) $('#auditBox').innerHTML = auditBox(c);
+  if ($('#sourceBox')) $('#sourceBox').innerHTML = sourceBox(c);
 }
 function renderPanel(){
   const c = cards.find(c => c.id === openId);
@@ -509,6 +523,7 @@ function renderPanel(){
       <button class="x" id="pClose" aria-label="Close">×</button></div>
     <div class="pb">
       <div class="links">${safeUrl(c.url) ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">Before: current site ↗</a>` : ''}${safeUrl(f.previewUrl) ? `<a href="${esc(f.previewUrl)}" target="_blank" rel="noopener">After: redesign ↗</a>` : ''}</div>
+      <div id="sourceBox">${sourceBox(c)}</div>
       <div id="auditBox">${auditBox(c)}</div>
       <div class="box" id="stageBox">${stageBox(c)}</div>
       <div class="box">
@@ -549,7 +564,7 @@ async function load(){
   loading = (async () => {
     try {
       const [r, w] = await Promise.all([api('GET', '/cards'), api('GET', '/workflows')]);
-      cards = r.cards; workflows = w.workflows; auditing = new Set(r.auditing || []);
+      cards = r.cards; workflows = w.workflows; auditing = new Set(r.auditing || []); crawling = new Set(r.crawling || []);
       render();
       renderWfButton();
       if (wfOpen && !wfEdit) renderWf();
@@ -606,6 +621,13 @@ $('#panel').addEventListener('click', async e => {
     return act(() => api('POST', '/claim', { stage: c.stage, id: c.id }), 'It’s yours');
   }
   if (t.closest('[data-release]')) return act(() => api('POST', `/cards/${openId}/release`, {}), 'Given back');
+  if (t.closest('[data-study-site]')){
+    const id = openId;
+    crawling.add(id); renderPanel();
+    const r = await act(() => api('POST', `/cards/${id}/study-site`, {}));
+    if (r?.card.source) toast(`Read ${r.card.source.pages} page${r.card.source.pages === 1 ? '' : 's'} and ${r.card.source.photos} photos`);
+    return;
+  }
   if (t.closest('[data-audit]')){
     const id = openId;
     auditing.add(id); renderPanel(); render();

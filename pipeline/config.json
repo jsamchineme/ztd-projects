@@ -1,7 +1,20 @@
 {
   "claimMinutes": 90,
   "attentionStage": "attention",
-  "ratingBands": { "bad": [1, 4], "average": [5, 7], "good": [8, 10] },
+  "ratingBands": {
+    "bad": [
+      1,
+      4
+    ],
+    "average": [
+      5,
+      7
+    ],
+    "good": [
+      8,
+      10
+    ]
+  },
   "templates": [
     "Front Desk GP",
     "Front Desk Dental",
@@ -27,16 +40,66 @@
     "Doorway": "Dental practices with good premises photos. See inside, step by step, before your first visit."
   },
   "fields": [
-    { "key": "score", "label": "Score (1–10)", "type": "number" },
-    { "key": "rating", "label": "Rating", "type": "select", "options": ["bad", "average", "good"]},
-    { "key": "analysis", "label": "Analysis notes", "type": "text" },
-    { "key": "findings", "label": "What needs fixing", "type": "text" },
-    { "key": "template", "label": "Template", "type": "template" },
-    { "key": "plan", "label": "Redesign plan", "type": "text" },
-    { "key": "previewUrl", "label": "Redesign preview (after)", "type": "url" },
-    { "key": "review", "label": "Review notes", "type": "text" },
-    { "key": "contact", "label": "Contact", "type": "text" },
-    { "key": "pitchNotes", "label": "Pitch notes", "type": "text" }
+    {
+      "key": "score",
+      "label": "Score (1–10)",
+      "type": "number"
+    },
+    {
+      "key": "rating",
+      "label": "Rating",
+      "type": "select",
+      "options": [
+        "bad",
+        "average",
+        "good"
+      ]
+    },
+    {
+      "key": "analysis",
+      "label": "Analysis notes",
+      "type": "text"
+    },
+    {
+      "key": "findings",
+      "label": "What needs fixing",
+      "type": "text"
+    },
+    {
+      "key": "template",
+      "label": "Template",
+      "type": "template"
+    },
+    {
+      "key": "plan",
+      "label": "Redesign plan",
+      "type": "text"
+    },
+    {
+      "key": "pages",
+      "label": "New site pages",
+      "type": "text"
+    },
+    {
+      "key": "previewUrl",
+      "label": "Redesign preview (after)",
+      "type": "url"
+    },
+    {
+      "key": "review",
+      "label": "Review notes",
+      "type": "text"
+    },
+    {
+      "key": "contact",
+      "label": "Contact",
+      "type": "text"
+    },
+    {
+      "key": "pitchNotes",
+      "label": "Pitch notes",
+      "type": "text"
+    }
   ],
   "pipelines": [
     {
@@ -44,79 +107,164 @@
       "name": "Production",
       "stages": [
         {
-          "id": "targets", "name": "Targets", "who": "ai",
+          "id": "targets",
+          "name": "Targets",
+          "who": "ai",
           "description": "Websites found by the discovery task, waiting to be analysed.",
           "feeds": "analysis",
           "instructions": "Discovery: find websites that fit the target market and add them with `node pipeline/cli.mjs add <url> --name \"<business>\"` (or `import <file>` for a list). Duplicates are skipped automatically. You don't claim cards here; Analysis pulls from this bucket."
         },
         {
-          "id": "analysis", "name": "Analysis", "who": "ai", "pullFrom": ["targets"],
+          "id": "analysis",
+          "name": "Analysis",
+          "who": "ai",
+          "pullFrom": [
+            "targets"
+          ],
           "description": "Study each site and score it 1–10.",
-          "requires": ["score", "analysis"],
+          "requires": [
+            "score",
+            "analysis"
+          ],
           "outcomeField": "rating",
           "outcomes": [
-            { "id": "bad", "label": "Bad", "to": "bad" },
-            { "id": "average", "label": "Average", "to": "average" },
-            { "id": "good", "label": "Good", "to": "good" }
+            {
+              "id": "bad",
+              "label": "Bad",
+              "to": "bad"
+            },
+            {
+              "id": "average",
+              "label": "Average",
+              "to": "average"
+            },
+            {
+              "id": "good",
+              "label": "Good",
+              "to": "good"
+            }
           ],
           "instructions": "Open the site and judge it as a potential redesign client. Score it 1–10 on design, mobile layout, speed, clarity of offer, calls to action, trust signals and how dated it looks (1 = very poor, 10 = excellent). Set `score` and write `analysis` (3–6 short bullet points backing the score). Rating follows the score (1–4 bad, 5–7 average, 8–10 good) unless you set `rating` yourself. Then complete the card; it moves to the matching bucket."
         },
         {
-          "id": "bad", "name": "Bad sites", "who": "any",
+          "id": "bad",
+          "name": "Bad sites",
+          "who": "any",
           "description": "Highest-priority sales targets. Redesign study pulls from here first.",
           "feeds": "study"
         },
         {
-          "id": "average", "name": "Average sites", "who": "any",
+          "id": "average",
+          "name": "Average sites",
+          "who": "any",
           "description": "Second-priority targets. Pulled once Bad sites is empty.",
           "feeds": "study"
         },
         {
-          "id": "good", "name": "Good sites", "who": "any", "terminal": true,
+          "id": "good",
+          "name": "Good sites",
+          "who": "any",
+          "terminal": true,
           "description": "Not targeted. Parked here for reference."
         },
         {
-          "id": "attention", "name": "Needs attention", "who": "human", "parking": true,
+          "id": "attention",
+          "name": "Needs attention",
+          "who": "human",
+          "parking": true,
           "description": "Cards an AI worker couldn't finish. Read why on the card, sort it out, then drag it to the right bucket."
         },
         {
-          "id": "study", "name": "Redesign study", "who": "any", "pullFrom": ["bad", "average"],
-          "description": "Work out what needs to change and which template to use.",
-          "requires": ["findings", "template", "plan"],
-          "outcomes": [
-            { "id": "done", "label": "Redesign planned", "to": "ready" },
-            { "id": "new_site", "label": "New site planned", "to": "ready" }
+          "id": "study",
+          "name": "Redesign study",
+          "who": "any",
+          "pullFrom": [
+            "bad",
+            "average"
           ],
-          "instructions": "Study the site in depth. Write `findings`: the concrete problems (layout, content, mobile, speed, branding, missing pages, weak calls to action). Choose a `template` by practice type and by what real photos the practice has on its current site (its own published photos only; never stock): a GP practice with good staff portraits or team photos gets \"Familiar Faces GP\", otherwise \"Front Desk GP\". A dental practice with good, consistent team portraits and bios gets \"Familiar Faces Dental\"; one whose best photos show its building, reception and treatment rooms gets \"Doorway\"; a rural or small-town practice with mostly older or anxious patients, weak photos or a slow current site gets \"Front Desk Local\"; any other dental practice gets \"Front Desk Dental\". Say in `findings` which photos exist and why you chose the template. Read the template's BRIEF.md (you're given the path) so your plan follows its homepage structure, and list in `plan` which of the practice's photos to use where. Write `plan`: section-by-section how the redesign maps the existing content onto the template, what to keep (logo, colours, copy, images) and what to add. Then complete with outcome `done`.\n\nIf the business has no working website (the site is down, doesn't load, is only a Facebook page, or the card links to its NHS listing), don't give up: this is a prospect for a brand-new site. Gather what you can from the NHS listing link in the notes, the Facebook page and a web search: practice name, address, phone, opening hours, services, NHS or private, team and photos. In `findings`, say there's no working website and list what you found. Choose a `template` and write a `plan` for a new site built from those details. Then complete with outcome `new_site`."
+          "description": "Work out what needs to change and which template to use.",
+          "requires": [
+            "findings",
+            "template",
+            "plan",
+            "pages"
+          ],
+          "outcomes": [
+            {
+              "id": "done",
+              "label": "Redesign planned",
+              "to": "ready"
+            },
+            {
+              "id": "new_site",
+              "label": "New site planned",
+              "to": "ready"
+            }
+          ],
+          "instructions": "Before you start, the practice's current website has been crawled for you (every page, its navigation, photos and documents; see the source-site overview and files). Read every page with real content, look at the photos, and open any leaflets. The homepage alone misses most of what the practice publishes.\n\nWrite `findings`: (1) the concrete problems with the current site (layout, mobile, speed, out-of-date notices, pop-ups, broken or missing pages, weak calls to action); (2) a content inventory: what each existing page actually says that a patient needs (services and treatments, fees and plans, registration, emergencies, hours, team and qualifications, history, FAQs, policies, news, recruitment), noting anything out of date or contradicting the NHS rules on nhsinform.scot; (3) which real photos exist and what they show (team, building, rooms, history), with their file names in source/img.\n\nChoose a `template` by practice type and by what real photos the practice has on its current site (its own published photos only; never stock): a GP practice with good staff portraits or team photos gets \"Familiar Faces GP\", otherwise \"Front Desk GP\". A dental practice with good, consistent team portraits and bios gets \"Familiar Faces Dental\"; one whose best photos show its building, reception and treatment rooms gets \"Doorway\"; a rural or small-town practice with mostly older or anxious patients, weak photos or a slow current site gets \"Front Desk Local\"; any other dental practice gets \"Front Desk Dental\". Say in `findings` which photos exist and why you chose the template. Read the template's BRIEF.md (you're given the path).\n\nWrite `pages`: the site map of the new site. Everything doesn't have to fit on the homepage: keep the homepage to the patient's top tasks as the brief describes, and give deeper content its own pages (for example Treatments, Fees and dental plan, New patients, Our team, Facial aesthetics, FAQs, About us and our history, Contact and opening hours, Privacy and FOI). For each page give: its title, a short URL like `treatments.html`, its purpose, the sections it contains, which source pages (pages/NN-slug.md) its content comes from, and which photos (source/img files) it uses. Keep the main menu to 7 items or fewer (put the rest in the footer or link them from the pages they belong to). End with a short list of existing content you're deliberately leaving out and why (for example stale COVID notices, blog chrome, prices superseded by the official NHS charges, social-event photos that show patients). Nothing a patient needs may be lost.\n\nWrite `plan`: the homepage section by section, and how the template is themed for this practice (logo, colours from the logo, which photos go where), what to keep and what to add.\n\nThen complete with outcome `done`.\n\nIf the business has no working website (the site is down, doesn't load, is only a Facebook page, or the card links to its NHS listing), don't give up: this is a prospect for a brand-new site. The crawl will hold only that one page. Gather what you can from it, the NHS listing link in the notes and a web search: practice name, address, phone, opening hours, services, NHS or private, team and photos. In `findings`, say there's no working website and list what you found. Choose a `template`, write a `pages` site map (usually a smaller one) and a `plan` for a new site built from those details. Then complete with outcome `new_site`.",
+          "crawl": true
         },
         {
-          "id": "ready", "name": "Ready to build", "who": "any",
+          "id": "ready",
+          "name": "Ready to build",
+          "who": "any",
           "description": "Site, findings and redesign plan, waiting for a builder.",
           "feeds": "build"
         },
         {
-          "id": "build", "name": "Build", "who": "any", "pullFrom": ["ready"], "audit": true,
-          "description": "Design the new site on the chosen template.",
-          "requires": ["previewUrl"],
-          "next": "ai_review",
-          "instructions": "Build the redesign on the chosen `template`, following `findings` and `plan`. Read the template's BRIEF.md and its worked example first (you're given the paths), copy its styles.css into the site unchanged except for the custom properties at the top, and follow the example's homepage structure and quality bar. Reuse the business's real content, logo and brand colours. If the card was planned as a new site (there's no working website), build it from the details gathered in `findings`, `plan` and the notes, and never invent services, prices, staff or reviews. Deploy a preview and set `previewUrl`. If the card came back from review, address everything in `review` first. Then complete the card."
-        },
-        {
-          "id": "ai_review", "name": "AI review", "who": "ai", "audit": true,
-          "description": "An agent checks the build against the plan and template.",
-          "requires": ["review"],
-          "outcomes": [
-            { "id": "pass", "label": "Pass", "to": "human_review" },
-            { "id": "changes", "label": "Needs changes", "to": "build" }
+          "id": "build",
+          "name": "Build",
+          "who": "any",
+          "pullFrom": [
+            "ready"
           ],
-          "instructions": "A browser audit of the preview runs just before you start (every link clicked, axe accessibility to WCAG 2.1 AA, phone layout and tap targets, menu, forms, keyboard), and you get its report and screenshots. Treat its measurements as facts. Then judge what it can't: compare `previewUrl` with the original `url`, the `findings`, the `plan` and the chosen `template`'s BRIEF.md rules (you're given the path). Check every planned section exists, the business's real content (name, phone, address, hours, services, team) was carried over correctly, and nothing is invented or placeholder. Write `review`: one line on what you checked, then a numbered list of everything to fix, most important first, each specific enough for the builder (which page and element, and what to change). Complete with outcome `changes` if there is any audit blocker or major issue, a missing planned section, or invented or placeholder content; otherwise `pass`, listing any minor issues in the review. External links the audit couldn't verify aren't failures."
+          "audit": true,
+          "description": "Design the new site on the chosen template.",
+          "requires": [
+            "previewUrl"
+          ],
+          "next": "ai_review",
+          "instructions": "Build the redesign on the chosen `template`, following `findings` and `plan`. Read the template's BRIEF.md and its worked example first (you're given the paths), copy its styles.css into the site unchanged except for the custom properties at the top, and follow the example's homepage structure and quality bar. Reuse the business's real content, logo and brand colours. If the card was planned as a new site (there's no working website), build it from the details gathered in `findings`, `plan` and the notes, and never invent services, prices, staff or reviews. Deploy a preview and set `previewUrl`. If the card came back from review, address everything in `review` first. Then complete the card.\n\nBuild every page listed in `pages`, not just the homepage. Every page uses the same header, footer, navigation, tokens and components as the template's example, with one h1, a short intro and clear sections; mark the current page in the menu. Take each page's content from the source pages named in `pages` (source/pages/NN-slug.md): rewrite it in plain English at a reading age of 9 to 11 and the NHS content style, but keep every fact, and never add facts that aren't there. Copy the photos named in `pages` and `plan` from source/img into site/img, resize them sensibly, and write real alt text. Link pages with relative links (`treatments.html`). Run the audit on the finished site: it crawls every page."
         },
         {
-          "id": "human_review", "name": "Human review", "who": "human",
+          "id": "ai_review",
+          "name": "AI review",
+          "who": "ai",
+          "audit": true,
+          "description": "An agent checks the build against the plan and template.",
+          "requires": [
+            "review"
+          ],
+          "outcomes": [
+            {
+              "id": "pass",
+              "label": "Pass",
+              "to": "human_review"
+            },
+            {
+              "id": "changes",
+              "label": "Needs changes",
+              "to": "build"
+            }
+          ],
+          "instructions": "A browser audit of the preview runs just before you start (every link clicked, axe accessibility to WCAG 2.1 AA, phone layout and tap targets, menu, forms, keyboard), and you get its report and screenshots. Treat its measurements as facts. Then judge what it can't: compare `previewUrl` with the original `url`, the `findings`, the `plan` and the chosen `template`'s BRIEF.md rules (you're given the path). Check every planned section exists, the business's real content (name, phone, address, hours, services, team) was carried over correctly, and nothing is invented or placeholder. Write `review`: one line on what you checked, then a numbered list of everything to fix, most important first, each specific enough for the builder (which page and element, and what to change). Complete with outcome `changes` if there is any audit blocker or major issue, a missing planned section, or invented or placeholder content; otherwise `pass`, listing any minor issues in the review. External links the audit couldn't verify aren't failures.\n\nAlso check the whole site against `pages` and the source-site inventory: every planned page exists and is linked, each one carries the facts from its source pages (spot-check prices, hours, names, qualifications and phone numbers against source/pages), and nothing a patient needs from the old site was lost. A missing planned page or lost patient information means outcome `changes`."
+        },
+        {
+          "id": "human_review",
+          "name": "Human review",
+          "who": "human",
           "description": "Final sign-off before the site goes to sales.",
           "outcomes": [
-            { "id": "approve", "label": "Approve for sales", "to": "to_pitch" },
-            { "id": "changes", "label": "Needs changes", "to": "build" }
+            {
+              "id": "approve",
+              "label": "Approve for sales",
+              "to": "to_pitch"
+            },
+            {
+              "id": "changes",
+              "label": "Needs changes",
+              "to": "build"
+            }
           ]
         }
       ]
@@ -126,25 +274,49 @@
       "name": "Sales",
       "stages": [
         {
-          "id": "to_pitch", "name": "Ready to pitch", "who": "human",
+          "id": "to_pitch",
+          "name": "Ready to pitch",
+          "who": "human",
           "description": "Approved redesigns. Pitch with the before and after.",
-          "outcomes": [{ "id": "pitched", "label": "Pitched", "to": "pitched" }],
+          "outcomes": [
+            {
+              "id": "pitched",
+              "label": "Pitched",
+              "to": "pitched"
+            }
+          ],
           "instructions": "Contact the business and show the original site (`url`) next to the redesign (`previewUrl`). Record who you spoke to in `contact` and what you said in `pitchNotes`."
         },
         {
-          "id": "pitched", "name": "Pitched", "who": "human",
+          "id": "pitched",
+          "name": "Pitched",
+          "who": "human",
           "description": "Waiting to hear back.",
           "outcomes": [
-            { "id": "interested", "label": "Interested", "to": "interested" },
-            { "id": "not_interested", "label": "Not interested", "to": "not_interested" }
+            {
+              "id": "interested",
+              "label": "Interested",
+              "to": "interested"
+            },
+            {
+              "id": "not_interested",
+              "label": "Not interested",
+              "to": "not_interested"
+            }
           ]
         },
         {
-          "id": "interested", "name": "Interested", "who": "human", "terminal": true,
+          "id": "interested",
+          "name": "Interested",
+          "who": "human",
+          "terminal": true,
           "description": "Wants to go ahead. Hand over to closing."
         },
         {
-          "id": "not_interested", "name": "Not interested", "who": "human", "terminal": true,
+          "id": "not_interested",
+          "name": "Not interested",
+          "who": "human",
+          "terminal": true,
           "description": "Declined for now."
         }
       ]

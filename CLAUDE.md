@@ -23,6 +23,7 @@ The business: redesign the websites of NHS dental and GP practices in Scotland, 
 | `pipeline/config.json` | Stages and outcomes, card fields, and templates (`templates`, `templateFiles`, `templateSummaries`) |
 | `pipeline/index.html` | Board UI: cards, panel, workflows drawer, template picker |
 | `pipeline/audit.mjs` | Playwright and axe browser audit. `node pipeline/audit.mjs <url> <outdir>` |
+| `pipeline/crawl.mjs` | Crawls a practice's current site into `work/<card>/source/` (SITE.md, page texts, photos, documents). Runs before Redesign study. `node pipeline/crawl.mjs <url> <outdir> [max pages]` |
 | `pipeline/viewports.mjs` | Screenshots and layout flags at 9 widths from 360 to 1440px. `node pipeline/viewports.mjs <url> <outdir> [widths]` |
 | `pipeline/template-thumbs.mjs` | Regenerates `templates/*/thumb.jpg` for the picker |
 | `pipeline/cli.mjs` | CLI for agents. See `pipeline/AGENTS.md` |

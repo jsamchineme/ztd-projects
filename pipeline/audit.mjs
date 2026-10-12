@@ -21,7 +21,7 @@ const VIEWPORTS = [
   { name: 'desktop', label: 'desktop', width: 1280, height: 800, isMobile: false, hasTouch: false, slice: 1600, maxSlices: 4 },
   { name: 'mobile', label: 'phone', width: 390, height: 844, isMobile: true, hasTouch: true, slice: 1400, maxSlices: 6 }
 ];
-const MAX_PAGES = 15;
+const MAX_PAGES = 30;
 const MAX_CLICKS = 40;
 const MAX_EXTERNAL = 60;
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';

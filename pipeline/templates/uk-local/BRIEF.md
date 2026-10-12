@@ -314,3 +314,15 @@ Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 320p
 - nhs.uk, *How to find an emergency or urgent NHS dentist appointment* (999 or A&E criteria): https://www.nhs.uk/nhs-services/dentists/how-to-find-an-nhs-dentist-in-an-emergency/
 - GDC, *Standards for the Dental Team*, Principle 2 (2.3.6 and 2.3.7 on written treatment plans, 2.4 on costs): https://standards.gdc-uk.org/
 - Braille Institute, Atkinson Hyperlegible: https://www.brailleinstitute.org/freefont/
+
+## Inner pages
+
+The worked example is the homepage. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it.
+
+- **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts and JS, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`.
+- **Page pattern.** A short breadcrumb or "Back to home" link, one `h1` that says what the page is, a one- or two-sentence intro, then sections with `h2` headings. Use the same components as the homepage (cards, care cards, summary lists, tables, the team grid) rather than inventing new ones.
+- **Keep the urgent route on every page.** The call button stays in the header. Pages about appointments, emergencies or treatment repeat the short urgent-help block.
+- **Long content.** FAQs go in `<details>` expanders grouped under headings. Fee lists go in a simple table with a "last checked" date and a link to the official NHS charges. Policies (privacy, FOI, complaints) go on plain text pages linked from the footer.
+- **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
+- **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
+- **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.

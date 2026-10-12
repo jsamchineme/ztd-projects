@@ -387,3 +387,15 @@ These were ambiguous in the brief and are worded to stay faithful. Confirm them 
 - **Unknowns, so the page says to phone:** test results by text, how the named GP is assigned, how to request a fit note after 7 days, building access, the complaints process, and how to get your CHI number.
 - **Gender:** stated only for Dr Carrie Forbes (female), Dr Jonathan Humby (male) and Mrs Katie Skea (female). All other gender information is missing and should be requested.
 - **Rota:** days listed without "morning" or "afternoon" are shown as "Working", meaning usually working that day, not necessarily all day.
+
+## Inner pages
+
+The worked example is the homepage. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it.
+
+- **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts and JS, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`.
+- **Page pattern.** A short breadcrumb or "Back to home" link, one `h1` that says what the page is, a one- or two-sentence intro, then sections with `h2` headings. Use the same components as the homepage (cards, care cards, summary lists, tables, the team grid) rather than inventing new ones.
+- **Keep the urgent route on every page.** The call button stays in the header. Pages about appointments, emergencies or treatment repeat the short urgent-help block.
+- **Long content.** FAQs go in `<details>` expanders grouped under headings. Fee lists go in a simple table with a "last checked" date and a link to the official NHS charges. Policies (privacy, FOI, complaints) go on plain text pages linked from the footer.
+- **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
+- **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
+- **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.

@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 import { createRunner } from './workers.mjs';
 
 // The browser audit needs Playwright and axe-core (npm --prefix pipeline install). Without them the board still runs.
+// The source-site study (crawl.mjs) uses the same Playwright stack; without it, Redesign study works from WebFetch alone.
+const crawlMod = await import('./crawl.mjs').catch(() => null);
 const auditMod = await import('./audit.mjs').catch(e => {
   console.warn(`Browser audit is off: ${e.message.split('\n')[0]}\nInstall it with: npm --prefix pipeline install`);
   return null;
@@ -232,10 +234,30 @@ async function auditCard(c, by){
   } finally { auditing.delete(c.id); broadcast(); }
 }
 
+// ---------- source-site study ----------
+// Crawls the card's current website into work/<card>/source: every page's text, the navigation, photos, documents.
+const crawling = new Set();
+const CRAWL_FRESH_MS = 7 * 864e5;
+const sourceSummary = r => ({ at: r.crawledAt, pages: r.pages.length, words: r.pages.reduce((n, p) => n + p.words, 0),
+  photos: r.images.filter(i => i.kind !== 'logo').length, documents: r.documents.length, errors: r.errors.length, singlePage: r.singlePage });
+async function crawlCard(c, by, { force = false } = {}){
+  if (!crawlMod) throw new ApiError(503, 'The site study isn’t installed. Run: npm --prefix pipeline install');
+  if (!force && c.source && Date.now() - Date.parse(c.source.at) < CRAWL_FRESH_MS && existsSync(join(WORK, String(c.id), 'source', 'SITE.md'))) return null; // studied recently
+  if (crawling.has(c.id)) throw new ApiError(409, `#${c.id}'s site is already being studied`);
+  crawling.add(c.id); broadcast();
+  try {
+    const r = await crawlMod.crawlSite(c.url, join(WORK, String(c.id), 'source'));
+    c.source = sourceSummary(r);
+    log(c, by || 'someone', 'study-site', { note: `${c.source.pages} page${c.source.pages === 1 ? '' : 's'}, ${c.source.photos} photos, ${c.source.documents} documents` });
+    save();
+    return r;
+  } finally { crawling.delete(c.id); broadcast(); }
+}
+
 const runner = createRunner({
   stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter, previewUrl,
   workDir: id => join(WORK, String(id)),
-  auditCard: auditMod && auditCard, hasPreview,
+  auditCard: auditMod && auditCard, hasPreview, crawlCard: crawlMod && crawlCard,
   auditScript: join(ROOT, 'audit.mjs'), root: ROOT
 });
 
@@ -259,7 +281,7 @@ function readJson(req, limit = 2e6){
   });
 }
 
-const publicConfig = () => ({ ...config, pipelines: config.pipelines.map(p => ({ ...p, stages: p.stages.map(s => stages.get(s.id)) })), claimMinutes: claimMs / 60000, auditAvailable: !!auditMod });
+const publicConfig = () => ({ ...config, pipelines: config.pipelines.map(p => ({ ...p, stages: p.stages.map(s => stages.get(s.id)) })), claimMinutes: claimMs / 60000, auditAvailable: !!auditMod, crawlAvailable: !!crawlMod });
 const withInstructions = c => c && ({ ...c, stageInfo: (({ id, name, who, requires, outcomes, feeds, instructions }) => ({ id, name, who, requires, outcomes, feeds, instructions }))(stages.get(c.stage)), templates: config.templates });
 
 async function api(req, res, url){
@@ -319,7 +341,7 @@ async function api(req, res, url){
       let list = db.cards;
       if (stage) list = list.filter(c => c.stage === stage);
       if (q) list = list.filter(c => (c.name + ' ' + c.url).toLowerCase().includes(q));
-      return send(res, 200, { version, cards: list, auditing: [...auditing] });
+      return send(res, 200, { version, cards: list, auditing: [...auditing], crawling: [...crawling] });
     }
     if (m === 'POST'){
       const items = Array.isArray(body.cards) ? body.cards : [body];
@@ -356,6 +378,7 @@ async function api(req, res, url){
   }
   if (m !== 'POST') throw new ApiError(405, 'Method not allowed');
   if (action === 'audit'){ await auditCard(c, by); return send(res, 200, { card: withInstructions(c) }); }
+  if (action === 'study-site'){ await crawlCard(c, by, { force: true }); return send(res, 200, { card: withInstructions(c) }); }
   if (action === 'move'){
     if (!stages.has(body.to)) throw new ApiError(400, `Unknown stage "${body.to}"`);
     if (body.to !== c.stage) enter(c, body.to, by, body.note);
@@ -373,15 +396,15 @@ async function api(req, res, url){
 
 // AI-built preview sites (/preview/<card>/) and their audit reports (/audit/<card>/).
 // Sandboxed so their scripts run in an opaque origin and can't call this API.
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml',
+const TYPES = { '.md': 'text/plain; charset=utf-8', '.pdf': 'application/pdf', '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 async function preview(res, pathname){
   const [, kind, id, ...rest] = pathname.split('/');
   if (!/^\d+$/.test(id || '')) return send(res, 404, 'Not found', 'text/plain');
   if (!rest.length) { res.writeHead(301, { Location: `/${kind}/${id}/` }); return res.end(); }
-  const root = join(WORK, id, kind === 'audit' ? 'audit' : 'site');
+  const root = join(WORK, id, kind === 'audit' ? 'audit' : kind === 'source' ? 'source' : 'site');
   let file;
-  try { file = resolve(root, decodeURIComponent(rest.join('/')) || (kind === 'audit' ? 'report.html' : 'index.html')); } catch { return send(res, 400, 'Bad path', 'text/plain'); }
+  try { file = resolve(root, decodeURIComponent(rest.join('/')) || (kind === 'audit' ? 'report.html' : kind === 'source' ? 'SITE.md' : 'index.html')); } catch { return send(res, 400, 'Bad path', 'text/plain'); }
   if (file !== root && !file.startsWith(root + sep)) return send(res, 403, 'Forbidden', 'text/plain');
   if (file.endsWith(sep) || file === root) file = join(file, 'index.html');
   try {
@@ -418,7 +441,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed', 'text/plain');
-  if (url.pathname.startsWith('/preview/') || url.pathname.startsWith('/audit/')) return preview(res, url.pathname);
+  if (url.pathname.startsWith('/preview/') || url.pathname.startsWith('/audit/') || url.pathname.startsWith('/source/')) return preview(res, url.pathname);
   if (url.pathname.startsWith('/templates/')) return template(res, url.pathname);
   if (url.pathname !== '/' && url.pathname !== '/index.html') return send(res, 404, 'Not found', 'text/plain');
   try { send(res, 200, await readFile(join(ROOT, 'index.html')), 'text/html; charset=utf-8'); }

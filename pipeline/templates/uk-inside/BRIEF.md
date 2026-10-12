@@ -274,3 +274,15 @@ The same "see inside" logic helps GP patients who are anxious, autistic, have a 
 - **GDC numbers** are left out: the website gives Charles Crummey's as 52345 and the leaflet as 49922. Link to the register instead.
 - **Photo dates:** the building, reception and facilities photos were uploaded in December 2013. The sterilising photo shows two nurses who are not named or described as current staff. A reception-desk group photo and a photo of a patient are deliberately not used.
 - **NHS 24 for unregistered patients:** from NHS inform ("contact NHS 24"). The 999 line follows NHS urgent-care advice (swelling affecting breathing or swallowing, bleeding that won't stop).
+
+## Inner pages
+
+The worked example is the homepage. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it.
+
+- **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts and JS, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`.
+- **Page pattern.** A short breadcrumb or "Back to home" link, one `h1` that says what the page is, a one- or two-sentence intro, then sections with `h2` headings. Use the same components as the homepage (cards, care cards, summary lists, tables, the team grid) rather than inventing new ones.
+- **Keep the urgent route on every page.** The call button stays in the header. Pages about appointments, emergencies or treatment repeat the short urgent-help block.
+- **Long content.** FAQs go in `<details>` expanders grouped under headings. Fee lists go in a simple table with a "last checked" date and a link to the official NHS charges. Policies (privacy, FOI, complaints) go on plain text pages linked from the footer.
+- **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
+- **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
+- **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.
