@@ -133,8 +133,8 @@ All ids below are used by the menu, task cards, search and footer. Keep them.
 
 1. **Skip link**: `a.skip-link` → `#main`.
 2. **Header**: `header.header`.
-   - `.header__top`: `a.brand` (name plus description line), `a.header__phone` (the number on desktop, "Call us" with an icon on small phones), and `form.search` (label, `input#search-field[required]`, button with "Search").
-   - `nav.nav` with `ul#nav-list.nav__list` (7 items max) and `button.nav__toggle`.
+   - `.header__top`, in this order: `a.brand` (name plus description line), `a.header__phone` (the number from 40em, "Call us" with an icon on phones), `button.nav__toggle` (chevron icon plus `span.nav__toggle-label` "Menu", `aria-controls="nav-list"`), and `form.search` (label, `input#search-field[required]`, button with "Search"). The toggle lives in the header row, not inside the nav, so name, Call and Menu share one row.
+   - `nav.nav` with `ul#nav-list.nav__list` (7 items max).
 3. **Search results region**: `div#search-results` (empty and hidden; `frontdesk.js` fills it).
 4. **Hero**: `div.hero`.
    - `.hero__photo` (inline-style background, desktop only) and `.hero__credit`.
@@ -184,6 +184,35 @@ Sections alternate grey and `.section--white` to give rhythm. Keep the alternati
 **Search keywords:**
 - Any element with an `id` and `data-search="words patients use"` becomes a search target. Add `data-search-title` if its heading isn't the right label, and `data-search-hint` for the one-line answer.
 - Always include the patient words "sick note", "sick line", "appointment", "prescription", "test results" and "register".
+
+## Responsive layout (keep it right)
+
+Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, with no sideways scroll at any width. The breakpoints are 40em (640px), 45em (720px), 48em (768px) and 64em (1024px). Do not add others without re-checking every width.
+
+**Header**
+- **Under 40em:** one row with the practice name on the left, then the Call and Menu buttons. Both are compact bordered buttons of the same size, each an icon above a short label ("Call us", "Menu"). The search field sits full width below, then the nav band with the two `nav__item--keep` links.
+- **40em to 64em (tablets):** the same row, but Call shows the full number with an icon, and Menu shows its label and a chevron. The search field is still full width below.
+- **64em and up:** the name, number and search sit on one row (the search is 15 to 20rem wide), and the full 7-item nav sits below. There is no Menu button.
+- **Open menu (under 64em):** the full list is shown stacked, with each row 48px tall.
+- **Without JavaScript:** the Menu button is hidden and all 7 links wrap.
+- The header row uses flex-wrap, so with very large text the name gets its own row instead of being squeezed. Keep `.brand` at `flex: 1 1 9rem`.
+
+**Grids**
+- **Top tasks:** one column of row cards (chevron on the right) until 64em, then 3 across (chevron at the bottom). Never put 3 big cards side by side on a tablet.
+- **Task list:** 1 column, then 2 from 45em, then 3 from 64em. The hairlines come from a 1px grid gap. A short last row is stretched, so there are never empty cells.
+- **`card-grid--3`:** 1 column, then 2 from 40em with an odd last card made full width, then 3 from 64em.
+- **`card-grid--2`:** 2 from 40em.
+- **Care cards:** 2 from 48em.
+- **People:** 2 from 40em with an odd last card made full width, then 4 from 64em, or 3 when the group has exactly 3 people. Under 24em each label sits above its value.
+- **Footer:** 1 column. Between 40em and 64em, the practice details are full width with the two link lists side by side. From 64em, 3 columns.
+- **Status panel:** stacked on phones. From 48em to 64em the times sit beside the headline. From 64em the panel stretches beside the intro, with "See all opening times" pinned to the shared bottom edge.
+- **Split (2/3 + 1/3):** from 64em only. The summary lists and date lists in the 2/3 column run full width, so they share a right edge with the tables.
+
+**Text and rhythm**
+- `h1` to `h3`, the status headline, the brand name and `.big-number` all scale with `clamp()`. There are no jumps.
+- `text-wrap: pretty` on running text stops lone last words.
+- Phone numbers, postcodes (wrap them in `span.nowrap`) and rota pills never break across lines.
+- Sections end on their own padding: the last child in each `.wrap`, the last step and blocks inside grids have no bottom margin. Do not add bottom margins back to the last element of a section.
 
 ## 5. Components (all in `styles.css`)
 

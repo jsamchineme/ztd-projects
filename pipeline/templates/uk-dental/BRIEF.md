@@ -81,10 +81,10 @@ Follow this order and reuse the class names. Sections are `<section class="secti
 
 1. **Icon sprite** (`svg.sprite`), then the **skip link** (`.skip-link` → `#main`).
 2. **Header** (`.site-header`).
-   - Row 1 (`.site-header__bar`): `.brand` (logo PNG or inline SVG, name, tagline), `.header-meta` (address, wide screens only), `.btn.btn--primary.header-call` (the number on wide screens, "Call" on phones), `.menu-toggle` (phones only).
+   - Row 1 (`.site-header__bar`): `.brand` (logo PNG or inline SVG, name, tagline), `.header-meta` (address, wide screens only), `.btn.btn--primary.header-call` (the number from 48em, "Call" on phones), `.menu-toggle` (below 60em).
    - Row 2: `nav.nav#site-nav` with **6 or fewer** items, named for tasks: New patients, NHS costs, Treatments, (signature service), Our team, Hours and contact.
 3. **Hero** (`.hero`, tint ground, 4px brand edge at the top).
-   - Left (`.hero__main`): `.status` pill (live); `h1` "[NHS / private / NHS and private] dentist in [Town]"; `.hero__lead` of 1 to 2 sentences that answers "can I join?" with the real waiting position; `.btn-row` with the Call button and an arrow link to `#join`; `.urgent-line` (emergency rule and NHS 24 on 111, with a link to `#emergency`); `.trust` (one real review, then the partners' faces and a line linking to `#team`).
+   - Left (`.hero__main`): `.status` pill (live); `h1` "[NHS / private / NHS and private] dentist in [Town]"; `.hero__lead` of 1 to 2 sentences that answers "can I join?" with the real waiting position; `.btn-row` with the Call button and an arrow link to `#join`; `.urgent-line` (emergency rule and NHS 24 on 111, with a link to `#emergency`); `.trust` (one real review, then the partners' faces and a line linking to `#team`). Keep `.trust` as the last child of `.hero__main`: below 60em the CSS moves the task panel up between the urgent line and the trust row.
    - Right: `aside.desk` "How can we help?". Five `.task` links: join, book (a `tel:` link), toothache (`.task--urgent`), costs, opening hours. `.desk__foot` has today's hours (`[data-today-hours]`) and the address with a directions link.
 4. **Join as a new patient** (`#join`, page ground). `.grid-2` of two `.card.card--feature`: NHS route and plan or private route. Each has a `.card__label`, `h3`, one sentence and `ol.steps` ("what happens next"), then its action. Below: `.callout` for nervous patients.
    - If the practice is not taking NHS patients, say so plainly in the NHS card and the hero lead, and give the NHS inform link for finding a dentist. Never hide it.
@@ -149,11 +149,41 @@ Re-theme a practice by changing only the **Brand** block at the top of `styles.c
 
 ## 8. Components quick reference
 
-`.btn--primary` (filled, the one action per block), `.btn--secondary` (outline), `.arrow-link` (verb-first text link with an arrow), `.inline-tap` (adds a 44px tap height to a link inside text without changing the line height), `.status[data-status]` (live pill: `.status__dot`, `.status__state`, `.status__detail`), `.urgent-line`, `.desk` and `.task`, `.card` (`.card--feature`, `.card__label`), `ol.steps`, `.callout`, `.quote` (`.quote--lead`), `.cost`, `.treat-group`, `.feature`, `.person`, `table.hours`, `.care-card`, `.place`, `.contact-line`.
+`.btn--primary` (filled, the one action per block), `.btn--secondary` (outline), `.arrow-link` (verb-first text link with an arrow), `.inline-tap` (adds a 44px tap height to a link inside text without changing the line height), `.status[data-status]` (live pill: `.status__dot`, `.status__state`, `.status__detail`), `.urgent-line`, `.desk` and `.task`, `.card` (`.card--feature`, `.card__label`), `ol.steps`, `.callout`, `.quote` (`.quote--lead`), `.cost`, `.treat-group`, `.feature`, `.person`, `table.hours`, `.care-card`, `.place`, `.contact-line`, `.nowrap` (keeps an arrow link's last word with its arrow, or a name, on one line), `.keep` (keeps a phone number or a time range together but still wraps inside itself at 200% text).
 
 **Icons:** a sprite of `<symbol>`s at the top of the body. Use one with `<svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>`. Icons are always decorative, with the meaning in text beside them. The available icons are phone, arrow, chevron, pin, clock, mail, join, alert, tag, menu, close, check, external, heart, tooth, shield, layers, star, smile, face and quote.
 
-## 9. Adapting Front Desk for a GP practice
+## 9. Responsive layout
+
+Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 200% text on a 320px phone (no sideways scroll). Don't add breakpoints in a build; if a practice's content breaks a layout, fix it in the template.
+
+**Breakpoints:** 30em (480px), 44em (704px), 48em (768px), 60em (960px), 64em (1024px), 70em (1120px). Side gutters are always `--gutter` on `.wrap`, so every section, card and panel shares one left edge. Section spacing is always `--section`.
+
+**Header**
+- Below 48em (phones, 600px tablets): one sticky row. Logo, the name on two lines (no tagline), a "Call" button, and a Menu toggle (icon only below 384px).
+- 48em to 60em (768 and 834px tablets): one sticky row. Logo, name and tagline, "Call 0131 …" with the number, and the Menu toggle.
+- From 60em: the full nav as a second row, not sticky. The address shows from 64em. The nav must fit one row at 960px: keep it to 6 short items.
+- The open menu is a single column of 48px rows under the header bar.
+
+**Hero:** two columns from 60em (main left, task panel right). Below 60em it is one column in this order: status, h1, lead, Call and join link, urgent line, the task panel, then the review and faces. The urgent line and trust row then go full width so their edges line up with the panel.
+
+**Status pill:** one line from 30em. Below 30em it is a two-line rounded box: the state, then the detail under it, with no "·".
+
+**Grids**
+- Join (`.grid-2`): 1 column, 2 from 52em. Cards are equal height and the action sits on the card's bottom edge. On phones the card buttons go full width.
+- Costs: stacked cards on phones; from 30em to 60em, one card per row with the figure in its own left column; 3 columns from 60em.
+- Reviews: 1 column, 2 from 48em (2 × 2).
+- Treatments: 1 column, 2 from 36em, 3 from 60em. Use 3 or 6 groups so no row has a lone group at desktop.
+- Signature feature: portrait as a small byline beside the caption below 44em; two columns (portrait left) from 44em, top-aligned up to 64em and centred above. The ticks list goes to 2 columns only where each item fits on one line.
+- Team: below 64em, cards with the photo on the left (1 column, 2 from 44em). From 64em, 4 portrait cards a row. Use an even number of people for the 2-column tablet layout where you can; 8 is ideal.
+- Visit: 1 column; 2 equal columns from 48em (hours left; address and urgent care card stacked right); 1.1 / 0.9 from 60em.
+- Footer: 1 column; brand row over 3 link columns from 44em; 4 columns from 70em.
+
+**Text:** headings use `clamp()` sizes and `text-wrap: balance`; body text uses `text-wrap: pretty`. Wrap phone numbers inside running text and each opening-hours session in `<span class="keep">`, and the last word plus arrow of an `.arrow-link` in `<span class="nowrap">`. Put `<wbr>` before the `@` of a long email address.
+
+**Images:** the town photo is 21:8 from 48em, 16:9 from 30em and 4:3 on phones. Portraits are 4:5 with `object-fit: cover` everywhere; in the tablet team cards they fill the card height.
+
+## 10. Adapting Front Desk for a GP practice
 
 NHS England's benchmark asks for top tasks first, plain English, and urgent help that's easy to find. Changes:
 
@@ -166,7 +196,7 @@ NHS England's benchmark asks for top tasks first, plain English, and urgent help
 7. Point Scottish practices to NHS inform and English practices to nhs.uk.
 8. Check against the [GP website benchmark tool](https://www.england.nhs.uk/long-read/step-by-step-guide-to-improving-general-practice-website-online-journeys/) before handover.
 
-## 10. Pre-handover checklist
+## 11. Pre-handover checklist
 
 **Facts**
 - [ ] Every fact on the page traces to the practice site, its NHS listing or the job card. Nothing is invented. List any you couldn't confirm in your report.
@@ -184,6 +214,7 @@ NHS England's benchmark asks for top tasks first, plain English, and urgent help
 - [ ] `node pipeline/audit.mjs <url> <out>` shows 0 blockers, 0 major and 0 minor issues.
 - [ ] Tab through the whole page. Focus is always visible, the skip link works, and the menu opens with Enter and closes with Escape.
 - [ ] Zoom to 200% and check at 320px wide: no sideways scrolling, nothing cut off.
+- [ ] Check 360, 768 and 1024px: header on one row, nav not wrapped, no lone word or stray "·", phone numbers whole (see section 9).
 - [ ] Turn on reduced motion: nothing animates.
 - [ ] Every image has the right `alt` (a person's name, a description of a place, or `alt=""` for decorative logos next to the name).
 - [ ] Headings in order: one h1, then h2s, then h3s.
@@ -194,7 +225,7 @@ NHS England's benchmark asks for top tasks first, plain English, and urgent help
 - [ ] Every Creative Commons photo is credited on the page and in `img/CREDITS.txt`. `fonts/OFL.txt` is present.
 - [ ] `<title>` and meta description name the practice, the town and "NHS" or "private" as appropriate.
 
-## 11. The worked example: Musselburgh Dental Care
+## 12. The worked example: Musselburgh Dental Care
 
 `example/index.html` uses only the facts in the job card. These are the judgement calls:
 

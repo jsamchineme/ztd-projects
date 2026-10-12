@@ -69,14 +69,48 @@ How it stays distinct from the approved and rejected work:
 | --- | --- | --- | --- |
 | 1 | **Header** | Practice name, six links, Call button | Sticky. Brand, Call, Menu in one row. |
 | 2 | **Front of house** | Live status, 111 line when closed, h1 (what and where), face pile linking to the team, Call button, four task links. Right: the reception team photo with a solid caption ("They're who you'll speak to when you phone…"). | Everything down to the fourth task link sits on the first screen. The photo follows. |
-| 3 | **Meet your dentists** | One portrait card per dentist: photo, name, role, facts (qualified, joined, interests, GDC number), one personality line from the published bio, "More about [name]" disclosure with the rest. | Photo beside the name badge, story below. |
+| 3 | **Meet your dentists** | One portrait card per dentist: photo, name, role, facts (qualified, joined, interests, GDC number), one personality line from the published bio, "More about [name]" disclosure with the rest. | Photo beside the name badge; facts and story full width below. |
 | 4 | **Join as a new patient** | NHS route as numbered steps, the private plan with published prices, "phone to check" where unknown. | Stacked panels. |
-| 5 | **Spotlight** | One person matched to one patient need. Kirriemuir: Beverley, hygienist with anxiety-management training, for nervous patients. A large portrait plus a quote from her profile and a call to action. | Portrait (max 17rem) above the text. |
+| 5 | **Spotlight** | One person matched to one patient need. Kirriemuir: Beverley, hygienist with anxiety-management training, for nervous patients. A large portrait plus a quote from her profile and a call to action. | A short photo card (portrait beside its caption) above the text. From 576px, portrait column beside the text. |
 | 6 | **Toothache or a dental emergency** | Red-edged urgent card with the live status and three routes, plus 999. | Stacked. |
 | 7 | **What it costs** | Official NHS Scotland rules beside a short list of the practice's published private fees. | Stacked. |
 | 8 | **Who else you'll meet** | Compact cards for hygienists, technicians and managers, then the nursing team group photo. | Compact cards stack. |
 | 9 | **Opening hours and how to find us** | Hours table (drives the live status), address, facilities, directions link, call and email, premises photo. | Stacked. |
 | 10 | **Footer** | Address, call, task links, NHS inform links. All links 44px tall. | |
+
+### Responsive layout
+
+Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 200% text size: one header row, no sideways scrolling, every tap target at least 44px. Keep these rules when you build. Set columns explicitly as below. Don't go back to `auto-fit` for card grids: that is what produced the 3 + 1 orphans and the cramped tablet rows.
+
+**Breakpoints** (all in `styles.css`; rem, so they follow text zoom):
+
+| Width | Name | What changes |
+| --- | --- | --- |
+| up to 352px (22rem) | small phone | The logo tile hides, so the practice name keeps two lines beside Call and Menu. The face pile shows 3 faces. |
+| up to 480px (30rem) | phone | The address under the name hides. The face pile shows 4 faces. The tasks are one column. |
+| 480px and up | | The tasks become 2 × 2. |
+| 576px and up (36rem) | small tablet | Dentists, compact cards and footer go to 2 columns. The spotlight goes side by side. The hero photo sits beside its caption. |
+| 640px and up (40rem) | tablet | In Visit, hours and address go side by side, with the premises photo as a wide strip (photo beside caption) underneath. |
+| 928 to 1024px (58 to 64rem) | large tablet | Dentist cards put the name, role and facts beside a bigger photo. |
+| 960px and up (60rem) | | The hero goes 2 columns (tasks left, reception photo right, 5:4). |
+| 1025px and up (64.0625rem) | desktop | Full nav. Dentists go to 4 columns as tall portrait cards (subgrid lines up the name badges and "words" panels across each row). Compact cards go to 3 columns, and Visit and the footer go to 3. |
+| 1200px and up (75rem) | wide | The header Call button also shows the number. |
+
+**Header.** One row at every width. Up to 1024px it shows the brand, Call (the word only) and Menu. The brand takes the leftover space and wraps its own text; Call and Menu never shrink. The open menu is a full-width panel under the header, with links on the same left edge as the page. From 1025px it shows the brand, the six nav links (no wrapping) and Call; from 1200px Call includes the number. If a practice name is long, test it at 320px. Shorten it to the name people use, never the legal name, before you shrink the type.
+
+**Grids:**
+- **Dentists** (`.people`): 1 column, then 2, then 4. Use 3 columns automatically when the count divides by 3 but not by 4 (3, 6, 9). Other counts (5, 7) leave a short last row on desktop. That's acceptable, but if you can choose who to show, pick a count that fills the rows.
+- **Compact cards** (`.people--compact`): 1 column, then 2. With an odd count on tablets, the last card runs full width on purpose. Desktop uses 3 columns, or 4 when 3 would leave one card alone.
+- **Tasks** (`.tasks`): always 1 column or 2 × 2. Keep it to four tasks.
+- **Emergency routes** (`.urgent__grid`): this uses container queries on the card. Routes stack, then go 2 + 1 (the third full width), then sit 3 across when the card is 800px wide or more.
+- **Panels** (`.panels`): stacked until the content is about 664px wide (a screen of about 710px), then 2 columns.
+- **Footer**: 1 column, then 2 with the practice details across the top, then 3.
+
+**Spacing and edges.** The side gutter is the `--gutter` token: 17px at 360px, 27px at 768px, 32px from 1024px up. Everything sits inside `.wrap`. In fees and hours tables, the first and last cell have no side padding, so the text lines up with the panel heading. Only the highlighted "today" row is indented. Section padding and panel padding use `clamp()`. Don't add fixed paddings at breakpoints.
+
+**Photos.** The hero photo is 3:2 on phones, 4:3 beside its caption on tablets and 5:4 on desktop, so it never pushes the tasks off the first screen. Portraits are 4:5 with `object-position: 50% 20%`. The group photo keeps its own ratio, so nobody at the edge is cropped out.
+
+**Text.** Headings use `clamp()` and `text-wrap: balance`. Paragraphs use `text-wrap: pretty`, so no last word sits alone. Phone numbers stay on one line at every width; they wrap only at 200% text size. Long emails get a `<wbr>` after the `@`.
 
 If the practice has a spotlight-worthy person for a different need (a children's dentist, a dentist who speaks Polish, a denture specialist), use the spotlight for that need instead. Use only one spotlight per page.
 
@@ -85,7 +119,7 @@ If the practice has a spotlight-worthy person for a different need (a children's
 - `.status[data-status]`: live pill. Put the static fallback text inside, which shows if JS fails.
 - `[data-when-closed]`: shown only when closed (starts `hidden`).
 - `table[data-hours]` with `tr[data-day][data-open][data-close]`: the single source of opening hours (0 = Sunday). Rows without `data-open` are closed days.
-- `.facepile`: up to 8 `-face.jpg` crops (112px squares), `aria-hidden`, plus one text link. Shows 4 on phones.
+- `.facepile`: up to 8 `-face.jpg` crops (112px squares), `aria-hidden`, plus one text link. Shows 4 on phones and 3 on 320px screens.
 - `.people > .person`: the portrait card, built from `.person__photo`, `.person__id` (h3 name, `.person__role`, `dl.person__facts`), and `.person__more` (`.person__words` with a `.label`, `details.story`).
 - `.people--compact > .person--compact`: small cards for the wider team.
 - `.spotlight`: one large portrait plus a `blockquote.quote` from the published bio.

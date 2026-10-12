@@ -79,7 +79,7 @@ Sources: [NHS service manual: Images](https://service-manual.nhs.uk/design-syste
 Sections alternate white and warm paper grounds. Reuse the class names.
 
 1. **Icon sprite** (`svg.sprite`), then the **skip link** (`.skip-link` → `#main`).
-2. **Header** (`.site-header`, sticky). `.brand` (logo mark, name, tagline; the tagline hides on phones), `.btn.btn--primary.header-call` ("Call" on phones, the full number from 640px), `.menu-toggle` ("Menu"). Then `nav.nav#site-nav` with 6 task-named items: See inside, Join, Toothache, Costs, Our team, Hours and directions.
+2. **Header** (`.site-header`, sticky). `.brand` (logo mark, name, tagline; the tagline hides below 576px and the logo mark below 360px), `.btn.btn--primary.header-call` ("Call" on phones, the full number from 640px), `.menu-toggle` ("Menu"). Then `nav.nav#site-nav` with 6 task-named items: See inside, Join, Toothache, Costs, Our team, Hours and directions.
 3. **Arrival** (`.arrival`, white). Left: `.status[data-live-status]`, `h1` "[NHS / private / NHS and private] dentist in [Town]", `.arrival__lead` (the join answer plus the "look inside" invitation), `ul.tasks` with four `.task` links: `.task--call` (the `tel:` link with the number), join, `.task--urgent` toothache, costs. Right (below on phones): `figure.first-look` with the outside photo and a solid caption plate that names the building, a landmark and parking, plus two links (See inside, Get directions).
 4. **See inside** (`#inside`, paper). `.section__head`, then `nav.route` (jump links to the four stops), then `ol.journey` of `li.stop`:
    - `.stop__marker` (number), `.stop__head` (`.stop__kicker` "Step 1 of 4" and an `h3`), `.stop__media` (one or more `figure.photo`, each with `figcaption`), `.stop__body` (a sentence, `ul.facts` with icons, an optional `.tip`, an optional `.arrow-link`).
@@ -113,6 +113,43 @@ Sections alternate white and warm paper grounds. Reuse the class names.
 - List every day from `mon` to `sun`. Use 24-hour `HH:MM`. Split a day around lunch (`[["09:00","13:00"],["14:00","17:30"]]`) to get "Closed for lunch". An empty list means closed.
 - Keep the visible `table.hours` and the JSON-LD `openingHoursSpecification` in the `<head>` in step with it.
 - `doorway.js` works in Europe/London time, writes times NHS style, marks today's row, refreshes every minute and shows "Closing soon" in the last 30 minutes. Without JS, the pill reads the fallback text you write in the HTML ("Open Monday to Friday · Closed at weekends").
+
+### Responsive layout (keep it this way)
+
+Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 200% text on a 320px screen. All breakpoints are in `styles.css`; don't add new ones for a single practice.
+
+**Header**
+- Below 1024px: the name, the Call button and the Menu toggle always share one row. `.brand` is `flex: 1 1 0` with `min-width: 0`, so a long practice name wraps inside its own space instead of pushing the buttons onto a second row. Keep `.brand__name` short (the trading name, not the legal one).
+- Below 640px the button says "Call"; from 640px it shows the full number. The tagline shows from 576px. The logo mark hides below 360px.
+- From 1024px: the menu toggle goes and the six nav links sit in a row under the header bar. With more than six items, or long labels, check 1024px still fits on one row.
+- The open phone menu is a full-width list of 48px rows under the bar.
+
+**Hero (`.arrival`)**
+- Below 576px: tasks, then the building photo full width.
+- 576 to 959px: the tasks run full width, then `.first-look` turns into a row (photo left, caption plate right), so the photo doesn't take over the screen.
+- From 960px: tasks left (5fr), photo right (6fr).
+
+**See inside (`.journey`)**
+- Below 720px: each stop stacks (heading, photos, answers) at full width.
+- 720 to 895px: the photo and the answers sit side by side (1fr 1fr). A `.stop__media--pair` spans the full width with the answers below it.
+- From 896px: the desktop layout, with the dashed route line, photos 7fr and answers 5fr.
+- `.stop__media--pair` from 600px: the `.photo--tall` sits beside the two stacked photos and stretches to their exact height (it uses `contain: size`, so it never sets the row height). Below 600px the tall photo is cropped square.
+- The `.route` jump links: one column below 400px, two equal-height columns to 767px, then one wrapping row.
+- `.faces`: auto-fill columns (min 5.5rem on phones, 6.5rem from 480px). Photos never grow past 7.5rem, so the 96px headshots stay sharp. Upload the 192px versions as `2x`.
+
+**Card grids**
+- Join (`.grid-2`) and Hours and Find us (`.visit`): one column, then two equal-height columns from 768px.
+- Care cards: one column; from 640px "open" and "closed" side by side with "life-threatening" deliberately full width beneath; three columns from 896px.
+- Costs: one column; 576 to 1023px each card is a row (figure left, words right); three columns from 1024px.
+- Treatments: one column; two from 576px; three from 1152px.
+- Footer: one column; from 576px the practice blurb runs full width over two link columns; three columns from 768px.
+- Buttons in a card's `.btn-row` grow to fill the row: side by side when both fit, otherwise each full width. Don't set fixed button widths.
+
+**Text**
+- Headings use `text-wrap: balance`, and body text `text-wrap: pretty`, so there are no lone last words.
+- `.inline-tap` links stay inline, so a full stop after the link never drops onto its own line.
+- `table.hours` uses a fixed layout (day column 42%, 46% below 480px). "(today)" sits on its own line under the day name until 1152px.
+- Every single-column grid uses `minmax(0, 1fr)`, so nothing pushes the page sideways at 200% text. Keep this if you add a grid.
 
 ## 7. Tokens and re-theming
 

@@ -104,6 +104,8 @@ h1, h2, h3 { overflow-wrap: break-word; min-width: 0; font-family: var(--font-di
 h1 { font-size: var(--fs-h1); font-weight: 750; letter-spacing: -0.02em; }
 h2 { font-size: var(--fs-h2); font-weight: 720; }
 h3 { font-size: var(--fs-h3); font-weight: 700; }
+h1, h2, h3 { text-wrap: balance; }
+p, li, figcaption, dd, td, th { text-wrap: pretty; }
 p, ul, ol, dl { margin: 0 0 1rem; }
 p:last-child, ul:last-child, ol:last-child { margin-bottom: 0; }
 strong { font-weight: 700; }
@@ -139,6 +141,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .icon { width: 1.25em; height: 1.25em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* 4. LAYOUT HELPERS ---------------------------------------------------------- */
+/* Single-column grids never grow past their container, even with text zoomed to 200% */
+.tasks, .facts, .steps, .ticks, .contact-lines, .care-cards, .costs, .treatments, .visit, .grid-2, .footer-grid { grid-template-columns: minmax(0, 1fr); }
 .wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
 .section { padding-block: var(--section); scroll-margin-top: 5rem; }
 .section--white { background: var(--surface); }
@@ -151,7 +155,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 }
 .eyebrow::before { content: ""; width: 1.5rem; height: 3px; border-radius: 2px; background: var(--place); }
 .grid-2 { display: grid; gap: clamp(1.25rem, 1rem + 1.5vw, 2rem); }
-@media (min-width: 56rem) { .grid-2 { grid-template-columns: 1fr 1fr; align-items: start; } }
+@media (min-width: 48rem) { .grid-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; } }
 [id] { scroll-margin-top: 5rem; }
 @media (min-width: 64rem) { [id], .section { scroll-margin-top: 8rem; } }
 
@@ -159,13 +163,18 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .site-header { position: sticky; top: 0; z-index: 50; background: var(--surface); border-bottom: 1px solid var(--line); }
 .site-header__bar { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; min-height: 4rem; padding-block: .5rem; }
 .brand { display: flex; align-items: center; gap: .75rem; min-height: var(--tap); margin-right: auto; color: var(--ink); text-decoration: none; }
+/* The name takes whatever room the Call button and Menu toggle leave, and wraps inside it,
+   so the three always share one row instead of the buttons dropping to a second row. */
+.site-header__bar > .brand { flex: 1 1 0; min-width: 0; }
+.site-header__bar > .btn, .site-header__bar > .menu-toggle { flex: none; }
+.brand > span { min-width: 0; }
 .brand:hover { color: var(--ink); }
 .brand__mark { width: auto; height: 2.25rem; border-radius: 6px; }
 .brand__name { display: block; font-family: var(--font-display); font-weight: 750; font-size: 1.0625rem; line-height: 1.1; }
 .brand__tag { display: block; font-size: var(--fs-small); color: var(--ink-soft); line-height: 1.25; }
 .header-call .header-call__long { display: none; }
 .menu-toggle {
-  display: inline-flex; align-items: center; gap: .4rem; min-height: var(--tap); min-width: var(--tap); padding: 0 .85rem;
+  display: inline-flex; justify-content: center; align-items: center; gap: .4rem; min-height: var(--tap); min-width: var(--tap); padding: 0 .85rem;
   border: 2px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink);
   font: inherit; font-weight: 700; cursor: pointer;
 }
@@ -190,13 +199,14 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 }
 @media (max-width: 39.99rem) {
   .site-header__bar { gap: .4rem; min-height: 3.75rem; }
-  .brand { gap: .4rem; }
-  .brand__tag { display: none; }
+  .brand { gap: .5rem; }
   .brand__mark { height: 1.5rem; }
-  .brand__name { font-size: .9375rem; max-width: 6.6rem; }
+  .brand__name { font-size: .9375rem; }
   .btn.header-call { padding-inline: .7rem; gap: .4rem; }
   .menu-toggle { padding-inline: .6rem; gap: .3rem; }
 }
+@media (max-width: 35.99rem) { .brand__tag { display: none; } }
+@media (max-width: 22.49rem) { .brand__mark { display: none; } }
 @media (min-width: 40rem) {
   .header-call .header-call__long { display: inline; }
   .header-call .header-call__short { display: none; }
@@ -213,7 +223,9 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
   display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
   min-height: var(--tap); padding: .6rem 1.15rem; border: 2px solid transparent; border-radius: var(--radius-sm);
   font-family: var(--font-text); font-weight: 700; font-size: 1rem; line-height: 1.2; text-decoration: none; cursor: pointer;
+  max-width: 100%; text-align: center;
 }
+.btn-row .btn, .care__body .btn { overflow-wrap: anywhere; }
 .btn--primary { background: var(--brand-text); color: #fff; box-shadow: 0 3px 0 var(--brand-deep); }
 .btn--primary:hover { background: var(--brand-text-hover); color: #fff; }
 .btn--primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--brand-deep); }
@@ -222,6 +234,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .btn--on-deep { background: var(--surface); color: var(--brand-deep); }
 .btn--on-deep:hover { background: var(--brand-tint); color: var(--brand-deep); }
 .btn-row { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: center; }
+/* In cards, buttons share the row when both fit and go full width (equal) when they don't */
+.card .btn-row > .btn { flex: 1 1 auto; }
 
 .arrow-link {
   display: inline-flex; align-items: center; gap: .4rem; min-height: var(--tap);
@@ -230,7 +244,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .arrow-link .icon { transition: transform .15s ease; }
 .arrow-link:hover .icon { transform: translateX(3px); }
 /* A link inside running text that still gets a 44px tap height without changing the line height */
-.inline-tap { display: inline-block; padding-block: .6rem; margin-block: -.6rem; }
+.inline-tap { display: inline; padding-block: .6rem; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ext::after { content: " (opens in a new tab)"; position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* 7. ARRIVAL (HERO) ---------------------------------------------------------- */
@@ -259,7 +273,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 /* Task list: the four things patients come to do */
 .tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .task {
-  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .15rem .85rem;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .15rem .85rem;
   min-height: 3.75rem; padding: .7rem .9rem; border: 1px solid var(--line); border-radius: var(--radius-sm);
   background: var(--surface); color: var(--ink); text-decoration: none;
 }
@@ -270,6 +284,10 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .task__title { display: block; font-weight: 700; color: var(--brand-text); line-height: 1.25; }
 .task__detail { display: block; font-size: var(--fs-small); color: var(--ink-soft); line-height: 1.35; margin-top: .1rem; }
 .task > .icon { color: var(--brand-text); }
+@media (max-width: 22.49rem) {
+  .task { gap: .15rem .65rem; padding: .65rem .7rem; }
+  .task__icon { width: 2.1rem; height: 2.1rem; }
+}
 .task--call { background: var(--brand-text); border-color: var(--brand-text); color: #fff; box-shadow: 0 3px 0 var(--brand-deep); }
 .task--call:hover { background: var(--brand-text-hover); border-color: var(--brand-text-hover); }
 .task--call .task__title, .task--call .task__detail, .task--call > .icon { color: #fff; }
@@ -289,12 +307,17 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .first-look figcaption a:hover { color: #fff; }
 .first-look__links { display: flex; flex-wrap: wrap; gap: 0 1.25rem; margin-top: .35rem; }
 .first-look__links a { display: inline-flex; align-items: center; gap: .35rem; min-height: var(--tap); font-weight: 700; }
+@media (min-width: 36rem) and (max-width: 59.99rem) {
+  .first-look:not(.first-look--text) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .first-look:not(.first-look--text) img { height: 100%; min-height: 12rem; }
+  .first-look:not(.first-look--text) figcaption { align-self: center; padding: clamp(1rem, .5rem + 1.5vw, 1.5rem); }
+}
 
 /* 8. THE VISIT, STEP BY STEP --------------------------------------------------
    An ordered list of "stops". A route line runs down the markers. Photos stack (NHS research:
    side-by-side galleries confused users). Each stop pairs photos with practical answers. */
 .journey { list-style: none; margin: 0; padding: 0; position: relative; counter-reset: stop; }
-.stop { position: relative; display: grid; gap: 1rem 1.5rem; padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); }
+.stop { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem 1.5rem; padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); }
 .stop + .stop { border-top: 1px dashed var(--place); padding-top: 2rem; }
 .stop:last-child { padding-bottom: 0; }
 .stop::before { /* the route line (wide screens) */
@@ -312,7 +335,20 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .stop__kicker { margin: 0; font-size: var(--fs-small); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--place-text); }
 .stop__media { display: grid; gap: 1rem; align-content: start; }
 .stop__body { max-width: 34rem; }
+@media (max-width: 44.99rem) { .stop__body { max-width: none; } }
 .stop__body > p { margin-bottom: 1rem; }
+/* Tablets: photo and practical answers side by side; a photo pair spans the full width above the answers */
+@media (min-width: 45rem) and (max-width: 55.99rem) {
+  .stop { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .stop__media--pair { grid-column: 1 / -1; }
+  .stop__media--pair + .stop__body { grid-column: 1 / -1; }
+}
+/* A photo pair: the tall photo beside two stacked ones, from small tablets up */
+@media (min-width: 37.5rem) {
+  .stop__media--pair { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+  .stop__media--pair .photo--tall { grid-row: span 2; align-self: stretch; display: flex; flex-direction: column; contain: size; min-height: 18rem; }
+  .stop__media--pair .photo--tall img { flex: 1 1 0; min-height: 0; aspect-ratio: auto; }
+}
 @media (min-width: 56rem) {
   .stop { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); padding-left: 4.5rem; }
   .stop + .stop { border-top: 0; padding-top: 0; }
@@ -321,14 +357,11 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
   .stop__head { padding-left: 0; }
   .stop + .stop .stop__marker { top: 0; }
   .stop__marker { width: 3.1rem; height: 3.1rem; font-size: 1.3rem; }
-  .stop__media--pair { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
-  .stop__media--pair .photo--tall { grid-row: span 2; }
 }
 
 .photo { margin: 0; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
 .photo img { width: 100%; aspect-ratio: var(--photo-ratio); object-fit: cover; background: var(--line); }
-.photo--tall img { aspect-ratio: 4 / 5; }
-@media (min-width: 56rem) { .photo--tall img { aspect-ratio: 6 / 11; } }
+.photo--tall img { aspect-ratio: 1 / 1; }
 .photo figcaption { padding: .75rem 1rem .9rem; font-size: var(--fs-small); color: var(--ink-soft); border-top: 3px solid var(--place); }
 
 /* Route: a jump list of the stops, so people can go straight to the part that worries them */
@@ -340,13 +373,16 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
   border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 700; text-decoration: none; line-height: 1.2;
 }
 .route a:hover { border-color: var(--brand-text); color: var(--brand-text); }
-.route li { counter-increment: route; }
+.route li { counter-increment: route; display: flex; }
+.route li > a { flex: 1 1 auto; }
+@media (max-width: 47.99rem) { .route a { border-radius: 1.5rem; font-size: 1rem; } }
+@media (max-width: 24.99rem) { .route ol { grid-template-columns: minmax(0, 1fr); } }
 .route a::before { content: counter(route); display: grid; place-items: center; flex: none; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--brand-deep); color: #fff; font-family: var(--font-display); font-size: .9375rem; }
 .route a:focus-visible::before { background: var(--focus-ink); }
 
 /* Practical answers beside each photo */
 .facts { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .6rem; }
-.facts li { display: grid; grid-template-columns: 1.5rem 1fr; gap: .65rem; align-items: start; }
+.facts li { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); gap: .65rem; align-items: start; }
 .facts .icon { margin-top: .2rem; color: var(--brand-text); }
 .facts strong { font-weight: 700; }
 .check-note { color: var(--place-text); font-weight: 600; }
@@ -367,7 +403,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .first-look--text figcaption strong { font-size: clamp(1.25rem, 1.1rem + .6vw, 1.625rem); margin-bottom: .5rem; }
 
 /* 9. FACES (the people you'll meet) ----------------------------------------- */
-.faces { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; gap: 1.25rem .9rem; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+.faces { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; gap: 1.25rem .75rem; grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr)); }
+@media (min-width: 30rem) { .faces { gap: 1.25rem .9rem; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); } }
 .stop--people .stop__body { max-width: none; grid-column: 1 / -1; }
 .face { text-align: left; }
 .face img { width: 100%; max-width: 7.5rem; aspect-ratio: 5 / 6; object-fit: cover; border-radius: var(--radius-sm); background: var(--line); margin-bottom: .5rem; }
@@ -394,11 +431,12 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .steps span { display: block; color: var(--ink-soft); font-size: var(--fs-small); }
 
 .ticks { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .6rem; }
-.ticks li { display: grid; grid-template-columns: 1.5rem 1fr; gap: .6rem; }
+.ticks li { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); gap: .6rem; }
 .ticks .icon { margin-top: .2rem; color: var(--brand-text); }
 
 .care-cards { display: grid; gap: 1rem; }
-@media (min-width: 56rem) { .care-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 40rem) { .care-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .care--emergency { grid-column: 1 / -1; } }
+@media (min-width: 56rem) { .care-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } .care--emergency { grid-column: auto; } }
 .care { display: flex; flex-direction: column; border-radius: var(--radius); overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
 .care__head { display: flex; align-items: center; gap: .6rem; padding: .85rem 1.15rem; background: var(--brand-deep); color: #fff; }
 .care__head h3 { margin: 0; color: #fff; font-size: 1.1875rem; min-width: 0; overflow-wrap: anywhere; }
@@ -413,13 +451,19 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .big-number { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: .01em; }
 
 .costs { display: grid; gap: 1rem; margin-bottom: 1.5rem; }
-@media (min-width: 48rem) { .costs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Tablets: one card per row, the figure beside the words, rather than three cramped columns */
+@media (min-width: 36rem) and (max-width: 63.99rem) {
+  .cost { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); column-gap: 1.5rem; align-items: start; }
+  .cost__figure { grid-column: 1; grid-row: 1 / span 2; margin: 0; }
+  .cost > :not(.cost__figure) { grid-column: 2; }
+}
+@media (min-width: 64rem) { .costs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .cost { border-top: 4px solid var(--brand-text); }
 .cost__figure { display: block; font-family: var(--font-display); font-weight: 800; font-size: 2rem; line-height: 1.1; color: var(--brand-text); margin-bottom: .35rem; }
 .costs-note { max-width: var(--measure); color: var(--ink-soft); }
 
 .treatments { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-@media (min-width: 48rem) { .treatments { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 36rem) { .treatments { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 72rem) { .treatments { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .treatments li { background: var(--surface); padding: 1.1rem 1.25rem; }
 .treatments h3 { font-size: 1.125rem; margin-bottom: .25rem; }
@@ -427,15 +471,18 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 
 /* 11. HOURS AND FIND US ------------------------------------------------------ */
 .visit { display: grid; gap: clamp(1.25rem, 1rem + 1.5vw, 2rem); }
-@media (min-width: 56rem) { .visit { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
-.hours { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+@media (min-width: 48rem) { .visit { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; } }
+.hours { width: 100%; table-layout: fixed; border-collapse: collapse; margin-bottom: 1rem; }
 .hours caption { text-align: left; font-weight: 700; padding-bottom: .5rem; }
 .hours th, .hours td { text-align: left; padding: .7rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
-.hours th { font-weight: 600; width: 42%; overflow-wrap: anywhere; }
+.hours th { font-weight: 600; width: 42%; }
+.hours th, .hours td { overflow-wrap: break-word; }
+@media (max-width: 29.99rem) { .hours th, .hours td { padding-inline: .5rem; } .hours th { width: 46%; } }
 .hours tr.is-today th, .hours tr.is-today td { background: var(--brand-tint); font-weight: 700; }
-.hours tr.is-today th::after { content: " (today)"; font-weight: 600; color: var(--brand-text); }
+.hours tr.is-today th::after { content: " (today)"; display: block; font-weight: 600; color: var(--brand-text); }
+@media (min-width: 72rem) { .hours tr.is-today th::after { display: inline; } }
 .contact-lines { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; gap: .5rem; }
-.contact-lines li { display: grid; grid-template-columns: 1.5rem 1fr; gap: .65rem; align-items: start; }
+.contact-lines li { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); gap: .65rem; align-items: start; }
 .contact-lines .icon { margin-top: .65rem; color: var(--brand-text); }
 .contact-lines a { display: inline-flex; align-items: center; min-height: var(--tap); overflow-wrap: anywhere; min-width: 0; }
 .contact-lines li > * { min-width: 0; }
@@ -448,7 +495,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 .site-footer a:hover { color: var(--brand-on-deep); }
 .site-footer ul { list-style: none; margin: 0; padding: 0; }
 .footer-grid { display: grid; gap: 2rem; margin-bottom: 2rem; }
-@media (min-width: 48rem) { .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; } }
+@media (min-width: 36rem) { .footer-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .footer-grid > :first-child { grid-column: 1 / -1; } }
+@media (min-width: 48rem) { .footer-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); } .footer-grid > :first-child { grid-column: auto; } }
 .footer-brand { color: #fff; font-family: var(--font-display); font-weight: 750; font-size: 1.25rem; margin-bottom: .35rem; }
 .footer-legal { border-top: 1px solid rgba(255, 255, 255, .2); padding-top: 1.25rem; display: grid; gap: .5rem; }
 

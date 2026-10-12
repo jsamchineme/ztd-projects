@@ -176,7 +176,7 @@ On a phone, no photo appears above the top tasks except four 40px reception face
 1. **Skip link**: `a.skip-link`, pointing to `#main`.
 2. **Header**: `header.masthead`.
    - `a.brand` holds the inline SVG mark, the name and a description line.
-   - `a.masthead__call` holds the phone number (desktop only).
+   - `a.masthead__call` holds a phone icon, `span.masthead__call-short` ("Call", `aria-hidden`), `span.masthead__call-label` and `span.masthead__call-number`. It is an outlined Call button on phones and tablets, and the label plus number as text on desktop. See "Responsive layout" below.
    - `nav.nav` holds `ul#nav-list` (7 items) and `button.nav__toggle`.
 3. **Welcome**: `div.welcome > .welcome__grid` with grid areas `intro`, `now`, `tasks` and `people`.
    - `.welcome__intro`: `h1` and `p.lede` (one sentence that counts the team).
@@ -228,6 +228,35 @@ On a phone, no photo appears above the top tasks except four 40px reception face
 Sections alternate white and `.section--tint`. Register uses `.section--blue` to stand out.
 
 **Multi-page build.** The homepage keeps items 1 to 5, a 4-doctor preview of item 6 and a short contact strip. Items 6 to 14 become their own pages with the same markup ([G1] recommends separate Appointments, Prescriptions and Contact pages). The "Our team" menu item then points to a team page holding items 5, 6 and 11.
+
+### Responsive layout
+
+Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and with text at 200%. No width scrolls sideways.
+
+**Breakpoints** (all in `em`, so they follow text zoom): **30em** (480px), **36em** (576px), **40em** (640px, body text and gutter grow), **56em** (896px, `.split` goes two columns) and **64em** (1024px, desktop).
+
+**Header**
+- Under 30em: row 1 is the brand and a "Call" button; the brand's description line is hidden (the lede repeats it). Row 2 is Appointments, Prescriptions and the Menu button.
+- 30em to 63.99em (larger phones and all tablets): same two rows, but the Call button shows the number. Nav text and gaps scale with `clamp()`. The open menu is full width, one item per row.
+- 64em and up: the label and number sit on the right as text, and all 7 menu items show on one row. Below 64em, 7 items do not fit on one row, so do not lower this breakpoint.
+- Under 22.5em (320px) the header tightens its gaps and drops the Menu chevron, so both rows stay on one line.
+- With very large text, the Call button drops under the name rather than squashing it.
+
+**Grids**
+- One column under 36em. `.task-list`, `.grid-2/3/4`, `.badges` and `.care-grid` go two columns from 36em.
+- `.grid-3` and `.grid-4` stay at two columns on tablets. An odd last card spans the whole row, so no card sits alone. From 64em: 3 or 4 columns.
+- `.care-grid` on tablets: 999 is full width, then 111 and Pharmacy side by side. From 64em: 3 across. The cards use `subgrid`, so the coloured heads line up when one wraps.
+- `.role` cards: from 36em they are stacked cards in a grid. Under 36em they become compact: faces and heading on one line, then text. At 320px the heading goes under the faces on every card.
+- The status card sits above the tasks until 64em, then moves to the right column with the "people you will see" panel under it.
+- `.wall` uses `auto-fill` with `minmax(6.25rem, 1fr)`: 2 to 3 faces across on phones, 4 at 600px and 6 on tablets and desktop. Hyphenated first names do not wrap.
+- `.tags` use `auto-fill` with `minmax(15rem, 1fr)`.
+- `.summary-list` is a container query: two columns (11rem term) only when its own box is at least 30rem wide, so it stacks inside narrow cards.
+- `.place` photo is 2:1 when stacked on tablets (36 to 56em) and 16:10 elsewhere. It always uses `object-fit: cover`.
+
+**Text**
+- `h1` and `h2` scale with `clamp()`. Headings use `text-wrap: balance` and paragraphs use `text-wrap: pretty`, so no word sits alone on a line.
+- In visible text, write phone numbers with `&nbsp;` (`01506&nbsp;670027`). `tel:` links never wrap.
+- On phones, the welcome spacing is tightened so the first task title shows on a 390 x 844 screen. Keep the status card's text short.
 
 ## 5. Components
 

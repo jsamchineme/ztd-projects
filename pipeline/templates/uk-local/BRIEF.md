@@ -91,7 +91,7 @@ Each major decision comes from a research finding. If a client asks for somethin
 - **Skip link:** "Skip to main content" is the first element. `<main id="main" tabindex="-1">`.
 - **Landmarks:** `header`, `nav[aria-label="Main menu"]`, `main`, `section[aria-labelledby]`, `aside` and `footer`.
 - **Headings:** one `h1`, an `h2` for each section and `h3` inside, with no skipped levels. The footer column headings are `h2`.
-- **Tap targets:** 44×44px or more on phones. Buttons are 56px tall. Stand-alone links use `.go`, which has a 44px minimum height. Footer links and contact links have their own `min-height: var(--tap)`. A link inside a sentence is exempt.
+- **Tap targets:** 44×44px or more on phones. Buttons are 56px tall. Stand-alone links use `.go`, which is at least 44px tall (inline-block with padding, so the arrow stays on the last word's line). Footer links and contact links have their own `min-height: var(--tap)`. A link inside a sentence is exempt.
 - **Menu:** the `.menu-toggle` button has `aria-expanded` and `aria-controls="site-nav"`. Escape closes the menu and returns focus to the button. Without JS the menu is simply open.
 - **Motion:** smooth scrolling only under `prefers-reduced-motion: no-preference`, and all transitions are switched off under `reduce`. Nothing animates on load.
 - **Text resize:**
@@ -113,7 +113,7 @@ Use these class names exactly. Every section is `<section class="section" id="�
 
 | # | Section | id | Classes | Content rules |
 |---|---|---|---|---|
-| 1 | Header | | `.site-header`, `.site-header__bar`, `.brand`, `.brand__mark`, `.header-call`, `.menu-toggle`, `.site-nav` | Inline SVG mark, practice name and town. The Call button with the number shows from 40em. The menu is: Home, Emergencies, Join, Costs, Treatments, Our team, Opening times and contact (7). |
+| 1 | Header | | `.site-header`, `.site-header__bar`, `.brand`, `.brand__mark`, `.header-call`, `.menu-toggle`, `.site-nav` | Inline SVG mark, practice name and town. Header Call button: hidden below 36em (the hero Call button is right below), "Call" from 36em, "Call" plus the number from 48em; the number stays in the accessible name throughout. See *Responsive layout*. The menu is: Home, Emergencies, Join, Costs, Treatments, Our team, Opening times and contact (7). |
 | 2 | Hero | | `.hero`, `.hero__grid`, `.status[data-status]`, `.hero__lead`, `.btn.btn--block`, `.hero__where`, `.today.today--hero` | **h1 = what and where** ("Your NHS and private dentist in Wick"). Lead = "Phone us to book, to ask about joining, or if you're in pain." Then the Call button, then the address and "Get directions". The Opening times card, with hours grouped (for example "Monday, Tuesday, Thursday, Friday"), shows from 56em only. Put the no-JS fallback text inside `[data-status-text]`. |
 | 3 | Quick answers | | `.section--answers`, `.answers`, `.answer`, `.answer--urgent`, `.go` | 5 rows in this order: I'm in pain, Can I join?, How do I book?, What will it cost?, Where are you? Each row is an `h3`, a one-line `p` and one `.go` verb link. |
 | 4 | Dental pain and emergencies | `emergency` | `.care-card--emergency`, `--urgent`, `--non-urgent`, `.note`, `.source` | Copy the three cards from NHS inform and nhs.uk (see the example). Add the **local health board's dental helpline** for unregistered patients (NHS inform *Dental emergencies* lists each board). Out of hours is NHS 24 on 111. |
@@ -201,6 +201,34 @@ Put this just before `</body>`. The status pill and the "Today" highlight read i
 - The table text in the HTML must match this data. Write the text in NHS style ("8am to 6pm").
 
 ---
+
+### Responsive layout (keep it this way)
+
+Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 320px with text at 200%. Breakpoints are in em; side gutters come only from `.wrap` (`--gutter`), so every heading, card, rule and button shares one left edge.
+
+**Breakpoints**
+
+| From | What changes |
+|---|---|
+| 0 | One column everywhere. Header: brand and Menu on one row. |
+| 22em (352px) | Phone numbers in links stop wrapping (`a[href^="tel:"]`). Below this, or with large text, they may wrap rather than overflow. |
+| 36em (576px) | Header Call button appears as "Call". Open menu shows links in two columns. `.split--early` pairs (Treatments lists) go to two columns. Footer: practice block full width, then two columns. |
+| 46em (736px) | Every `.split` goes to two columns (Emergencies, Join, Costs, Contact). Quick answers: question and link on one line, answer underneath. |
+| 48em (768px) | Body text 20px. Header Call shows the number. Team cards go to `auto-fit, minmax(20rem, 1fr)` (two per row). |
+| 56em (896px) | Hero gets the Opening times card beside it. Quick answers become a three-column table (13rem / 1fr / 19rem). |
+| 64em (1024px) | Footer goes to three columns. |
+| 70em (1120px) | Full nav row under the brand and Call; the Menu button goes. Below this the Menu button is used, including on 1024px tablets. |
+
+**Header rules**
+- `.site-header__bar` wraps only when text is zoomed. The brand is `flex: 1 1 10rem; max-width: max-content`, so a long practice name wraps inside the brand (two lines at 320px) instead of pushing Menu to a second row.
+- Never add a third control to the header row, and keep the menu at 7 items or fewer so the 70em nav fits on one line. If a practice needs more items or a longer name, raise the 70em breakpoint rather than letting the nav wrap.
+
+**Grid and text rules**
+- Use `.split` for two-column content and `.split--early` only for short list items. Do not use three columns below 56em.
+- Hours rows: the time is pushed right with `margin-left: auto`, so when a long day group wraps, the time stays right-aligned on the next line.
+- `.cap__figure` has a fixed minimum width so the text beside "80%" and "£384" lines up.
+- `.note` has no max-width, so it lines up with the cards in its column.
+- Write `NHS&nbsp;24&nbsp;on&nbsp;<strong>111</strong>` so that phrase never splits.
 
 ## 5. Token reference (`styles.css`, section 1)
 

@@ -68,6 +68,10 @@ On a workflow step, **Workers can → use a real browser** also gives workers Ch
 
 `make pipeline` installs these the first time. To run an audit by hand: `node pipeline/audit.mjs http://localhost:4390/preview/12/ /tmp/audit-12`.
 
+### Templates
+
+Six design templates live in `pipeline/templates/`, listed in `config.json` (`templates`, `templateFiles`, `templateSummaries`). On a card, the **Template** field is a picker: each template shows a thumbnail and a one-line summary, with **Preview** (the worked example at phone, tablet or desktop size, inside the board), **Open** (the example in a new tab) and **Brief** (the rules build workers follow). After changing a template, refresh its thumbnail with `node pipeline/template-thumbs.mjs`.
+
 Build workers write the new site into `pipeline/data/work/<card>/site/`. It's published at `http://localhost:4390/preview/<card>/` and saved as the card's redesign preview. Previews are sandboxed, so their scripts can't touch the board.
 
 Human review and the Sales stages can't be given to AI workers.

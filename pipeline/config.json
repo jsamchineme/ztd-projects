@@ -18,6 +18,14 @@
     "Familiar Faces Dental": "templates/uk-team",
     "Doorway": "templates/uk-inside"
   },
+  "templateSummaries": {
+    "Front Desk GP": "GP practices. Task-first NHS look: live open status, top tasks, staff rota. Needs no photos.",
+    "Front Desk Dental": "Dental practices. Task-first: joining, toothache, NHS costs, reviews and team.",
+    "Front Desk Local": "Rural and small-town practices with older or anxious patients. Very light and fast, no photos.",
+    "Familiar Faces GP": "GP practices with good staff photos. Faces beside the answers: who answers, who you'll see.",
+    "Familiar Faces Dental": "Dental practices with good team portraits and bios. The team is the brand.",
+    "Doorway": "Dental practices with good premises photos. See inside, step by step, before your first visit."
+  },
   "fields": [
     { "key": "score", "label": "Score (1–10)", "type": "number" },
     { "key": "rating", "label": "Rating", "type": "select", "options": ["bad", "average", "good"]},
