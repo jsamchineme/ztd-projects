@@ -7,16 +7,17 @@
 It is the "after" in a sales pitch, and a design system that AI build workers reuse. Follow this brief exactly.
 
 - **Sister family:** Front Desk (`uk-gp/`, `uk-dental/`, `uk-local/`) is the task-led, nearly image-free option. Familiar Faces is the people-led option for practices that have, or will pay for, real staff photos. It keeps Front Desk's discipline: NHS patterns, plain English, no pop-ups, live status and verb-led links.
-- **Worked example:** Linlithgow Group Medical Practice, West Lothian (prospect `p057-04`, graded Average). Every fact comes from its current website, lgmp.gpsurgery.net, checked on 11 October 2026.
+- **Worked example:** Linlithgow Group Medical Practice, West Lothian (prospect `p057-04`, graded Average). It is a 4-page site: the homepage, Our team, Appointments and Register. Every fact comes from its current website, lgmp.gpsurgery.net (crawled on 12 October 2026), or from NHS inform, which the pages link to.
 
 ## Files
 
 | File | What it is | Edit per practice? |
 |---|---|---|
 | `styles.css` | The whole design system. Section 1 holds every token as a CSS custom property. | Tokens only |
-| `familiar.js` | About 130 lines of plain JavaScript. It runs the phone menu, the live open or closed status, and hides past holiday dates. It reads its data from the page. | Never |
+| `familiar.js` | About 130 lines of plain JavaScript. It runs the phone menu, the live open or closed status, and hides past holiday dates. It reads its data from the page, so it also works on inner pages that have no status card. | Never |
 | `fonts/` | Atkinson Hyperlegible Next, Regular and Bold, Latin woff2 (12 KB each). SIL Open Font Licence (`fonts/OFL.txt`). | Never |
 | `example/index.html` | The worked homepage for Linlithgow Group Medical Practice. Copy it to start a new practice. | Yes |
+| `example/our-team.html`, `example/appointments.html`, `example/register.html` | Worked inner pages for the same practice, built with the same shell and components. See "Inner pages" at the end. | Yes |
 | `example/img/` | `people/` (portraits as 96, 240 and, for doctors, 400px WebP), the building photo, and `CREDITS.txt` with every source URL. | Each practice gets its own |
 | `PHOTO-SHOTLIST.md` | One-page brief for the practice or a local photographer. It doubles as a paid add-on. | No |
 
@@ -160,7 +161,7 @@ On a phone, no photo appears above the top tasks except four 40px reception face
 23. Curl every external link before handover.
 
 ### Performance
-24. **Budget:** under 1.2 MB on desktop and 700 KB on a phone. The example weighs about **235 KB on desktop and 235 KB on a phone** (first load, after scrolling the whole page).
+24. **Budget:** under 1.2 MB on desktop and 700 KB on a phone. After scrolling the whole page, the example homepage weighs about **180 KB**, Our team about **205 KB**, Appointments about **100 KB** and Register about **90 KB**, on both desktop and phone.
 25. **Portrait files:**
     - 96px and 240px WebP for everyone; doctors also get 400px.
     - Quality about 60.
@@ -184,7 +185,7 @@ On a phone, no photo appears above the top tasks except four 40px reception face
      - `.now__head` holds the `h2` and `.pill[data-now=word]`.
      - Then `[data-now=date]`, `[data-now=detail]`, the green call `.button` and a link to `#opening-times`.
      - `.now__team` holds a facepile of reception faces and one sentence naming them.
-   - `aside.hero-team`: desktop only (hidden on phones). It holds 6 doctor faces and a link to `#team`.
+   - `aside.hero-team`: desktop only (hidden on phones). It holds 6 doctor faces and a link to the team (`our-team.html` in the multi-page example).
    - `section.tasks`: `h2` "How can we help?" and `ul.task-list` with 8 `.task` items. Each has an icon, `h3.task__title > a.task__link`, `p.task__answer` and a chevron. The whole card is the target.
 4. **Urgent help**: `section#urgent.urgent`, a `.care-grid` of `.care--emergency`, `.care--urgent` and `.care--pharmacy`, then `p.urgent__open`.
 5. **Who does what**: `section#team`, a `ul.grid-4` of `.role[data-team]` cards. Each card has a facepile, `h3`, `.role__names`, `.role__for` and `.more-link`.
@@ -227,7 +228,14 @@ On a phone, no photo appears above the top tasks except four 40px reception face
 
 Sections alternate white and `.section--tint`. Register uses `.section--blue` to stand out.
 
-**Multi-page build.** The homepage keeps items 1 to 5, a 4-doctor preview of item 6 and a short contact strip. Items 6 to 14 become their own pages with the same markup ([G1] recommends separate Appointments, Prescriptions and Contact pages). The "Our team" menu item then points to a team page holding items 5, 6 and 11.
+**Multi-page build (the example does this).** In a multi-page site the homepage keeps its tasks, urgent help and "Who does what", and hands the long sections to their own pages ([G1] recommends separate Appointments, Prescriptions and Contact pages). In the example:
+- **Item 6** becomes a preview on the homepage: the named-GP inset, the first 4 doctor badges in `ul.badges.badges--preview` and an action link to `our-team.html#doctors`. The full list, the qualifications expander and the training card move to `our-team.html`.
+- **Item 7** (Appointments) moves to `appointments.html`. Homepage task links point to `appointments.html`, `appointments.html#cancel` and `appointments.html#home-visits`.
+- **Item 10** (Register) stays as a short blue band: one sentence on who can join, the two form action links and a link to `register.html`. The steps move to `register.html`.
+- **Item 11** (Everyone at the practice) moves to `our-team.html`, with the wider team shown open rather than in an expander.
+- Prescriptions, test results, fit notes, the building, contact and "More information" stay on the homepage until a practice needs separate pages for them.
+
+Menu links use `appointments.html`, `our-team.html` and `register.html` for the pages, and `./#prescriptions`, `./#test-results` and `./#contact` for homepage sections. The `./` prefix means the same menu works on every page.
 
 ### Responsive layout
 
@@ -278,6 +286,7 @@ Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and with te
 | `[data-team=gp/nurse/care/admin/pharmacy/therapy/mental/community]` | Sets `--team` and `--team-tint` for bars, rings and initials grounds. |
 | `p.link-line` | A paragraph that holds only a link. Gets a 44px tap height on phones. |
 | `.inset`, `.inset--people`, `.card`, `.card--flag`, `.card--people`, `.steps`, `.details`, `.summary-list`, `.table`, `.dates`, `.callout`, `.button`, `.action-link`, `.more-link` | NHS content patterns. |
+| `.page-head`, `.breadcrumb`, `.contents`, `.questions`, `.badges--preview`, `.table--wide`, `.table__note`, `.group-intro` | Inner-page patterns. See "Inner pages". |
 
 **Team colours.**
 - They come from the NHS identity palette: GP blue, nurse aqua green, HCA light blue, admin warm yellow, pharmacy purple, therapy green, mental health dark pink and community grey.
@@ -460,12 +469,73 @@ Confirm these with the practice before go-live:
 
 ## Inner pages
 
-The worked example is the homepage. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it.
+The example is a 4-page site. Redesign study writes a `pages` site map, and Build makes every page on it. Copy the patterns below exactly; do not invent new ones.
 
-- **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts and JS, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`.
-- **Page pattern.** A short breadcrumb or "Back to home" link, one `h1` that says what the page is, a one- or two-sentence intro, then sections with `h2` headings. Use the same components as the homepage (cards, care cards, summary lists, tables, the team grid) rather than inventing new ones.
-- **Keep the urgent route on every page.** The call button stays in the header. Pages about appointments, emergencies or treatment repeat the short urgent-help block.
-- **Long content.** FAQs go in `<details>` expanders grouped under headings. Fee lists go in a simple table with a "last checked" date and a link to the official NHS charges. Policies (privacy, FOI, complaints) go on plain text pages linked from the footer.
-- **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
-- **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
-- **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.
+### The example's pages
+
+| Page | What it holds |
+|---|---|
+| `index.html` | Homepage: status card, 8 tasks, urgent help, Who does what, a 4-doctor preview, prescriptions, test results and fit notes, a short register band, building, contact and more. |
+| `our-team.html` | Who does what (role cards linking within the page), Our doctors (named-GP inset, all 14 badges, qualifications expander), Questions about seeing a doctor (question group beside the training card), Nurses and health care assistants (badges), Reception, admin and management (tags, the reception wall), and Other NHS teams in our building (tags, shown open). |
+| `appointments.html` | Page head with the live status card, urgent help, How to book (with what reception will ask, from NHS inform), Types of appointment (4 flagged cards and the early-morning inset), Change or cancel beside a Home visits card, Clinics and health checks (clinic table and 3 cards), and Questions about appointments. |
+| `register.html` | Who can register (with temporary and care home routes), Check you live in our area (places, the exact boundary in an expander, a link to the map), How to register (5 steps, both form links, an online services card), What to have ready (taken from the practice's own form, plus the NHS inform ID rule), and Questions about registering. |
+
+### Rules for every inner page
+- **Same shell everywhere.** Copy the header, menu and footer from `index.html` byte for byte. The only change is `aria-current="page"`: remove it from Home and put it on the page's own menu link. Pages not in the menu (privacy, complaints) mark nothing.
+- **One `h1`** that says what the page is, then `h2` sections, `h3` cards. Sections alternate white and `.section--tint`; the page head has a hairline under it, so the first section can be either.
+- **Keep the urgent route.** The call button stays in the header. Pages about appointments, emergencies or treatment repeat the whole `section.urgent` block from the homepage, straight after the page head.
+- **Plain English, NHS style**, verb-led links, 60 words or fewer per paragraph.
+- **Long content.** FAQs go in a question group. Fee lists go in a `.table` with a `p.checked` "last checked" line and a link to the official NHS charges. Policies (privacy, FOI, complaints) go on plain text pages linked from the footer.
+- **Menu.** 7 items or fewer, pointing to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
+- **File names.** Short lowercase names like `our-team.html` and `new-patients.html`, all beside `index.html`, with relative links.
+- **Facts.** Same rules as the homepage. Where an inner page explains something the practice does not publish (named GP, doctors' days, documents needed), say so and write "Phone to check". When the practice's own form or leaflet answers a question, use it: the example's "What to have ready" list comes from the fields on the practice's registration form.
+- **Check.** The audit crawls every linked page and must report 0 / 0 / 0. Run `viewports.mjs` on every main inner page at 360, 390, 768, 1024 and 1280px.
+
+### Inner-page patterns (section 11 of `styles.css`)
+
+**Page head.** Every inner page opens with it, inside `main`:
+```html
+<div class="page-head"><div class="wrap">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><ol>
+    <li><a href="./"><svg class="breadcrumb__back-icon">…</svg><span class="breadcrumb__back">Back to </span>Home</a><svg class="breadcrumb__sep">…</svg></li>
+    <li><span aria-current="page">Our team</span></li>
+  </ol></nav>
+  <h1>Our team</h1>
+  <p class="lede">One or two sentences.</p>
+  <nav class="contents" aria-labelledby="contents-title"><p class="contents__title" id="contents-title">On this page</p><ol>…</ol></nav>
+</div></div>
+```
+- The breadcrumb shows "Home › Page" from 40em, and "‹ Back to Home" on phones (only the parent shows). For deeper pages, add ancestor `li`s; phones still show only the direct parent.
+- The **contents list** ("On this page") is for pages with 4 or more sections. It is one column on phones and two from 36em. Each item is a link to a section `id`.
+- **Status card in the page head** (Appointments): wrap the `h1`, lede and contents in a `div` inside `.split`, and copy `section#now` from the homepage beside it, with its link changed to `./#opening-times`. Include `script#practice-schedule` at the end of the page so the status runs. On phones and tablets the card moves up to sit straight after the lede, before the contents list.
+
+**Question group** (FAQs): an `h2`, then `div.questions` holding `details.details` expanders. Each has a question as its `summary` and one to three short paragraphs in `.details__body`. Put a `p.link-line` in the answer when there is somewhere to go. Keep to 4 to 7 questions. Do not put `tel:` links inside answers (the number is in the header). On a wide screen the group can sit in a `.split` beside a related card (the training card on Our team).
+
+**Team page layout** (`our-team.html`), in this order:
+1. Who does what: the homepage role cards, with links changed to point within the page.
+2. Our doctors: the named-GP inset (`#same-doctor`) first, a one-line note on ordering and gender, every `.badge`, then `details#qualifications`.
+3. Questions about seeing a doctor: a question group in `.split` with the training card (`aside.card.card--flag#training`).
+4. Nurses and health care assistants: `.badge`s with role and gender. Add a `badge__facts` row only for facts the practice publishes (clinics, what they help with). Say in a `p.checked` line if qualifications are not published.
+5. Reception, admin and management: `.team-group` of `.tags` (with a complaints `p.link-line` inside), the reception `.wall`, then secretaries and admin.
+6. Other NHS teams in our building: every `.team-group` shown open (no expander on this page), with a self-referral link where one exists, and a `p.checked` "Team list checked" date.
+
+**Homepage doctor preview.** `ul.badges.badges--preview` with exactly 4 badges (partners in the practice's order), followed by an action link "See all N doctors and their qualifications". It is 4 across from 64em.
+
+**Clinic table.** `table.table.table--wide` with two columns, Clinic and When. Put a one-line description under the clinic name in `span.table__note` inside the row's `th`. Follow it with a `p.checked` line giving the date the practice last updated the list.
+
+**Types of appointment.** `ul.grid-2` of `.card.card--flag`, one per appointment type the practice names, each with an `id` the homepage tasks can link to. Hours outside normal opening (the 7am to 8am early appointments) go in an `.inset` under the grid.
+
+**A card that is its own section** (Home visits): `section.card.card--flag` with an `h2`, beside a plain `section` in a `.split`. Use it when two short topics share a row.
+
+**Register page.** Who can register (`.split` with the reception `.card--people`), the area (place list, boundary text in a `details.details`, a map link card), `ol.steps` with both form action links and an online services card, then "What to have ready" with the NHS inform ID rule in an `.inset`. Never embed a scanned map: describe the boundary in words and link to the map.
+
+### Linlithgow inner pages: facts to confirm with the practice
+- **Appointment types:** the practice says it offers "5 different types of appointment" but lists 4 (routine, GP to fill, same day, emergency). The page shows the 4 it lists.
+- **Named GP and doctors' working days:** not published; the pages say to phone.
+- **Choosing a doctor:** the pages say you can ask for a doctor by name when you book. The practice has not published a policy on this.
+- **Online booking:** online access lets you view and cancel, not book (from the practice's registration and prescriptions pages).
+- **Training information** (GP training scheme visits, medical students) was last updated by the practice in 2014.
+- **Nurses' and HCAs' qualifications:** not published.
+- **Documents needed to register:** the practice's only guidance is a 2013 Word document that refers to EHIC cards and EEA countries. It is out of date, so the page uses NHS inform's rule and says to phone.
+- **Paper registration forms:** a 2014 PDF form is still on the practice's site; the page says to phone rather than link to it.
+- **Linlithgow Care Home:** the form names three units (Cockelroy, Avonfield, Cairnpapple). The page uses the form's own spelling, "Cockelroy". Phone to check.

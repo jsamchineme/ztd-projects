@@ -6,7 +6,7 @@ A photography-led website template for UK dental practices (NHS, private or mixe
 
 Doorway sits beside the approved "Front Desk" family (`uk-dental`, `uk-gp`, `uk-local`). It keeps their discipline: tasks first, plain English, live status, NHS patterns and no pop-ups. Front Desk is deliberately light on imagery. Doorway makes the practice's own photographs the second thing on the page, and gives every one a job: **orientation** (recognise the building, find the door) or **reassurance** (this is the room, these are the people). No photo is decoration.
 
-Worked example: **Family Dental Care East Lothian, Prestonpans** (`example/index.html`).
+Worked example: **Family Dental Care East Lothian, Prestonpans**, a four-page site: `example/index.html` (homepage), `see-inside.html`, `new-patients.html` and `our-team.html`.
 
 ## 1. Files
 
@@ -16,6 +16,7 @@ Worked example: **Family Dental Care East Lothian, Prestonpans** (`example/index
 | `doorway.js` | About 100 lines of plain JS: the phone menu and the live open or closed status. Reads the hours from the page. No network calls. | No. |
 | `fonts/` | Red Hat Display (headings) and Red Hat Text (body), variable woff2, latin and latin-ext, plus `OFL.txt`. About 88 KB in all; a page usually loads only the two latin files (61 KB). | No. |
 | `example/index.html` | The worked homepage. Copy it for each practice. | Yes, for each practice. |
+| `example/see-inside.html`, `new-patients.html`, `our-team.html` | Worked inner pages (see "Inner pages"). Copy the one closest to each page on the site map. | Yes, for each practice. |
 | `example/img/` | That practice's photos and `CREDITS.txt`. | Replace for each practice. |
 | `PHOTO-SHOTLIST.md` | One-page brief for the practice or a local photographer. Doubles as the paid photo add-on. | Rarely. |
 
@@ -79,7 +80,7 @@ Sources: [NHS service manual: Images](https://service-manual.nhs.uk/design-syste
 Sections alternate white and warm paper grounds. Reuse the class names.
 
 1. **Icon sprite** (`svg.sprite`), then the **skip link** (`.skip-link` → `#main`).
-2. **Header** (`.site-header`, sticky). `.brand` (logo mark, name, tagline; the tagline hides below 576px and the logo mark below 360px), `.btn.btn--primary.header-call` ("Call" on phones, the full number from 640px), `.menu-toggle` ("Menu"). Then `nav.nav#site-nav` with 6 task-named items: See inside, Join, Toothache, Costs, Our team, Hours and directions.
+2. **Header** (`.site-header`, sticky). `.brand` (logo mark, name, tagline; the tagline hides below 576px and the logo mark below 360px), `.btn.btn--primary.header-call` ("Call" on phones, the full number from 640px), `.menu-toggle` ("Menu"). Then `nav.nav#site-nav` with 6 task-named items: See inside, Join, Toothache, Costs, Our team, Hours and directions. In the example, See inside, Join and Our team go to their inner pages; Toothache, Costs and Hours and directions stay as homepage anchors (`index.html#emergency` and so on from inner pages).
 3. **Arrival** (`.arrival`, white). Left: `.status[data-live-status]`, `h1` "[NHS / private / NHS and private] dentist in [Town]", `.arrival__lead` (the join answer plus the "look inside" invitation), `ul.tasks` with four `.task` links: `.task--call` (the `tel:` link with the number), join, `.task--urgent` toothache, costs. Right (below on phones): `figure.first-look` with the outside photo and a solid caption plate that names the building, a landmark and parking, plus two links (See inside, Get directions).
 4. **See inside** (`#inside`, paper). `.section__head`, then `nav.route` (jump links to the four stops), then `ol.journey` of `li.stop`:
    - `.stop__marker` (number), `.stop__head` (`.stop__kicker` "Step 1 of 4" and an `h3`), `.stop__media` (one or more `figure.photo`, each with `figcaption`), `.stop__body` (a sentence, `ul.facts` with icons, an optional `.tip`, an optional `.arrow-link`).
@@ -286,3 +287,34 @@ The worked example is the homepage. Real practice sites need more pages: Redesig
 - **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
 - **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
 - **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.
+
+### The example's pages
+
+| Page | What it holds | Sections, in order |
+| --- | --- | --- |
+| `index.html` | Tasks, the 4-stop route, join, urgent help, costs, treatments, hours | As in section 6. The journey ends with a "See every room" button to `see-inside.html`; the people stop links to `our-team.html`; the join section links to `new-patients.html`; the costs note links to `new-patients.html#costs`. |
+| `see-inside.html` | Every useful premises photo, as a 6-stop route | Page head · route (Arriving, Reception, The treatment room, Clean instruments, The people, After your visit) · Getting here (`.visit`: Find us and Access cards) · Feeling nervous (`.grid-2`: what we do, NHS advice with the NHS inform link) · Where next (`.tasks.next-tasks`, with the urgent task). |
+| `new-patients.html` | Joining, first visit, what to bring, costs | Page head with the two join buttons · How joining works (`ol.steps` + "Once you're registered") · First visit (`ol.steps` + "What to bring" `ul.ticks` + `.tip`) · Costs (`#costs`, two fee tables) · Common questions (FAQ groups) · Urgent help (the homepage care cards, copied). |
+| `our-team.html` | Everyone the practice publishes, with photos | Page head · Our dentists (`ul.team`) · Our orthodontist · Practice managers, nurses and reception · Our story (dated `ul.facts`) beside the GDC register card · Where next. |
+
+### Inner-page patterns (copy these exactly)
+
+All are in `styles.css` section 14. Each page is built from the same parts:
+
+- **Shell.** Copy the sprite, skip link, header, footer, hours JSON and `doorway.js` from `index.html` unchanged, except: `.brand` links to `index.html`; menu anchors become `index.html#…`; the current page's menu link gets `aria-current="page"` (it shows a brand underline). The JSON-LD stays on the homepage only.
+- **Page head** (`div.page-head`, white): `nav.crumbs[aria-label="Breadcrumb"]` with `ol` (Home link, then the current page as `<span aria-current="page">`), one `h1` that names the page in patient words, `p.page-head__lead` (1 to 2 sentences), and an optional `.btn-row` for the page's main action. No photo in the page head: on phones the h1 and the action must be on the first screen.
+- **Bands.** Then `section.section` bands alternating paper and white, each with a `.section__head` (eyebrow, `h2`, one-line lead). Reuse homepage components inside: `.journey`, `.grid-2` with `.card`, `ol.steps`, `ul.ticks`, `ul.facts`, `.tip`, `.care-cards`, `.visit`.
+- **Fee table** (`.card.fee-card` > `table.fee-table`): a `caption` naming the list, a `thead` row (`Who` or `Treatment` / `You pay` or `Price`, the price header `th.fee-col`), then one `tr` per charge: `th[scope=row]` with an optional plain-English `span` underneath, and `td.fee-col` with the figure. A price from the practice's site that may be stale adds `<span class="check-note">Phone to check</span>` under the figure; "ask us" rows use `span.fee-ask`. Always finish with `p.fee-meta`: a calendar icon and "Last checked [date]", plus the link to the official NHS charges. Put NHS and private tables in `.fee-stack` (stacked, then 7fr/5fr from 1024px). Scotland: NHS inform's *Receiving NHS dental treatment in Scotland*. England: the nhs.uk band charges.
+- **FAQ group** (`div.faq`): an `h3` group title, then `details` > `summary` (the question, as a patient asks it) + `div.faq__body` (1 to 3 short paragraphs). Two or three groups of 2 to 4 questions. Links inside answers use `.inline-tap`. Never hide the only copy of urgent or cost information inside a `details`.
+- **Team cards** (`ul.team` > `li.person`): `img` (the 96px headshot, `alt=""`, 2x `srcset` where it exists), `div.person__text` (`h3` name, `p.person__role`, optional `p.person__qual` such as "Qualified: Dundee, 2015"), then an optional `p.person__bio` of 1 to 3 plain sentences rewritten from the practice's own words. One column, two from 768px, three from 1152px. Group by job with an `h2` per group (dentists, orthodontist, managers). Leave out GDC numbers unless checked; link to the GDC register instead. People without a photo: `li.person.person--text`.
+- **Where next** (`ul.tasks.next-tasks`): the homepage task links at the foot of a page, the Call task first. Include the urgent task on pages about the visit or treatment.
+- **Two-photo pair.** A `.stop__media--pair` with only a `.photo--tall` and one other photo: the tall one sits beside the other at the same height (see `see-inside.html` stop 3).
+- **Text-only stop** (`.stop--text`) whose body is just one `ul.facts`: the list runs in two columns from 896px (stop 6 of `see-inside.html`).
+- **Urgent route.** `new-patients.html` repeats the homepage care cards. Pages about the visit end with the urgent task in "Where next". Every page keeps the header Call button and the footer's 111 and 999 line.
+
+### What the inner pages confirmed or left open (example)
+
+- **Costs:** NHS figures from NHS inform (*Receiving NHS dental treatment in Scotland*, updated 27 July 2026): free examinations for everyone, free treatment under 26 and in pregnancy or 12 months after, 80% up to £384 a course. Tooth whitening "from £260" is from the practice's own page, undated: shown with "Phone to check".
+- **Team:** names, roles, qualifications and bios from each person's page on the practice site (October 2026). The team page now lists GDC numbers, but Charles Crummey's still differs from the leaflet, so they stay out.
+- **Not used:** every photo of patients (the examination and Childsmile pages), and YouTube frames that don't show a place the patient will see.
+

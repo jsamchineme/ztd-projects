@@ -5,3 +5,8 @@ Licence: CC BY-SA 2.0, https://creativecommons.org/licenses/by-sa/2.0/
 Changes: resized and recompressed.
 
 Team photographs and logo: Musselburgh Dental Care's own images, cropped to 4:5 and recompressed.
+
+Practice photographs on our-team.html: Musselburgh Dental Care's own images, from its current website. Resized and recompressed.
+- practice-1970s.jpg (the practice building, late 1970s): https://i0.wp.com/musselburghdentalcare.com/wp-content/uploads/2022/05/265354a1-037a-4315-9b0c-b38876829e42.jpeg
+- practice-today.jpg (the practice today): https://i0.wp.com/musselburghdentalcare.com/wp-content/uploads/2018/02/img_8690.jpg
+- surgery-2024.jpg (new treatment room, March 2024; cropped to 4:5): https://musselburghdentalcare.com/wp-content/uploads/2024/03/img_6150.jpeg

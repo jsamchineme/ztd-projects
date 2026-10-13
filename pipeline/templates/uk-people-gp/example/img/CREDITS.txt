@@ -126,4 +126,13 @@ health-centre-720.webp, health-centre-1200.webp
     Changes: cropped to 16:10 and resized. Credited in the photo caption and the page footer.
     The photo is from 2011. Ask the practice for a current photo (see PHOTO-SHOTLIST.md).
 
+3. INNER PAGES (our-team.html, appointments.html, register.html), added 12 October 2026
+No new photos. The inner pages reuse the staff portraits listed above.
+Not used, on purpose:
+- The practice boundary map (https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2026/02/lgmp-practice-boundary-1536x1090.jpg).
+  It is a scan of an Ordnance Survey map with printed place names, so it is not the practice's own
+  photo, its licence is unclear, and the words in it are unreadable on a phone. register.html describes
+  the boundary in words and links to the map on the practice's current website instead.
+- The Linlithgow Palace banner from the practice homepage: it is decorative and does not show the practice.
+
 No stock photos and no AI-generated images are used anywhere in this template.

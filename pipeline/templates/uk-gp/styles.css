@@ -922,7 +922,7 @@ html:not(.js) .nav__toggle { display: none; }
   background: var(--colour-border);
 }
 .steps > li:last-child { padding-bottom: 0; }
-.steps h4 { margin-bottom: var(--space-1); font-size: var(--fs-body); }
+.steps h3, .steps h4 { margin-bottom: var(--space-1); font-size: var(--fs-body); }
 .steps p { margin-bottom: 0; }
 
 /* Ticked list for "what you can do / bring" */
@@ -1060,8 +1060,9 @@ html:not(.js) .nav__toggle { display: none; }
   .people:has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 .person { margin: 0; padding: var(--space-3) var(--space-4); background: var(--colour-surface); border: 1px solid var(--colour-border); }
-.person h4 { margin-bottom: var(--space-1); text-wrap: pretty; }
+.person h3, .person h4 { margin-bottom: var(--space-1); font-size: var(--fs-h4); text-wrap: pretty; }   /* h3 when the group sits straight under an h2 */
 .person__role { margin-bottom: var(--space-3); color: var(--colour-text-secondary); }
+.person__role:last-child { margin-bottom: 0; }
 .person dl { margin: 0; }
 .person dt { font-size: var(--fs-small); color: var(--colour-text-secondary); }
 .person dd { margin: 0 0 var(--space-2); }
@@ -1156,3 +1157,115 @@ html:not(.js) .nav__toggle { display: none; }
   .person dd { margin-bottom: var(--space-2); }
   .person dd:last-child { margin-bottom: 0; }
 }
+
+
+/* 17. INNER PAGES ==========================================================
+   Every inner page opens with .page-head: the breadcrumb, then a white intro
+   box (h1, lede, optional urgent line) beside an "On this page" contents list.
+   Sections follow with the same .section / .section--white rhythm as the
+   homepage, starting white. See BRIEF.md, "Inner pages". */
+
+/* Breadcrumb (NHS): ancestors as links, then the current page as plain text */
+.breadcrumb { padding-top: var(--space-3); }
+.breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-small);
+}
+.breadcrumb__list li { display: inline-flex; align-items: center; margin: 0; }
+.breadcrumb__list li + li::before {
+  content: "";
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  margin: 0 0.8em 0 0.55em;
+  border: solid var(--colour-text-secondary);
+  border-width: 2px 2px 0 0;
+  transform: rotate(45deg);
+}
+.breadcrumb__list a { display: inline-flex; align-items: center; min-width: var(--tap); min-height: var(--tap); }
+.breadcrumb__list [aria-current="page"] { color: var(--colour-text-secondary); }
+
+/* Page head: intro box (echoes .hero__intro), the page's one key action in a
+   .panel (echoes the status panel), then the contents list.
+   Phones: intro, panel, contents. From 64em: intro (7 of 12) and panel
+   (5 of 12) share a row and a bottom edge; the contents list runs full
+   width below them in 3 columns. */
+.page-head { padding-bottom: var(--space-6); }
+.page-head__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "intro" "panel" "contents";
+  gap: var(--space-4);
+}
+.page-head__intro {
+  grid-area: intro;
+  padding: var(--space-4);
+  background: var(--colour-surface);
+  border-top: 4px solid var(--colour-brand);
+}
+.page-head__intro h1 { margin-bottom: var(--space-2); }
+.page-head__intro > :last-child { margin-bottom: 0; }
+.page-head__intro .hero__urgent { margin-top: var(--space-4); }
+.page-head__panel { grid-area: panel; }
+.page-head .contents { grid-area: contents; }
+.panel h2 { font-size: var(--fs-h4); margin-bottom: var(--space-2); }
+.panel .action-link { margin: var(--space-3) 0; }
+@media (min-width: 64em) {
+  .page-head { padding-bottom: var(--space-7); }
+  .page-head__inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-areas: "intro panel" "contents contents";
+    column-gap: var(--space-5);
+    row-gap: var(--space-4);
+    align-items: stretch;
+  }
+  .page-head__intro { padding: var(--space-6) var(--space-6) var(--space-5); }
+  .page-head__panel { padding: var(--space-5); }
+}
+
+/* Contents list (NHS): links to the h2 sections on this page */
+.contents h2 {
+  margin-bottom: var(--space-1);
+  color: var(--colour-text-secondary);
+  font-size: var(--fs-body);
+}
+.contents ul { margin: 0; padding: 0; list-style: none; }
+.contents li { display: flex; gap: var(--space-2); margin: 0; break-inside: avoid; }
+.contents li::before { content: "\2014"; flex: none; padding-top: 0.6em; color: var(--colour-text-secondary); line-height: 1.5; }
+.contents a { display: inline-flex; align-items: center; min-height: var(--tap); padding-block: var(--space-1); line-height: 1.35; }
+@media (min-width: 40em) { .contents ul { columns: 2; column-gap: var(--space-5); } }
+@media (min-width: 64em) { .contents ul { columns: 3; } }
+
+/* Rota in words for phones and tablets (the .rota table shows from 64em) */
+@media (min-width: 64em) { .rota-list { display: none; } }
+
+/* FAQ group: several .details expanders stacked between hairlines */
+.details-group { max-width: var(--measure); margin: 0 0 var(--space-4); border-top: 1px solid var(--colour-border); }
+.details-group > .details { max-width: none; margin: 0; padding-block: var(--space-1); border-bottom: 1px solid var(--colour-border); }
+.details-group > .details[open] .details__body { margin-bottom: var(--space-3); }
+.details-group + p { margin-top: var(--space-4); }
+
+/* Fee table: .table with a caption, then a .table-note (last checked, official link) */
+.table-note { margin-top: calc(var(--space-3) * -1); color: var(--colour-text-secondary); font-size: var(--fs-small); }
+.table--fees { max-width: var(--measure); }
+.table--fees td:last-child, .table--fees th:last-child { width: 40%; }
+.table--fees tbody th { font-weight: var(--weight-regular); }
+
+/* Long name lists (administration and reception) inside a .card--plain */
+.name-list { margin: 0; padding: 0; list-style: none; columns: 1; }
+.name-list li { break-inside: avoid; margin: 0; padding-block: var(--space-2); border-bottom: 1px solid var(--colour-border); }
+@media (min-width: 40em) { .name-list { columns: 2; column-gap: var(--space-5); } }
+@media (min-width: 64em) { .name-list { columns: 4; } }
+
+/* Toned-down care cards. Only the life-threatening (999) card keeps a solid red header; urgent and
+   non-urgent cards use a pale tinted header with a coloured top line, so a page of help options
+   reads calmly instead of as a wall of alarms. Text on the tints is dark (over 12:1). */
+.care--urgent .care__head { background: #fdeceb; color: var(--colour-text); box-shadow: inset 0 4px 0 var(--colour-urgent); border-top-color: #fdeceb; }
+.care--non-urgent .care__head { background: var(--colour-brand-tint); color: var(--colour-text); box-shadow: inset 0 4px 0 var(--colour-brand); border-top-color: var(--colour-brand-tint); }
+.care--urgent .care__kicker, .care--non-urgent .care__kicker { color: var(--colour-text-secondary); }
+.care--urgent .care__head, .care--non-urgent .care__head { padding-top: calc(var(--space-3) + 4px); }

@@ -12,10 +12,13 @@ Familiar Faces is the people-first sibling of the approved **Front Desk** family
 
 | File | What it is | Edit it? |
 | --- | --- | --- |
-| `styles.css` | The whole design system. Tokens at the top (section 1), components below, numbered. | Tokens only. |
+| `styles.css` | The whole design system. Tokens at the top (section 1), components below, numbered. Section 14 holds the inner-page patterns. | Tokens only. |
 | `faces.js` | About 90 lines of plain JS: the phone menu (`aria-expanded`, `aria-controls`, Escape to close) and the live open or closed status. It reads the hours from the page's hours table, in Europe/London time. | No. |
 | `fonts/` | Red Hat Display and Red Hat Text variable woff2 (latin and latin-ext), plus `OFL.txt`. Self-hosted, no CDN. | No. |
 | `example/index.html` | The worked homepage for Kirriemuir Dental Practice. Copy it for each practice. | Yes, for each practice. |
+| `example/our-team.html` | Worked inner page: every dentist with a full profile and whole bio, hygienists, the clinical dental technician, managers, and the nursing and reception group photos. | Yes, for each practice. |
+| `example/fees.html` | Worked inner page: NHS charges in Scotland (from NHS inform), the full private fee list, the dental plan, missed appointment charges, a short urgent block. | Yes, for each practice. |
+| `example/new-patients.html` | Worked inner page: two ways to join, the first visit, the nervous-patient spotlight, hours and directions, joining FAQs, the full urgent card. | Yes, for each practice. |
 | `example/no-photos.html` | Demo of the fallback when a practice has only 1 or 2 photos. Not linked from the homepage. | Reference only. |
 | `example/img/` | That practice's own photos, optimised, and `CREDITS.txt` with every source URL. | Replace for each practice. |
 | `PHOTO-SHOTLIST.md` | One-page brief for the practice or a local photographer. Doubles as a paid add-on. | Hand it out. |
@@ -232,10 +235,13 @@ Never fill gaps with silhouettes, avatars, illustrations of people or stock.
 - Public holiday closures.
 - Sean Ward's GDC number (not published, so not shown).
 - Nursing and reception team members aren't named on the site, so they aren't named here.
+- Added for the inner pages (re-crawled 12 October 2026): whether plan prices are per month; what the Dental Emergency Assistance Support product actually covers (the site calls it "discretionary"); whether the private fee list and plan prices are current (the pages carry no date); whether the "Join our dental plan" online link (identportal.co.uk) is still the one the practice wants used.
+- Light edits to the published bios, for grammar only: Nicole's "During her time at university, Nicole outreach posts at both Stornoway and Elgin" is left out because it's missing a word, and her next two sentences are joined; Alan's "went onto" and "Batchelor Of" are corrected. Ask the practice to approve the bios as shown.
+- NHS charges on `fees.html` are NHS inform's own table ("correct as at 1 November 2025"), checked 12 October 2026. Re-check them before every handover.
 
 ## Inner pages
 
-The worked example is the homepage. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it.
+The worked example is a four-page site: `index.html` plus `our-team.html`, `fees.html` and `new-patients.html`. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it. Copy the worked inner pages and the patterns below exactly; don't invent new layouts.
 
 - **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts and JS, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`.
 - **Page pattern.** A short breadcrumb or "Back to home" link, one `h1` that says what the page is, a one- or two-sentence intro, then sections with `h2` headings. Use the same components as the homepage (cards, care cards, summary lists, tables, the team grid) rather than inventing new ones.
@@ -244,3 +250,81 @@ The worked example is the homepage. Real practice sites need more pages: Redesig
 - **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
 - **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
 - **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.
+
+### The example's pages and menu
+
+| Page | Menu item | What it holds |
+| --- | --- | --- |
+| `index.html` | Home | The homepage (section 5). Its task links and section links now point to the inner pages: Join → `new-patients.html`, What it costs → `fees.html`, "Meet the whole team" → `our-team.html`, "See what each plan includes" → `fees.html#plan`. Emergency and Find us stay on the homepage as anchors (`./#emergency`, `./#visit`). |
+| `new-patients.html` | Join | Page head with live status and Call; Two ways to join (NHS steps panel, plan panel); Your first visit (three panels); the Beverley spotlight; hours and directions with the practice-front photo (this page carries the `data-hours` table, so the status is live); Questions about joining (FAQ); the full urgent card. |
+| `fees.html` | Costs | Page head with a "Last checked" note; NHS (who pays nothing and what others pay, combined in one panel, beside the common NHS charges table); Private fees (11 fee groups); Our dental plan (two plan panels, family discounts, how to join, plan FAQ); If you miss an appointment beside a short urgent block. |
+| `our-team.html` | Our team | Dentists as full profiles; hygienists as compact cards with their whole bios; the clinical dental technician as a full profile; practice managers as two compact cards; nursing and reception group photos. |
+
+The menu is the same six items on every page, with `aria-current="page"` on the current one. The header and footer are byte-for-byte identical across pages apart from `aria-current`. The footer's Patients column links all four pages plus `./#emergency` and `./#visit`.
+
+### Inner-page patterns (copy exactly)
+
+All of these live in `styles.css` section 14. They only arrange existing components: no new colours, type sizes or shapes.
+
+**Page head.** Every inner page starts with the same block, on the paper background, before the first `.section`:
+
+```html
+<div class="page-head"><div class="wrap">
+  <a class="back-link" href="./">Back to home</a>
+  <!-- optional, on pages about appointments: the .front__status block from the homepage -->
+  <h1>What the page is</h1>
+  <p class="lede">One or two sentences.</p>
+  <!-- optional: .front__call (Call button + one line), or a .note "Last checked" box -->
+  <nav class="contents" aria-labelledby="contents-title">
+    <h2 id="contents-title">On this page</h2>
+    <ul class="actions"><li><a class="action" href="#section-id">Section name</a></li>…</ul>
+  </nav>
+</div></div>
+```
+
+The back link is a plain "Back to home" (left chevron), not a full breadcrumb: every inner page sits one level under home. "On this page" lists the page's h2 sections as action links: stacked on phones, flowing in a row from 576px. Name each link after its section, 2 to 4 words. Then alternate `.section--surface` and plain `.section` bands, as on the homepage.
+
+**Full profile (team page).** Use `ul.profiles > li.profile` when the whole bio is shown, not hidden in a `details`:
+
+```html
+<li class="profile" id="first-last">
+  <figure class="profile__photo"><img … 360w/520w, sizes="(min-width: 64.0625rem) 224px, (min-width: 40rem) 192px, 34vw"></figure>
+  <div class="profile__id"><h3 class="person__name">Name</h3><p class="person__role">Role</p></div>
+  <dl class="person__facts profile__facts">…</dl>
+  <div class="profile__bio"><p>The practice's own words.</p>…</div>
+</li>
+```
+
+Phones: photo beside the name, facts and bio full width. From 640px: photo column beside name, facts and bio. From 1025px: photo, then name and facts, then the bio in its own column with a hairline rule. Give each profile an `id` (the person's name) so other pages can link to it, as `fees.html` links to `our-team.html#sam-cobley`. Use the same `person__facts` rows as the homepage cards. On the team page, people with short bios (hygienists) use the homepage's `.people--compact` cards with the whole bio in `.person__words`. Two compact cards sit side by side at every width from 576px. Group photos follow the cards; a second group photo with a squarer ratio uses `.group-photo--split` (photo beside its caption from 640px).
+
+**Fee groups (fees page).** Use the practice's own fee headings, one small `table.fees` per heading, inside `.fee-groups` (1 column, 2 from 768px, groups never split across columns):
+
+```html
+<div class="fee-groups">
+  <div class="fee-group"><h3 id="fees-exams">Examinations</h3>
+    <div class="table-wrap"><table class="fees" aria-labelledby="fees-exams"><tbody>
+      <tr><td>New patient examination</td><td>£85</td></tr>…
+    </tbody></table></div></div>
+  …
+</div>
+<p class="small">From our current private fee list. Last checked [date]. Phone to check before you book.</p>
+```
+
+Write prices as "£85", "from £95", "about £350 to £650", "£1,200". No pence when the source shows .00. Price ranges that might not fit on a phone use `table.fees.fees--wrap`. Every fee page carries a **"Last checked" note** (`.note` in the page head and a `.small` line under each list) and **links to the official NHS charges** on NHS inform. Show NHS charges in their own table, copied from NHS inform's "Receiving NHS dental treatment in Scotland" table with its "correct as at" date. Never copy NHS charges from the practice's site.
+
+**Panels in threes.** `.panels--3` is the explicit 1, 2, 3 column version of `.panels` (3 columns from 1025px). Use it for three equal panels, such as What to bring, At your check-up and Who you'll see.
+
+**FAQ group.** Questions go in a `.faq` wrapper of the same `details.story` used for the homepage bios, at reading size. Each `summary` is the patient's question in their words. Answers are short and plain. Links inside an answer go in an `.actions` list, never inline, so every tap target stays 44px. Give the group an `h3` (`.faq__title`) when it sits inside a section, or let the section's `h2` head it.
+
+```html
+<div class="faq">
+  <details class="story"><summary>Can I register my children?</summary>
+    <div class="story__text"><p>Yes…</p></div></details>
+  …
+</div>
+```
+
+**Urgent help.** Pages about appointments, joining or emergencies end with the homepage's full `.urgent` card (same three routes and 999). Pages about treatment or costs carry a short `.urgent` block: an `h3`, one line ("If you're our patient, phone us. When we're closed, phone NHS 24 on 111."), 999 as text, then Call and "Find out what to do in a dental emergency" (`./#emergency`) as action links. The live status needs a `table[data-hours]` on the same page; on pages without one the pill shows its static fallback, so leave it out there.
+
+**Phone numbers in body text.** Inline `tel:` links inside sentences are under 44px tall and fail the audit. Say "phone us" in the sentence and put "Call 01575 572711" in an `.actions` list after it.
+

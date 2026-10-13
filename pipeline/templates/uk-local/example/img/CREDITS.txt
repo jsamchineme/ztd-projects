@@ -1,0 +1,13 @@
+Private treatment photos on treatments.html, all from Wikimedia Commons, cropped to 16:10, resized to 720x450 and recompressed.
+
+implants.jpg: "Dental implants" by Tiia Monto. https://commons.wikimedia.org/wiki/File:Dental_implants.jpg
+Licence: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/
+
+whitening.jpg: "Teeth whitening kits" by Teethguru. https://commons.wikimedia.org/wiki/File:Teeth_whitening_kits.jpg
+Licence: CC BY-SA 3.0, https://creativecommons.org/licenses/by-sa/3.0/
+
+braces.jpg: "Transparent-Bracket" by Hanabishi. https://commons.wikimedia.org/wiki/File:Transparent-Bracket.JPG
+Licence: public domain.
+
+crown.jpg: "Single Unit Zirconia Anterior Dental Crown" by James Roback, UticaDentalLab. https://commons.wikimedia.org/wiki/File:Single_Unit_Zirconia_Anterior_Dental_Crown.jpg
+Licence: CC BY-SA 4.0, https://creativecommons.org/licenses/by-sa/4.0/

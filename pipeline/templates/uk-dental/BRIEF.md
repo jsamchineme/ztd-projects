@@ -12,11 +12,12 @@ Front Desk is not a "concept" site. It is a calm, well-made NHS-grade service pa
 
 | File | What it is | Edit it? |
 | --- | --- | --- |
-| `styles.css` | The whole design system. Tokens at the top (section 1), components below. | Tokens only. |
+| `styles.css` | The whole design system. Tokens at the top (section 1), components below, including the inner-page components. | Tokens only. |
 | `frontdesk.js` | About 120 lines of plain JS: the phone menu and the live open or closed status. Reads the hours from the page. | No. |
 | `fonts/` | Figtree variable woff2 (weights 300 to 900), latin and latin-ext, plus `OFL.txt`. Referenced from `styles.css` by relative path. | No. |
 | `retheme.mjs` | Prints contrast-safe brand tokens from a logo colour. `node retheme.mjs "#13ABC3" "#B8902F"` | No. |
 | `example/index.html` | The worked homepage for Musselburgh Dental Care. Copy it for each practice. | Yes, for each practice. |
+| `example/treatments.html`, `example/aesthetics.html`, `example/our-team.html` | Worked inner pages (see "Inner pages"). Copy the one closest to each page on the practice's site map. | Yes, for each practice. |
 | `example/img/` | That practice's images and `CREDITS.txt`. | Replace for each practice. |
 
 The example links `../styles.css` and `../frontdesk.js`. Keep that layout: one template folder, one `example/` (or practice) folder inside it.
@@ -237,11 +238,29 @@ NHS England's benchmark asks for top tasks first, plain English, and urgent help
 - **Anna Maguire and Lynsey Ogilvie** have no GDC number in the source, so none is shown. Lynsey Ogilvie's year of qualification isn't given.
 - **The dental plan's cost and cover** aren't published, so the page asks patients to email or phone.
 
+**Inner pages (12 October 2026):**
+- **NHS charges** on `treatments.html` are NHS inform's table (charges from 1 November 2025, page updated 27 July 2026). The practice's own FAQ page still shows the November 2023 charges and links to a Scottish Dental page that no longer exists, so neither is used.
+- **Check-up frequency** follows NHS inform ("from less than 6 months to every 2 years"), not the practice's "annual" wording.
+- **Aesthetics prices** are as published on the practice's aesthetics page, which dates from 2022. The page says "phone us to check before you book". The before-and-after patient photos on that page are not used.
+- **Joanna Adamczak-Gawrychowska** is on the old team page but not on the current homepage team list, so she is left out. Confirm with the practice.
+- **"Shirley"** is listed with no surname, as published.
+- **Fraser Sim:** his bio says he became a partner in 1985; the practice history says "soon after" 1980. The team page uses 1985 and the timeline says "later".
+- **Saturday appointments:** the practice FAQ says some dentists may offer them, but the hours say closed at weekends. Left out; phone to check.
+- **The Edinburgh branch** (28 Annadale Street) in Mr Sim's bio is left out, as it's unclear whether it is still part of the practice.
+
 Licences: Figtree © The Figtree Project Authors, SIL OFL 1.1. Icons adapted from Feather (MIT). High Street photo © Barbara Carr, CC BY-SA 2.0, via Geograph and Wikimedia Commons.
 
 ## Inner pages
 
-The worked example is the homepage. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it.
+Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it. The example now has three worked inner pages. Copy the closest one and keep its structure.
+
+| Page | What it shows | Patterns to copy |
+| --- | --- | --- |
+| `example/treatments.html` | Treatment groups, the NHS charges table, help with costs, how to pay, and 14 FAQs in 4 groups | Page head with "On this page" panel, `.treatments` groups with ids, fee table, `.costs` cards, FAQ groups beside the "Still have a question?" card |
+| `example/aesthetics.html` | Dr McArdle, four treatments with what to expect, every price, aftercare, and who to phone if something goes wrong | Page head with a price panel, `.feature` portrait, treatment cards (`.card--feature` + `.treat-list`), fee table, private-only `.callout`, aftercare expanders beside a `.care-card` |
+| `example/our-team.html` | Six dentists, the manager and head nurse with long bios and GDC numbers, the wider team by name, and the history since the 1960s | `.team--list` cards, `.names` list, `.history` timeline with `.photos` |
+
+All three are built from the homepage's header, menu and footer. The menu links to the inner pages (`treatments.html#costs`, `treatments.html`, `aesthetics.html`, `our-team.html`) and back to homepage sections as `./#join` and `./#visit`, so the header is identical on every page except for `aria-current="page"`. The homepage's task panel, costs note, treatments, aesthetics feature and team section each end with a link to the matching inner page.
 
 - **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts and JS, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`.
 - **Page pattern.** A short breadcrumb or "Back to home" link, one `h1` that says what the page is, a one- or two-sentence intro, then sections with `h2` headings. Use the same components as the homepage (cards, care cards, summary lists, tables, the team grid) rather than inventing new ones.
@@ -250,3 +269,15 @@ The worked example is the homepage. Real practice sites need more pages: Redesig
 - **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
 - **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
 - **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.
+
+### Inner-page patterns (copy the markup from the example)
+
+1. **Page head** (`section.page-head` > `.wrap.page-head__grid`). Left (`.page-head__main`): `nav.breadcrumb` (`ol`: "Home" link, then the page name in `span[aria-current="page"]`), the `h1`, `p.page-head__lead` (1 to 2 sentences), a `.btn-row` with the Call button and one arrow link, then the page's `.urgent-line` (treatment and appointment pages) or a `.trust` row (team page). Right: `nav.desk` "On this page" with 4 to 6 `.task` links to the page's sections. Same-page tasks use `.task__chev--down`, so the chevron points down. The desk text can carry real facts (the aesthetics panel shows each price). It sits under the main column below 60em.
+2. **Fee table** (`.fee-table-wrap` > `table.fee-table`). The `caption` names the list, with a one-line `span` under it. `thead` has "Treatment" and "You pay" (or "Price"). One `tbody` per group, starting with `tr.fee-table__group > th[scope="rowgroup"][colspan="2"]`; each item is `th[scope="row"]` plus a `td` price. Free items get `td.fee-table__free`. Wrap each end of a price range in `.keep` ("£104.68 to" / "£164.52"). Follow it with `.costs-note`: `p.last-checked` (`<strong>Last checked: [date].</strong>`, where the figures come from and their date) and an arrow link to the official source. NHS charges in Scotland come from the [NHS inform charges table](https://www.nhsinform.scot/care-support-and-rights/nhs-services/dental/receiving-nhs-dental-treatment-in-scotland/), never from the practice's old site. Private price lists link to the NHS charges instead and say "phone us to check before you book".
+3. **FAQ groups** (`.faq-layout` > `.faq-groups` + `.card.card--feature`). Each `.faq-group` has an `h3` with an icon, then `div.faq` of `details` > `summary` (the question, then `<svg class="icon"><use href="#i-chevron"/></svg>`) and `div.faq__body`. Group by task (check-ups, treatment, paying, getting here), 2 to 4 questions a group. Questions in the patient's words; answers in 1 to 3 short paragraphs or a list. The side card is "Still have a question?" with Call, email and an hours link; it sticks in view from 60em. Use `div.faq` on its own (no layout or card) for short lists such as aftercare.
+4. **Treatment cards** (`.grid-2` of `.card.card--feature` with an `id`). `.card__label` holds the price ("From £130"), then `h3`, 1 to 3 short paragraphs, and a `dl.treat-list` of plain facts: "How long it takes", "How long it lasts", "You may notice".
+5. **Help card beside a list** (`.visit` > `div.faq` + `.care-card#help`). For anything that can go wrong after treatment: rows of "what you notice" (`h4`) and "who to phone" (with `tel:` links).
+6. **Team page** (`ul.team.team--list`). The same `li.person` markup as the homepage, with up to two `.person__bio` paragraphs: training and career first, then one personal line if the practice publishes one. The photo sits beside the words from 30em and above them on small phones. Two columns from 64em. Group as dentists, then manager and senior nurse in their own section. The wider team goes in `ul.names` (names only, as published).
+7. **History** (`.history-layout` > `ol.history` + `.photos`). Each `li` is `span.history__when` and one `p`, in plain present tense ("Mr Carr moves the practice…"). Only dates the source gives. The `.photos` column takes one wide `figure.photo.photo--wide` (old photo, natural ratio) and two 4:5 `figure.photo`s, each with a short caption. Photos are the practice's own, of premises or staff, never patients, and each is listed in `img/CREDITS.txt` with its source URL.
+8. **Grounds.** After the page head, alternate `.section` and `.section--white` exactly as the homepage does.
+

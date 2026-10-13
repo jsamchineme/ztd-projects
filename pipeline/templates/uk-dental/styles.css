@@ -512,6 +512,7 @@ a:focus-visible .icon, a:focus-visible * { color: var(--focus-ink); }
 .care-card__row:last-child { border-bottom: 0; padding-bottom: 0; }
 .care-card__row h4 { margin: 0; font-size: 1.0625rem; }
 .care-card__row a { font-weight: 700; }
+.visit > .care-card:first-child { margin-top: 0; } /* when the care card starts a column (inner pages) */
 
 /* Place photograph */
 .place { margin: clamp(2rem, 5vw, 3.5rem) 0 0; }
@@ -539,6 +540,130 @@ a:focus-visible .icon, a:focus-visible * { color: var(--focus-ink); }
 .footer-legal { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .18); display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: space-between; color: var(--on-deep-soft); }
 .footer-legal p { margin: 0; max-width: none; }
 
+/* ---- Inner pages ----
+   Every inner page opens with .page-head (the hero's ground and brand edge, no live panel), then
+   .section blocks on alternating grounds, exactly as the homepage. See BRIEF.md "Inner pages". */
+.page-head {
+  background: linear-gradient(180deg, var(--brand-tint) 0%, var(--page) 100%);
+  border-bottom: 1px solid var(--line);
+  padding-block: clamp(.75rem, 2vw, 1.5rem) clamp(2rem, 5vw, 3.75rem);
+  position: relative;
+}
+.page-head::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--brand); }
+.page-head__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+@media (min-width: 60em) { .page-head__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); } }
+.page-head h1 { margin: .5rem 0 .9rem; max-width: 15em; }
+.page-head__lead { font-size: var(--fs-lead); line-height: 1.45; margin-bottom: 1.5rem; max-width: 30em; }
+.page-head .btn-row { margin-bottom: 1.5rem; }
+.page-head__main > :last-child { margin-bottom: 0; }
+@media (max-width: 59.99em) { .page-head .urgent-line { max-width: none; } }
+.page-head .desk__head p { margin: .2rem 0 0; font-size: var(--fs-small); color: var(--ink-soft); }
+
+/* Breadcrumb: "Home > This page". Small, quiet, and every link 44px tall. */
+.breadcrumb ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 .6rem; font-size: var(--fs-small); }
+.breadcrumb li { display: flex; align-items: center; gap: .6rem; min-height: var(--tap); color: var(--ink-soft); }
+.breadcrumb li + li::before {
+  content: ""; width: .45rem; height: .45rem; flex: none; transform: rotate(45deg);
+  border-top: 2px solid var(--line-strong); border-right: 2px solid var(--line-strong);
+}
+.breadcrumb a { display: inline-flex; align-items: center; min-height: 3rem; min-width: 3rem; font-weight: 600; }
+
+/* "On this page" panel reuses .desk and .task. Same-page tasks point down. */
+.task__chev--down { transform: rotate(90deg); }
+
+/* Long text inside a section: a comfortable measure, and h3s that breathe. */
+.prose { max-width: 46rem; }
+.prose > h3:not(:first-child) { margin-top: 2rem; }
+.prose ul { padding-left: 1.2em; }
+.prose li + li { margin-top: .35rem; }
+.prose li::marker { color: var(--brand-text); }
+
+/* Fee table: one row per item, the price right-aligned in plain lining numerals.
+   Group rows (tbody > tr:first-child th[colspan]) name each kind of treatment. */
+.fee-table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1rem, 3vw, 2rem); }
+.fee-table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); overflow-wrap: anywhere; }
+.fee-table caption { text-align: left; font-weight: 750; font-size: var(--fs-h3); line-height: var(--lh-head); padding-bottom: .35rem; text-wrap: balance; }
+.fee-table caption span { display: block; margin-top: .35rem; font-weight: 500; font-size: var(--fs-small); color: var(--ink-soft); line-height: 1.45; }
+.fee-table th, .fee-table td { text-align: left; padding: .7rem .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.fee-table thead th { font-size: var(--fs-label); font-weight: 700; color: var(--ink-soft); border-bottom: 2px solid var(--line-strong); padding-top: 1rem; }
+.fee-table tbody th { font-weight: 500; }
+.fee-table .fee-table__group th { padding-top: 1.35rem; font-weight: 750; font-size: 1.0625rem; color: var(--brand-deep); border-bottom-color: var(--line-strong); }
+.fee-table td, .fee-table thead th:last-child { text-align: right; width: 9.5em; font-weight: 700; font-variant-numeric: tabular-nums lining-nums; }
+.fee-table td.fee-table__free { color: var(--ok); }
+.fee-table tr > :first-child { padding-left: 0; }
+.fee-table tr > :last-child { padding-right: 0; }
+@media (max-width: 29.99em) { .fee-table td, .fee-table thead th:last-child { width: 7.5em; } }
+@media (min-width: 48em) { .fee-table td, .fee-table thead th:last-child { width: 12em; } }
+.fee-table-wrap + .costs-note { margin-top: 1.25rem; }
+.costs + .fee-table-wrap { margin-top: clamp(1.5rem, 3vw, 2.25rem); }
+.costs-note + .grid-2, .fee-table-wrap + .callout { margin-top: clamp(2rem, 4vw, 3rem); }
+.last-checked { font-size: var(--fs-small); }
+.last-checked strong { color: var(--ink); }
+
+/* FAQ: groups of <details> expanders, each with an h3 over it. Native, so keyboard and screen readers just work. */
+.faq-groups { display: grid; gap: clamp(2rem, 4vw, 2.75rem); max-width: 50rem; }
+/* FAQ beside a "Still have a question?" card from 60em; the card stays in view while you read. */
+.faq-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+@media (min-width: 60em) { .faq-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); } .faq-layout > .card { position: sticky; top: 1.5rem; } }
+.faq-layout > .card .btn { width: 100%; margin-top: .25rem; }
+.faq-layout > .card .contact-line { margin-top: .75rem; }
+.faq-group h3 { display: flex; align-items: center; gap: .65rem; margin-bottom: .5rem; }
+.faq-group h3 .icon { color: var(--brand-text); width: 1.5rem; height: 1.5rem; }
+.faq { border-top: 3px solid var(--brand-deep); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary {
+  list-style: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: center;
+  min-height: 3.5rem; padding: .75rem 0; cursor: pointer; font-weight: 700; color: var(--brand-text); line-height: 1.35;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary .icon { transform: rotate(90deg); color: var(--brand-text); }
+.faq details[open] > summary .icon { transform: rotate(-90deg); }
+.faq summary:hover { color: var(--brand-text-hover); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .18em; }
+.faq summary:focus-visible { background: var(--focus); color: var(--focus-ink); outline: none; box-shadow: 0 -2px var(--focus), 0 4px var(--focus-ink); text-decoration: none; }
+.faq summary:focus-visible .icon { color: var(--focus-ink); }
+.faq__body { padding: 0 0 1.25rem; }
+.faq__body > :last-child { margin-bottom: 0; }
+.faq__body ul { padding-left: 1.2em; }
+.faq__body li + li { margin-top: .35rem; }
+.faq__body li::marker { color: var(--brand-text); }
+
+/* Treatment detail cards (aesthetics): .card.card--feature in .grid-2, with a .treat-list of plain facts. */
+.grid-2 > .card > .treat-list { padding-top: .5rem; }
+.card .treat-list div:first-child { border-top: 1px solid var(--line); }
+
+/* Team page: photo beside a longer bio at every width. One column below 64em, two from 64em. */
+.team--list { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 64em) { .team--list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; } }
+.team--list .person { display: grid; grid-template-columns: clamp(96px, 22vw, 168px) minmax(0, 1fr); align-items: start; }
+.team--list .person img { height: auto; aspect-ratio: 4 / 5; }
+.team--list .person__body { padding: clamp(.85rem, 2vw, 1.25rem) clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.5rem); }
+.team--list .person__bio + .person__bio { margin-top: .5rem; }
+@media (max-width: 29.99em) {
+  .team--list .person { grid-template-columns: minmax(0, 1fr); }
+  .team--list .person img { width: 112px; margin: 1rem 0 0 1rem; border-radius: var(--radius-sm); }
+}
+
+/* Wider team: a plain list of names in as many columns as fit. */
+.names { list-style: none; margin: 0; padding: 0; columns: 4 9rem; column-gap: clamp(1rem, 3vw, 2rem); }
+.names li { break-inside: avoid; padding: .6rem 0; border-bottom: 1px solid var(--line); font-weight: 600; }
+
+/* History: year in its own column, what happened beside it. Photos sit in the right column from 60em. */
+.history-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+@media (min-width: 60em) { .history-layout { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
+.history { list-style: none; margin: 0; padding: 0; border-top: 3px solid var(--brand-deep); }
+.history li { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: .25rem 1.5rem; padding-block: 1rem; border-bottom: 1px solid var(--line); }
+.history__when { font-weight: 800; color: var(--brand-deep); font-size: 1.125rem; line-height: 1.4; }
+.history li p { margin: 0; }
+@media (max-width: 29.99em) { .history li { grid-template-columns: minmax(0, 1fr); } }
+.photos { display: grid; gap: 1.25rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.photo { margin: 0; }
+.photo--wide { grid-column: 1 / -1; }
+.photo img { width: 100%; border-radius: var(--radius); background: var(--brand-tint); }
+.photo:not(.photo--wide) img { aspect-ratio: 4 / 5; object-fit: cover; }
+.photo figcaption { margin-top: .4rem; font-size: var(--fs-label); color: var(--ink-soft); line-height: 1.4; }
+/* Tablets: all three photos in one row. The wide photo gets twice the width, so the heights line up. */
+@media (min-width: 30em) and (max-width: 59.99em) { .photos { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); } .photo--wide { grid-column: auto; } }
+
 /* Print: patients print hours and directions */
 @media print {
   .site-header, .menu-toggle, .desk, .place, .btn-row { display: none !important; }
@@ -553,3 +678,9 @@ a:focus-visible .icon, a:focus-visible * { color: var(--focus-ink); }
   .status[data-state="open"] .status__dot { animation: breathe 2.4s ease-in-out infinite; }
   @keyframes breathe { 50% { box-shadow: 0 0 0 7px rgba(0, 127, 59, .06); } }
 }
+
+/* Toned-down care cards. Only the life-threatening (999) card keeps a solid red header; urgent and
+   non-urgent cards use a pale tinted header with a coloured top line, so a page of help options
+   reads calmly instead of as a wall of alarms. Text on the tints is dark (over 12:1). */
+.care-card__head { background: #fdeceb; color: var(--ink, #17262e); box-shadow: inset 0 4px 0 var(--urgent); padding-top: calc(1rem + 4px); }
+.care-card__head h3 { color: inherit; }

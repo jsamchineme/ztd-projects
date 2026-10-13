@@ -11,7 +11,8 @@
    8. People components: face, facepile, role card, badge, name tag, wall
    9. Content components: inset, steps, cards, details, tables, place
    10. Footer
-   11. Photo fallbacks, motion, print
+   11. Inner pages: page head, breadcrumb, contents list, question group
+   12. Photo fallbacks, motion, print
    ========================================================================== */
 
 /* 1. TOKENS ================================================================ */
@@ -653,7 +654,68 @@ main li > a:focus-visible, main dd a:focus-visible { padding-block: 0; }
 .footer__meta { border-top: 1px solid rgba(255,255,255,0.35); padding-top: var(--space-4); }
 .footer__meta p { margin-bottom: var(--space-2); max-width: none; }
 
-/* 11. PHOTO FALLBACKS, MOTION, PRINT ======================================= */
+/* 11. INNER PAGES ===========================================================
+   Every inner page opens with .page-head: a breadcrumb, one h1, a one- or
+   two-sentence .lede and, on long pages, an "On this page" contents list.
+   Everything below it reuses the components above. See BRIEF.md "Inner pages". */
+.page-head { padding-block: var(--space-3) var(--space-6); border-bottom: 1px solid var(--colour-border); }
+.page-head h1 { margin-bottom: var(--space-2); }
+.page-head .lede { max-width: 46rem; }
+.page-head .split { align-items: start; }
+.page-head .now { grid-area: auto; margin-top: var(--space-1); } /* not in the welcome grid */
+@media (min-width: 56em) { .page-head .split { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); } }
+/* Phones and tablets: the status card comes straight after the intro, before the contents list */
+@media (max-width: 55.99em) {
+  .page-head .split { row-gap: 0; }
+  .page-head .split > div { display: contents; }
+  .page-head .split > .now { margin-top: var(--space-4); }
+  .page-head .split .contents { order: 1; }
+}
+
+/* Breadcrumb: ancestors, then the current page. Phones show "Back to" the parent only. */
+.breadcrumb { font-size: var(--fs-small); margin-bottom: var(--space-2); }
+.breadcrumb ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; }
+.breadcrumb li { margin: 0; display: inline-flex; align-items: center; max-width: none; }
+main .breadcrumb li > a { display: inline-flex; align-items: center; gap: 0.35em; min-height: var(--tap); padding-block: 0; }
+.breadcrumb svg { width: 0.85em; height: 0.85em; fill: currentColor; flex: none; }
+.breadcrumb__sep { margin-inline: 0.5em; fill: var(--colour-text-secondary) !important; }
+.breadcrumb__back, .breadcrumb__back-icon { display: none; }
+.breadcrumb [aria-current="page"] { color: var(--colour-text-secondary); }
+@media (max-width: 39.99em) {
+  .breadcrumb li:not(:nth-last-child(2)) { display: none; }
+  .breadcrumb li .breadcrumb__sep { display: none; }
+  .breadcrumb__back { display: inline; }
+  .breadcrumb__back-icon { display: block; }
+}
+
+/* Contents list ("On this page"): NHS contents list with dashes */
+.contents { margin-top: var(--space-4); max-width: 46rem; }
+.contents__title { font-weight: var(--weight-bold); margin-bottom: var(--space-1); }
+.contents ol { list-style: none; margin: 0; padding: 0; }
+@media (min-width: 36em) { .contents ol { columns: 2; column-gap: var(--space-5); } }
+.contents li { margin: 0; position: relative; padding-left: 1.5em; break-inside: avoid; }
+.contents li::before { content: "\2014"; position: absolute; left: 0; top: 0.6em; color: var(--colour-text-secondary); }
+main .contents li > a { display: inline-block; padding-block: 0.6em; }
+
+/* Question group: related details expanders stacked with rules, for FAQs */
+.questions { max-width: 46rem; margin: 0 0 var(--space-5); border-top: 1px solid var(--colour-border); }
+.questions .details { margin: 0; padding-block: var(--space-1); border-bottom: 1px solid var(--colour-border); }
+.questions .details summary { display: flex; padding-block: var(--space-2); }
+.questions .details__body { margin-block: 0 var(--space-3); }
+.questions .details__body > :last-child { margin-bottom: 0; }
+
+/* Doctor preview on the homepage: exactly 4 badges, one row on desktop */
+@media (min-width: 64em) { .badges--preview { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* Table rows with a short description under the row heading (clinic list) */
+.table--wide { max-width: 52rem; }
+.table__note { display: block; margin-top: var(--space-1); font-weight: var(--weight-regular); font-size: var(--fs-small); color: var(--colour-text-secondary); }
+.table td { min-width: 8rem; }
+
+/* Section intro that sits under an h2 inside a section (not the section head) */
+.group-intro { max-width: 46rem; }
+
+/* 12. PHOTO FALLBACKS, MOTION, PRINT ======================================= */
 /* No building photo: the "place" figure is simply left out of the HTML. */
 /* No portraits at all: every .face and .badge__photo uses initials (see BRIEF.md 8). */
 
@@ -664,7 +726,14 @@ main li > a:focus-visible, main dd a:focus-visible { padding-block: 0; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 @media print {
-  .masthead__call, .nav, .skip-link, .now .button { display: none !important; }
+  .masthead__call, .nav, .skip-link, .now .button, .breadcrumb, .contents { display: none !important; }
   .now, .footer { background: none; color: var(--colour-text); border: 1px solid var(--colour-text); }
   a { color: var(--colour-text); }
 }
+
+/* Toned-down care cards. Only the life-threatening (999) card keeps a solid red header; urgent and
+   non-urgent cards use a pale tinted header with a coloured top line, so a page of help options
+   reads calmly instead of as a wall of alarms. Text on the tints is dark (over 12:1). */
+.care__head { background: var(--colour-brand-tint, #e8f1fa); color: var(--colour-text); box-shadow: inset 0 4px 0 var(--colour-brand); padding-top: calc(var(--space-3) + 4px); }
+.care--urgent .care__head { background: #fdeceb; box-shadow: inset 0 4px 0 var(--colour-urgent); }
+.care--emergency .care__head { background: var(--colour-urgent); color: var(--colour-on-brand); box-shadow: none; padding-top: var(--space-3); }

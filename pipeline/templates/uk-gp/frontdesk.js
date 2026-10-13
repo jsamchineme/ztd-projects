@@ -7,7 +7,9 @@
    2. Live open/closed status, in UK time (Europe/London), from the schedule
    3. Dated notices that appear and disappear on their own
    4. Opening-times table: marks the row that applies now; drops past holidays
-   5. Site search that answers inline, in the page (never an overlay)
+   5. Site search that answers inline, in the page (never an overlay). Inner pages
+      leave out #search-results and #practice-schedule, so their search form
+      submits to the homepage (./?q=...), which holds the index for every page.
 */
 (function () {
   'use strict';
@@ -159,7 +161,8 @@
     var heading = el.querySelector('h2, h3, h4');
     var title = el.getAttribute('data-search-title') || (heading ? heading.textContent.trim() : '');
     var text = (title + ' ' + el.getAttribute('data-search')).toLowerCase();
-    return { id: el.id, title: title, hint: el.getAttribute('data-search-hint') || '', text: text };
+    // data-search-href points a result at another page (the homepage indexes the inner pages)
+    return { href: el.getAttribute('data-search-href') || '#' + el.id, title: title, hint: el.getAttribute('data-search-hint') || '', text: text };
   });
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function search(q) {
@@ -181,7 +184,7 @@
       '<h2 id="search-results-title" tabindex="-1">' + (results.length ? 'Results for “' + esc(q) + '”' : 'No results for “' + esc(q) + '”') + '</h2>' +
       (results.length
         ? '<ul class="search-results__list">' + results.map(function (r) {
-            return '<li><a href="#' + esc(r.e.id) + '">' + esc(r.e.title) + '</a>' + (r.e.hint ? '<p>' + esc(r.e.hint) + '</p>' : '') + '</li>';
+            return '<li><a href="' + esc(r.e.href) + '">' + esc(r.e.title) + '</a>' + (r.e.hint ? '<p>' + esc(r.e.hint) + '</p>' : '') + '</li>';
           }).join('') + '</ul>'
         : '<p>Try another word, like “appointment” or “prescription”' + phone + '.</p>') +
       '<button type="button" class="search-results__clear">Clear search</button></div></div>';

@@ -18,6 +18,10 @@ Inside
 - xray-480.jpg, xray-698.jpg
   https://www.familydentalcareeastlothian.co.uk/system/images/210/original/DSC_4429-web.jpg
   (from https://www.familydentalcareeastlothian.co.uk/our-facilities)
+- washer-480.jpg, washer-720.jpg (used on see-inside.html, added October 2026)
+  https://www.familydentalcareeastlothian.co.uk/system/images/205/original/DSC_4517-web.jpg
+  (from https://www.familydentalcareeastlothian.co.uk/our-facilities). One dental nurse at the
+  instrument washer. She is not named or described as current staff.
 - sterilising-480.jpg, sterilising-720.jpg
   https://www.familydentalcareeastlothian.co.uk/system/images/206/original/DSC_4530-web.jpg
   (from https://www.familydentalcareeastlothian.co.uk/our-facilities)
@@ -56,6 +60,10 @@ Not used, on purpose
   probably a patient. Not used without confirmed consent.
 - MLP_0081-web.jpg (our-facilities page): four people at the reception desk. The photos date from
   the 2013 move, so we can't confirm they still work here. Not shown as "our team".
+- MLP_0187-web.jpg (routine-examination page) and MLP_0196, MLP_0208, MLP_0199, DSC_4586
+  (childsmile page): all show identifiable patients, most of them children. Not used.
+- Other frames from the YouTube tour (shelves of coloured trays; an office doorway): they don't
+  help a patient recognise a place they'll visit. Not used.
 - Leaflet cover photo (practice leaflet PDF): a child and adult in the dental chair. Patients; not used.
 
 Dates

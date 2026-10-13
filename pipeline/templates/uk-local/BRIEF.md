@@ -16,8 +16,11 @@ Front Desk is the "after" in a before-and-after pitch. It doesn't try to win on 
 | `frontdesk.js` | About 120 lines of plain JS. It runs the phone menu and the live "Open now" status. There are no dependencies and no build step. |
 | `fonts/` | Atkinson Hyperlegible Next as a variable woff2 (weights 200 to 800), with Latin and Latin Extended subsets totalling 53 KB. The licence is SIL OFL 1.1 (`fonts/OFL.txt`). It's referenced by relative path from `styles.css`. |
 | `example/index.html` | A complete homepage for a real practice, Wick Dental Practice in Caithness. It's built only from facts on its own website, its NHS inform listing and official NHS pages. |
+| `example/emergencies.html` | Inner page: toothache and emergencies, day and night (see *Inner pages*). |
+| `example/new-patients.html` | Inner page: joining, the first visit step by step, what to bring, NHS costs and exemptions. |
+| `example/treatments.html` | Inner page: NHS and private treatments, the NHS fee table, treatment FAQs. |
 
-The example uses no images, so there's no `example/img/`. That's deliberate (see decision 6).
+The homepage uses no images (see decision 6). The one exception is the private treatment panels on `treatments.html`, which show photos of the treatment objects themselves, never people, from `example/img/`. Wick's photos were checked again for the inner pages: the banner is a composite of stock models over a Google Street View capture, the other banners are Caithness scenery, and the team photos are 363×300 and include children. None passes rule 7.
 
 ---
 
@@ -37,7 +40,7 @@ Each major decision comes from a research finding. If a client asks for somethin
 | 8 | **A live open or closed status** from the published hours, in Europe/London time. It says "Open now. Closes at 6pm", "Open now. Closes soon, at 6pm" or "Closed now. Opens on Monday at 8am". | "Can I ring them now?" is the question behind most visits. NHS England 3.6: *"make sure useful information like opening times and the practice phone number are visible on the homepage."* |
 | 9 | **Atkinson Hyperlegible Next for everything,** with 19px body text on phones and 20px on desktop. | It was designed by the Braille Institute for readers with low vision, and its letterforms are unambiguous (I, l and 1 differ; the zero is slashed so 0 is not read as O in a phone number). That suits older readers. The NHS default is 16px on mobile and 19px on desktop; this template goes larger because many patients are older. |
 | 10 | **NHS meaning colours and NHS focus style.** Links are blue #005EB8, care cards use NHS red and blue, and focus is yellow #FFEB3B with a black bar. The practice's own colour is used only for brand moments: the header stripe, the mark, the Call button and the hero tint. | NHS service manual, *Colour* and *Focus state*. Patients already know these signals from nhs.uk and NHS inform. Not using the NHS logo or the NHS blue header keeps it clear that this is the practice's own site. |
-| 11 | **Total weight under 100 KB.** It uses one font file, no images, no third-party scripts, no map embed and no analytics. | The brief targets rural signal. NHS England 1.5: *"build for relatively simple browsers (like those used on a mobile)."* A Google Maps embed alone is about 1 MB and sets third-party cookies, so the template uses a "Get directions" link instead (GDPR). |
+| 11 | **Total weight under 100 KB** for the homepage. It uses one font file, no images, no third-party scripts, no map embed and no analytics. | The brief targets rural signal. NHS England 1.5: *"build for relatively simple browsers (like those used on a mobile)."* A Google Maps embed alone is about 1 MB and sets third-party cookies, so the template uses a "Get directions" link instead (GDPR). |
 | 12 | **A "Page last reviewed" date** in the footer. | NHS England, stage 2.4: *"Add timestamps to your pages to show when the content was last reviewed."* |
 | 13 | **Phone first, then wider screens.** It's one column on a phone. The desktop only adds the Opening times card next to the hero and lays the answers out as a table. | NHS England 1.5: *"think of it as a long list (how it will be viewed on a mobile screen)."* |
 
@@ -113,7 +116,7 @@ Use these class names exactly. Every section is `<section class="section" id="�
 
 | # | Section | id | Classes | Content rules |
 |---|---|---|---|---|
-| 1 | Header | | `.site-header`, `.site-header__bar`, `.brand`, `.brand__mark`, `.header-call`, `.menu-toggle`, `.site-nav` | Inline SVG mark, practice name and town. Header Call button: hidden below 36em (the hero Call button is right below), "Call" from 36em, "Call" plus the number from 48em; the number stays in the accessible name throughout. See *Responsive layout*. The menu is: Home, Emergencies, Join, Costs, Treatments, Our team, Opening times and contact (7). |
+| 1 | Header | | `.site-header`, `.site-header__bar`, `.brand`, `.brand__mark`, `.header-call`, `.menu-toggle`, `.site-nav` | Inline SVG mark, practice name and town. Header Call button: hidden below 36em (the hero Call button is right below), "Call" from 36em, "Call" plus the number from 48em; the number stays in the accessible name throughout. See *Responsive layout*. The menu is: Home, Emergencies, New patients, Treatments and costs, Our team, Opening times and contact (6). The first four point to pages; the last two to homepage sections (`./#team`, `./#contact`). |
 | 2 | Hero | | `.hero`, `.hero__grid`, `.status[data-status]`, `.hero__lead`, `.btn.btn--block`, `.hero__where`, `.today.today--hero` | **h1 = what and where** ("Your NHS and private dentist in Wick"). Lead = "Phone us to book, to ask about joining, or if you're in pain." Then the Call button, then the address and "Get directions". The Opening times card, with hours grouped (for example "Monday, Tuesday, Thursday, Friday"), shows from 56em only. Put the no-JS fallback text inside `[data-status-text]`. |
 | 3 | Quick answers | | `.section--answers`, `.answers`, `.answer`, `.answer--urgent`, `.go` | 5 rows in this order: I'm in pain, Can I join?, How do I book?, What will it cost?, Where are you? Each row is an `h3`, a one-line `p` and one `.go` verb link. |
 | 4 | Dental pain and emergencies | `emergency` | `.care-card--emergency`, `--urgent`, `--non-urgent`, `.note`, `.source` | Copy the three cards from NHS inform and nhs.uk (see the example). Add the **local health board's dental helpline** for unregistered patients (NHS inform *Dental emergencies* lists each board). Out of hours is NHS 24 on 111. |
@@ -213,9 +216,9 @@ Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 320p
 | 0 | One column everywhere. Header: brand and Menu on one row. |
 | 22em (352px) | Phone numbers in links stop wrapping (`a[href^="tel:"]`). Below this, or with large text, they may wrap rather than overflow. |
 | 36em (576px) | Header Call button appears as "Call". Open menu shows links in two columns. `.split--early` pairs (Treatments lists) go to two columns. Footer: practice block full width, then two columns. |
-| 46em (736px) | Every `.split` goes to two columns (Emergencies, Join, Costs, Contact). Quick answers: question and link on one line, answer underneath. |
+| 46em (736px) | Every `.split` goes to two columns (Emergencies, Join, Costs, Contact), except `.split--late`. Quick answers: question and link on one line, answer underneath. |
 | 48em (768px) | Body text 20px. Header Call shows the number. Team cards go to `auto-fit, minmax(20rem, 1fr)` (two per row). |
-| 56em (896px) | Hero gets the Opening times card beside it. Quick answers become a three-column table (13rem / 1fr / 19rem). |
+| 56em (896px) | Hero gets the Opening times card beside it. Quick answers become a three-column table (13rem / 1fr / 19rem). `.split--late` (the fee table and its notes) goes to two columns. |
 | 64em (1024px) | Footer goes to three columns. |
 | 70em (1120px) | Full nav row under the brand and Call; the Menu button goes. Below this the Menu button is used, including on 1024px tablets. |
 
@@ -317,12 +320,127 @@ Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 320p
 
 ## Inner pages
 
-The worked example is the homepage. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it.
+The example is a four-page site: the homepage plus three worked inner pages. Real practice sites need more pages: Redesign study writes a `pages` site map, and Build makes every page on it. Copy the inner pages' patterns exactly.
 
-- **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts and JS, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`.
-- **Page pattern.** A short breadcrumb or "Back to home" link, one `h1` that says what the page is, a one- or two-sentence intro, then sections with `h2` headings. Use the same components as the homepage (cards, care cards, summary lists, tables, the team grid) rather than inventing new ones.
-- **Keep the urgent route on every page.** The call button stays in the header. Pages about appointments, emergencies or treatment repeat the short urgent-help block.
-- **Long content.** FAQs go in `<details>` expanders grouped under headings. Fee lists go in a simple table with a "last checked" date and a link to the official NHS charges. Policies (privacy, FOI, complaints) go on plain text pages linked from the footer.
+| Page | h1 | Sections, in order |
+|---|---|---|
+| `emergencies.html` | Toothache and dental emergencies | Page head with Call button and live status · How urgent is it? (the three care cards) · Who to call (registered, not registered, with the health board helpline; grouped Opening times card) · Common problems and what to do (two FAQ groups) · More from us (`.next-links`) |
+| `new-patients.html` | Joining as a new patient | Page head with Call · How to join (joining-status note first, 4 `.steps`, Feeling nervous, Good to know) · Your first visit, step by step (5 `.steps`, What to bring panel) · What NHS treatment costs (`id="costs"`: cost-hero, caps, Getting help with costs FAQ group) · Urgent help card |
+| `treatments.html` | Treatments and costs | Page head with Call · NHS treatment (`.split--early` ruled lists) · NHS charges for common treatments (`id="nhs-charges"`: fee table + £384 cap and notes) · Private treatment (`.panels`, "Ask us for a quote") · Questions about treatment (FAQ group) · Urgent help card |
+
+The homepage keeps all its sections (it must still finish the top tasks on its own), and each section ends with one `.go` link to the page that goes deeper. Quick answers link to the pages, not the anchors.
+
+### Rules
+
+- **Same shell everywhere.** Every page reuses this template's header, menu, footer, tokens, fonts, the hours JSON and `frontdesk.js`, copied exactly from `example/index.html`. Mark the current page in the menu with `aria-current="page"`. On inner pages, menu links to homepage sections are written `./#team`.
+- **Keep the urgent route on every page.** The Call button stays in the header. Pages about appointments, emergencies or treatment end with the Urgent help card (below).
 - **Menu.** The 7 or fewer menu items point to the most-used pages. Everything else is linked from the footer and from the pages it belongs to.
 - **File names.** Use short lowercase names like `treatments.html` and `new-patients.html`, all in the site root, with relative links between them.
-- **Check.** The browser audit crawls every page. All pages must pass it, and `viewports.mjs` must show clean layouts on the main inner pages too.
+- **Policies** (privacy, FOI, complaints) go on plain text pages (page head + sections) linked from the footer.
+- **Check.** The browser audit crawls every page. All pages must pass it at 0 / 0 / 0, and `viewports.mjs` must show clean layouts on every inner page.
+
+### Inner-page patterns (`styles.css` section 7)
+
+**Page head.** Replaces the hero on every inner page. Same tint ground as the hero, so the site reads as one.
+
+```html
+<div class="page-head">
+  <div class="wrap">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="./">Home</a></li>
+        <li aria-current="page">New patients</li>
+      </ol>
+    </nav>
+    <h1>Joining as a new patient</h1>
+    <p class="page-head__lead">One or two sentences: the answer most people came for.</p>
+    <div class="page-head__actions">
+      <a class="btn btn--block" href="tel:…">…Call <span class="btn-number">…</span></a>
+      <!-- emergencies only: the live status pill -->
+      <p class="status" data-status><span data-status-text>Open Monday to Friday from 8am</span></p>
+    </div>
+  </div>
+</div>
+```
+
+- The breadcrumb is one level deep, so it is also the back link. Its "Home" link is 44px tall.
+- The page head is a `div`, not a `section`: the `h1` is the page's own heading. Content sections follow as usual (`section.section[aria-labelledby]`), alternating `section--surface` and the default ground. The first section after the page head is `section--surface`.
+- Use the Call button in the page head on any page about booking, joining, emergencies or treatment. Add the status pill only on the emergencies page.
+
+**Fee table.** For the NHS charges, or a practice's own dated price list. Never for undated or "offer" prices.
+
+```html
+<div class="split split--wide-left split--late">
+  <div>
+    <table class="fees">
+      <caption class="visually-hidden">NHS dental charges in Scotland, from 1 November 2025</caption>
+      <thead><tr><th scope="col">Treatment</th><th scope="col">You pay</th></tr></thead>
+      <tbody>
+        <tr class="fees__group"><th scope="rowgroup" colspan="2">Gums and fillings</th></tr>
+        <tr><th scope="row">Small metal filling (back tooth)</th><td>£14.00</td></tr>
+        <tr><th scope="row">Gum cleaning, over 1 to 4 visits</th><td><span class="nowrap">£35.52 to</span> <span class="nowrap">£142.08</span></td></tr>
+      </tbody>
+      <!-- one <tbody> per group -->
+    </table>
+    <div class="fees__meta"><p>Charges from 1 November 2025.</p><p>Last checked: 12 October 2026.</p></div>
+    <p class="mb-0"><a class="go" href="https://www.nhsinform.scot/…#dental_treatment_costs">Check the official NHS charges on NHS inform</a></p>
+  </div>
+  <div><!-- .cap for the £384 maximum, a .note, a .source --></div>
+</div>
+```
+
+- Row headings in plain words first ("Taking out a tooth (simple)"), NHS inform's wording in brackets only when it helps. Ranges use "to", with each amount in `.nowrap` so a range breaks only at "to" on phones.
+- Always show **"Charges from [date]"** (the date on the official source) and **"Last checked: [build date]"**, and link to the official page. In England, use the three NHS bands from nhs.uk instead of items.
+- The table is one column on tablets (`.split--late`) and sits beside its notes from 56em.
+
+**FAQ group.** Long Q&A goes in NHS-style expanders, grouped under an `h3`.
+
+```html
+<div class="faq">
+  <h3>Getting help with costs</h3>
+  <details class="details">
+    <summary><span>I am on a low income</span></summary>
+    <div class="details__body">
+      <p>…</p>
+      <p class="phone-line"><span>For help with the form:</span> <a href="tel:03003301343">0300 330 1343</a></p>
+    </div>
+  </details>
+</div>
+```
+
+- Write questions in the patient's words ("My dentures are broken", "Can I mix NHS and private treatment?").
+- Two groups can sit side by side in a `.split`. The `.faq` caps at 46rem on its own.
+- Put a phone number inside an expander as a `.phone-line`, not a link in a sentence: it needs the 44px tap height (the audit flags it otherwise).
+- End the section with a `.source` line naming and linking the NHS page the answers come from.
+
+**Panels.** One white `.panel` per private treatment (or service), in a `ul.panels` grid: `h3`, one plain sentence, then `p.panel__price` reading "Ask us for a quote" unless the practice gave a current, dated price. Add a `.note` below if the old site showed prices that may be stale.
+
+**Treatment photos (optional).** A panel may show a photo of the treatment object itself: an implant model, a whitening kit, braces on a model, a crown. Never people, mouths or before-and-after shots, and never needles or medicine vials (facial aesthetics stays text-only: anti-wrinkle injections are prescription-only medicines and can't be advertised to the public). Use the practice's own photos first, otherwise openly licensed Wikimedia Commons photos. Add `panel--photo` to the `li` and put `<img class="panel__photo" width="720" height="450" alt="…" loading="lazy">` first. Crop to 16:10 at 720×450, JPEG under 70 KB. Use `ul.panels.panels--photos`: four columns from 64em, and any panel without a photo gets `panel--wide` so it spans the row below. Credit every Commons photo in a `p.credits` under the grid, with author, licence link and "cropped and resized".
+
+**Urgent help card.** The last section of every page about appointments, emergencies or treatment. It is the NHS urgent care card with an `h2` (styled `h3-size`), so it stays in the heading outline.
+
+```html
+<section class="section" id="urgent-help" aria-labelledby="urgent-help-title">
+  <div class="wrap">
+    <div class="urgent-help">
+      <div class="care-card care-card--urgent">
+        <div class="care-card__head">
+          <h2 id="urgent-help-title" class="h3-size"><span class="visually-hidden">Urgent advice: </span>In pain or need help urgently?</h2>
+        </div>
+        <div class="care-card__body">
+          <p class="phone-line"><span>We are open:</span> <a href="tel:…">…</a></p>
+          <p class="phone-line"><span>We are closed:</span> <strong>NHS&nbsp;24 on 111</strong></p>
+          <p>Call <strong>999</strong> if swelling makes it hard to breathe, speak or swallow.</p>
+          <p><a class="go" href="emergencies.html">Find out what to do in an emergency</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+On the new-patients page the card is for people not yet registered, so it gives the health board dental helpline instead of the practice number.
+
+**Grouped Opening times card.** Outside the hero, use `.today.today--grouped` with grouped rows (as in the hero card) and an `h3.today__title`. It gets the hero card's compact row size.
+
+**Next links.** A page that doesn't end with the urgent card ends with `ul.next-links` of two or three `.go` links to related pages.

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appointments: Linlithgow Group Medical Practice</title>
+<meta name="description" content="How to book, change or cancel an appointment at Linlithgow Group Medical Practice, urgent appointments, home visits and clinic days.">
+<link rel="preload" href="../fonts/atkinson-hyperlegible-next-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/atkinson-hyperlegible-next-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../styles.css">
+<script src="../familiar.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="masthead">
+  <div class="wrap masthead__top">
+    <a class="brand" href="./">
+      <svg class="brand__mark" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+        <rect class="mark-ground" width="44" height="44" rx="10"/>
+        <circle class="mark-figure" cx="28" cy="15" r="4.4" opacity="0.75"/>
+        <path class="mark-figure" d="M20.6 32c.7-5.2 3.8-8.4 7.4-8.4 4.3 0 7.6 3.6 7.6 8.4z" opacity="0.75"/>
+        <circle class="mark-figure" cx="16.5" cy="17" r="5.2"/>
+        <path class="mark-figure" d="M7 35c0-6.4 4.2-10 9.5-10S26 28.6 26 35z"/>
+      </svg>
+      <span class="brand__text">
+        <span class="brand__name">Linlithgow Group Medical Practice</span>
+        <span class="brand__sub">NHS GP practice at Linlithgow Health Centre</span>
+      </span>
+    </a>
+    <a class="masthead__call" href="tel:+441506670027">
+      <svg class="masthead__call-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.4 2.3.6 3.6.6a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6a1 1 0 0 1-.25 1l-2.2 2.2z"/></svg>
+      <span class="masthead__call-short" aria-hidden="true">Call</span>
+      <span class="masthead__call-label">Call us, Monday to Friday, 8am to 6pm</span>
+      <span class="masthead__call-number">01506&nbsp;670027</span>
+    </a>
+  </div>
+  <nav class="nav" aria-label="Main menu">
+    <div class="wrap nav__inner">
+      <ul class="nav__list" id="nav-list">
+        <li class="nav__item--home"><a href="./">Home</a></li>
+        <li class="nav__item--keep"><a href="appointments.html" aria-current="page">Appointments</a></li>
+        <li class="nav__item--keep"><a href="./#prescriptions">Prescriptions</a></li>
+        <li><a href="./#test-results">Test results</a></li>
+        <li><a href="our-team.html">Our team</a></li>
+        <li><a href="register.html">Register</a></li>
+        <li><a href="./#contact">Contact us</a></li>
+      </ul>
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-list">Menu
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 8.6 12 16l7.4-7.4-1.4-1.4-6 6-6-6z"/></svg>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <div class="page-head">
+    <div class="wrap">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="./"><svg class="breadcrumb__back-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.4 4.6 8 12l7.4 7.4 1.4-1.4-6-6 6-6z"/></svg><span class="breadcrumb__back">Back to </span>Home</a><svg class="breadcrumb__sep" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.6 4.6 16 12l-7.4 7.4-1.4-1.4 6-6-6-6z"/></svg></li>
+          <li><span aria-current="page">Appointments</span></li>
+        </ol>
+      </nav>
+      <div class="split">
+        <div>
+          <h1>Appointments</h1>
+          <p class="lede">Phone us on 01506&nbsp;670027, Monday to Friday, 8am to 6pm. Or ask at the reception desk.</p>
+      <nav class="contents" aria-labelledby="contents-title">
+        <p class="contents__title" id="contents-title">On this page</p>
+        <ol><li><a href="#how-to-book">How to book</a></li><li><a href="#types">Types of appointment</a></li><li><a href="#cancel">Change or cancel</a></li><li><a href="#home-visits">Home visits</a></li><li><a href="#clinics">Clinics and health checks</a></li><li><a href="#questions">Questions about appointments</a></li></ol>
+      </nav>
+        </div>
+      <section class="now" id="now" data-state="closed" aria-labelledby="now-title">
+        <div class="now__head">
+          <h2 id="now-title">Are we open?</h2>
+          <p class="now__state"><span class="pill" data-now="word">Monday to Friday, 8am to 6pm</span></p>
+        </div>
+        <p class="now__date" data-now="date">Our opening times</p>
+        <p class="now__detail" data-now="detail">If you need help when we are closed, call NHS 24 on 111. In an emergency, call 999.</p>
+        <a class="button" href="tel:+441506670027"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.4 2.3.6 3.6.6a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6a1 1 0 0 1-.25 1l-2.2 2.2z"/></svg>Call 01506&nbsp;670027</a>
+        <p class="now__hours"><a href="./#opening-times">Check opening times and holidays</a></p>
+        <div class="now__team">
+          <ul class="facepile" role="list"><li><span class="face" data-team="admin"><img src="img/people/hazel-96.webp" srcset="img/people/hazel-96.webp 96w, img/people/hazel-240.webp 240w" sizes="2.5rem" width="96" height="96" alt="Hazel" decoding="async"></span></li><li><span class="face" data-team="admin"><img src="img/people/jodi-96.webp" srcset="img/people/jodi-96.webp 96w, img/people/jodi-240.webp 240w" sizes="2.5rem" width="96" height="96" alt="Jodi" decoding="async"></span></li><li><span class="face" data-team="admin"><img src="img/people/susan-96.webp" srcset="img/people/susan-96.webp 96w, img/people/susan-240.webp 240w" sizes="2.5rem" width="96" height="96" alt="Susan" decoding="async"></span></li><li><span class="face" data-team="admin"><img src="img/people/vikki-96.webp" srcset="img/people/vikki-96.webp 96w, img/people/vikki-240.webp 240w" sizes="2.5rem" width="96" height="96" alt="Vikki" decoding="async"></span></li></ul>
+          <p>Hazel, Jodi, Susan, Vikki and the reception team answer your call.</p>
+        </div>
+      </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- URGENT HELP -->
+  <section class="urgent" id="urgent" aria-labelledby="urgent-title">
+    <div class="wrap">
+      <h2 id="urgent-title">Need help urgently?</h2>
+      <ul class="care-grid" role="list">
+        <li><div class="care care--emergency">
+          <div class="care__head"><h3>Life is at risk</h3></div>
+          <div class="care__body"><span class="care__number">999</span><p>Call 999 if someone is seriously ill or injured and their life is at risk. This includes a mental health emergency.</p></div>
+        </div></li>
+        <li><div class="care care--urgent">
+          <div class="care__head"><h3>Urgent, and we are closed</h3></div>
+          <div class="care__body"><span class="care__number">111</span><p>Call NHS 24 on 111, day or night. Or <a href="https://www.nhs24.scot/111/">use NHS 24 111 online</a>.</p></div>
+        </div></li>
+        <li><div class="care care--pharmacy">
+          <div class="care__head"><h3>Minor illness</h3></div>
+          <div class="care__body"><span class="care__number care__number--word">Pharmacy</span><p>Your local pharmacy can help with many minor illnesses. <a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/pharmacy/nhs-pharmacy-first-scotland/">Read about NHS Pharmacy First Scotland</a>.</p></div>
+        </div></li>
+      </ul>
+      <p class="urgent__open"><strong>Urgent, and we are open?</strong> Phone us on <a href="tel:+441506670027">01506&nbsp;670027</a>. The duty doctor assesses every urgent request.</p>
+    </div>
+  </section>
+
+  <!-- HOW TO BOOK -->
+  <section class="section" id="how-to-book" aria-labelledby="book-title">
+    <div class="wrap split">
+      <div>
+        <h2 id="book-title">How to book</h2>
+        <ul>
+          <li>Phone us on <a href="tel:+441506670027">01506&nbsp;670027</a>, Monday to Friday, 8am to 6pm.</li>
+          <li>Or come to the reception desk at 288 High Street.</li>
+          <li>Book a separate appointment for each person who needs to be seen.</li>
+        </ul>
+        <h3 id="what-we-ask">What reception will ask you</h3>
+        <p>To check they are talking to the right person, they will ask for your name, address, date of birth and contact details.</p>
+        <p>They will also ask for a short outline of the problem. This helps them find the right person for you. You do not need to give lots of detail.</p>
+        <p class="link-line"><a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/general-practice-services/">Read about GP receptionists on NHS inform</a></p>
+      </div>
+      <div class="card card--people">
+        <ul class="facepile facepile--large" role="list"><li><span class="face" data-team="admin"><img src="img/people/hazel-96.webp" srcset="img/people/hazel-96.webp 96w, img/people/hazel-240.webp 240w" sizes="3.5rem" width="96" height="96" alt="Hazel" loading="lazy" decoding="async"></span></li><li><span class="face" data-team="admin"><img src="img/people/jodi-96.webp" srcset="img/people/jodi-96.webp 96w, img/people/jodi-240.webp 240w" sizes="3.5rem" width="96" height="96" alt="Jodi" loading="lazy" decoding="async"></span></li><li><span class="face" data-team="admin"><img src="img/people/susan-96.webp" srcset="img/people/susan-96.webp 96w, img/people/susan-240.webp 240w" sizes="3.5rem" width="96" height="96" alt="Susan" loading="lazy" decoding="async"></span></li><li><span class="face" data-team="admin"><img src="img/people/vikki-96.webp" srcset="img/people/vikki-96.webp 96w, img/people/vikki-240.webp 240w" sizes="3.5rem" width="96" height="96" alt="Vikki" loading="lazy" decoding="async"></span></li></ul>
+        <h3>Who answers your call</h3>
+        <p>Hazel, Jodi, Susan, Vikki and the rest of our reception team.</p>
+        <a class="more-link" href="our-team.html#reception">Meet the reception team</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPES OF APPOINTMENT -->
+  <section class="section section--tint" id="types" aria-labelledby="types-title">
+    <div class="wrap">
+      <div class="section__head">
+        <h2 id="types-title">Types of appointment</h2>
+        <p>We keep different kinds of appointment, so everyone is seen in good time.</p>
+      </div>
+      <ul class="grid-2" role="list">
+        <li><div class="card card--flag" id="routine">
+          <h3>Routine appointments</h3>
+          <p>Booked about 10 to 14 days ahead.</p>
+        </div></li>
+        <li><div class="card card--flag" id="same-day">
+          <h3>Appointments on the day</h3>
+          <p>Only released on the day. They are for people who are unwell and need to be seen that day.</p>
+        </div></li>
+        <li><div class="card card--flag" id="urgent-appointments">
+          <h3>Urgent appointments for today</h3>
+          <p>Available Monday to Friday, for people who need to be seen urgently. The duty doctor assesses every request first.</p>
+        </div></li>
+        <li><div class="card card--flag" id="gp-booked">
+          <h3>Appointments a GP asks for</h3>
+          <p>Some appointments can only be booked when a GP recommends one.</p>
+        </div></li>
+      </ul>
+      <div class="inset" id="early">
+        <h3>Early morning appointments, 7am to 8am</h3>
+        <p>Book these in advance. The building is only open for these booked appointments until 8am. Phone lines open at 8am.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHANGE, CANCEL AND HOME VISITS -->
+  <div class="section">
+    <div class="wrap split">
+      <section id="cancel" aria-labelledby="cancel-title">
+        <h2 id="cancel-title">Change or cancel an appointment</h2>
+        <p>If you cannot come, please tell us so someone else can have the appointment.</p>
+        <ul>
+          <li>Phone us on <a href="tel:+441506670027">01506&nbsp;670027</a>.</li>
+          <li>Use your text reminder. It gives you the option to cancel.</li>
+          <li>Cancel online, if you have <a href="./#prescriptions-online">online access</a>.</li>
+        </ul>
+        <p>We send text reminders for appointments. If you do not want them, tell our reception desk.</p>
+      </section>
+      <section class="card card--flag" id="home-visits" aria-labelledby="visits-title">
+        <h2 id="visits-title">Home visits</h2>
+        <p>If you are too ill to come in, phone before 10:30am. Tell us as much as you can, so we can judge how urgent it is.</p>
+        <p>We may not be able to visit the same day if you ask for a non-urgent visit after 11am.</p>
+        <p>A home visit takes much more of a doctor&rsquo;s time. If you can travel, please come in.</p>
+      </section>
+    </div>
+  </div>
+
+  <!-- CLINICS AND HEALTH CHECKS -->
+  <section class="section section--tint" id="clinics" aria-labelledby="clinics-title">
+    <div class="wrap">
+      <div class="section__head">
+        <h2 id="clinics-title">Clinics and health checks</h2>
+        <p>Our nurses, health care assistants and midwife run regular clinics. Phone to book.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="table table--wide">
+          <caption class="visually-hidden">Clinics and when they run</caption>
+          <thead><tr><th scope="col">Clinic</th><th scope="col">When</th></tr></thead>
+          <tbody>
+                  <tr><th scope="row">Asthma<span class="table__note">Check-ups, inhaler technique and advice from a practice nurse.</span></th><td>Monday, Tuesday, Wednesday and Friday</td></tr>
+                  <tr><th scope="row">Heart health<span class="table__note">Yearly blood tests, a review of your medicines and lifestyle, and blood pressure checks.</span></th><td>Monday to Friday</td></tr>
+                  <tr><th scope="row">COPD (chronic bronchitis)<span class="table__note">Lung function tests, inhaler technique, and a review of your medicines and lifestyle.</span></th><td>Tuesday morning and Thursday afternoon</td></tr>
+                  <tr><th scope="row">Diabetes<span class="table__note">A yearly review with a GP, a practice nurse, a chiropodist (foot care) and a dietitian.</span></th><td>Tuesday and Thursday mornings</td></tr>
+                  <tr><th scope="row">High blood pressure<span class="table__note">Blood pressure checks and a lifestyle review. We can check your blood pressure over 24 hours.</span></th><td>Monday to Friday</td></tr>
+                  <tr><th scope="row">Stop smoking<span class="table__note">Advice and support. Nicotine replacement therapy is available.</span></th><td>Monday to Friday</td></tr>
+                  <tr><th scope="row">Cervical screening<span class="table__note">Screening for cervical cancer.</span></th><td>Monday to Friday</td></tr>
+                  <tr><th scope="row">ECG (heart trace)<span class="table__note">Checks your heart rhythm.</span></th><td>Monday to Friday</td></tr>
+                  <tr><th scope="row">Antenatal care<span class="table__note">Routine pregnancy check-ups with our midwife.</span></th><td>Monday to Friday</td></tr>
+                  <tr><th scope="row">Mother and baby<span class="table__note">A drop-in clinic for advice and weighing your baby.</span></th><td>Thursday, 10am to 11am</td></tr>
+                  <tr><th scope="row">Breastfeeding group</th><td>Tuesday, 11am to midday</td></tr>
+                  <tr><th scope="row">Parentcraft classes</th><td>Monday afternoon</td></tr>
+                  <tr><th scope="row">Childhood immunisations</th><td>Friday, by appointment only</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="checked">The practice last updated its clinic list on 1 July 2026.</p>
+      <ul class="grid-3" role="list">
+        <li><div class="card" id="psa">
+          <h3>PSA blood test</h3>
+          <p>If you are aged 50 to 75, you can book a PSA blood test with a health care assistant. Read the leaflet first. It explains the good and bad points of the test.</p>
+          <p>If you have symptoms and are worried, book with a GP instead.</p>
+          <p class="link-line"><a href="https://lgmp.gpsurgery.net/wp-content/uploads/sites/1320/2025/11/PSA-Advice.pdf">Read the PSA test leaflet (PDF)</a></p>
+        </div></li>
+        <li><div class="card" id="health-checks">
+          <h3>Yearly health checks</h3>
+          <p>Have your own blood pressure monitor? You can send us a reading instead of coming in. Use the form named in your reminder text or letter.</p>
+          <p>Prefer to come in? Phone to book with a health care assistant or practice nurse.</p>
+          <p class="link-line"><a href="https://lgmp.gpsurgery.net/patient-info/health-management/">Get the health check forms</a></p>
+        </div></li>
+        <li><div class="card" id="online-reviews">
+          <h3>Reviews you can do online</h3>
+          <p>Some reviews have an online form. These include blood pressure, the pill, HRT and ADHD medicine checks.</p>
+          <p class="link-line"><a href="https://lgmp.gpsurgery.net/patient-info/online-forms/">See all our online forms</a></p>
+        </div></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section class="section" id="questions" aria-labelledby="questions-title">
+    <div class="wrap">
+      <h2 id="questions-title">Questions about appointments</h2>
+      <div class="questions">
+        <details class="details">
+          <summary>Can I book online?</summary>
+          <div class="details__body">
+            <p>Online access lets you view and cancel appointments, but not book them. To book, phone us or come to reception.</p><p class="link-line"><a href="./#prescriptions-online">Find out how to get online access</a></p>
+          </div>
+        </details>
+        <details class="details">
+          <summary>Can I book for my family in one call?</summary>
+          <div class="details__body">
+            <p>Please book a separate appointment for each person who needs to be seen.</p>
+          </div>
+        </details>
+        <details class="details">
+          <summary>Can I see the same doctor each time?</summary>
+          <div class="details__body">
+            <p>Ask for the doctor by name when you book.</p><p class="link-line"><a href="our-team.html#same-doctor">Find out about seeing the same doctor</a></p>
+          </div>
+        </details>
+        <details class="details">
+          <summary>Will my appointment be filmed?</summary>
+          <div class="details__body">
+            <p>Our GP registrar films some appointments for training. The films are kept confidential. If you do not want this, ask for the camera to be switched off.</p>
+          </div>
+        </details>
+        <details class="details">
+          <summary>Can I stop text reminders?</summary>
+          <div class="details__body">
+            <p>Yes. Tell our reception desk if you do not want them.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__cols">
+      <div>
+        <h2>Linlithgow Group Medical Practice</h2>
+        <address>Linlithgow Health Centre, 288 High Street, Linlithgow, EH49 7ER</address>
+        <ul class="footer__links">
+          <li><a href="tel:+441506670027">Call 01506&nbsp;670027</a></li>
+          <li><a href="./#opening-times">Check opening times</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Get help</h2>
+        <p>Urgent and we are closed: call NHS 24 on 111.<br>Emergency: call 999.</p>
+        <ul class="footer__links">
+          <li><a href="https://www.nhs24.scot/111/">Use NHS 24 111 online</a></li>
+          <li><a href="https://www.nhsinform.scot/scotlands-service-directory/pharmacies/">Find a pharmacy</a></li>
+          <li><a href="https://www.nhsinform.scot/illnesses-and-conditions/a-to-z/">Look up a condition on NHS inform</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>About us</h2>
+        <ul class="footer__links">
+          <li><a href="our-team.html">Meet our team</a></li>
+          <li><a href="./#complaints">Make a complaint</a></li>
+          <li><a href="https://lgmp.gpsurgery.net/accessibility/">Read our accessibility statement</a></li>
+          <li><a href="https://www.nhslothian.scot/">Visit NHS Lothian</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__meta">
+      <p>Page last reviewed: 12 October 2026. Next review due: 12 April 2027.</p>
+      <p>Staff photos are the practice's own, from its current website. Building photo by Graeme Yuill, CC BY-SA 2.0.</p>
+    </div>
+  </div>
+</footer>
+
+<script type="application/json" id="practice-schedule">
+{
+  "timezone": "Europe/London",
+  "weekdays": [1, 2, 3, 4, 5],
+  "periods": [
+    { "from": "07:00", "to": "08:00", "state": "limited", "label": "Early appointments only", "detail": "The building is open for booked appointments. Phone lines open at 8am." },
+    { "from": "08:00", "to": "18:00", "state": "open", "label": "Open now", "detail": "Phone lines are open until 6pm." }
+  ],
+  "holidays": ["2026-12-25", "2026-12-28"],
+  "specialDays": {},
+  "closed": {
+    "label": "Closed now",
+    "holidayLabel": "Closed for the public holiday",
+    "detail": "If you need help now, call NHS 24 on 111. In an emergency, call 999."
+  }
+}
+</script>
+</body>
+</html>
