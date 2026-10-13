@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n033-01",
+  "grade": "NoSite",
+  "reason": "Email domain holycornerplaygroup.org has no working nursery website"
+ },
+ {
+  "id": "n033-02",
+  "grade": "Good",
+  "reason": "Modern Honeypot site with clear Book a Tour and Book a Visit buttons, phone numbers in header, tel links, floating CTA on phone"
+ },
+ {
+  "id": "n033-03",
+  "grade": "Good",
+  "reason": "Modern Honeypot site with clear Book a Tour and Book a Visit buttons, phone numbers in header, tel links, floating CTA on phone"
+ },
+ {
+  "id": "n033-04",
+  "grade": "Good",
+  "reason": "Clean modern WordPress site with clear nav (Under 3s, 3-5, Tour, Fees), strong photo hero, tel link; only a cookie box to dismiss"
+ },
+ {
+  "id": "n033-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n033-06",
+  "grade": "Excluded",
+  "reason": "Busy Bees chain"
+ },
+ {
+  "id": "n033-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n033-08",
+  "grade": "Average",
+  "reason": "WordPress with one large room photo, wrapped heading eating the phone header, only Home and Contact in nav, no tel link, fees or visit action"
+ },
+ {
+  "id": "n033-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n033-10",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Hutchesons' Grammar School: polished independent school site with clear Visit and Apply links; not a nursery target"
+ }
+]

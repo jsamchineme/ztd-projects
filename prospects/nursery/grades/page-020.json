@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n020-01",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n020-02",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n020-03",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n020-04",
+  "grade": "Average",
+  "reason": "Very plain GoDaddy page: green ground, one big photo, phone number and cookie bar; works on phone but gives no ages, fees, funded hours or visit action up front"
+ },
+ {
+  "id": "n020-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n020-06",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n020-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n020-08",
+  "grade": "Excluded",
+  "reason": "part of a larger charity site. Was: Autism and neurodiversity charity (not a nursery) on Wix with 93px sideways overflow on phone, splash logo, Donate focus and cookie bar"
+ },
+ {
+  "id": "n020-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n020-10",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ }
+]

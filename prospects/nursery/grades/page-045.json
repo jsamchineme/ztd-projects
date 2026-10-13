@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n045-01",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n045-02",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n045-03",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n045-04",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n045-05",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n045-06",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: School site with open day popup and cookie banner, huge heading on blue; not nursery focused, 9s load"
+ },
+ {
+  "id": "n045-07",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n045-08",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n045-09",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Loretto school site looks fine on phone but measured 18,000px sideways overflow; not nursery focused"
+ },
+ {
+  "id": "n045-10",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ }
+]

@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n075-01",
+  "grade": "Average",
+  "reason": "Thrive group template behind cookie consent wall; long generic page with fees and funded hours text; slow on phone"
+ },
+ {
+  "id": "n075-02",
+  "grade": "Excluded",
+  "reason": "Thrive chain"
+ },
+ {
+  "id": "n075-03",
+  "grade": "NoSite",
+  "reason": "Email domain playful.com has no working nursery website"
+ },
+ {
+  "id": "n075-04",
+  "grade": "Bad",
+  "reason": "Tiny Tots Academy: 2000s site with gradient buttons, tiny text, no viewport tag, 12s load"
+ },
+ {
+  "id": "n075-05",
+  "grade": "NoSite",
+  "reason": "Email domain tinytotsnursery.com has no working nursery website"
+ },
+ {
+  "id": "n075-06",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n075-07",
+  "grade": "Average",
+  "reason": "Tiptoes: carousel hero with recaptcha badge; works on phone but dated and generic"
+ },
+ {
+  "id": "n075-08",
+  "grade": "Average",
+  "reason": "Tiptoes: carousel hero with recaptcha badge; works on phone but dated and generic"
+ },
+ {
+  "id": "n075-09",
+  "grade": "Bad",
+  "reason": "IONOS site with 378px sideways overflow on phone; logo and menu cut off"
+ },
+ {
+  "id": "n075-10",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ }
+]

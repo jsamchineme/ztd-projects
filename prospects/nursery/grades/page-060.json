@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n060-01",
+  "grade": "Average",
+  "reason": "Red Squirrel Nursery: nice outdoor photo, Find Out More button and tel numbers, but generic and long text"
+ },
+ {
+  "id": "n060-02",
+  "grade": "Average",
+  "reason": "Redwood Childcare: Divi purple template with stock kids photo and cookie box covering content, no tel link"
+ },
+ {
+  "id": "n060-03",
+  "grade": "Bad",
+  "reason": "Riverbank Nursery: hot pink and cyan, comic-style font, stock hands-painting photo, cookie panel; dated 1989-style"
+ },
+ {
+  "id": "n060-04",
+  "grade": "NoSite",
+  "reason": "Email domain riversidechildcare.org.uk has no working nursery website"
+ },
+ {
+  "id": "n060-05",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n060-06",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Robert Gordon's College nursery: school navy accordion menu, cookie banner, long pale text; no visit action"
+ },
+ {
+  "id": "n060-07",
+  "grade": "Bad",
+  "reason": "2014 WordPress site: dropdown select menu, small slider, cookie bar, tiny text, no tel link"
+ },
+ {
+  "id": "n060-08",
+  "grade": "Average",
+  "reason": "Rocking Horse SCIO: friendly photo and clear text with inspection mention, but cloud template and thin visit or contact action"
+ },
+ {
+  "id": "n060-09",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n060-10",
+  "grade": "Bad",
+  "reason": "Rompers: loud red boxes with drop shadows, clip-art painted hands, cookie bar covering page"
+ }
+]

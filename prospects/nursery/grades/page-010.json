@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n010-01",
+  "grade": "Average",
+  "reason": "Group WordPress site with scratchy red texture banners, location photo carousel and icon nav of eight towns; text-heavy and dated, no fees, funded hours or inspection grades up front"
+ },
+ {
+  "id": "n010-02",
+  "grade": "Average",
+  "reason": "Group WordPress site with scratchy red texture banners, location photo carousel and icon nav of eight towns; text-heavy and dated, no fees, funded hours or inspection grades up front"
+ },
+ {
+  "id": "n010-03",
+  "grade": "Average",
+  "reason": "Group WordPress site with scratchy red texture banners, location photo carousel and icon nav of eight towns; text-heavy and dated, no fees, funded hours or inspection grades up front"
+ },
+ {
+  "id": "n010-04",
+  "grade": "Excluded",
+  "reason": "Thrive chain"
+ },
+ {
+  "id": "n010-05",
+  "grade": "Average",
+  "reason": "Group WordPress site with scratchy red texture banners, location photo carousel and icon nav of eight towns; text-heavy and dated, no fees, funded hours or inspection grades up front"
+ },
+ {
+  "id": "n010-06",
+  "grade": "Bad",
+  "reason": "Old grey-pattern WordPress theme, clip-art lettered logo with stick figures, tiny menu collapsing to a dropdown on phone, cookie bar, 4.6s load"
+ },
+ {
+  "id": "n010-07",
+  "grade": "Average",
+  "reason": "Works on phone with big phone number and Care Inspectorate registration, but dated blue site with logo clip-art and long text wall; no fees or funded hours"
+ },
+ {
+  "id": "n010-08",
+  "grade": "Average",
+  "reason": "Nursery is a sub-page of a parish church site: works on phone, but nursery is buried under Organisations, cookie bar, heavy text, no fees, hours or visit action"
+ },
+ {
+  "id": "n010-09",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n010-10",
+  "grade": "Average",
+  "reason": "Cookie bar over an awards poster hero, 8-item nav, tan header; works on phone but poster image takes the first screen and key parent answers are not up front"
+ }
+]

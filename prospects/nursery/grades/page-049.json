@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n049-01",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n049-02",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n049-03",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n049-04",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n049-05",
+  "grade": "Average",
+  "reason": "Mulberry Bush: friendly rounded layout with Learn More, Contact and inspection report buttons, but bubbly generic template"
+ },
+ {
+  "id": "n049-06",
+  "grade": "Bad",
+  "reason": "No viewport meta: tiny text on a green/blue 2000s-style page, microscopic nav on phone"
+ },
+ {
+  "id": "n049-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n049-08",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n049-09",
+  "grade": "Average",
+  "reason": "Mackin Childcare: readable, photo hero and Contact Us button, but cloud-edge template, no tel link, only funded hours mention"
+ },
+ {
+  "id": "n049-10",
+  "grade": "Bad",
+  "reason": "Musselburgh Private Nursery: heading cut off, 378px sideways overflow on phone, nav clipped"
+ }
+]

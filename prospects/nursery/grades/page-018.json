@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n018-01",
+  "grade": "Bad",
+  "reason": "Cartoon astronaut and planet clip-art, Comic Sans, tiny hero text and two phone numbers on phone; amateur kids-theme look, no fees, ages or inspection grades"
+ },
+ {
+  "id": "n018-02",
+  "grade": "Average",
+  "reason": "Same cloud-and-painted-tree clip-art template as other Edinburgh nurseries: works on phone with Fees and Enquiry Form but dated, cluttered and no funded hours or inspection info"
+ },
+ {
+  "id": "n018-03",
+  "grade": "Excluded",
+  "reason": "part of a larger charity site. Was: Clean modern Squarespace site (Cothrom, an adult-learning charity) with strong imagery and clear menu; not a nursery prospect"
+ },
+ {
+  "id": "n018-04",
+  "grade": "Bad",
+  "reason": "2012-style site with no viewport meta: whole desktop page shrunk to unreadable tiny text on phone, feedback tab, clip-art lettering"
+ },
+ {
+  "id": "n018-05",
+  "grade": "Average",
+  "reason": "Book a Visit, Enquiry and Fees and Funding easy to find, but cookie box plus an AI chatbot pop-up cover the page, Comic-style headings over a gradient and cloud clip-art"
+ },
+ {
+  "id": "n018-06",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Polished school and nursery site (Craigclowan) with full-bleed photo hero, Enquire button and clear menu; a school, not a small-nursery target"
+ },
+ {
+  "id": "n018-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n018-08",
+  "grade": "Average",
+  "reason": "Illustrated tree-house header and cutesy fonts, but Book a Visit button and funded places statement are easy to find on phone; no fees or inspection grades up front"
+ },
+ {
+  "id": "n018-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n018-10",
+  "grade": "Average",
+  "reason": "Pop-up \"Join the Cranley team\" recruitment modal covers the page on load (desktop and phone), dark patterned hero, slow 4.4-4.7s; no ages, fees or funded hours visible"
+ }
+]

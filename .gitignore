@@ -3,6 +3,7 @@
 
 # Live board: cards, workflows and AI-built preview sites (back up separately)
 pipeline/data/
+pipeline/data-nursery/
 
 # Prospect screenshots (large; regenerate from the grading task)
 prospects/shots/
@@ -11,3 +12,7 @@ prospects/gp/shots/
 # Dependencies and logs
 node_modules/
 *.log
+
+# Nursery prospects: screenshots and the raw datastore CSV (re-download monthly)
+prospects/nursery/shots/
+prospects/nursery/source/

@@ -23,7 +23,9 @@ const DATA = process.env.PIPELINE_DATA || join(ROOT, 'data', 'cards.json');
 const WORK = join(dirname(DATA), 'work'); // per-card folders for AI workers; <card>/site is served as its preview
 
 // ---------- config ----------
-const config = JSON.parse(readFileSync(join(ROOT, 'config.json'), 'utf8'));
+// PIPELINE_CONFIG runs a separate project (for example nurseries) with its own stages and templates.
+const CONFIG = process.env.PIPELINE_CONFIG ? resolve(process.env.PIPELINE_CONFIG) : join(ROOT, 'config.json');
+const config = JSON.parse(readFileSync(CONFIG, 'utf8'));
 const stages = new Map();
 for (const p of config.pipelines) for (const s of p.stages){
   if (stages.has(s.id)) throw new Error(`Duplicate stage id "${s.id}" in config.json`);

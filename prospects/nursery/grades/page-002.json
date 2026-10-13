@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n002-01",
+  "grade": "Average",
+  "reason": "Elementor WordPress with real photos and phone/email bar, but one generic Get in touch button; no ages, hours, funded hours or inspection grades"
+ },
+ {
+  "id": "n002-02",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n002-03",
+  "grade": "Bad",
+  "reason": "Placeholder Squarespace page: site being rebuilt, Instagram feed only, no nursery info"
+ },
+ {
+  "id": "n002-04",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n002-05",
+  "grade": "Average",
+  "reason": "WordPress with Book Your Place CTA and bold type, but cookie banner covers phone view and no funded hours, fees or inspection info on the home page"
+ },
+ {
+  "id": "n002-06",
+  "grade": "NoSite",
+  "reason": "Email domain acorndaynursery.com has no working nursery website"
+ },
+ {
+  "id": "n002-07",
+  "grade": "Good",
+  "reason": "Clean Squarespace site, real photos, clear Visit and FAQs pages, mentions funded hours and waiting list"
+ },
+ {
+  "id": "n002-08",
+  "grade": "Bad",
+  "reason": "Near-empty GoDaddy page: logo and Now Open only, cookie banner, no ages, hours, fees or how to join"
+ },
+ {
+  "id": "n002-09",
+  "grade": "Bad",
+  "reason": "Single sparse page with washed-out hand-paint photo behind small text, no menu, no fees, ages or inspection grades"
+ },
+ {
+  "id": "n002-10",
+  "grade": "NoSite",
+  "reason": "Email domain acrewoodnursery.org has no working nursery website"
+ }
+]

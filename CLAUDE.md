@@ -4,7 +4,7 @@ This repo holds three things:
 
 - **Mapboard** (`index.html`, `server.mjs`): a whiteboard app that can generate and edit boards with Claude.
 - **Pipeline** (`pipeline/`): the main project. It's a board that moves website-redesign prospects through stages, worked by people and by AI workers (the local `claude` CLI).
-- **Prospects** (`prospects/`): graded lists of Scottish dental practices (`prospects/data`, `prospects/grades`) and GP practices (`prospects/gp/`). Screenshots are gitignored.
+- **Prospects** (`prospects/`): graded lists of Scottish dental practices (`prospects/data`, `prospects/grades`) and GP practices (`prospects/gp/`)., plus independent nurseries (`prospects/nursery/`, see its README). Screenshots are gitignored.
 
 The business: redesign the websites of NHS dental and GP practices in Scotland, then pitch the before and after. The audience is patients, often older or anxious, and practice managers.
 
@@ -12,6 +12,7 @@ The business: redesign the websites of NHS dental and GP practices in Scotland, 
 
 - `make pipeline` starts the board at http://localhost:4390. It installs `pipeline/node_modules` (Playwright, axe-core, Playwright MCP) on the first run and uses the installed Chrome.
 - Restart the server after changing `server.mjs`, `workers.mjs`, `audit.mjs` or `config.json`. Changes to `pipeline/index.html` only need a browser reload.
+- `make nurseries` runs the separate nursery board at http://localhost:4391: `pipeline/nursery.config.json` (its own stages, templates and `research` brief that every worker reads) with data in `pipeline/data-nursery/`. A config can set `title`, `audience`, `businessNoun` and `research`; `PIPELINE_CONFIG` picks the config file.
 - `make start` runs Mapboard at http://localhost:4380.
 
 ## Pipeline layout
@@ -42,7 +43,7 @@ Live board data lives in `pipeline/data/` (cards.json, plus `work/<card>/` with 
 
 ## Templates (`pipeline/templates/`)
 
-There are six. The **Front Desk** family is task-first with little imagery (GP `uk-gp`, Dental `uk-dental`, Local `uk-local`). The **Familiar Faces** family is people-led (GP `uk-people-gp`, Dental `uk-team`). **Doorway** (`uk-inside`) is led by photos of the practice premises. Each one has `BRIEF.md`, `styles.css` (tokens at the top), `fonts/`, a small JS file and `example/`. The people-led ones also have `PHOTO-SHOTLIST.md`.
+There are six. The **Front Desk** family is task-first with little imagery (GP `uk-gp`, Dental `uk-dental`, Local `uk-local`). The **Familiar Faces** family is people-led (GP `uk-people-gp`, Dental `uk-team`). **Doorway** (`uk-inside`) is led by photos of the practice premises. The nursery board has its own three: **Front Desk Nursery** (`uk-nursery`), **Key Worker** (`uk-people-nursery`) and **Garden Gate** (`uk-inside-nursery`), built from `prospects/research/nursery-websites.md`; nursery builds never show identifiable children. Each one has `BRIEF.md`, `styles.css` (tokens at the top), `fonts/`, a small JS file and `example/`. The people-led ones also have `PHOTO-SHOTLIST.md`.
 
 Rules for any template or built site:
 - **Never invent facts:** no made-up prices, reviews, staff, online booking or policies. Write "phone to check" when a fact is unclear. Check NHS facts against nhsinform.scot or nhs.uk.

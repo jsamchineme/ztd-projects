@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Takes a thumbnail of each template's worked example (top of the page at desktop width) for the board's template picker.
 // Writes templates/<folder>/thumb.jpg. Re-run after changing a template.
-// Usage: node pipeline/template-thumbs.mjs
+// Usage: node pipeline/template-thumbs.mjs [folder ...]   (no folders: every template)
 import http from 'node:http';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { join, extname, dirname, resolve, sep } from 'node:path';
@@ -24,7 +24,8 @@ const base = `http://127.0.0.1:${server.address().port}`;
 
 const browser = await chromium.launch({ executablePath: CHROME });
 try {
-  for (const dir of (await readdir(ROOT)).sort()){
+  const only = process.argv.slice(2);
+  for (const dir of (await readdir(ROOT)).sort().filter(d => !only.length || only.includes(d))){
     try { await stat(join(ROOT, dir, 'example', 'index.html')); } catch { continue; }
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 0.5 });
     await page.goto(`${base}/${dir}/example/`, { waitUntil: 'networkidle' });

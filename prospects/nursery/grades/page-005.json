@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n005-01",
+  "grade": "NoSite",
+  "reason": "Email domain abc8nursery.co.uk has no working nursery website"
+ },
+ {
+  "id": "n005-02",
+  "grade": "Average",
+  "reason": "WordPress with handwritten fonts, large photo hero, phone/email icons, Bookings and Fees page; cookie bar covers phone view and 7,900-char text-heavy pages"
+ },
+ {
+  "id": "n005-03",
+  "grade": "Bad",
+  "reason": "Only a Facebook page behind a cookie wall, no own website"
+ },
+ {
+  "id": "n005-04",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n005-05",
+  "grade": "NoSite",
+  "reason": "Email domain livingclassrooms.org.uk has no working nursery website"
+ },
+ {
+  "id": "n005-06",
+  "grade": "NoSite",
+  "reason": "Email domain adpc.org.uk has no working nursery website"
+ },
+ {
+  "id": "n005-07",
+  "grade": "Bad",
+  "reason": "Only a Facebook page behind a cookie wall, no own website"
+ },
+ {
+  "id": "n005-08",
+  "grade": "Average",
+  "reason": "Tidy navy and cream WordPress site with logo, works on phone, but giant empty hero blocks, no CTA, fees, funded hours or inspection info up front"
+ },
+ {
+  "id": "n005-09",
+  "grade": "Bad",
+  "reason": "Slow (4.7s) dark photo-tile site, overlapping and unreadable low-contrast text, logo cut off, near-empty on phone"
+ },
+ {
+  "id": "n005-10",
+  "grade": "NoSite",
+  "reason": "Email domain basicchildcare.co.uk has no working nursery website"
+ }
+]

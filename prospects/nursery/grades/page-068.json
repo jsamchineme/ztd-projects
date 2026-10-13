@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n068-01",
+  "grade": "Excluded",
+  "reason": "site is a placeholder Google Site"
+ },
+ {
+  "id": "n068-02",
+  "grade": "Average",
+  "reason": "Cartoon sun logo, blue pill nav and cloud graphics; Care Inspectorate button is good but generic and slightly childish"
+ },
+ {
+  "id": "n068-03",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n068-04",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n068-05",
+  "grade": "Bad",
+  "reason": "IONOS site with 378px sideways overflow on phone; text and logo cut off on dark background"
+ },
+ {
+  "id": "n068-06",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n068-07",
+  "grade": "Bad",
+  "reason": "Lime green and purple comic-font page over a faded banner photo; amateur and busy; cookie bar"
+ },
+ {
+  "id": "n068-08",
+  "grade": "Average",
+  "reason": "Technotots: full-bleed ball-pit photo hero with coloured letters; long page, generic Bootstrap template"
+ },
+ {
+  "id": "n068-09",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n068-10",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ }
+]

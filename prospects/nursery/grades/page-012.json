@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n012-01",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n012-02",
+  "grade": "Excluded",
+  "reason": "Busy Bees chain. Was: National chain (Busy Bees): modern site with Book a visit button, find-a-nursery search and funded hours/fees content; full-screen Cookiebot modal covers the phone view but the design behind is clean; not a small-nursery target"
+ },
+ {
+  "id": "n012-03",
+  "grade": "Excluded",
+  "reason": "Busy Bees chain. Was: National chain (Busy Bees): modern site with Book a visit button, find-a-nursery search and funded hours/fees content; full-screen Cookiebot modal covers the phone view but the design behind is clean; not a small-nursery target"
+ },
+ {
+  "id": "n012-04",
+  "grade": "NoSite",
+  "reason": "Email domain busybeesnursery.uk has no working nursery website"
+ },
+ {
+  "id": "n012-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n012-06",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n012-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n012-08",
+  "grade": "Bad",
+  "reason": "Wix site with a black empty video block, 5-item bar with tiny Read more links, desktop layout cut off on phone; no clear parent answers"
+ },
+ {
+  "id": "n012-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n012-10",
+  "grade": "Bad",
+  "reason": "Stock kids-template look: clip-art clouds, rainbow and sunburst background, hand-written fonts, cookie bar; hero text overlaps on phone"
+ }
+]

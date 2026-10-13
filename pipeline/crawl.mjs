@@ -69,7 +69,7 @@ export async function crawlSite(startUrl, outDir, { maxPages = DEFAULT_MAX_PAGES
   try {
     while (queue.length && site.pages.length < maxPages){
       const { url, depth, from } = queue.shift();
-      if (disallow.some(p => new URL(url).pathname.startsWith(p))){ site.skipped.push({ url, why: 'robots.txt asks crawlers not to visit' }); continue; }
+      if (disallow.some(re => re.test(new URL(url).pathname + new URL(url).search))){ site.skipped.push({ url, why: 'robots.txt asks crawlers not to visit' }); continue; }
       const page = await ctx.newPage();
       let res;
       try { res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 }); }
@@ -186,7 +186,8 @@ async function robots(ctx, start){
     for (const line of (await r.text()).split(/\r?\n/)){
       const [k, ...v] = line.split(':'); const val = v.join(':').trim();
       if (/^user-agent$/i.test(k.trim())) applies = val === '*';
-      else if (applies && /^disallow$/i.test(k.trim()) && val && val !== '/') out.push(val.replace(/\*.*$/, ''));
+      // Wildcards (*) and end anchors ($) become a pattern, so "/*/admin/" blocks admin folders, not the whole site.
+      else if (applies && /^disallow$/i.test(k.trim()) && val && val !== '/') out.push(new RegExp('^' + val.replace(/[.+?^{}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\\\$$/, '$')));
     }
     return out;
   } catch { return []; }

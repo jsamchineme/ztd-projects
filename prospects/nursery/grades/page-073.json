@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n073-01",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n073-02",
+  "grade": "NoSite",
+  "reason": "Email domain orchard-nursery.co.uk has no working nursery website"
+ },
+ {
+  "id": "n073-03",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n073-04",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n073-05",
+  "grade": "Good",
+  "reason": "Pumpkin Patch: clean modern WordPress with Check Availability button and real room photo; fees and waiting list mentioned"
+ },
+ {
+  "id": "n073-06",
+  "grade": "Average",
+  "reason": "Red Squirrel: decent photo hero but standard template and tiny contact text; no hours or fees"
+ },
+ {
+  "id": "n073-07",
+  "grade": "Bad",
+  "reason": "Craighalbert Wix site with menu and headings running off the phone screen; text-heavy"
+ },
+ {
+  "id": "n073-08",
+  "grade": "Average",
+  "reason": "Secret Garden: old WordPress blog-style theme; works on phone but dated, no visit action"
+ },
+ {
+  "id": "n073-09",
+  "grade": "Average",
+  "reason": "Station House: giant Lego photo hero and cookie bar; works but unusual and thin on parent answers"
+ },
+ {
+  "id": "n073-10",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ }
+]

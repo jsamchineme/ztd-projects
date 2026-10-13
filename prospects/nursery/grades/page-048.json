@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n048-01",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n048-02",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n048-03",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n048-04",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n048-05",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n048-06",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n048-07",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n048-08",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: School site with black empty hero and large type; not a nursery focus, nothing for parents up front"
+ },
+ {
+  "id": "n048-09",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n048-10",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ }
+]

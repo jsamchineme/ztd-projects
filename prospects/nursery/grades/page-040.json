@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n040-01",
+  "grade": "Bad",
+  "reason": "2006-era NurseryWeb template: grey dotted background, stock-photo banner, rainbow-letter heading, tiny text, no viewport meta so desktop layout shrinks to unreadably small on phone"
+ },
+ {
+  "id": "n040-02",
+  "grade": "Bad",
+  "reason": "2006-era NurseryWeb template: grey dotted background, stock-photo banner, rainbow-letter heading, tiny text, no viewport meta so desktop layout shrinks to unreadably small on phone"
+ },
+ {
+  "id": "n040-03",
+  "grade": "NoSite",
+  "reason": "Email domain libertykids.co.uk has no working nursery website"
+ },
+ {
+  "id": "n040-04",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n040-05",
+  "grade": "Good",
+  "reason": "Clean modern WordPress/Elementor site: hours, Enquire Now and Book a Tour buttons and tel icon in sticky header, works well on phone; no fees shown on home (Musselburgh)"
+ },
+ {
+  "id": "n040-06",
+  "grade": "Good",
+  "reason": "Clean modern WordPress/Elementor site: hours, Enquire Now and Book a Tour buttons and tel icon in sticky header, works well on phone; no fees shown on home (Balmedie)"
+ },
+ {
+  "id": "n040-07",
+  "grade": "Bad",
+  "reason": "Wix site with cluttered header (outdoor-site banner, sibling-discount badge, login), huge serif hero, cookie bar; layout cut off sideways on phone, 'More' nav"
+ },
+ {
+  "id": "n040-08",
+  "grade": "NoSite",
+  "reason": "Email domain linwoodchildcare.org has no working nursery website"
+ },
+ {
+  "id": "n040-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n040-10",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ }
+]

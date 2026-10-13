@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n007-01",
+  "grade": "Bad",
+  "reason": "Duda site with 378px sideways scroll on phone, 3.8s load, heading cut off, grey empty hero, cookie bar; no ages, fees or hours"
+ },
+ {
+  "id": "n007-02",
+  "grade": "Average",
+  "reason": "WordPress with Book a tour and Funding pages, but blocking £300 recommend-a-friend pop-up plus cookie banner on load, slow 4.2s, very long text"
+ },
+ {
+  "id": "n007-03",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Modern purple independent school site (Belmont House) with clear Apply and video hero, works well on phone; a school, not a small nursery"
+ },
+ {
+  "id": "n007-04",
+  "grade": "NoSite",
+  "reason": "Email domain bishopbriggsvillagenursery.co.uk has no working nursery website"
+ },
+ {
+  "id": "n007-05",
+  "grade": "Bad",
+  "reason": "Only a Facebook page (8.8s load) behind a cookie wall, no own website"
+ },
+ {
+  "id": "n007-06",
+  "grade": "Bad",
+  "reason": "Wix site with rough hand-drawn heading font, 9-item menu, \"I like Blackhall Nursery because\" banner; text and heading cut off on phone"
+ },
+ {
+  "id": "n007-07",
+  "grade": "Bad",
+  "reason": "Wix site laid out for desktop only: on the phone the logo, headline and text are cropped and cut off the right edge; polished otherwise but not mobile-friendly, no clear book-a-visit action"
+ },
+ {
+  "id": "n007-08",
+  "grade": "NoSite",
+  "reason": "Email domain bearsdennursery.com has no working nursery website"
+ },
+ {
+  "id": "n007-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n007-10",
+  "grade": "Bad",
+  "reason": "Wix site laid out for desktop only: on the phone the logo, headline and text are cropped and cut off the right edge; polished otherwise but not mobile-friendly, no clear book-a-visit action"
+ }
+]

@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n021-01",
+  "grade": "Good",
+  "reason": "Modern teal hero with real photos, clear Enquire Now on phone and desktop, Care Inspectorate mentioned; no fees shown"
+ },
+ {
+  "id": "n021-02",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n021-03",
+  "grade": "Bad",
+  "reason": "Old Wix site, green clip-art style banner, grey low-contrast text, nav and text cut off sideways on phone, no funded hours or inspection info"
+ },
+ {
+  "id": "n021-04",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n021-05",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n021-06",
+  "grade": "Average",
+  "reason": "Modern Webflow look but grey-on-beige low-contrast text and grey CTA buttons, image slider; no inspection grades or visit action"
+ },
+ {
+  "id": "n021-07",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n021-08",
+  "grade": "Average",
+  "reason": "Photo carousel hero, large black header on phone, very little content (974 chars); no fees, hours or visit action"
+ },
+ {
+  "id": "n021-09",
+  "grade": "NoSite",
+  "reason": "Email domain dunbarprivatenursery.com has no working nursery website"
+ },
+ {
+  "id": "n021-10",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ }
+]

@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n043-01",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n043-02",
+  "grade": "Bad",
+  "reason": "2011-era plain template, small dense text, grey boxy menu, no clear contact or visit action"
+ },
+ {
+  "id": "n043-03",
+  "grade": "Bad",
+  "reason": "Bubble comic font on bright blue, small text, 37px sideways overflow on phone, no tel link"
+ },
+ {
+  "id": "n043-04",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n043-05",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n043-06",
+  "grade": "NoSite",
+  "reason": "Email domain littlemenurseryglasgow.com has no working nursery website"
+ },
+ {
+  "id": "n043-07",
+  "grade": "NoSite",
+  "reason": "Email domain littlemenurseryglasgow.com has no working nursery website"
+ },
+ {
+  "id": "n043-08",
+  "grade": "NoSite",
+  "reason": "Email domain littlemonkeysnursery.com has no working nursery website"
+ },
+ {
+  "id": "n043-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n043-10",
+  "grade": "NoSite",
+  "reason": "Email domain littlemonkeysnursery.com has no working nursery website"
+ }
+]

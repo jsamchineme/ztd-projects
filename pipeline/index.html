@@ -388,7 +388,7 @@ function sourceBox(c){
   return `<div class="box"><h3>Current website</h3>
     ${s ? `<div class="atiles"><div class="atile"><b>${s.pages}</b>page${s.pages === 1 ? '' : 's'}</div><div class="atile"><b>${s.photos}</b>photos</div><div class="atile"><b>${s.documents}</b>documents</div></div>
       <p class="hint" style="margin:8px 0 10px">Studied ${ago(s.at)} · ${s.words} words${s.singlePage ? ' · a directory or social page, so only that page was read' : ''}${s.errors ? ` · ${s.errors} page${s.errors > 1 ? 's' : ''} couldn’t be read` : ''}</p>`
-      : `<p class="hint" style="margin:0 0 10px">Reads every page of the practice’s current site in a real browser: its menu, text, photos and leaflets. Redesign study does this automatically.</p>`}
+      : `<p class="hint" style="margin:0 0 10px">Reads every page of the ${esc(cfg.businessNoun || 'practice')}’s current site in a real browser: its menu, text, photos and leaflets. Redesign study does this automatically.</p>`}
     <div class="row">
       ${cfg.crawlAvailable ? `<button class="btn" data-study-site ${busy ? 'disabled' : ''}>${busy ? '<span class="spin" aria-hidden="true" style="display:inline-block;margin-right:6px"></span>Studying… (a few minutes)' : s ? 'Study again' : 'Study the site'}</button>` : ''}
       ${s ? `<a class="btn" href="/source/${c.id}/SITE.md" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Read the study ↗</a>` : ''}
@@ -928,6 +928,7 @@ $('#wf').addEventListener('click', async e => {
     $('#board').innerHTML = `<div id="offline"><strong>Can’t reach the Pipeline server</strong>Start it with <code>make pipeline</code> (or <code>node pipeline/server.mjs</code>), then reload this page.</div>`;
     return;
   }
+  if (cfg.title) { document.title = cfg.title; $('.brand').textContent = cfg.title; }
   for (const p of cfg.pipelines) for (const s of p.stages) stages[s.id] = s;
   if (!cfg.pipelines.some(p => p.id === tab)) tab = cfg.pipelines[0].id;
   setMe(me);

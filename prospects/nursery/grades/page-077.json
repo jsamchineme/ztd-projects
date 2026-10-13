@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n077-01",
+  "grade": "Bad",
+  "reason": "Wix 2017 site with log-in badge and content cut off the right of phone screen"
+ },
+ {
+  "id": "n077-02",
+  "grade": "Average",
+  "reason": "Udny: Jimdo site behind full cookie dialog; simple handwritten-style heading, thin content"
+ },
+ {
+  "id": "n077-03",
+  "grade": "Excluded",
+  "reason": "college or university nursery. Was: UHI Moray college: modern, clean and phone friendly; not a typical nursery target"
+ },
+ {
+  "id": "n077-04",
+  "grade": "Excluded",
+  "reason": "college or university nursery. Was: University of St Andrews: polished and clear on phone"
+ },
+ {
+  "id": "n077-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n077-06",
+  "grade": "NoSite",
+  "reason": "Email domain vipchildcare.co.uk has no working nursery website"
+ },
+ {
+  "id": "n077-07",
+  "grade": "Average",
+  "reason": "Victoria Park Kindergarten: elegant but plain Elementor site behind cookie wall; no booking action visible"
+ },
+ {
+  "id": "n077-08",
+  "grade": "Good",
+  "reason": "Viewpark Montessori: modern, Book a Visit and call buttons, Care Inspectorate grades on first screen"
+ },
+ {
+  "id": "n077-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n077-10",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ }
+]

@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n067-01",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n067-02",
+  "grade": "Average",
+  "reason": "Stonelaw: clean Squarespace with YouTube video; 5.8s load, no visit action or hours up front"
+ },
+ {
+  "id": "n067-03",
+  "grade": "NoSite",
+  "reason": "Email domain gnes.net has no working nursery website"
+ },
+ {
+  "id": "n067-04",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Strathallan: polished school design with cookie notice; modern and phone friendly"
+ },
+ {
+  "id": "n067-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n067-06",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n067-07",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n067-08",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n067-09",
+  "grade": "Average",
+  "reason": "Cloudflare check hides the site; almost no text captured so judged on limited evidence"
+ },
+ {
+  "id": "n067-10",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ }
+]

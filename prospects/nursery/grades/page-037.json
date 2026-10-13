@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n037-01",
+  "grade": "Average",
+  "reason": "WordPress with cartoon clouds, butterflies and scribble logo, yellow nav bar, speech-bubble sections; works on phone with tel link but no fees, funded hours or inspection grades"
+ },
+ {
+  "id": "n037-02",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n037-03",
+  "grade": "NoSite",
+  "reason": "Email domain morrisoninvestments.co.uk has no working nursery website"
+ },
+ {
+  "id": "n037-04",
+  "grade": "Bad",
+  "reason": "Jimdo site with chunky grey and teal tile menu wrapping to three rows, large empty header, no phone screenshot (mobile load failed), no tel link or key parent answers"
+ },
+ {
+  "id": "n037-05",
+  "grade": "Average",
+  "reason": "WordPress with rainbow-letter logo, full-screen 'Recommend a Friend' pop-up plus cookie wall covering phone; underlying site has fees and funded-hours info but is cluttered"
+ },
+ {
+  "id": "n037-06",
+  "grade": "Bad",
+  "reason": "Dated 2010s look: textured bright blue background, cartoon wellies logo, stock-photo children banner, desktop 8.5s load; fees, funded hours and Care Inspectorate are mentioned but buried"
+ },
+ {
+  "id": "n037-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n037-08",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n037-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n037-10",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ }
+]

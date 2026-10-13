@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n070-01",
+  "grade": "Average",
+  "reason": "Croft: pop-up offer plus cookie wall covers the page; otherwise standard WordPress with enquire button"
+ },
+ {
+  "id": "n070-02",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n070-03",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Edinburgh Academy: cookie wall and Google Translate bar over faded hero; school site, copyright 2018"
+ },
+ {
+  "id": "n070-04",
+  "grade": "Bad",
+  "reason": "Wix site with header and hero text cut off the phone screen; no clear parent info"
+ },
+ {
+  "id": "n070-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n070-06",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n070-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n070-08",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Merchiston school site, polished design with open day prompt; modern"
+ },
+ {
+  "id": "n070-09",
+  "grade": "Excluded",
+  "reason": "domain not connected (Wix)"
+ },
+ {
+  "id": "n070-10",
+  "grade": "NoSite",
+  "reason": "Email domain hsog.co.uk has no working nursery website"
+ }
+]

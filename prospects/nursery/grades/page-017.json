@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n017-01",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n017-02",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Polished independent school (Clifton Hall) with full-bleed photo hero and tartan side tabs, responsive; cookie modal only; a school, not a small-nursery target"
+ },
+ {
+  "id": "n017-03",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n017-04",
+  "grade": "NoSite",
+  "reason": "Email domain clydevalleykindergarten.com has no working nursery website"
+ },
+ {
+  "id": "n017-05",
+  "grade": "Good",
+  "reason": "Clean Elementor site with Book a Visit button at top of phone view, family nursery photo hero, fees and waiting list content; only a cookie banner in the way"
+ },
+ {
+  "id": "n017-06",
+  "grade": "Bad",
+  "reason": "Community hall site (not a nursery) using a stock WordPress theme with a plant photo hero and no nursery content; near-empty"
+ },
+ {
+  "id": "n017-07",
+  "grade": "Bad",
+  "reason": "Playgroup site with rainbow clip-art logo banner, long wall of small-width text and Comic-style pages; dated, no phone screenshot captured"
+ },
+ {
+  "id": "n017-08",
+  "grade": "Average",
+  "reason": "Plain IONOS site with huge square logo and oversized heading filling the phone screen, cookie bar; Fees page and funded hours exist but no visit action"
+ },
+ {
+  "id": "n017-09",
+  "grade": "NoSite",
+  "reason": "Email domain cornerstonesnursery.com has no working nursery website"
+ },
+ {
+  "id": "n017-10",
+  "grade": "Bad",
+  "reason": "Cartoon astronaut and planet clip-art, Comic Sans, tiny hero text and two phone numbers on phone; amateur kids-theme look, no fees, ages or inspection grades"
+ }
+]

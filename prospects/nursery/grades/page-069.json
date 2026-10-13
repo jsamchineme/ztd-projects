@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n069-01",
+  "grade": "NoSite",
+  "reason": "Email domain tlcnursery.co.uk has no working nursery website"
+ },
+ {
+  "id": "n069-02",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n069-03",
+  "grade": "Average",
+  "reason": "Broomhill: rainbow clip-art logo and long page; works on phone but dated, no booking action seen"
+ },
+ {
+  "id": "n069-04",
+  "grade": "Average",
+  "reason": "Broomhill: rainbow clip-art logo and long page; works on phone but dated, no booking action seen"
+ },
+ {
+  "id": "n069-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n069-06",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n069-07",
+  "grade": "Good",
+  "reason": "City Nursery: clear Book a Tour button, hours and ages up top, strong photo; modern"
+ },
+ {
+  "id": "n069-08",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Compass School: red tiles, black empty video block and ticker; 13s load"
+ },
+ {
+  "id": "n069-09",
+  "grade": "Average",
+  "reason": "Corstorphine: Elementor template with stacked mixed-size photos and awkward layout; thin parent answers"
+ },
+ {
+  "id": "n069-10",
+  "grade": "Average",
+  "reason": "Croft: pop-up offer plus cookie wall covers the page; otherwise standard WordPress with enquire button"
+ }
+]

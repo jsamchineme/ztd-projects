@@ -13,7 +13,8 @@ const gi = args.indexOf('--grades');
 const wanted = (gi >= 0 ? args[gi + 1] : 'Bad,Average').split(',').map(s => s.trim().toLowerCase());
 const dry = args.includes('--dry-run');
 const BASE = (process.env.PIPELINE_URL || 'http://localhost:4390').replace(/\/$/, '');
-const STAGE = { bad: 'bad', average: 'average', good: 'good' };
+// NoSite (nurseries with no website found) goes in as a new-site prospect; ask for it with --grades NoSite.
+const STAGE = { bad: 'bad', average: 'average', good: 'good', nosite: 'bad' };
 
 const readAll = sub => readdirSync(join(dir, sub)).filter(f => f.endsWith('.json')).sort()
   .flatMap(f => JSON.parse(readFileSync(join(dir, sub, f), 'utf8')));
@@ -56,16 +57,23 @@ for (const g of grades){
   const r = records.get(g.id);
   if (!r) { console.warn(`No record for ${g.id}`); continue; }
   const site = siteUrl(r);
+  // GP and dental records link to their NHS listing; nursery records to their Care Inspectorate search.
   const nhs = r.nhsUrl && r.nhsUrl.replace(/ /g, '%20');
-  const url = site || nhs;
-  if (!url) { console.warn(`No website or NHS listing for ${r.name}`); continue; }
+  const listing = nhs || r.ciUrl;
+  const listingName = nhs ? 'NHS listing' : 'Care Inspectorate';
+  const url = site || listing;
+  if (!url) { console.warn(`No website or ${listingName} for ${r.name}`); continue; }
   const k = key(url);
   const shot = r.shot ? resolve(dir, r.shot) : null;
   const where = [r.name, r.address].filter(Boolean).join(', ');
+  const phone = r.site?.phone || r.phone;
+  const gr = r.grades;
   const noteLines = [
-    `${where}${r.site?.phone ? ` · ${r.site.phone}` : ''}`,
-    !site && 'No website: card links to the NHS listing.',
-    nhs && site && `NHS listing: ${nhs}`,
+    `${where}${phone ? ` · ${phone}` : ''}${r.email ? ` · ${r.email}` : ''}`,
+    r.csNumber && `Care Inspectorate ${r.csNumber}: ${r.sector}, ${r.places || '?'} places${r.under3s ? ', takes under 3s' : ''}${r.manager ? `, manager ${r.manager}` : ''}`,
+    gr?.min && `Care Inspectorate grades (published ${gr.published}): ${[['care, play and learning', gr.careAndPlay], ['setting', gr.setting], ['staff team', gr.staffTeam], ['leadership', gr.leadership]].filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(', ')} (6 = excellent)`,
+    !site && `No website: card links to the ${listingName}.`,
+    listing && site && `${listingName}: ${listing}`,
     shot && `Screenshot: ${shot}`
   ].filter(Boolean);
   const analysis = [`${g.grade}: ${g.reason}`, ...signals(r.site).map(s => `- ${s}`)].join('\n');
@@ -79,7 +87,7 @@ for (const g of grades){
   }
   cards.set(k, {
     url, name: r.name, stage: STAGE[grade], notes: noteLines.join('\n'),
-    fields: { rating: grade, analysis, ...(r.site?.phone && { contact: r.site.phone }) }
+    fields: { rating: STAGE[grade], analysis, ...(phone && { contact: phone }) }
   });
 }
 

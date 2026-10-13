@@ -1,0 +1,87 @@
+PHOTO CREDITS: Key Worker example (Heads of Ayr Nursery, Alloway by Ayr)
+Checked and downloaded on 13 October 2026. Every file was resized, cropped and re-saved as WebP,
+which strips EXIF and location data. No child appears in any image used here.
+
+1. STAFF PORTRAITS
+Source: the nursery's own Meet Our Team page, https://www.headsofayrnursery.co.uk/team-4
+Owner: Heads of Ayr Nursery. Used here only in a mock-up shown to that nursery.
+Each person's identity is already public on that page, with the same photo.
+Before go-live: get the nursery's written confirmation that every person shown has consented
+to their photo being used on the new website (see PHOTO-SHOTLIST.md, consent). Anyone who
+opts out is shown with initials instead.
+Files: people/<name>-240.webp and -400.webp (4:5 portrait), -sq96.webp and -sq160.webp (square face).
+
+people/kerri-*.webp  Kerri Miller (Nursery manager)
+    https://static.wixstatic.com/media/85a981_694acd9b3a9e48a888ded554cf655094~mv2.jpg  (alt text on the source page: "Kerri.jpg")
+people/caroline-*.webp  Caroline (Depute manager)
+    https://static.wixstatic.com/media/85a981_2d5f53527a244e5e9c4e94f71f4323e0~mv2.jpg  (alt text on the source page: "Caroline.jpg")
+people/chelsea-*.webp  Chelsea (Senior team manager)
+    https://static.wixstatic.com/media/85a981_a239354744234080926328eba207845d~mv2.jpg  (alt text on the source page: "Chelsea.jpg")
+people/lisa-*.webp  Lisa (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_268c57053eea414089690bdc99c0d208~mv2.jpg  (alt text on the source page: "Lisa.jpg")
+people/fern-*.webp  Fern (Room lead)
+    https://static.wixstatic.com/media/85a981_26a11491a89a4e688acbd87561a4c859~mv2.jpg  (alt text on the source page: "Fern.jpg")
+people/steph-*.webp  Steph (Room lead)
+    https://static.wixstatic.com/media/85a981_7063b473c3fa4a3198a88d47ffb36a53~mv2.jpg  (alt text on the source page: "Steph.jpg")
+people/caitlin-*.webp  Caitlin (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_a4b11d8142494a46805edd22118dd71e~mv2.jpg  (alt text on the source page: "Caitlin.jpg")
+people/nadia-*.webp  Nadia (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_29187918fe994c4d940825bb8038a974~mv2.jpeg  (alt text on the source page: "Nadia.jpeg")
+people/aillie-*.webp  Aillie (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_b14e7bc50b6842328e86aa887fe763b7~mv2.jpg  (alt text on the source page: "Aillie.jpg")
+people/nicola-*.webp  Nicola (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_0d60dd5190434c5ab48c38033e5142c6~mv2.jpg  (alt text on the source page: "Nicola.jpg")
+people/skye-*.webp  Skye (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_4e1694ccc8fd43c39c595a6ee45bf4fe~mv2.jpg  (alt text on the source page: "Skye Photo.jpg")
+people/linda-*.webp  Linda (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_3a4bf4841858422d9b9a8e83141ebf3e~mv2.jpg  (alt text on the source page: "Linda.jpg")
+people/hannah-*.webp  Hannah (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_8cb01119dc1f4b8cabae6dc696f3004a~mv2.jpg  (alt text on the source page: "picHF.jpg")
+people/hilary-*.webp  Hilary (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_60a2e08cedd9435188b4a3b7fecd04af~mv2.jpg  (alt text on the source page: "Hilary Photo.jpg")
+people/sasha-*.webp  Sasha (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_3fb397d28b244c2aaf424683ee22ff89~mv2.jpg  (alt text on the source page: "Sasha.jpg")
+people/leigh-*.webp  Leigh (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_697234e1e1d64b90a96c91627fa5752b~mv2.jpeg  (alt text on the source page: "Leigh.jpeg")
+people/rachel-*.webp  Rachel (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_79efdc72933a45799272b412aeb22405~mv2.jpeg  (alt text on the source page: "Rachel.jpeg")
+people/rebecca-*.webp  Rebecca (Early years practitioner)
+    https://static.wixstatic.com/media/85a981_6da611c7717c447b815797224d904b21~mv2.jpeg  (alt text on the source page: "Rebecca.jpeg")
+people/caitlin-r-*.webp  Caitlin R (Nursery apprentice)
+    https://static.wixstatic.com/media/85a981_f3722aafc5b74c6988343dbcca15ebca~mv2.jpeg  (alt text on the source page: "Caitlin R.jpeg")
+people/rochelle-*.webp  Rochelle (Admin co-ordinator)
+    https://static.wixstatic.com/media/85a981_f425cfbc13a4449e8ca3f8683348c40f~mv2.jpg  (alt text on the source page: "Rochelle.jpg")
+people/lindsey-*.webp  Lindsey (Nursery chef)
+    https://static.wixstatic.com/media/85a981_4b141aed0a594bfd94405bb4cab0cf84~mv2.jpeg  (alt text on the source page: "Lindsey.jpeg")
+
+2. PLACE AND FOOD PHOTOS (no people, or staff only)
+Source: the nursery's own website. Owner: Heads of Ayr Nursery.
+building-720.webp, building-1280.webp  Nursery building and car park (About page)
+    https://static.wixstatic.com/media/85a981_e24e359a5a5a4ccd91dfbec8f083b8fe~mv2.jpg
+playroom-640.webp, playroom-1080.webp  Empty playroom with painted hillside wall (Gallery and Education pages)
+    https://static.wixstatic.com/media/85a981_98163f2480754088bc6facd3031a5c72~mv2.png
+    The source does not say which room this is, so the page does not name it.
+playroom-window-640.webp, playroom-window-1080.webp  Empty playroom with glass doors to the garden (Gallery page)
+    https://static.wixstatic.com/media/85a981_75efb7b162cd4c30a556c243bb999be2~mv2.png
+    The source does not say which room this is, so the page does not name it.
+quiet-corner-640.webp  Empty quiet corner with books (Education page)
+    https://static.wixstatic.com/media/85a981_2ee16be5e6d24127ac95f042b96b616b~mv2.jpg
+fields-640.webp  Donkeys in the field by the nursery (Contact page)
+    https://static.wixstatic.com/media/85a981_f472ad8f3e47420db8bf61bcc2e69762~mv2.jpg
+approach-400.webp  Gravel path to the nursery building (Contact page)
+    https://static.wixstatic.com/media/85a981_0a17b8d8bdd744c2aed8b476bf0ca7d8~mv2.jpg
+lunch-640.webp  Lunch and pudding held by a member of kitchen staff, hands only (Nutrition page)
+    https://static.wixstatic.com/media/85a981_02b35edb87f84e0eb1b1560fd1d0c967~mv2.jpg
+chef-400.webp, chef-640.webp  Lindsey, nursery chef, at the oven (Nutrition page). Staff consent as section 1.
+    https://static.wixstatic.com/media/85a981_1a7e2bb6092b4f709defc3c5eb1da1f7~mv2.jpg
+
+3. EXCLUDED FROM THE SOURCE SITE (do not reuse)
+- Every gallery, education, home and contact photo that shows a child's face (about 30 images).
+- The homepage watercolour banner of running children (an illustration of children, not the real place).
+- The cartoon logo sign and award badges. Ask the nursery for its logo as a vector file if it wants one.
+
+4. TEXT QUOTED ON THE PAGES
+- Kerri Miller's welcome: the welcome letter in the Parent Handbook PDF,
+  https://www.headsofayrnursery.co.uk/_files/ugd/85a981_a7fb898c11e84bf29b441f6204f160e7.pdf
+- Parent quotes (Amy, Eilidh, and the unattributed one): https://www.headsofayrnursery.co.uk/testimonials
+  Confirm with the nursery that these parents agreed to be quoted by first name.

@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n019-01",
+  "grade": "Average",
+  "reason": "Pop-up \"Join the Cranley team\" recruitment modal covers the page on load (desktop and phone), dark patterned hero, slow 4.4-4.7s; no ages, fees or funded hours visible"
+ },
+ {
+  "id": "n019-02",
+  "grade": "Good",
+  "reason": "Squarespace site with aerial photo hero, clear menu including Opening Hours and Funding, and FAQs; clean and readable on phone (cookie banner only)"
+ },
+ {
+  "id": "n019-03",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n019-04",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n019-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n019-06",
+  "grade": "NoSite",
+  "reason": "Email domain nclan.ac.uk has no working nursery website"
+ },
+ {
+  "id": "n019-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n019-08",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n019-09",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n019-10",
+  "grade": "NoSite",
+  "reason": "Email domain daisydaycare.org has no working nursery website"
+ }
+]

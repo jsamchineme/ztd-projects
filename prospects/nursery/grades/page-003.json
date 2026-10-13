@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n003-01",
+  "grade": "Excluded",
+  "reason": "independent school (its own web team). Was: Modern independent school site (Albyn) polished and mobile-friendly with Apply Now and open events (pop-up on load); a school, not a small nursery, so not a target"
+ },
+ {
+  "id": "n003-02",
+  "grade": "Excluded",
+  "reason": "part of a larger charity site. Was: Charity site (ALC Aberdeen) with carousel hero, big cookie bar covering phone view and Donate focus; no nursery parent answers"
+ },
+ {
+  "id": "n003-03",
+  "grade": "Excluded",
+  "reason": "part of a charity group site (ALC)"
+ },
+ {
+  "id": "n003-04",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n003-05",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n003-06",
+  "grade": "NoSite",
+  "reason": "Email domain almondparknursery.com has no working nursery website"
+ },
+ {
+  "id": "n003-07",
+  "grade": "Bad",
+  "reason": "Cartoon dinosaur lettering on bright blue, clip-art house and sun, bubble fonts, baby-icon placeholder tiles; amateur look despite funded hours mention"
+ },
+ {
+  "id": "n003-08",
+  "grade": "NoSite",
+  "reason": "Email domain crss.org.uk has no working nursery website"
+ },
+ {
+  "id": "n003-09",
+  "grade": "Average",
+  "reason": "Works on phone with Register button and video tour, but hand-drawn font over tinted photo, no funded hours, fees or inspection info"
+ },
+ {
+  "id": "n003-10",
+  "grade": "Average",
+  "reason": "WordPress with Fees and Funding page, but blurry cropped logo hero, pill menu and long text wall on phone, no clear visit action"
+ }
+]

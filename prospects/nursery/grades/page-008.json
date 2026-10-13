@@ -1,0 +1,52 @@
+[
+ {
+  "id": "n008-01",
+  "grade": "Bad",
+  "reason": "Duda site with tiled blossom wallpaper, Google+ icon, stock photo, 378px sideways scroll and logo cut off on phone; only three pages"
+ },
+ {
+  "id": "n008-02",
+  "grade": "Average",
+  "reason": "WordPress with clip-art cloud/rainbow background and cartoon touches, works on phone with Fees and Enquiry Form, but cluttered and dated; no funded hours or inspection grades"
+ },
+ {
+  "id": "n008-03",
+  "grade": "Average",
+  "reason": "WordPress with clip-art cloud/rainbow background and cartoon touches, works on phone with Fees and Enquiry Form, but cluttered and dated; no funded hours or inspection grades"
+ },
+ {
+  "id": "n008-04",
+  "grade": "Average",
+  "reason": "Elementor with bubble fonts, cloud clip-art and rainbow colours but phone, hours and Book a Tour are easy to find; busy, no fees, funded hours or inspection info"
+ },
+ {
+  "id": "n008-05",
+  "grade": "Average",
+  "reason": "WordPress with phone, hours, Check Availability and Book a Tour buttons, but dark generic hero, big cookie banner and blank gap on phone, no inspection or funded hours up front"
+ },
+ {
+  "id": "n008-06",
+  "grade": "Average",
+  "reason": "Plain GoDaddy playgroup site: real room photo, small menu, cookie banner covers phone view; no fees, hours, ages or how to join on home screen"
+ },
+ {
+  "id": "n008-07",
+  "grade": "NoSite",
+  "reason": "No website from the email domain; not searched for yet"
+ },
+ {
+  "id": "n008-08",
+  "grade": "NoSite",
+  "reason": "Searched: no website found"
+ },
+ {
+  "id": "n008-09",
+  "grade": "Bad",
+  "reason": "Website is parked or empty"
+ },
+ {
+  "id": "n008-10",
+  "grade": "Average",
+  "reason": "Divi site with cloud clip-art header, grunge-font 1140 Hours banner and visible phone number; busy and dated (no phone screenshot captured)"
+ }
+]
