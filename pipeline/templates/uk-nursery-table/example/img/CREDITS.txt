@@ -1,0 +1,54 @@
+Big Table worked example: Sheephouse Nursery, Fauldhouse (Care Inspectorate CS2011297290)
+Photo sources and decisions. Crawled from https://sheephousenursery.co.uk/ on 13 October 2026.
+
+Every photo below was cropped so that no child's face, name or identifying feature shows.
+All EXIF, location data and JPEG comments were stripped (re-encoded with Pillow, no metadata).
+Sizes: WebP (quality 64 to 66) plus JPEG (quality 76).
+
+USED (cropped)
+- kitchen-apron.jpg / .webp (440 x 560)
+  From /wp-content/uploads/sheephouse-kitchen-2-1240x2110.jpg (kitchen page).
+  Crop: the left side only, below the shoulders: the cook's apron, the worktop and a tray of baking.
+  Excluded from the crop: the cook's face, and two children (faces visible) on the right.
+  Staff: the cook is not identifiable in the crop. Confirm the cook is happy for it to be used.
+- lunch-trays.jpg / .webp (1020 x 112)
+  From /wp-content/uploads/sheephouse-kitchen-1-1240x573.jpg (kitchen page).
+  Crop: a thin band of three high-chair trays with plates of food and cups.
+  Excluded from the crop: the three babies' faces and upper bodies (only small hands at the edge remain).
+- mud-kitchen.jpg / .webp (1240 x 500) and mud-kitchen-720
+  From /wp-content/uploads/booking-1240x1653.jpg (booking page).
+  Crop: the bottom of the photo: the wet mud-kitchen bench with pots, spoons and a pink cup.
+  Excluded from the crop: the child's face and head. A strip of a yellow raincoat remains at the top edge.
+- craft-table.jpg / .webp (440 x 497)
+  From /wp-content/uploads/the-sheephouse-way-620x827.jpg (the sheephouse way page).
+  Crop: the lower left of a craft table seen from above: card cones, tissue paper, pens, glitter pots.
+  Excluded from the crop: two children's faces at the top. Small hands remain at the right edge.
+- digger-tray.jpg / .webp (350 x 300)
+  From /wp-content/uploads/spare-690x460.jpg (homepage).
+  Crop: the right half: a toy digger in a soil tray and one small hand.
+  Excluded from the crop: the child's face and hair on the left.
+
+NOT USED, and why
+- sheep-logo.jpg (logo): not reused as an image. The sheep was redrawn as an inline SVG mark.
+- the-sheephouse-way-2-1 / nursery-care (homepage tiles), nursery-care.jpg, nursery-care-2.jpg:
+  identifiable babies and children; no useful crop without faces.
+- home-page-main-photo (hero): four identifiable toddlers in waterproofs.
+- home-page-out-of-school-club (both sizes), out-of-school-club-2: identifiable children,
+  nursery t-shirts with the logo and phone number.
+- the-sheephouse-team-1 / -2-2: a group of children with staff on a field; faces visible.
+- the-sheephouse-team-2-1: two staff at a stall; context unknown and staff consent not confirmed.
+- grace-up-the-tree: identifiable child, and the file name carries a child's first name.
+- booking-2: two identifiable toddlers at a drum.
+- sheep_location.webp: the nursery's own drive-time map. Not reused as an image; its drive
+  times are typed as text on the page and the map is redrawn as an inline SVG.
+
+DRAWINGS (no photos)
+All other imagery is drawn in code for this template: the sheep mark, the lunch-table hero,
+the two room scenes, the stamped award plate, the local map, doodles and kitchen icons.
+No people, faces or hands are drawn.
+
+PARENT QUOTES
+Taken from the nursery's own website (the sheephouse way page). The site labels them by
+child's name ("Olly and Jude's mum" and so on); the example replaces those labels with
+"A mum of two Sheephouse children" and similar, because we never publish children's names.
+The third quote is one sentence from a longer review.
