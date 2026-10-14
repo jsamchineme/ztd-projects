@@ -1,0 +1,51 @@
+Jaybees Childcare (Lochmaben) worked example: image sources
+=============================================================
+Every photo below comes from the nursery's own website, jaybeeschildcare.co.uk,
+crawled on 13 October 2026. Each was cropped so that no child's face is shown,
+re-encoded as WebP (400px, and up to 800px where the source allowed), and saved
+without any metadata (no EXIF, no location). Confirm with the nursery before
+go-live that it is happy for these to be reused, and that staff consent covers
+the two staff photos.
+
+USED (file -> source on the old site -> what was done)
+- forest-log-*.webp   <- wp-content/uploads/2022/12/FOREST-SITTING-ON-LOG-768x576.jpeg
+                         Four children seen from behind on a log. Used whole: no faces visible.
+- den-*.webp          <- 2022/12/FRASER-FOREST-768x1024.jpeg. Top third only (the branch den); the child is cropped out.
+- digging-*.webp      <- 2023/11/FOREST-NOAH-1.png. Inner crop of hands digging; face and the site's decorative blob frame removed.
+- welly-log-*.webp    <- 2023/11/... "FOREST" blob image (crawl file 028). Crop of red wellies and hands on a log; face cropped out.
+- tyres-field-*.webp  <- 2024/07/AFTER-SCHOOL.png. Two children on tyres seen from behind; one child far away at the goal, not identifiable.
+- watering-can-*.webp <- 2022/07/FINN-GARDEN-e1671760124537.jpg. Lower-left crop: watering can and bean plants; face cropped out.
+- scarecrow-*.webp    <- 2022/12/gardening-workshop-2-1024x768.jpg. Lower-left crop of the scarecrow and potato beds; all people cropped out.
+- baking-*.webp       <- 2022/12/BAKING.jpg. Lower half: hands, dough and rolling pins; faces cropped out.
+- dino-tray-*.webp    <- 2023/11/SENSORY-DINO-1536x1152.jpeg. Crop of the sensory tray and hands; faces cropped out.
+- digger-*.webp       <- 2024/07/maxwell-sandpit.png. Crop of the toy digger and a hand; face cropped out.
+- handprints-*.webp   <- 2022/10/jaybees-fb-07-768x1024.jpeg. Lower-left crop of the handprint board; the two children painting are cropped out.
+- paint-tray-*.webp   <- 2023/11/rory-sensory.png. Crop of the paint tray; child cropped out.
+- staff-trio-400.webp <- 2022/12/jaybees_Team_family.png (alt on the old site: "Alexa Soan, Georgia Bell and Jackie Bell").
+                         Staff only. Cropped inside the site's blob frame; one small drawn arrow from the old site's
+                         design overlay was painted out with the wall colour. The people are not altered.
+- bev-400.webp        <- 2022/12/BEV-300x246.png. Staff only (the cook), cropped to a circle-friendly square.
+- forest-poster.webp, ../media/forest-loop.mp4
+                         A 10-second slow pan (ffmpeg) across forest-log, labelled "Our forest classroom". 165 KB. No sound.
+- tour-poster.webp, ../media/tour.mp4, ../media/tour.vtt
+                         A 32-second film made only from the stills above (slow zoom, fades). No sound; captions describe each shot.
+- favicon.svg         Drawn for this template (the mascot's face). Not the nursery's logo.
+
+The mascot (../mascot.svg) and icons (../icons.svg) are hand-coded for this template. They are not the
+nursery's logo bee and contain no people.
+
+NOT USED, and why
+- Every other photo on the old site (about 60) shows a child's face or a named child: the homepage slider
+  (geo-maggie, ellie-lamb-2, sharon-music, ellis-snow), the room pages' blob photos (GEO-BABIES, ROSE-SENSORY-SHAPE,
+  BEE-BOPS-FINN-AND-ANGUS, ALFIE-TATTIES-HERE-SHAPE, ALFIE-TENNIS-SHAPE, soccerbees-2, AFTER-SCHOOLFRASER-AND-FREDDIE),
+  the forest set (FOREST-SKY, FOREST-ANGUS, FOREST-NAIRN-AND-CAMERON, FOREST-SNACK, FOREST-LOOKING-FOR-BUGS,
+  jaybees-fb-03/-05, dirty-finger), the intergenerational and event photos (IMG_7077, IMG_0076, IMG_6324,
+  heather-antlers, sports-day-parents, mothers-day), Happy Hands baby photos (HAPPY-HANDS, babies lying down),
+  recycle-768x576 (a child's face behind painted hands) and sensory-foam.
+- Most staff portraits on the team page (300x246) include children in the frame, so staff appear as initials.
+- staff.png (the whole team) includes a selfie and was too small once cropped.
+- Facebook feed images (juicer.io): third-party posts, some with children.
+- Accreditation logos (SSSC, Eat Safe, Care Inspectorate, RHS, Millie's Mark, Eco-Schools): trademarks; we never
+  use the Care Inspectorate logo. Named in text only where the site's own words support it.
+- The Jaybees logo (jaybees-logo.png): not redrawn; the header uses the template's own mascot. Swap in the
+  nursery's real logo as an inline SVG at handover if they want it.

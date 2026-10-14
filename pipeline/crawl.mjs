@@ -311,7 +311,7 @@ ${s.imagesNotSaved?.length ? `- Plus ${s.imagesNotSaved.length} more photos not 
 ${s.documents.length ? s.documents.map(d => `- ${d.text || d.url} · ${d.file ? `docs/${d.file}` : 'not downloaded'} · ${d.url}`).join('\n') : '(none)'}
 
 ## Pop-ups, forms and embeds
-${s.pages.filter(p => p.overlays.length || p.forms.length || p.iframes.length).map(p => `- ${p.slug}: ${[p.overlays.length && `pop-up “${p.overlays[0].slice(0, 100)}”`, p.forms.length && `${p.forms.length} form(s)`, p.iframes.length && `embeds ${p.iframes.map(f => new URL(f).hostname).join(', ')}`].filter(Boolean).join('; ')}`).join('\n') || '(none)'}
+${s.pages.filter(p => p.overlays.length || p.forms.length || p.iframes.length).map(p => `- ${p.slug}: ${[p.overlays.length && `pop-up “${p.overlays[0].slice(0, 100)}”`, p.forms.length && `${p.forms.length} form(s)`, p.iframes.length && `embeds ${p.iframes.map(f => { try { return new URL(f).hostname; } catch { return f; } }).join(', ')}`].filter(Boolean).join('; ')}`).join('\n') || '(none)'}
 
 ## Not read
 ${[...s.errors.map(e => `- ${e.url}: ${e.error}`), ...s.skipped.filter(x => !/not a content page/.test(x.why)).slice(0, 30).map(x => `- ${x.url}: ${x.why}`)].join('\n') || '(nothing)'}

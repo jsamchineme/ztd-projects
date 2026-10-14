@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMax slice">
+<!-- Meadow template: the painted header scene for Bardykes Farm Nursery School.
+     Hand-coded SVG. Watercolour comes from the #wc filter (wobbly edges, grain and a
+     darker pigment rim). Ink lines use #ink. No people, ever: animals, buildings,
+     plants, weather and objects only. Each layer has an id so a builder can swap
+     animals or buildings for another nursery (see BRIEF.md, "Redrawing the scene").
+     The middle 900 units (x 270 to 1170) are what a 390px phone shows. -->
+<defs>
+  <filter id="wc" x="-8%" y="-8%" width="116%" height="116%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="11" xChannelSelector="R" yChannelSelector="G" result="wob"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="9" result="g"/>
+    <feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.1 1.35" result="ga"/>
+    <feComposite in="wob" in2="ga" operator="in" result="tex"/>
+    <feMorphology in="wob" operator="erode" radius="2.2" result="core"/>
+    <feComposite in="wob" in2="core" operator="out" result="rim"/>
+    <feMerge><feMergeNode in="tex"/><feMergeNode in="rim"/><feMergeNode in="rim"/></feMerge>
+  </filter>
+  <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="B" result="w"/>
+    <feGaussianBlur in="w" stdDeviation="3"/>
+  </filter>
+  <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency=".06" numOctaves="2" seed="11" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#BFDDF0"/><stop offset=".7" stop-color="#DCEDF6"/><stop offset="1" stop-color="#FBF6EA" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBF6EA" stop-opacity="0"/><stop offset="1" stop-color="#FBF6EA"/></linearGradient>
+  <g id="daisy"><circle r="4.2" fill="#fff" stroke="#E8DCC2" stroke-width=".8"/><circle r="1.7" fill="#E9B530"/></g>
+  <g id="cup"><circle r="3.6" fill="#F2C531"/><circle r="1.2" fill="#D59A13"/></g>
+  <g id="clover"><circle r="3.4" fill="#D88BA6"/><circle cx="-2" cy="-2" r="2" fill="#E9A9BF"/></g>
+  <path id="tuft" d="M0 0c-2-9-6-14-11-17m11 17c0-10 2-17 6-22m-6 22c3-7 8-11 14-12" fill="none" stroke="#5E8C4A" stroke-width="2.2" stroke-linecap="round"/>
+</defs>
+
+<!-- sky and weather -->
+<g id="sky-wash"><rect width="1440" height="420" fill="url(#sky)"/></g>
+<g id="sun" filter="url(#wc)"><circle cx="1196" cy="96" r="54" fill="#F6CF4F" fill-opacity=".8"/><circle cx="1196" cy="96" r="36" fill="#F9DD72" fill-opacity=".7"/></g>
+<g id="clouds" filter="url(#soft)" fill="#fff" fill-opacity=".85">
+  <path d="M170 120c10-30 60-34 76-10 16-22 62-18 70 8 30 0 40 30 14 38H160c-26-6-16-38 10-36z"/>
+  <path d="M760 74c12-24 50-26 62-6 14-16 48-12 54 8 24 2 30 26 8 30H752c-22-4-14-32 8-32z"/>
+</g>
+<g id="birds" filter="url(#ink)" fill="none" stroke="#4A4034" stroke-width="2.2" stroke-linecap="round">
+  <path d="M960 132q8-8 15 0 7-8 15 0"/><path d="M1000 112q6-6 11 0 6-6 11 0"/><path d="M402 70q7-7 13 0 7-7 13 0"/>
+</g>
+
+<!-- hills -->
+<g id="hills" filter="url(#wc)">
+  <path d="M0 292C160 222 330 238 470 262S760 214 930 230 1250 196 1440 250V560H0z" fill="#B9CF9A" fill-opacity=".75"/>
+  <path d="M0 330C190 290 380 300 560 318S900 276 1100 300 1330 290 1440 312V560H0z" fill="#9CC07D" fill-opacity=".7"/>
+</g>
+<g id="far-trees" filter="url(#wc)" fill="#6F9A5A" fill-opacity=".7">
+  <ellipse cx="96" cy="300" rx="34" ry="28"/><ellipse cx="140" cy="292" rx="26" ry="24"/>
+  <ellipse cx="1340" cy="292" rx="32" ry="26"/><ellipse cx="1384" cy="300" rx="24" ry="20"/>
+</g>
+
+<!-- the big tree behind the house -->
+<g id="big-tree">
+  <path filter="url(#wc)" d="M452 380c4-40 2-80-6-120l14-2c4 26 10 40 22 52l-8 8c-8-6-12-12-14-18 2 30 4 56 10 80z" fill="#7A5638" fill-opacity=".85"/>
+  <g filter="url(#wc)" fill-opacity=".72">
+    <circle cx="420" cy="214" r="58" fill="#6E9F52"/><circle cx="478" cy="190" r="62" fill="#5E9147"/>
+    <circle cx="520" cy="236" r="48" fill="#7DAE5E"/><circle cx="452" cy="256" r="46" fill="#8BBB68"/>
+  </g>
+</g>
+
+<!-- the farmhouse (the old dairy and farmhouse at Bardykes) -->
+<g id="farmhouse">
+  <g filter="url(#wc)">
+    <path d="M520 312h90v74h-90z" fill="#B6563F" fill-opacity=".8"/>
+    <path d="M510 314l50-34 58 34z" fill="#5E5A57" fill-opacity=".85"/>
+    <path d="M838 318h120v70H838z" fill="#C9A77A" fill-opacity=".75"/>
+    <path d="M830 320l66-30 70 30z" fill="#6A6560" fill-opacity=".85"/>
+    <path d="M610 236h240v152H610z" fill="#F7F1E3"/>
+    <path d="M596 240l52-56h164l52 56z" fill="#7C8A99" fill-opacity=".9"/>
+    <path d="M640 160h20v34h-20zM798 160h20v34h-20z" fill="#A8664A" fill-opacity=".85"/>
+    <path d="M708 330h44v58h-44z" fill="#B2412E" fill-opacity=".9"/>
+  </g>
+  <g fill="#3F5B4C" fill-opacity=".85">
+    <rect x="628" y="256" width="28" height="30" rx="3"/><rect x="676" y="256" width="28" height="30" rx="3"/><rect x="756" y="256" width="28" height="30" rx="3"/><rect x="804" y="256" width="28" height="30" rx="3"/>
+    <rect x="628" y="314" width="28" height="34" rx="3"/><rect x="804" y="314" width="28" height="34" rx="3"/>
+    <rect x="852" y="340" width="30" height="48" fill="#4B3A2C"/><rect x="900" y="340" width="40" height="48" fill="#4B3A2C"/>
+  </g>
+  <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M610 238v150h240V238M596 240l52-56h164l52 56M708 388v-58h44v58M520 386v-72h90M510 314l50-34 50 30M958 388v-68M830 320l66-30 70 30"/>
+    <path d="M642 256v30M690 256v30M770 256v30M818 256v30M628 271h28M676 271h28M756 271h28M804 271h28"/>
+    <path d="M650 160c-6-14 4-22-4-34m162 34c8-12-2-22 6-32" stroke="#9BA3AA" stroke-width="2.4"/>
+  </g>
+</g>
+
+<!-- old cart -->
+<g id="cart" transform="translate(962 340)">
+  <g filter="url(#wc)"><path d="M0 0h70l-6 26H6z" fill="#3E6E52" fill-opacity=".85"/><circle cx="48" cy="34" r="18" fill="#B2412E" fill-opacity=".35"/></g>
+  <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="2" stroke-linecap="round">
+    <circle cx="48" cy="34" r="18"/><path d="M48 16v36M30 34h36M35 21l26 26M61 21L35 47M0 4l-28 30"/><path d="M0 0h70l-6 26H6z"/>
+  </g>
+</g>
+
+<!-- field and fence -->
+<g id="field" filter="url(#wc)">
+  <path d="M0 384C240 368 480 372 720 378S1200 368 1440 380V560H0z" fill="#A9CF7E" fill-opacity=".85"/>
+  <path d="M0 440C300 420 600 436 860 430S1240 418 1440 436V560H0z" fill="#93C26A" fill-opacity=".7"/>
+</g>
+
+<!-- horse behind the fence -->
+<g id="horse" transform="translate(286 292)">
+  <g filter="url(#wc)">
+    <path d="M20 50C20 30 50 26 80 28c20 1 28-4 36-14l16-24c6-8 18-8 24-2l20 30c4 8-2 14-10 12l-16-6c-8 10-14 26-18 38-2 16-10 26-20 28H22C10 86 8 64 20 50z" fill="#9A6440" fill-opacity=".88"/>
+    <path d="M30 88h10v40H30zM48 88h10v38H48zM102 88h10v38h-10zM118 86h10v40h-10z" fill="#6E4329" fill-opacity=".85"/>
+    <path d="M132-10c-8 14-14 28-22 40l8 4c6-12 14-26 22-38z" fill="#3D2C22" fill-opacity=".9"/>
+    <path d="M18 54C2 60-2 82 4 98c4-14 8-26 16-34z" fill="#3D2C22" fill-opacity=".85"/>
+  </g>
+  <path d="M154-6l14 26" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+  <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 50C20 30 50 26 80 28c20 1 28-4 36-14l16-24c6-8 18-8 24-2l20 30c4 8-2 14-10 12l-16-6c-8 10-14 26-18 38-2 16-10 26-20 28H22C10 86 8 64 20 50z"/>
+    <path d="M30 90v38h10V90M48 90v36h10V90M102 90v36h10V90M118 88v38h10V88M142-14l4-12 6 10"/>
+    <circle cx="150" cy="0" r="1.8" fill="#3B3127"/><circle cx="170" cy="26" r="1.3" fill="#3B3127"/>
+  </g>
+</g>
+<g id="fence" filter="url(#ink)" fill="none" stroke="#6B4E36" stroke-width="3" stroke-linecap="round">
+  <path d="M258 352v46M318 352v46M378 352v46M438 352v46M498 352v44"/>
+  <path d="M250 362c80-3 170-2 254 0M250 382c80-3 170-2 254 0" stroke-width="2.4"/>
+</g>
+
+<!-- Highland cow, after the cow on the Bardykes T-shirts -->
+<g id="highland-cow" transform="translate(1004 362)">
+  <g filter="url(#wc)">
+    <path d="M24 20c6-22 40-26 70-24 34 2 60 6 66 30 4 20-2 40-14 46H40c-16-8-22-30-16-52z" fill="#C8763A" fill-opacity=".85"/>
+    <path d="M46 70h14v30H46zM70 72h12v28H70zM118 72h12v28h-12zM140 70h14v30h-14z" fill="#8E4F25" fill-opacity=".85"/>
+    <ellipse cx="18" cy="40" rx="27" ry="24" fill="#BF6C33" fill-opacity=".9"/>
+    <ellipse cx="10" cy="56" rx="14" ry="10" fill="#8A5440" fill-opacity=".85"/>
+    <path d="M-2 22c6 10 30 12 40 0-6 14-4 18-14 22-8-6-20-8-26-22z" fill="#E09A5A"/>
+  </g>
+  <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 20C-12 20-24 8-22-8M30 18c16 2 28-8 28-24" stroke="#EFE3C2" stroke-width="7"/>
+    <path d="M6 20C-12 20-24 8-22-8M30 18c16 2 28-8 28-24"/>
+    <path d="M24 20c6-22 40-26 70-24 34 2 60 6 66 30 4 20-2 40-14 46M44 70c-4-2-6-4-8-6M46 100V72M60 100V72M70 100V74M82 100V74M118 100V74M130 100V74M140 100V72M154 100V72"/>
+    <path d="M160 30c10 10 12 30 8 46m0 0l-4 8m4-8l4 8"/>
+    <path d="M60 22c4 6 10 6 14 0M86 20c4 6 10 6 14 0M112 24c4 6 10 6 14 0M70 42c4 6 10 6 14 0M100 44c4 6 10 6 14 0M128 46c4 6 10 6 14 0"/>
+    <circle cx="6" cy="57" r="1.6" fill="#3B3127"/><circle cx="15" cy="57" r="1.6" fill="#3B3127"/>
+  </g>
+</g>
+
+<!-- washing line -->
+<g id="washing">
+  <g filter="url(#ink)" fill="none" stroke="#6B4E36" stroke-width="3" stroke-linecap="round"><path d="M1200 296v92M1356 300v88"/><path d="M1200 302q78 26 156 2" stroke-width="1.6"/></g>
+  <g filter="url(#wc)">
+    <path d="M1216 307h24l2 34h-28z" fill="#E7A08A" fill-opacity=".85"/>
+    <path d="M1252 313h30v22l-6 18h-6l-3-14-3 14h-6l-6-18z" fill="#7FAFD0" fill-opacity=".85"/>
+    <path d="M1292 316h12v26h8v8h-20z" fill="#F2C531" fill-opacity=".85"/>
+    <path d="M1316 313h28l-2 30h-24z" fill="#A992CC" fill-opacity=".8"/>
+  </g>
+  <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="1.6"><path d="M1226 305v5M1262 312v5M1298 314v5M1330 311v5"/></g>
+</g>
+
+<!-- beehive and apple tree -->
+<g id="apple-tree" transform="translate(1290 250)">
+  <path filter="url(#wc)" d="M58 150c2-34 2-62-4-86l12-2c4 22 6 56 6 88z" fill="#7A5638" fill-opacity=".85"/>
+  <g filter="url(#wc)" fill-opacity=".72"><circle cx="40" cy="60" r="44" fill="#6E9F52"/><circle cx="84" cy="52" r="42" fill="#7DAE5E"/><circle cx="62" cy="24" r="38" fill="#5E9147"/></g>
+  <g fill="#C8432F"><circle cx="30" cy="52" r="5"/><circle cx="70" cy="34" r="5"/><circle cx="96" cy="64" r="5"/><circle cx="54" cy="76" r="5"/><circle cx="84" cy="88" r="4.5"/></g>
+</g>
+<g id="beehive" transform="translate(1222 398)">
+  <g filter="url(#wc)">
+    <path d="M0 6h50v18H0zM2 24h46v18H2zM2 42h46v18H2z" fill="#4F8A5B" fill-opacity=".85"/>
+    <path d="M-6 6l31-12 31 12z" fill="#EDE2C6"/>
+  </g>
+  <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="1.8"><path d="M0 6h50v54H0zM0 24h50M0 42h50M-6 6l31-12 31 12M18 58h14"/></g>
+  <g fill="#F2C531" stroke="#3B3127" stroke-width="1"><ellipse cx="66" cy="0" rx="4" ry="3"/><ellipse cx="80" cy="-14" rx="4" ry="3"/></g>
+  <path d="M66 0q8 -12 14 -14" fill="none" stroke="#3B3127" stroke-width="1" stroke-dasharray="2 3"/>
+</g>
+
+<!-- hens by the house -->
+<g id="hens" filter="url(#wc)">
+  <g transform="translate(790 410)"><path d="M0 0c0-14 12-22 24-18 10 4 10-6 18-8l-2 16c4 14-6 24-22 24C8 14 0 10 0 0z" fill="#B5652F" fill-opacity=".9"/><path d="M-2-4l-7 3 7 2" fill="#E9B530"/><path d="M2-14q3-6 7-2 1-5 5-2" fill="#C8432F"/></g>
+  <g transform="translate(862 424) scale(-.85 .85)"><path d="M0 0c0-14 12-22 24-18 10 4 10-6 18-8l-2 16c4 14-6 24-22 24C8 14 0 10 0 0z" fill="#E7D6B8"/><path d="M-2-4l-7 3 7 2" fill="#E9B530"/><path d="M2-14q3-6 7-2 1-5 5-2" fill="#C8432F"/></g>
+</g>
+<g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="1.6" stroke-linecap="round">
+  <path d="M800 432v8m8-8v8M870 442v7m-7-7v7"/><circle cx="796" cy="398" r="1.3" fill="#3B3127"/>
+</g>
+
+<!-- lambs in the meadow -->
+<g id="lambs">
+  <g transform="translate(560 452)">
+    <g filter="url(#wc)" fill="#FFFDF7"><circle cx="10" cy="0" r="14"/><circle cx="28" cy="-6" r="15"/><circle cx="46" cy="0" r="14"/><circle cx="28" cy="8" r="14"/></g>
+    <g filter="url(#wc)"><ellipse cx="-6" cy="-4" rx="10" ry="12" fill="#4A4038" fill-opacity=".9"/></g>
+    <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="1.8" stroke-linecap="round"><path d="M12 18v14M24 20v14M38 20v14M48 16v14M-2-14c-6-4-12 0-14 4"/></g>
+  </g>
+  <g transform="translate(650 476) scale(.8)">
+    <g filter="url(#wc)" fill="#FFFDF7"><circle cx="10" cy="0" r="14"/><circle cx="28" cy="-6" r="15"/><circle cx="46" cy="0" r="14"/><circle cx="28" cy="8" r="14"/></g>
+    <g filter="url(#wc)"><ellipse cx="62" cy="-6" rx="10" ry="12" fill="#4A4038" fill-opacity=".9"/></g>
+    <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="2" stroke-linecap="round"><path d="M12 18v14M24 20v14M38 20v14M48 16v14M66-16c6-4 12 0 14 4"/></g>
+  </g>
+</g>
+
+<!-- the duck pond -->
+<g id="pond">
+  <g filter="url(#wc)"><ellipse cx="190" cy="486" rx="150" ry="34" fill="#8FC0DD" fill-opacity=".75"/><ellipse cx="200" cy="482" rx="100" ry="18" fill="#B9DAEC" fill-opacity=".7"/></g>
+  <g filter="url(#wc)">
+    <path d="M150 474c0-12 14-18 28-14 4-12 18-12 20-2 2 8-6 10-8 12 2 10-10 18-26 16-10 0-14-4-14-12z" fill="#F7F1E3"/>
+    <path d="M196 458l10 2-10 4z" fill="#E58A2E"/>
+    <path d="M226 488c0-6 6-9 12-7 2-6 9-6 10-1 0 4-3 5-4 6 1 5-5 8-12 8-4 0-6-2-6-6z" fill="#F2C531"/>
+    <path d="M256 492c0-6 6-9 12-7 2-6 9-6 10-1 0 4-3 5-4 6 1 5-5 8-12 8-4 0-6-2-6-6z" fill="#F2C531"/>
+  </g>
+  <g filter="url(#ink)" fill="none" stroke="#3B3127" stroke-width="1.6" stroke-linecap="round"><circle cx="188" cy="458" r="1.4" fill="#3B3127"/><path d="M120 500q14 4 28 0M250 506q10 3 20 0"/></g>
+</g>
+
+<!-- meadow flowers and grass along the bottom -->
+<g id="flowers">
+  <use href="#daisy" x="70" y="430"/><use href="#cup" x="96" y="446"/><use href="#daisy" x="384" y="470"/><use href="#cup" x="412" y="488"/><use href="#clover" x="440" y="476"/>
+  <use href="#daisy" x="512" y="508"/><use href="#cup" x="760" y="476"/><use href="#daisy" x="786" y="496"/><use href="#clover" x="822" y="486"/><use href="#daisy" x="930" y="506"/>
+  <use href="#cup" x="960" y="490"/><use href="#daisy" x="1120" y="482"/><use href="#cup" x="1146" y="500"/><use href="#clover" x="1250" y="490"/><use href="#daisy" x="1290" y="506"/>
+  <use href="#cup" x="1360" y="470"/><use href="#daisy" x="1394" y="490"/><use href="#daisy" x="680" y="520"/><use href="#cup" x="300" y="526"/>
+</g>
+<g id="grass">
+  <use href="#tuft" x="40" y="470"/><use href="#tuft" x="360" y="496"/><use href="#tuft" x="540" y="530"/><use href="#tuft" x="740" y="500"/><use href="#tuft" x="900" y="526"/>
+  <use href="#tuft" x="1090" y="506"/><use href="#tuft" x="1236" y="520"/><use href="#tuft" x="1420" y="500"/><use href="#tuft" x="620" y="540"/>
+</g>
+<rect y="500" width="1440" height="60" fill="url(#fade)"/>
+</svg>
