@@ -1,5 +1,5 @@
 // A project: chat with Claude, running services, changes, files and settings.
-import { h, $, fill, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy } from './ui.js';
+import { h, $, fill, onTap, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy } from './ui.js';
 import { state, go, onLeave, refreshProjects, setTitle, localStorageSet, localStorageGet, renderSideProjects } from './app.js';
 import { runStudioUpdate } from './people.js';
 
@@ -56,7 +56,7 @@ async function chatTab(ctx, chatId){
   const backdrop = h('div', { class: 'chat-list-backdrop', onclick: () => showList(false) });
   const phoneTitle = h('span', { class: 'chat-phonebar-title' });
   const phoneBar = h('div', { class: 'chat-phonebar only-phone' },
-    h('button', { type: 'button', class: 'btn ghost small', 'aria-label': 'Show chats', onclick: () => showList(true) }, '☰ Chats'),
+    onTap(h('button', { type: 'button', class: 'btn ghost small', 'aria-label': 'Show chats' }, '☰ Chats'), () => showList(true)),
     phoneTitle,
     h('button', { type: 'button', class: 'btn ghost small', onclick: () => go(`/p/${id}/chat/new`) }, '+ New'));
   listEl.addEventListener('click', e => {

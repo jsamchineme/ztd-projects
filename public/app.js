@@ -1,5 +1,5 @@
 // ZTD Studio front end: routing, sign-in screens and the app shell.
-import { h, $, api, authApi, toast, fail, busy, dialog, field, initials, ApiError } from './ui.js';
+import { h, $, onTap, api, authApi, toast, fail, busy, dialog, field, initials, ApiError } from './ui.js';
 import { renderProject, newProjectDialog } from './project.js';
 import { renderAccount, renderTeams, renderAdmin } from './people.js';
 
@@ -95,7 +95,7 @@ function shell(){
         h('button', { class: 'nav-item', onclick: signOut }, h('span', { class: 'name muted' }, 'Sign out')))),
     h('div', { class: 'main' },
       h('div', { class: 'topbar' },
-        h('button', { class: 'btn ghost small', 'aria-label': 'Menu', onclick: () => $('.shell').classList.toggle('menu-open') }, '☰'),
+        onTap(h('button', { class: 'btn ghost small', 'aria-label': 'Menu' }, '☰'), () => $('.shell').classList.toggle('menu-open')),
         h('strong', { id: 'topbar-title' }, state.me.appName || 'Studio')),
       h('div', { id: 'main', class: 'main', style: { flex: '1' } }))));
   $('.shell').addEventListener('click', e => {

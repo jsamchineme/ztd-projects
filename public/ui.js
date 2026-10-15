@@ -27,6 +27,22 @@ export function h(tag, attrs, ...children){
 // Replaces el's contents, taking children the way h() does (lists flattened; null and false skipped). The DOM's own
 // replaceChildren prints them as text ("null", "[object HTMLParagraphElement]").
 export const fill = (el, ...children) => el.replaceChildren(...h('div', null, ...children).childNodes);
+// Runs fn as soon as a finger or mouse presses el, rather than on the click. On phones, the first tap after typing
+// often only closes the keyboard and its click is lost, so menus needed a second tap. The click that follows a press
+// is swallowed, so it can't land on a backdrop that just appeared. Enter and Space still work through the click.
+export function onTap(el, fn){
+  el.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    document.activeElement?.blur?.();
+    fn(e);
+    const swallow = ev => { ev.stopPropagation(); ev.preventDefault(); };
+    document.addEventListener('click', swallow, { capture: true, once: true });
+    setTimeout(() => document.removeEventListener('click', swallow, { capture: true }), 700);
+  });
+  el.addEventListener('click', fn);
+  return el;
+}
 export const $ = (sel, root = document) => root.querySelector(sel);
 
 export class ApiError extends Error { constructor(msg, status, code){ super(msg); this.status = status; this.code = code; } }
