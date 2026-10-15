@@ -1,5 +1,7 @@
 # Studio handover (15 October 2026)
 
+> **Update (15 October 2026):** Studio's code has moved out of this repo into its own Studio project on the server (`/srv/projects/studio-src`). The `studio/` paths below refer to older commits.
+
 Studio is live at **https://studio.ztddevs.com**. It's your Claude-style web app for building and running projects on your server. Three steps that only you can do are left: about 10 minutes in total.
 
 ## Do this first (in order)
