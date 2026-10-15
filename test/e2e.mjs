@@ -351,6 +351,24 @@ await check('focus checks: an admin turns them on; off-topic prompts are flagged
   await page.locator('label:has-text("Flag prompts that don’t fit their project") input').uncheck();
   await page.getByText('Focus checks are off').waitFor();
 }, page);
+await check('GitHub backup: set a repo, see the deploy key, back up now, turn off', async () => {
+  await page.goto(BASE + '/admin');
+  await page.fill('input[aria-label="GitHub repo"]', 'https://gitlab.com/someone/projects');
+  await page.click('button:has-text("Set up")');
+  await page.getByText('Use the repo’s address from GitHub').first().waitFor();
+  await page.fill('input[aria-label="GitHub repo"]', 'https://github.com/someone/ztd-projects');
+  await page.click('button:has-text("Set up")');
+  await page.getByText('Allow write access').waitFor();
+  await page.locator('pre', { hasText: 'ssh-ed25519' }).waitFor();
+  await page.click('button:has-text("Back up now")');
+  await page.locator('.ok-box', { hasText: 'Backed up 1 project (changed: demo-site)' }).waitFor({ timeout: 15000 });
+  await page.click('button:has-text("Back up now")');
+  await page.locator('.ok-box', { hasText: 'Up to date: 1 project' }).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${SHOTS}/10c-github-backup.png`, fullPage: true });
+  await page.click('button:has-text("Turn off")');
+  await page.click('dialog button:has-text("Turn off")');
+  await page.locator('button:has-text("Set up")').waitFor();
+}, page);
 await check('phone layout: chat usable at 390px', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(projectUrl + '/chat');

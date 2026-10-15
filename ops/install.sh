@@ -46,6 +46,7 @@ install_helpers(){
   install -m 755 -o root -g root "$APP/ops/studio-ctl.mjs" /usr/local/lib/studio/studio-ctl.mjs
   install -m 755 -o root -g root "$APP/ops/fake-claude.mjs" /usr/local/lib/studio/fake-claude.mjs
   ln -sf /usr/local/lib/studio/studio-ctl.mjs /usr/local/sbin/studio-ctl
+  if [ -f "$APP/ops/github-backup.sh" ]; then install -m 755 -o root -g root "$APP/ops/github-backup.sh" /usr/local/lib/studio/github-backup.sh; fi
   rsync -a --delete "$APP/ops/starters/" /usr/local/lib/studio/starters/
   chown -R root:root /usr/local/lib/studio
 }
@@ -138,6 +139,12 @@ install -m 755 "$APP/ops/backup.sh" /usr/local/sbin/studio-backup
 cat > /etc/cron.d/studio-backup <<'EOF'
 # ZTD Devs Studio nightly backup
 30 3 * * * root /usr/local/sbin/studio-backup >> /var/log/studio-backup.log 2>&1
+EOF
+
+# Hourly backup of every project to GitHub, once an admin sets a repo (Admin → GitHub backup)
+cat > /etc/cron.d/studio-github-backup <<'EOF'
+# ZTD Devs Studio: push every project to the GitHub backup repo (does nothing until one is set)
+17 * * * * root /usr/local/sbin/studio-ctl github-backup run --quiet >/dev/null 2>&1
 EOF
 
 # Apache: the modules Studio's sites need

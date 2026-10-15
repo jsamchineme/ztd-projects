@@ -381,6 +381,22 @@ route('GET', '/api/admin/system', async ({ user }) => {
 
 // Email settings (lib/mail.mjs). The password is never sent back to the browser.
 route('GET', '/api/admin/mail', async ({ user }) => { needAdmin(user); return mailSettings(); });
+// Backing up every project to one GitHub repo, a folder per project (see ops/github-backup.sh).
+route('GET', '/api/admin/github-backup', async ({ user }) => { needAdmin(user); return ctlJson(['github-backup', 'status']); });
+route('PUT', '/api/admin/github-backup', async ({ user, body, req }) => {
+  needAdmin(user);
+  const r = await ctlJson(['github-backup', 'set'], { stdin: JSON.stringify({ url: String(body.url || '') }) });
+  audit(user.id, 'admin.github-backup', r.url, '', ipOf(req));
+  return r;
+});
+route('POST', '/api/admin/github-backup/run', async ({ user, req }) => {
+  needAdmin(user); audit(user.id, 'admin.github-backup-run', '', '', ipOf(req));
+  return ctlJson(['github-backup', 'run']);
+});
+route('DELETE', '/api/admin/github-backup', async ({ user, req }) => {
+  needAdmin(user); audit(user.id, 'admin.github-backup-off', '', '', ipOf(req));
+  return ctlJson(['github-backup', 'off']);
+});
 // Studio-wide switches that admins can flip on the Admin page.
 const adminSettings = () => ({ scopeCheck: getSetting('scopeCheck', false) });
 route('GET', '/api/admin/settings', async ({ user }) => { needAdmin(user); return adminSettings(); });

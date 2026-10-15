@@ -211,11 +211,13 @@ export async function renderAdmin(main){
   const studioCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Checking…'));
   const mailCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
   const focusCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
+  const backupCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
   inner.append(
     h('h1', null, 'Admin'),
     h('h2', null, 'Studio version'), studioCard,
     h('h2', null, 'Email'), mailCard,
     h('h2', null, 'Project focus'), focusCard,
+    h('h2', null, 'GitHub backup'), backupCard,
     h('h2', null, 'People'), h('p', { class: 'muted small' }, 'To add someone, invite them to a team from Teams and people.'), usersCard,
     h('h2', null, 'Activity log'), auditCard);
 
@@ -252,6 +254,7 @@ export async function renderAdmin(main){
     else auditCard.replaceChildren(h('table', { class: 'list' }, h('thead', null, h('tr', null, h('th', null, 'When'), h('th', null, 'Who'), h('th', null, 'What'), h('th', null, 'Detail'), h('th', null, 'IP'))), h('tbody', null, trs)),
       h('button', { class: 'btn small', style: { marginTop: '10px' }, onclick: () => loadAudit(true).catch(fail) }, 'Older'));
   }
+  loadBackup(backupCard).catch(e => backupCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadFocus(focusCard).catch(e => focusCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadMail(mailCard).catch(e => mailCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadStudio(studioCard).catch(e => studioCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
@@ -309,6 +312,50 @@ export async function runStudioUpdate(btn, logBox){
 }
 
 // Email for password resets and invites. Saving checks the settings with the mail server first.
+// GitHub backup: every project's committed code, pushed to one repo with a folder per project (ops/github-backup.sh).
+async function loadBackup(card){
+  let poll = null;
+  const paint = s => {
+    clearTimeout(poll);
+    const repo = s.url.replace(/^git@github\.com:|\.git$/g, '');
+    const act = (label, fn, cls = '') => h('button', { class: 'btn ' + cls, type: 'button', onclick: e => busy(e.target, fn).catch(() => {}) }, label);
+    const urlInput = h('input', { type: 'text', value: repo ? `https://github.com/${repo}` : '', placeholder: 'https://github.com/you/ztd-projects', 'aria-label': 'GitHub repo' });
+    const save = act(repo ? 'Change repo' : 'Set up', async () => paint(await api('PUT', '/api/admin/github-backup', { url: urlInput.value })), repo ? '' : 'primary');
+    if (!repo){
+      fill(card,
+        h('p', { style: { marginTop: 0 } }, 'Push every project’s committed code to one GitHub repo, a folder per project, every hour. Good for browsing everything in one place, and as an off-server backup.'),
+        h('ol', { class: 'small' },
+          h('li', null, 'On GitHub, create an empty ', h('strong', null, 'private'), ' repo, for example ztd-projects.'),
+          h('li', null, 'Paste its address here. Studio then shows a key to add to that repo.')),
+        h('div', { class: 'row', style: { alignItems: 'end' } }, field('GitHub repo', urlInput), save));
+      return;
+    }
+    const last = s.last;
+    fill(card,
+      h('p', { style: { marginTop: 0 } }, 'Backing up to ', h('a', { href: `https://github.com/${repo}`, target: '_blank', rel: 'noopener' }, repo), ' every hour, a folder per project. Only committed changes are included.'),
+      s.running ? h('div', { class: 'note' }, 'Backing up now…')
+        : last ? h('div', { class: last.ok ? 'ok-box' : 'error-box' }, `${last.message} (${ago(Date.parse(last.at))})`)
+        : h('div', { class: 'note' }, 'No backup yet. Add the key below on GitHub, then press Back up now.'),
+      h('p', { class: 'small' }, 'Studio pushes with its own key. On GitHub, open the repo’s ',
+        h('a', { href: `https://github.com/${repo}/settings/keys/new`, target: '_blank', rel: 'noopener' }, 'Settings → Deploy keys → Add deploy key'),
+        ', paste this key, and tick ', h('strong', null, 'Allow write access'), ':'),
+      h('pre', { class: 'mono small', style: { whiteSpace: 'pre-wrap', wordBreak: 'break-all' } }, s.publicKey),
+      h('div', { class: 'row' },
+        act('Back up now', async () => paint(await api('POST', '/api/admin/github-backup/run')), 'primary'),
+        h('button', { class: 'btn', type: 'button', onclick: () => copy(s.publicKey) }, 'Copy key'),
+        act('Turn off', async () => { if (await confirmDialog('Turn off the GitHub backup?', 'Nothing more is pushed. What’s on GitHub stays there.', 'Turn off')) paint(await api('DELETE', '/api/admin/github-backup')); })),
+      h('details', { class: 'small', style: { marginTop: '10px' } }, h('summary', null, 'Use a different repo'),
+        h('div', { class: 'row', style: { alignItems: 'end' } }, field('GitHub repo', urlInput), save)));
+    if (s.running) poll = setTimeout(async () => {
+      if (!document.body.contains(card)) return;
+      const n = await api('GET', '/api/admin/github-backup').catch(() => null);
+      if (n && !n.running && n.last) toast(n.last.ok ? 'Backup done' : 'The backup failed', !n.last.ok);
+      if (n) paint(n);
+    }, 2000);
+  };
+  paint(await api('GET', '/api/admin/github-backup'));
+}
+
 // Focus checks: flag prompts that don't fit their project's description (see checkScope in lib/agent.mjs).
 async function loadFocus(card){
   const s = await api('GET', '/api/admin/settings');

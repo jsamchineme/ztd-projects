@@ -258,6 +258,37 @@ WantedBy=multi-user.target
     process.stdout.write(r.stdout);
   },
 
+  // ----- backing up every project to one GitHub repo, a folder per project (ops/github-backup.sh) -----
+  'github-backup'(action = 'status', flag){
+    const STATE = '/var/lib/studio/github-backup', CFG = '/etc/studio/github-backup.json', KEY = '/etc/studio/github-backup-key';
+    const conf = () => existsSync(CFG) ? JSON.parse(readFileSync(CFG, 'utf8')) : {};
+    const running = () => sh('systemctl', ['is-active', '--quiet', 'studio-github-backup']).status === 0;
+    const last = join(STATE, 'last.json');
+    if (action === 'set'){
+      // Any form of the repo's GitHub address; stored as the SSH one, which the deploy key works with.
+      const m = /^(?:git@github\.com:|ssh:\/\/git@github\.com\/|https:\/\/github\.com\/)([A-Za-z0-9-]{1,39})\/([A-Za-z0-9._-]{1,100}?)(?:\.git)?\/?$/.exec(String(JSON.parse(readStdin() || '{}').url || '').trim());
+      if (!m) die('Use the repo’s address from GitHub, like https://github.com/you/ztd-projects');
+      if (!existsSync(KEY)){
+        const k = sh('ssh-keygen', ['-q', '-t', 'ed25519', '-N', '', '-C', `ztd-studio-backup@${CONF.domain}`, '-f', KEY]);
+        if (k.status !== 0) die(k.stderr || 'Could not make a key', 1);
+      }
+      chmodSync(KEY, 0o600);
+      writeFileSync(CFG, JSON.stringify({ url: `git@github.com:${m[1]}/${m[2]}.git` }) + '\n', { mode: 0o600 });
+      log(`github-backup set ${m[1]}/${m[2]}`);
+    } else if (action === 'off'){
+      rmSync(CFG, { force: true });   // keeps the key, so turning it back on doesn't need a new deploy key
+      log('github-backup off');
+    } else if (action === 'run'){
+      if (!conf().url){ if (flag === '--quiet') return; die('Set a GitHub repo first', 1); }   // cron runs it every hour
+      if (!running()){
+        const r = sh('systemd-run', ['--unit=studio-github-backup', '--collect', '--quiet', '/bin/bash', '/usr/local/lib/studio/github-backup.sh']);
+        if (r.status !== 0) die(r.stderr || 'Could not start the backup', 1);
+      }
+    } else if (action !== 'status') die('Unknown github-backup action');
+    console.log(JSON.stringify({ url: conf().url || '', publicKey: existsSync(KEY + '.pub') ? readFileSync(KEY + '.pub', 'utf8').trim() : '',
+      last: existsSync(last) ? JSON.parse(readFileSync(last, 'utf8')) : null, running: action === 'run' || running() }));
+  },
+
   // ----- updating Studio itself, from the committed code in the Studio source project (ctl.json studioSource) -----
   'studio-source'(since = '-'){
     // Prints the newest commit of the Studio source and, given the installed commit, what an update would bring.

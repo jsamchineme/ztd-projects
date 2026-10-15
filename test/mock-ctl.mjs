@@ -93,6 +93,24 @@ switch (cmd){
     c.on('exit', code => process.exit(code ?? 1));
     break;
   }
+  case 'github-backup': {
+    // The real ops/github-backup.sh, pushing to a local bare repo that stands in for GitHub.
+    const cfg = join(ROOT, 'github-backup.json'), gh = join(ROOT, 'github.git'), last = join(ROOT, 'github-backup', 'last.json');
+    let url = existsSync(cfg) ? JSON.parse(readFileSync(cfg, 'utf8')).shown : '';
+    if (a[0] === 'set'){
+      url = String(JSON.parse(readStdin()).url || '').replace(/^https:\/\/github\.com\/(.+?)\/?$/, 'git@github.com:$1.git');
+      if (!/^git@github\.com:[\w.-]+\/[\w.-]+\.git$/.test(url)){ console.error('Use the repo’s address from GitHub'); process.exit(2); }
+      if (!existsSync(gh)) spawnSync('git', ['init', '-q', '--bare', gh]);
+      writeFileSync(cfg, JSON.stringify({ url: gh, shown: url }));
+    } else if (a[0] === 'off'){ rmSync(cfg, { force: true }); url = ''; }
+    else if (a[0] === 'run'){
+      const r = spawnSync('bash', [join(HERE, '..', 'ops', 'github-backup.sh')], { encoding: 'utf8',
+        env: { ...process.env, PROJECTS_DIR: P, STATE_DIR: join(ROOT, 'github-backup'), CONFIG_FILE: cfg, KEY_FILE: '/dev/null' } });
+      if (r.status !== 0 && !existsSync(last)){ console.error(r.stderr || r.stdout); process.exit(1); }
+    }
+    console.log(JSON.stringify({ url, publicKey: url ? 'ssh-ed25519 AAAAFAKEKEY ztd-studio-backup@localhost' : '', last: existsSync(last) ? JSON.parse(readFileSync(last, 'utf8')) : null, running: false }));
+    break;
+  }
   case 'scope-check': {
     const req = JSON.parse(readStdin());
     const r = spawnSync('node', [FAKE, '-p', '--model', 'haiku', '--no-session-persistence'], { encoding: 'utf8', input: `<purpose>\n${req.purpose}\n</purpose>\n<request>\n${req.prompt}\n</request>` });
