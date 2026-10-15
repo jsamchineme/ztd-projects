@@ -58,7 +58,13 @@ async function chatTab(ctx, chatId){
     h('button', { type: 'button', class: 'btn ghost small', 'aria-label': 'Show chats', onclick: () => showList(true) }, '☰ Chats'),
     phoneTitle,
     h('button', { type: 'button', class: 'btn ghost small', onclick: () => go(`/p/${id}/chat/new`) }, '+ New'));
-  listEl.addEventListener('click', e => { if (e.target.closest('a, button')) showList(false); });
+  listEl.addEventListener('click', e => {
+    const a = e.target.closest('a, button');
+    if (!a) return;
+    // The open chat: just close the drawer, rather than reloading the conversation.
+    if (a.getAttribute('href') === location.pathname){ e.preventDefault(); e.stopPropagation(); }
+    showList(false);
+  });
   const onKey = e => { if (e.key === 'Escape') showList(false); };
   document.addEventListener('keydown', onKey);
   onLeave(() => document.removeEventListener('keydown', onKey));
@@ -67,10 +73,11 @@ async function chatTab(ctx, chatId){
   let chats = [];
   async function loadList(){
     chats = await api('GET', `/api/projects/${id}/chats`);
-    phoneTitle.textContent = chats.find(c => c.id === chatId)?.title || 'New chat';
+    const open = location.pathname.split('/').pop();   // a new chat gets its id in the address after the first message
+    phoneTitle.textContent = chats.find(c => c.id === open)?.title || 'New chat';
     listEl.replaceChildren(...[
       h('button', { class: 'btn block', style: { marginBottom: '8px' }, onclick: () => go(`/p/${id}/chat/new`) }, '+ New chat'),
-      ...chats.map(c => h('a', { class: 'nav-item' + (c.id === chatId ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, 'data-link': '' },
+      ...chats.map(c => h('a', { class: 'nav-item' + (c.id === open ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, 'data-link': '' },
         c.running ? h('span', { class: 'dot busy' }) : null,
         h('span', { class: 'name' }, c.title, h('br'), h('span', { class: 'sub' }, `${c.mine ? 'You' : 'Teammate'} · ${ago(c.updatedAt)}`)))),
       chats.length ? null : h('p', { class: 'small muted', style: { margin: '6px 10px' } }, 'Chats you start appear here.')].filter(Boolean));
