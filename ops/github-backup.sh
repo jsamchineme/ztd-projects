@@ -20,7 +20,11 @@ export GIT_SSH_COMMAND="ssh -i $KEY -o IdentitiesOnly=yes -o BatchMode=yes -o Co
 export GIT_AUTHOR_NAME="ZTD Devs Studio" GIT_AUTHOR_EMAIL="studio@localhost" GIT_COMMITTER_NAME="ZTD Devs Studio" GIT_COMMITTER_EMAIL="studio@localhost"
 report(){ node -e 'require("fs").writeFileSync(process.argv[1], JSON.stringify({ at: new Date().toISOString(), ok: process.argv[2] === "1", message: process.argv[3] }))' "$STATE/last.json" "$1" "$2"; echo "$2"; }
 count(){ if [ "$1" = 1 ]; then echo "1 project"; else echo "$1 projects"; fi; }
-trap 'report 0 "The backup failed. See: journalctl -u studio-github-backup"' ERR
+# Errors go to a file as well as the journal, so a failure can say on the Admin page what went wrong.
+ERRLOG="$STATE/errors"; : > "$ERRLOG"
+exec 3>&2 2> >(tee -a "$ERRLOG" >&3)
+failed(){ local step=$1; sleep 0.2; report 0 "The backup failed at: $step. $(grep -v -e '^\s*$' -e '^To ' "$ERRLOG" | sed 's/^remote: *//' | tail -n 4 | tr '\n' ' ' | tr -s ' ' | cut -c1-500)"; }
+trap 'failed "$BASH_COMMAND"' ERR
 
 # What GitHub has now, so history carries on from there (also checks that the key works).
 if ! remote=$(git ls-remote "$URL" refs/heads/main 2>&1); then
