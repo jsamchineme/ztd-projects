@@ -30,8 +30,8 @@ export async function renderProject(main, id, tab, sub){
   main.append(head, body);
 
   const paintLinks = p => $('#svc-links')?.replaceChildren(...p.services.filter(s => s.url).map(s =>
-    h('a', { class: 'svc-link', href: s.url, target: '_blank', rel: 'noopener', title: `${s.label}: ${s.status.state}` },
-      h('span', { class: 'dot ' + s.status.state.replace(' ', '-') }), s.subdomain + '.' + state.me.domain, ' ↗')));
+    h('a', { class: 'svc-link', href: s.url, target: '_blank', rel: 'noopener', title: `${s.label}: ${s.status.state} · ${s.subdomain}.${state.me.domain}` },
+      h('span', { class: 'dot ' + s.status.state.replace(' ', '-') }), h('span', null, s.subdomain, h('span', { class: 'svc-domain' }, '.' + state.me.domain)), ' ↗')));
   paintLinks(project);
   api('GET', `/api/projects/${id}/git/status`).then(s => { if (s.files?.length){ changeCount.hidden = false; changeCount.textContent = s.files.length; } }).catch(() => {});
   const ctx = { project, id, body, paintLinks, reload: async () => { ctx.project = await api('GET', `/api/projects/${id}`); paintLinks(ctx.project); return ctx.project; } };
