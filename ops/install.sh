@@ -8,6 +8,11 @@ SRC="$(cd "$(dirname "$0")/.." && pwd)"
 APP=/srv/studio/app
 DATA=/srv/studio/data
 PORT=4300
+# The previous install, kept for a rollback. Root-only: it's put back as root, so Studio mustn't be able to change it.
+PREV=/var/lib/studio/app.prev
+
+# Nothing is changed until every JavaScript file parses (a broken file used to take Studio down until fixed by hand).
+bash "$SRC/ops/check.sh" "$SRC" || { echo "Not installed: Studio is still running the previous version."; exit 1; }
 
 id studio >/dev/null 2>&1 || useradd --system --create-home --home-dir /srv/studio --shell /usr/sbin/nologin studio
 id ztd >/dev/null 2>&1 || useradd --create-home --home-dir /home/ztd --shell /bin/bash ztd
@@ -26,6 +31,10 @@ mkdir -p /srv/studio-uploads
 chown studio:ztd /srv/studio-uploads; chmod 2750 /srv/studio-uploads
 
 # Code (owned by root, so neither Studio nor agents can change it)
+if [ -f "$APP/server.mjs" ]; then
+  mkdir -p "$(dirname "$PREV")"; chmod 700 "$(dirname "$PREV")"
+  rm -rf "$PREV"; cp -al "$APP" "$PREV" 2>/dev/null || cp -a "$APP" "$PREV"   # hard links: the copy below replaces files rather than writing into them
+fi
 rsync -a --delete --exclude node_modules --exclude data --exclude '.env' "$SRC/" "$APP/"
 ( cd "$APP" && npm ci --omit=dev --no-audit --no-fund >/dev/null 2>&1 || npm install --omit=dev --no-audit --no-fund >/dev/null )
 chown -R root:root "$APP"; chmod -R go-w "$APP"
@@ -33,11 +42,14 @@ chown -R root:root "$APP"; chmod -R go-w "$APP"
 chmod 755 "$APP"
 
 # Root helper and starters
-install -m 755 -o root -g root "$APP/ops/studio-ctl.mjs" /usr/local/lib/studio/studio-ctl.mjs
-install -m 755 -o root -g root "$APP/ops/fake-claude.mjs" /usr/local/lib/studio/fake-claude.mjs
-ln -sf /usr/local/lib/studio/studio-ctl.mjs /usr/local/sbin/studio-ctl
-rsync -a --delete "$APP/ops/starters/" /usr/local/lib/studio/starters/
-chown -R root:root /usr/local/lib/studio
+install_helpers(){
+  install -m 755 -o root -g root "$APP/ops/studio-ctl.mjs" /usr/local/lib/studio/studio-ctl.mjs
+  install -m 755 -o root -g root "$APP/ops/fake-claude.mjs" /usr/local/lib/studio/fake-claude.mjs
+  ln -sf /usr/local/lib/studio/studio-ctl.mjs /usr/local/sbin/studio-ctl
+  rsync -a --delete "$APP/ops/starters/" /usr/local/lib/studio/starters/
+  chown -R root:root /usr/local/lib/studio
+}
+install_helpers
 
 if [ ! -f /etc/studio/ctl.json ]; then
   cat > /etc/studio/ctl.json <<EOF
@@ -135,5 +147,18 @@ systemctl enable studio studio.socket >/dev/null 2>&1
 # The first time, Studio still holds the port itself: stop it so the socket can take it over.
 if ! systemctl is-active --quiet studio.socket; then systemctl stop studio; systemctl start studio.socket; fi
 systemctl restart studio
-sleep 2
-systemctl is-active studio
+
+# Studio must answer, and still be running a few seconds later (not crashing and restarting in a loop). If it
+# doesn't, the previous version goes back in, so a bad update never leaves Studio down.
+answers(){ [ "$(curl -s -o /dev/null -w '%{http_code}' --max-time "$1" "http://127.0.0.1:$PORT/api/me" || true)" != 000 ]; }
+studio_up(){ answers 20 && sleep 3 && systemctl is-active --quiet studio && answers 10; }
+if studio_up; then systemctl is-active studio; exit 0; fi
+echo "Studio didn't start with this version. Its log:"
+journalctl -u studio -n 25 --no-pager -o cat || true
+if [ ! -d "$PREV" ]; then echo "No previous version to go back to."; exit 1; fi
+echo "Putting the previous version back…"
+rsync -a --delete "$PREV/" "$APP/"
+install_helpers
+systemctl restart studio
+if studio_up; then echo "Rolled back: Studio is running the previous version."; else echo "Studio didn't start after the rollback either. Check: journalctl -u studio"; fi
+exit 1

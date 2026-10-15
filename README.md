@@ -79,6 +79,8 @@ Restarting Studio stops any Claude runs in progress.
 
 **Or update from Studio itself.** Commit the changes in the **Studio** project's Changes tab, then press **Update and restart Studio** on the Admin page (Studio admins only). It runs `studio-ctl studio-update`, which installs the last commit of the Studio source project (`studioSource` in `/etc/studio/ctl.json`) with its own `ops/install.sh` in a separate systemd unit (`studio-update`) and shows the log as it goes. Uncommitted changes aren't installed. Agents can't run this. `studio-update` refuses to install from a project that runs as `ztd`, or whose folders other users could change.
 
+**A broken update can't take Studio down.** `install.sh` first runs `ops/check.sh`, which syntax-checks every `.js`/`.mjs` file, and stops before changing anything if one fails. After restarting, it checks that Studio answers on its port and is still running a few seconds later; if not, it puts back the previous version (kept root-only in `/var/lib/studio/app.prev`) and the update reports a failure. The same check runs on every commit in a clone with `git config core.hooksPath .githooks` (turned on in the Studio source project).
+
 **Moving the Studio source out of the pipeline project** (once). Studio used to update from `studio/` in the pipeline repo, which every project's agent could change. To move it:
 
 1. Commit these changes in the pipeline project, then press **Update and restart Studio**. This installs the new `install.sh`, which creates `studiodev` and gives `/srv/projects` to root.
