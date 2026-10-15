@@ -199,8 +199,11 @@ WantedBy=multi-user.target
         // stdin: {"message","name","email","files":[optional paths]}
         const c = JSON.parse(readStdin() || '{}');
         if (typeof c.message !== 'string' || !c.message.trim() || c.message.length > 5000) die('A commit message is needed');
-        const name = need(c.name || 'Studio user', /^[^\n<>]{1,100}$/, 'name');
-        const email = need(c.email || 'studio@localhost', /^[^\s<>@]+@[^\s<>@]+$/, 'email');
+        // The repo's own identity (git config --local) wins, so every commit in a project is made as the same
+        // person whichever Studio user presses Commit. Without one, the Studio user's name and email are used.
+        const local = k => g('config', '--local', '--get', k).stdout.trim();
+        const name = need(local('user.name') || c.name || 'Studio user', /^[^\n<>]{1,100}$/, 'name');
+        const email = need(local('user.email') || c.email || 'studio@localhost', /^[^\s<>@]+@[^\s<>@]+$/, 'email');
         const add = g('add', '-A'); if (add.status !== 0) die(add.stderr, 1);
         return out(g('-c', `user.name=${name}`, '-c', `user.email=${email}`, 'commit', '-q', '-m', c.message));
       }
