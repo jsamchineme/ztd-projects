@@ -638,6 +638,19 @@ function settingsTab(ctx){
     h('option', { value: state.me.user.id }, `My Claude (${state.me.claude?.connected ? state.me.claude.kind === 'subscription' ? 'subscription' : 'API key' : 'not connected yet'})`));
   worker.value = p.workerClaudeUserId || '';
   const confirm = h('input', { type: 'text', placeholder: p.slug, 'aria-label': 'Type the short name to confirm' });
+  // Studio admins: older projects share the ztd user; this moves one onto its own user, as new projects get.
+  const userCard = h('div', { class: 'card' }, h('p', { class: 'muted', style: { margin: 0 } }, 'Checking…'));
+  const paintUser = u => fill(userCard, u.own
+    ? h('p', { style: { margin: 0 } }, 'Runs as its own Linux user, ', h('span', { class: 'mono' }, u.user), '. Other projects’ chats and services can’t open its folder.')
+    : [h('p', { style: { marginTop: 0 } }, 'Runs as ', h('span', { class: 'mono' }, u.user), ', a Linux user shared with other older projects, so their chats can read and change its folder, and its chats can do the same to theirs. New projects get their own user.'),
+      h('p', { class: 'small muted' }, 'Moving it gives it its own user, like new projects. Its running services stop for a minute or two and start again; chats keep their history, and nothing else changes.'),
+      h('button', { class: 'btn primary', onclick: e => busy(e.target, async () => {
+        if (!await confirmDialog(`Move ${p.name} to its own user?`, 'Its services stop while its files move, then start again. Don’t start chats in it until this finishes.', 'Move it')) return;
+        const r = await api('POST', `/api/projects/${ctx.id}/own-user`);
+        toast(r.failed.length ? `Moved, but ${r.failed.join(', ')} didn’t start again: see Services.` : `Moved: ${p.name} now runs as ${r.user}`, !!r.failed.length);
+        paintUser({ user: r.user, own: true });
+      }, 'Moving…').catch(() => {}) }, 'Move to its own user')]);
+  if (state.me.user.role === 'admin') api('GET', `/api/projects/${ctx.id}/user`).then(paintUser, e => fill(userCard, h('div', { class: 'error-box' }, e.message)));
   inner.append(
     h('h1', null, 'Settings'),
     h('form', { onsubmit: async e => {
@@ -651,6 +664,7 @@ function settingsTab(ctx){
       field('Claude for the project’s own AI workers', worker, 'some projects (like the pipeline) run Claude themselves; they use this connection'),
       h('p', { class: 'small muted' }, `Folder on the server: /srv/projects/${p.slug}/repo`),
       h('button', { class: 'btn primary', type: 'submit', style: { marginTop: '8px' } }, 'Save')),
+    ...(state.me.user.role === 'admin' ? [h('h2', null, 'Who it runs as'), userCard] : []),
     h('h2', { style: { color: 'var(--bad)' } }, 'Delete project'),
     h('div', { class: 'card' },
       h('p', null, 'Stops its services and removes its web addresses. The folder is moved to /srv/projects/.trash on the server, so an admin can still recover it.'),

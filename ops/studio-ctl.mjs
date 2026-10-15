@@ -188,6 +188,44 @@ WantedBy=multi-user.target
     log(`project-create ${p}`);
     console.log(JSON.stringify({ ok: true }));
   },
+  'project-user'(p){
+    slug(p);
+    console.log(JSON.stringify({ user: userOf(p), own: userOf(p) !== RUN_USER }));
+  },
+  'project-own-user'(p){
+    // Moves an older project from the shared runUser to its own user, as new projects get. Stops its running services
+    // and prints which they were: Studio then rewrites their units (apply) for the new user and starts them again.
+    const dir = join(PROJECTS, slug(p));
+    if (userOf(p) !== RUN_USER) die('This project already runs as its own user');
+    if (!existsSync(repo(p))) die('Project folder is missing');
+    const prefix = `ztd-${p}-`;
+    const units = readdirSync(UNIT_DIR).filter(f => f.startsWith(prefix) && f.endsWith('.service'));
+    const running = units.filter(f => sh('systemctl', ['is-active', '--quiet', f]).status === 0);
+    for (const f of running) sh('systemctl', ['stop', f]);
+    // -h: symbolic links themselves, never what they point to (the folder was writable by every ztd agent)
+    const own = (who, path, group = who) => sh('chown', ['-hR', `${who}:${group}`, path]);
+    const restore = msg => { own(RUN_USER, dir); for (const f of running) sh('systemctl', ['start', f]); die(msg, 1); };
+    const u = makeProjectUser(p, false);   // recorded only once its files are moved
+    const r = own(u, dir);
+    if (r.status !== 0) restore(`Could not move the files: ${r.stderr.trim().split('\n').pop()}`);
+    chmodSync(dir, 0o700);
+    // Its chats' Claude sessions, so they carry on where they left off
+    const sessions = join(RUN_HOME, '.claude', 'projects', repo(p).replace(/[^a-zA-Z0-9]/g, '-'));
+    if (existsSync(sessions)){
+      const to = join(homeOf(u), '.claude', 'projects');
+      mkdirSync(to, { recursive: true });
+      sh('cp', ['-a', sessions, to]);
+      own(u, join(homeOf(u), '.claude'));
+    }
+    // Its chat attachments: readable by this project's user only
+    const up = uploads(p);
+    mkdirSync(up, { recursive: true });
+    own('studio', up, u);
+    sh('find', [up, '-type', 'd', '-exec', 'chmod', '2750', '{}', '+']);
+    recordProjectUser(p, u);
+    log(`project-own-user ${p}: ${u}`);
+    console.log(JSON.stringify({ user: u, running: running.map(f => f.slice(prefix.length, -'.service'.length)) }));
+  },
   'project-delete'(p){
     const dir = join(PROJECTS, slug(p));
     for (const f of readdirSync(UNIT_DIR)) if (f.startsWith(`ztd-${p}-`) && f.endsWith('.service')){
@@ -453,7 +491,7 @@ function projectUserName(p){
   const u = `zp-${p}`;
   return u.length <= 31 ? u : `zp-${p.slice(0, 19).replace(/-+$/, '')}-${createHash('sha1').update(p).digest('hex').slice(0, 8)}`;
 }
-function makeProjectUser(p){
+function makeProjectUser(p, record = true){
   const u = projectUserName(p);
   if (!PROJECT_USER_NAME.test(u)) die(`Can't make a user for ${p}`, 1);
   sh('groupadd', ['-f', AGENTS_GROUP]);
@@ -462,13 +500,16 @@ function makeProjectUser(p){
     if (r.status !== 0) die(r.stderr || 'Could not create the project’s user', 1);
   } else sh('usermod', ['-aG', AGENTS_GROUP, u]);
   chmodSync(`/home/${u}`, 0o750);
+  if (record) recordProjectUser(p, u);
+  return u;
+}
+function recordProjectUser(p, u){
   const conf = JSON.parse(readFileSync(CONF_FILE, 'utf8'));
   conf.projectUsers = { ...(conf.projectUsers || {}), [p]: u };
   writeFileSync(CONF_FILE + '.tmp', JSON.stringify(conf, null, 2) + '\n', { mode: 0o644 });
   renameSync(CONF_FILE + '.tmp', CONF_FILE);
   PROJECT_USERS[p] = u; AGENT_USERS.add(u);
   log(`project user ${u} for ${p}`);
-  return u;
 }
 
 // The update installs this code as root, so it must come from a project only its own user can change: not one run as

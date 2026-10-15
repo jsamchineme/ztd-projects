@@ -381,6 +381,22 @@ route('GET', '/api/admin/system', async ({ user }) => {
 
 // Email settings (lib/mail.mjs). The password is never sent back to the browser.
 route('GET', '/api/admin/mail', async ({ user }) => { needAdmin(user); return mailSettings(); });
+// Which Linux user a project runs as, and moving an older project off the shared user onto its own (Studio admins).
+route('GET', '/api/projects/:id/user', async ({ user, params }) => {
+  needAdmin(user);
+  return ctlJson(['project-user', P.getProject(params.id).slug]);
+});
+route('POST', '/api/projects/:id/own-user', async ({ user, params, req }) => {
+  needAdmin(user);
+  const p = P.getProject(params.id);
+  if (A.runningChats().some(id => A.getChat(id)?.projectId === p.id)) throw err(409, 'Claude is working in this project. Wait for its chats to finish (or stop them), then try again.');
+  const r = await ctlJson(['project-own-user', p.slug], { timeout: 900000 });
+  audit(user.id, 'project.own-user', p.slug, r.user, ipOf(req));
+  await P.applyServices(p);   // the units now run as the new user
+  const failed = [];
+  for (const name of r.running) await ctlOk(['svc', p.slug, name, 'start'], { timeout: 60000 }).catch(() => failed.push(name));
+  return { ...r, failed };
+});
 // Backing up every project to one GitHub repo, a folder per project (see ops/github-backup.sh).
 route('GET', '/api/admin/github-backup', async ({ user }) => { needAdmin(user); return ctlJson(['github-backup', 'status']); });
 route('PUT', '/api/admin/github-backup', async ({ user, body, req }) => {

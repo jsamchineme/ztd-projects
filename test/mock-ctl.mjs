@@ -111,6 +111,15 @@ switch (cmd){
     console.log(JSON.stringify({ url, publicKey: url ? 'ssh-ed25519 AAAAFAKEKEY ztd-studio-backup@localhost' : '', last: existsSync(last) ? JSON.parse(readFileSync(last, 'utf8')) : null, running: false }));
     break;
   }
+  case 'project-user': console.log(JSON.stringify(st.ownUsers?.[a[0]] ? { user: st.ownUsers[a[0]], own: true } : { user: 'ztd', own: false })); break;
+  case 'project-own-user': {
+    if (st.ownUsers?.[a[0]]){ console.error('This project already runs as its own user'); process.exit(2); }
+    const running = Object.entries(st.units).filter(([u, x]) => u.startsWith(`ztd-${a[0]}-`) && x.pid && alive(x.pid)).map(([u]) => u);
+    for (const u of running) stopUnit(u);
+    st.ownUsers = { ...st.ownUsers, [a[0]]: `zp-${a[0]}` }; save();
+    console.log(JSON.stringify({ user: `zp-${a[0]}`, running: running.map(u => u.slice(`ztd-${a[0]}-`.length)) }));
+    break;
+  }
   case 'scope-check': {
     const req = JSON.parse(readStdin());
     const r = spawnSync('node', [FAKE, '-p', '--model', 'haiku', '--no-session-persistence'], { encoding: 'utf8', input: `<purpose>\n${req.purpose}\n</purpose>\n<request>\n${req.prompt}\n</request>` });

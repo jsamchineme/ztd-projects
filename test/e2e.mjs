@@ -369,6 +369,21 @@ await check('GitHub backup: set a repo, see the deploy key, back up now, turn of
   await page.click('dialog button:has-text("Turn off")');
   await page.locator('button:has-text("Set up")').waitFor();
 }, page);
+await check('an older project moves to its own user; services start again and chats carry on', async () => {
+  await page.goto(projectUrl + '/settings');
+  await page.getByText('a Linux user shared with other older projects').waitFor();
+  await page.click('button:has-text("Move to its own user")');
+  await page.click('dialog button:has-text("Move it")');
+  await page.getByText('Runs as its own Linux user').waitFor({ timeout: 15000 });
+  await page.locator('.mono', { hasText: 'zp-demo-site' }).first().waitFor();
+  await page.click('.tab:has-text("Services")');
+  await page.locator('.pill', { hasText: 'running' }).first().waitFor({ timeout: 15000 });
+  await page.click('.tab:has-text("Chat")');
+  await page.fill('textarea', 'still here after the move?');
+  await page.keyboard.press('Enter');
+  await page.locator('.bubble', { hasText: 'still here after the move?' }).waitFor({ timeout: 8000 });
+  await page.waitForFunction(() => !document.querySelector('.send.stop'), null, { timeout: 15000 });
+}, page);
 await check('phone layout: chat usable at 390px', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(projectUrl + '/chat');
