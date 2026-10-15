@@ -256,22 +256,23 @@ export async function renderAdmin(main){
   loadAudit().catch(e => auditCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
 }
 
-// Updating Studio: installs the last commit of studio/ from the source project and restarts, then waits for it to come back.
+// Updating Studio: installs the last commit of the Studio source project and restarts, then waits for it to come back.
 const short = c => c?.slice(0, 7) || '';
 async function loadStudio(card){
   const { installed, source, sourceError } = await api('GET', '/api/admin/studio');
   const commitLine = c => h('li', null, h('span', { class: 'mono' }, short(c.hash)), ' ', c.subject, h('span', { class: 'muted small' }, ` · ${c.author}, ${ago(Date.parse(c.date))}`));
   const upToDate = installed && source && installed.commit === source.head.hash;
+  const where = source ? (source.path === '.' ? `the ${source.project} project` : `${source.path}/ in the ${source.project} project`) : '';
   const logBox = h('pre', { class: 'update-log', hidden: true });
   const btn = h('button', { class: 'btn primary', disabled: !source || source.updating, onclick: () => update() }, upToDate ? 'Reinstall and restart Studio' : 'Update and restart Studio');
   card.replaceChildren(
     h('p', null, 'Running: ', installed ? [h('span', { class: 'mono' }, short(installed.commit)), ` ${installed.subject} `, h('span', { class: 'muted small' }, `(installed ${ago(Date.parse(installed.installedAt))})`)]
       : h('span', { class: 'muted' }, 'a version installed by hand, so Studio can’t tell which commit it is.')),
     sourceError ? h('div', { class: 'error-box' }, sourceError) : null,
-    source ? h('p', null, `Latest commit to ${source.path}/ in the ${source.project} project: `, h('span', { class: 'mono' }, short(source.head.hash)), ` ${source.head.subject}`) : null,
+    source ? h('p', null, `Latest commit to ${where}: `, h('span', { class: 'mono' }, short(source.head.hash)), ` ${source.head.subject}`) : null,
     upToDate ? h('p', { class: 'ok-box' }, 'Studio is up to date.') : null,
     source?.pending?.length ? [h('p', null, `${source.pending.length} new commit${source.pending.length > 1 ? 's' : ''} to install. Check these are changes you expect, because the update runs the install script as root:`), h('ul', { class: 'small' }, source.pending.map(commitLine))] : null,
-    source?.dirty?.length ? h('div', { class: 'note' }, `${source.dirty.length} uncommitted change${source.dirty.length > 1 ? 's' : ''} in ${source.path}/ won’t be installed. Commit them in the ${source.project} project’s Changes tab first: `, h('span', { class: 'mono small' }, source.dirty.slice(0, 8).join(', ') + (source.dirty.length > 8 ? ' …' : ''))) : null,
+    source?.dirty?.length ? h('div', { class: 'note' }, `${source.dirty.length} uncommitted change${source.dirty.length > 1 ? 's' : ''} in ${where} won’t be installed. Commit them in its Changes tab first: `, h('span', { class: 'mono small' }, source.dirty.slice(0, 8).join(', ') + (source.dirty.length > 8 ? ' …' : ''))) : null,
     source?.updating ? h('div', { class: 'note' }, 'An update is running now.') : null,
     h('div', { class: 'row' }, btn), logBox);
 

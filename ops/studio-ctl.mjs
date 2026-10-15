@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // studio-ctl: the only privileged entry point Studio uses. Installed root-owned at /usr/local/sbin/studio-ctl.
-// Studio (user "studio") may run any command through sudo; AI agents (user "ztd") may run only svc, logs and status.
+// Studio (user "studio") may run any command through sudo; AI agents (user "ztd", or a project's own user) may run only
+// svc, logs and status, and only for projects that run as their own user.
 // Every argument is validated here, because the callers are not trusted.
 import { spawn, spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, readdirSync, renameSync, chmodSync, cpSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, readdirSync, renameSync, chmodSync, cpSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const CONF = JSON.parse(readFileSync('/etc/studio/ctl.json', 'utf8'));
@@ -24,18 +25,27 @@ const need = (v, re, what) => { if (typeof v !== 'string' || !re.test(v)) die(`I
 const slug = v => need(v, SLUG, 'name');
 const unit = (p, s) => `ztd-${slug(p)}-${slug(s)}`;
 const repo = p => join(PROJECTS, slug(p), 'repo');
+// Projects listed in projectUsers run (files, chats, git, services) as their own Unix user instead of ztd, so other
+// projects' agents can't change them. The Studio source project is one: see studio-update.
+const PROJECT_USERS = CONF.projectUsers || {};
+for (const [p, u] of Object.entries(PROJECT_USERS)) if (!SLUG.test(p) || !/^[a-z][a-z0-9-]{0,30}$/.test(u) || u === 'root') die('Bad projectUsers in ctl.json');
+const userOf = p => PROJECT_USERS[slug(p)] || RUN_USER;
+const homeOf = u => u === RUN_USER ? RUN_HOME : `/home/${u}`;
+const AGENT_USERS = new Set([RUN_USER, ...Object.values(PROJECT_USERS)]);
 const uploads = p => join(CONF.uploadsDir || '/srv/studio-uploads', slug(p));   // chat attachments, written by Studio
 const sh = (cmd, args, opts = {}) => spawnSync(cmd, args, { encoding: 'utf8', ...opts });
-const asUser = (args, opts = {}) => sh(RUNUSER, ['-u', RUN_USER, '--', ...args], { env: userEnv(), ...opts });
-function userEnv(extra = {}){
-  return { HOME: RUN_HOME, USER: RUN_USER, LOGNAME: RUN_USER, LANG: 'C.UTF-8', PATH: '/usr/local/bin:/usr/bin:/bin', ...extra };
+const asUser = (user, args, opts = {}) => sh(RUNUSER, ['-u', user, '--', ...args], { env: userEnv(user), ...opts });
+function userEnv(user, extra = {}){
+  return { HOME: homeOf(user), USER: user, LOGNAME: user, LANG: 'C.UTF-8', PATH: '/usr/local/bin:/usr/bin:/bin', ...extra };
 }
 function readStdin(){ try { return readFileSync(0, 'utf8'); } catch { return ''; } }
 function log(msg){ sh('logger', ['-t', 'studio-ctl', `${caller}: ${msg}`]); }
 
 const AGENT_ALLOWED = new Set(['svc', 'logs', 'status', 'help']);
 const [cmd, ...a] = process.argv.slice(2);
-if (caller === RUN_USER && !AGENT_ALLOWED.has(cmd)) die('Not allowed from agents. Ask in Studio instead.', 13);
+const isAgent = AGENT_USERS.has(caller);
+if (isAgent && !AGENT_ALLOWED.has(cmd)) die('Not allowed from agents. Ask in Studio instead.', 13);
+if (isAgent && (cmd === 'svc' || cmd === 'logs') && userOf(a[0]) !== caller) die('Not allowed from agents for that project.', 13);
 
 const commands = {
   help(){
@@ -73,11 +83,11 @@ Description=Studio ${p}/${name}
 After=network.target
 
 [Service]
-User=${RUN_USER}
-Group=${RUN_USER}
+User=${userOf(p)}
+Group=${userOf(p)}
 WorkingDirectory=${repo(p)}
 EnvironmentFile=${join(ENV_DIR, `${u}.env`)}
-Environment=HOME=${RUN_HOME}
+Environment=HOME=${homeOf(userOf(p))}
 ExecStart=/bin/bash -lc "${quoted}"
 Restart=on-failure
 RestartSec=3
@@ -130,7 +140,7 @@ WantedBy=multi-user.target
     const u = unit(p, s);
     const n = String(Math.max(1, Math.min(5000, Number(lines) || 200)));
     const args = ['-u', u, '-n', n, '--no-pager', '-o', 'short-iso'];
-    if (follow === 'follow' && caller !== RUN_USER) args.push('-f');
+    if (follow === 'follow' && !isAgent) args.push('-f');
     const child = spawn('journalctl', args, { stdio: 'inherit' });
     process.on('SIGTERM', () => child.kill('SIGTERM'));
     child.on('exit', code => process.exit(code ?? 0));
@@ -142,19 +152,21 @@ WantedBy=multi-user.target
     const dir = join(PROJECTS, slug(p));
     if (existsSync(dir)) die('A project folder with that name already exists');
     const url = readStdin().trim();
-    mkdirSync(dir); sh('chown', [`${RUN_USER}:${RUN_USER}`, dir]);
+    const user = userOf(p);
+    mkdirSync(dir); sh('chown', [`${user}:${user}`, dir]);
+    if (user !== RUN_USER) chmodSync(dir, 0o700);
     if (url){
       if (!/^https:\/\/[\w.-]+\/[\w./-]+$/.test(url)) die('Only public https git URLs are supported');
-      const r = asUser(['git', 'clone', '--depth', '50', url, repo(p)], { timeout: 300000 });
+      const r = asUser(user, ['git', 'clone', '--depth', '50', url, repo(p)], { timeout: 300000 });
       if (r.status !== 0){ rmSync(dir, { recursive: true, force: true }); die(r.stderr || 'Clone failed', 1); }
     } else {
       const src = join(STARTERS, need(starter, /^[a-z-]{1,30}$/, 'starter'));
       if (!existsSync(src)) die('Unknown starter');
       cpSync(src, repo(p), { recursive: true });
-      sh('chown', ['-R', `${RUN_USER}:${RUN_USER}`, dir]);
-      asUser(['git', 'init', '-q', '-b', 'main'], { cwd: repo(p) });
-      asUser(['git', 'add', '-A'], { cwd: repo(p) });
-      asUser(['git', '-c', 'user.name=ZTD Studio', '-c', 'user.email=studio@localhost', 'commit', '-qm', 'Start project'], { cwd: repo(p) });
+      sh('chown', ['-R', `${user}:${user}`, dir]);
+      asUser(user, ['git', 'init', '-q', '-b', 'main'], { cwd: repo(p) });
+      asUser(user, ['git', 'add', '-A'], { cwd: repo(p) });
+      asUser(user, ['git', '-c', 'user.name=ZTD Studio', '-c', 'user.email=studio@localhost', 'commit', '-qm', 'Start project'], { cwd: repo(p) });
     }
     log(`project-create ${p}`);
     console.log(JSON.stringify({ ok: true }));
@@ -178,7 +190,7 @@ WantedBy=multi-user.target
   git(p, action, ...rest){
     const cwd = repo(p);
     if (!existsSync(cwd)) die('Project folder is missing');
-    const g = (...args) => asUser(['git', '-c', 'core.quotepath=off', '-c', `safe.directory=${cwd}`, ...args], { cwd, maxBuffer: 64 * 1024 * 1024 });
+    const g = (...args) => asUser(userOf(p), ['git', '-c', 'core.quotepath=off', '-c', `safe.directory=${cwd}`, ...args], { cwd, maxBuffer: 64 * 1024 * 1024 });
     const out = r => { if (r.status !== 0) die(r.stderr || 'git failed', 1); process.stdout.write(r.stdout); };
     if (!existsSync(join(cwd, '.git'))) die('Not a git repository', 3);
     switch (action){
@@ -229,18 +241,18 @@ WantedBy=multi-user.target
   // ----- files (read-only browsing for the UI) -----
   ls(p){
     const cwd = repo(p);
-    const r = asUser(['git', '-c', `safe.directory=${cwd}`, 'ls-files', '--cached', '--others', '--exclude-standard'], { cwd, maxBuffer: 32 * 1024 * 1024 });
+    const r = asUser(userOf(p), ['git', '-c', `safe.directory=${cwd}`, 'ls-files', '--cached', '--others', '--exclude-standard'], { cwd, maxBuffer: 32 * 1024 * 1024 });
     process.stdout.write(r.stdout);
   },
   cat(p){
     const rel = readStdin().trim();
     if (!rel || rel.startsWith('/') || rel.split('/').includes('..')) die('Invalid path');
-    const r = asUser(['head', '-c', '400000', join(repo(p), rel)]);
+    const r = asUser(userOf(p), ['head', '-c', '400000', join(repo(p), rel)]);
     if (r.status !== 0) die('Cannot read that file', 1);
     process.stdout.write(r.stdout);
   },
 
-  // ----- updating Studio itself, from the committed code in a project (by default pipeline/studio) -----
+  // ----- updating Studio itself, from the committed code in the Studio source project (ctl.json studioSource) -----
   'studio-source'(since = '-'){
     // Prints the newest commit of the Studio source and, given the installed commit, what an update would bring.
     const { cwd, path, g } = studioSource();
@@ -258,15 +270,15 @@ WantedBy=multi-user.target
     // Installs the last commit of the Studio source with its own ops/install.sh, which restarts Studio. It runs in a
     // separate systemd unit, because restarting Studio stops everything Studio started (including this command).
     if (updating()) die('An update is already running', 1);
-    const { cwd, path, g } = studioSource();
+    const { cwd, path, user, g } = studioSource();
     const head = g('log', '-1', '--format=%H%x1f%s', 'HEAD', '--', path).stdout.trim().split('\x1f');
     const tmp = join('/var/tmp', `studio-update-${Date.now()}`);
     mkdirSync(tmp, { mode: 0o700 });
-    const tar = asUser(['git', '-c', `safe.directory=${cwd}`, '-C', cwd, 'archive', '--format=tar', 'HEAD', path], { encoding: 'buffer', maxBuffer: 256 * 1024 * 1024 });
+    const tar = asUser(user, ['git', '-c', `safe.directory=${cwd}`, '-C', cwd, 'archive', '--format=tar', 'HEAD', path], { encoding: 'buffer', maxBuffer: 256 * 1024 * 1024 });
     if (tar.status !== 0){ rmSync(tmp, { recursive: true, force: true }); die(String(tar.stderr) || 'git archive failed', 1); }
     const x = sh('tar', ['-x', '-C', tmp, '--no-same-owner'], { input: tar.stdout });
     if (x.status !== 0){ rmSync(tmp, { recursive: true, force: true }); die(x.stderr || 'Unpacking failed', 1); }
-    const src = join(tmp, path);
+    const src = path === '.' ? tmp : join(tmp, path);
     writeFileSync(join(src, '.version'), JSON.stringify({ commit: head[0], subject: head[1], installedAt: new Date().toISOString() }));
     const r = sh('systemd-run', ['--unit=studio-update', '--collect', '--quiet', '/bin/bash', '-c',
       'bash "$1/ops/install.sh" "$2"; code=$?; rm -rf "$0"; echo "studio-update finished: $code"; exit $code', tmp, src, CONF.domain]);
@@ -299,8 +311,8 @@ WantedBy=multi-user.target
     if (resume && resume !== '-') args.push('--resume', resume);
     if (existsSync(uploads(p))) args.push('--add-dir', uploads(p));   // chat attachments, readable in Plan mode too
     if (req.system) args.push('--append-system-prompt', String(req.system).slice(0, 20000));
-    const child = spawn(RUNUSER, ['-u', RUN_USER, '--', bin, ...args], {
-      cwd, env: userEnv({ ...extra, MCP_CONNECTION_NONBLOCKING: 'false', CHROME_BIN: '/usr/bin/google-chrome', DISABLE_AUTOUPDATER: '1', STUDIO_PROJECT: p }),
+    const child = spawn(RUNUSER, ['-u', userOf(p), '--', bin, ...args], {
+      cwd, env: userEnv(userOf(p), { ...extra, MCP_CONNECTION_NONBLOCKING: 'false', CHROME_BIN: '/usr/bin/google-chrome', DISABLE_AUTOUPDATER: '1', STUDIO_PROJECT: p }),
       stdio: ['pipe', 'inherit', 'inherit'], detached: true
     });
     child.on('error', e => die(e.message, 1));
@@ -315,7 +327,7 @@ WantedBy=multi-user.target
     // Runs `claude setup-token` under a pty. Studio relays the sign-in link and the pasted code; the token is printed at the end.
     const bin = CONF.fakeClaude && existsSync(CONF.fakeClaude) ? CONF.fakeClaude : CLAUDE;
     const child = spawn('script', ['-qfec', `stty cols 1000 rows 60; exec ${bin} setup-token`, '/dev/null'], {
-      cwd: RUN_HOME, env: userEnv({ TERM: 'dumb', COLUMNS: '500', DISABLE_AUTOUPDATER: '1' }), stdio: 'inherit', uid: uidOf(RUN_USER), gid: gidOf(RUN_USER)
+      cwd: RUN_HOME, env: userEnv(RUN_USER, { TERM: 'dumb', COLUMNS: '500', DISABLE_AUTOUPDATER: '1' }), stdio: 'inherit', uid: uidOf(RUN_USER), gid: gidOf(RUN_USER)
     });
     child.on('error', e => die(e.message, 1));
     for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => child.kill('SIGTERM'));
@@ -349,12 +361,21 @@ WantedBy=multi-user.target
   }
 };
 
+// The update installs this code as root, so it must come from a project only its own user can change: not one run as
+// ztd, where any project's agent could rewrite it. Every folder on the way must belong to root or that user.
 function studioSource(){
-  const src = CONF.studioSource || { project: 'pipeline', path: 'studio' };
-  const cwd = repo(src.project), path = need(src.path, /^[\w-]+(\/[\w-]+)*$/, 'source path');
+  const src = CONF.studioSource;
+  if (!src) die('No Studio source project is set up. On the server, run: bash /srv/studio/app/ops/isolate-studio.sh <team>', 1);
+  const cwd = repo(src.project), path = need(src.path, /^(\.|[\w-]+(\/[\w-]+)*)$/, 'source path');
+  const user = userOf(src.project);
+  if (user === RUN_USER) die(`The Studio source project ${src.project} runs as ${RUN_USER}, so other projects' agents could change it. Give it its own user in projectUsers.`, 1);
   if (!existsSync(join(cwd, '.git'))) die('The Studio source project has no git repository', 1);
-  const g = (...args) => asUser(['git', '-c', `safe.directory=${cwd}`, '-c', 'core.quotepath=off', ...args], { cwd });
-  return { cwd, path, g };
+  const uid = uidOf(user), top = statSync(PROJECTS), dir = statSync(join(PROJECTS, src.project));
+  if (top.uid !== 0 || (top.mode & 0o022)) die(`${PROJECTS} must belong to root and not be writable by others`, 1);
+  if (dir.uid !== uid || (dir.mode & 0o077)) die(`${join(PROJECTS, src.project)} must belong to ${user} with mode 700`, 1);
+  for (const d of [cwd, join(cwd, '.git')]) if (statSync(d).uid !== uid || !statSync(d).isDirectory()) die(`${d} must be a folder belonging to ${user}`, 1);
+  const g = (...args) => asUser(user, ['git', '-c', `safe.directory=${cwd}`, '-c', 'core.quotepath=off', ...args], { cwd });
+  return { cwd, path, user, g };
 }
 const updating = () => sh('systemctl', ['is-active', '--quiet', 'studio-update']).status === 0;
 

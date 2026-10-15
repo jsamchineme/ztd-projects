@@ -32,9 +32,10 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `lib/uploads.mjs` | Files attached in chat (paste, drop or the paperclip): up to 20 MB each and 10 per message, saved to `/srv/studio-uploads/<slug>/<id>/`. That folder is owned by `studio` with group `ztd`, so Claude can read the files but not change them, and they stay out of git. The prompt lists the paths and Claude opens them with Read, which handles images, PDFs, notebooks and text. |
 | `lib/claude.mjs` | Each user's Claude connection: a subscription token via `claude setup-token`, or an API key. Stored encrypted (AES-256-GCM). |
 | `lib/ctl.mjs` | Runs `studio-ctl` through sudo |
-| `ops/studio-ctl.mjs` | The root helper. It's the only privileged code. AI agents (user `ztd`) may run only `status`, `svc` and `logs`. |
+| `ops/studio-ctl.mjs` | The root helper. It's the only privileged code. AI agents (user `ztd` or a project's own user) may run only `status`, and `svc` and `logs` for projects that run as their own user. |
 | `ops/install.sh` | Installs or updates everything on the server. Safe to re-run. |
 | `ops/backup.sh` | Nightly backup (03:30) to `/var/backups/ztd`, kept for 14 days |
+| `ops/isolate-studio.sh` | One-off: moves the Studio source into its own project, `studio-src`, run as the user `studiodev` (see Security model) |
 | `ops/migrate-pipeline.sh` | Copies this repo and its board data from a Mac to the server, then registers it as the Pipeline project |
 | `ops/fake-claude.mjs` | Stand-in for the `claude` CLI for tests. Turn it on with `"fakeClaude"` in `/etc/studio/ctl.json`. |
 | `bin/admin.mjs` | `studio-admin` on the server: `bootstrap`, `reset-link`, `import-project`, `make-admin`, `add-user`, `delete-user` |
@@ -50,7 +51,8 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `/etc/studio/studio.env` | Secrets and settings: `STUDIO_SECRET`, SMTP. Mode 640 root:studio. |
 | `/etc/studio/ctl.json` | studio-ctl settings (domain, ports, optional `fakeClaude`) |
 | `/etc/studio/env/` | Each service's environment variables (root only) |
-| `/srv/projects/<slug>/repo` | Project folders (owned by `ztd`). Deleted projects go to `/srv/projects/.trash`. |
+| `/srv/projects/<slug>/repo` | Project folders (owned by `ztd`). `/srv/projects` itself belongs to root. Deleted projects go to `/srv/projects/.trash`. |
+| `/srv/projects/studio-src/repo` | The Studio source, owned by `studiodev`, mode 700 |
 | `/var/backups/ztd` | Nightly backups |
 
 ## Operating it
@@ -75,7 +77,14 @@ ssh -i ~/.ssh/ztddevs root@129.121.95.175 'bash /root/studio-src/ops/install.sh 
 
 Restarting Studio stops any Claude runs in progress.
 
-**Or update from Studio itself.** Commit the changes to `studio/` in the pipeline project's Changes tab, then press **Update and restart Studio** on the Admin page (Studio admins only). It runs `studio-ctl studio-update`, which installs the last commit of `studio/` with its own `ops/install.sh` in a separate systemd unit (`studio-update`) and shows the log as it goes. Uncommitted changes aren't installed. The page lists the new commits first: read them, because the install script runs as root. Agents can't run this. The first time, deploy by hand as above, because the button needs the new `studio-ctl`.
+**Or update from Studio itself.** Commit the changes in the **Studio** project's Changes tab, then press **Update and restart Studio** on the Admin page (Studio admins only). It runs `studio-ctl studio-update`, which installs the last commit of the Studio source project (`studioSource` in `/etc/studio/ctl.json`) with its own `ops/install.sh` in a separate systemd unit (`studio-update`) and shows the log as it goes. Uncommitted changes aren't installed. Agents can't run this. `studio-update` refuses to install from a project that runs as `ztd`, or whose folders other users could change.
+
+**Moving the Studio source out of the pipeline project** (once). Studio used to update from `studio/` in the pipeline repo, which every project's agent could change. To move it:
+
+1. Commit these changes in the pipeline project, then press **Update and restart Studio**. This installs the new `install.sh`, which creates `studiodev` and gives `/srv/projects` to root.
+2. In Teams and people, create a team, for example "Studio", with only Studio admins in it.
+3. On the server, as root: `bash /srv/studio/app/ops/isolate-studio.sh <that team's slug>`. It copies `studio/` (with its history) as of the installed commit into `/srv/projects/studio-src/repo`, sets `projectUsers` and `studioSource` in `ctl.json`, and adds the **Studio** project to that team.
+4. Delete `studio/` from the pipeline project and commit that. From then on, change Studio in the Studio project.
 
 **Turn on email** (password resets and invites). The easy way: Admin page → Email. Enter the settings, then press Check and save. Studio signs in to the mail server before saving, and stores the password encrypted in its database. Settings saved there replace any in the server file. Or add these to `/etc/studio/studio.env`, then run `systemctl restart studio`:
 
@@ -95,7 +104,10 @@ Without email, admins copy invite links from Teams and people, and reset links f
 - Login is rate-limited to 5 attempts a minute per IP. After 10 wrong codes, two-step sign-in locks for 15 minutes. Passwords need at least 12 characters, and a password reset signs out every session.
 - Project subdomains are team-only unless a service is marked public.
 - Claude runs as `ztd` in bypass-permissions mode. It can change any project's files, and it can restart services through `sudo studio-ctl svc`. It can't read Studio's database or secrets, and it can't install services or change Apache.
-- Agents for different projects share the `ztd` user, so project folders aren't isolated from each other. Give each project its own Unix user if you ever host untrusted code.
+- Agents for different projects share the `ztd` user, so project folders aren't isolated from each other. A project listed in `projectUsers` in `ctl.json` runs (chats, git, services) as its own user instead, in a folder only that user can open. `sudo studio-ctl` lets each agent user act only on its own projects.
+- The Studio source is one such project (`studio-src`, user `studiodev`), so team members' chats can't change the code that updates install as root. Keep its team to Studio admins.
+- systemd holds Studio's port (`studio.socket`) even while Studio restarts, so a project's process can't take it over and pose as Studio.
+- Projects may only set cookies for their own host: Studio drops `Domain=` from their cookies, and refuses Studio's own cookie names.
 - Each run receives the user's Claude token as an environment variable. Another agent running at the same moment could read it through `/proc`. That's acceptable for a small trusted team.
 
 ## Testing
