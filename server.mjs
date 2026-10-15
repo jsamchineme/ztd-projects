@@ -23,7 +23,7 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; ch
 const SECURITY = {
   'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
   'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'X-Frame-Options': 'DENY',
-  'Permissions-Policy': 'camera=(), microphone=(self), geolocation=()'   // the chat's 🎤 dictation needs the mic,
+  'Permissions-Policy': 'camera=(), microphone=(self), geolocation=()',   // the chat's 🎤 dictation needs the mic
   ...(SECURE ? { 'Strict-Transport-Security': 'max-age=31536000' } : {})
 };
 
