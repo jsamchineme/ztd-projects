@@ -262,7 +262,9 @@ dialog h2 { margin: 0 0 4px; font: 600 1.25rem/1.3 var(--serif); }
   .side { position: fixed; inset: 0 auto 0 0; width: 280px; z-index: 30; transform: translateX(-100%); transition: transform .2s; box-shadow: var(--shadow); }
   .shell.menu-open .side { transform: none; }
   .shell.menu-open::after { content: ""; position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 20; }
-  .menu-btn { width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 26px; line-height: 1; }
+  .menu-btn { width: 44px; height: 44px; min-height: 44px; padding: 0; }
+  .menu-btn .bars { width: 22px; height: 2px; border-radius: 2px; background: currentColor; box-shadow: 0 -7px 0 currentColor, 0 7px 0 currentColor; }   /* ☰ drawn, so it centres exactly */
+  .topbar strong { line-height: 1.2; }
   .topbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--bg); }
   .page { padding: 20px 16px 50px; }
   .proj-head { padding: 10px 16px 0; }
