@@ -1,5 +1,5 @@
 // A project: chat with Claude, running services, changes, files and settings.
-import { h, $, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy } from './ui.js';
+import { h, $, fill, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy } from './ui.js';
 import { state, go, onLeave, refreshProjects, setTitle, localStorageSet, localStorageGet, renderSideProjects } from './app.js';
 
 const MODELS = [['opus', 'Opus'], ['fable', 'Fable'], ['sonnet', 'Sonnet'], ['haiku', 'Haiku']];
@@ -345,7 +345,7 @@ function servicesTab(ctx){
 
   function paint(p){
     ctx.paintLinks(p);
-    inner.replaceChildren(
+    fill(inner,
       h('div', { class: 'row' }, h('div', null, h('h1', null, 'Services'), h('p', { class: 'muted', style: { margin: 0 } }, 'The programs this project runs. Restart one to load new code.')),
         h('div', { class: 'spacer' }), p.canManage ? h('button', { class: 'btn', onclick: () => editServices(p) }, 'Edit services') : null),
       p.services.length ? null : h('div', { class: 'card' }, 'No services yet.', p.canManage ? ' Use “Edit services” to add one.' : ''),

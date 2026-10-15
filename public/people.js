@@ -1,5 +1,5 @@
 // Account, teams and admin pages.
-import { h, $, api, authApi, toast, fail, busy, dialog, confirmDialog, field, ago, copy, initials } from './ui.js';
+import { h, $, fill, api, authApi, toast, fail, busy, dialog, confirmDialog, field, ago, copy, initials } from './ui.js';
 import { state, go, setTitle, claudeLabel } from './app.js';
 
 const page = main => { const inner = h('div', { class: 'page-inner', style: { maxWidth: '820px' } }); main.append(h('div', { class: 'page', style: { flex: 1 } }, inner)); return inner; };
@@ -138,7 +138,7 @@ export async function renderTeams(main){
   const inner = page(main);
   async function load(){
     const teams = await api('GET', '/api/teams');
-    inner.replaceChildren(
+    fill(inner,
       h('div', { class: 'row' }, h('div', null, h('h1', null, 'Teams and people'), h('p', { class: 'muted', style: { margin: 0 } }, 'Everyone in a team can open its projects, chat with Claude in them and restart them. Owners and admins can also invite people and change settings.')),
         h('div', { class: 'spacer' }), state.me.user.role === 'admin' ? h('button', { class: 'btn', onclick: () => newTeam(load) }, '+ New team') : null),
       !state.me.mailEnabled ? h('div', { class: 'note' }, 'Email isn’t set up on this server yet, so invitations aren’t emailed. Copy each invite link and send it yourself.') : null,
@@ -265,7 +265,7 @@ async function loadStudio(card){
   const where = source ? (source.path === '.' ? `the ${source.project} project` : `${source.path}/ in the ${source.project} project`) : '';
   const logBox = h('pre', { class: 'update-log', hidden: true });
   const btn = h('button', { class: 'btn primary', disabled: !source || source.updating, onclick: () => update() }, upToDate ? 'Reinstall and restart Studio' : 'Update and restart Studio');
-  card.replaceChildren(
+  fill(card,
     h('p', null, 'Running: ', installed ? [h('span', { class: 'mono' }, short(installed.commit)), ` ${installed.subject} `, h('span', { class: 'muted small' }, `(installed ${ago(Date.parse(installed.installedAt))})`)]
       : h('span', { class: 'muted' }, 'a version installed by hand, so Studio can’t tell which commit it is.')),
     sourceError ? h('div', { class: 'error-box' }, sourceError) : null,

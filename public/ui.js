@@ -24,6 +24,9 @@ export function h(tag, attrs, ...children){
   }
   return el;
 }
+// Replaces el's contents, taking children the way h() does (lists flattened; null and false skipped). The DOM's own
+// replaceChildren prints them as text ("null", "[object HTMLParagraphElement]").
+export const fill = (el, ...children) => el.replaceChildren(...h('div', null, ...children).childNodes);
 export const $ = (sel, root = document) => root.querySelector(sel);
 
 export class ApiError extends Error { constructor(msg, status, code){ super(msg); this.status = status; this.code = code; } }
