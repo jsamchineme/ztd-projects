@@ -124,8 +124,9 @@ async function chatTab(ctx, chatId){
   function chatOptions(c){
     const leave = () => { if (c.id === openId()) go(`/p/${id}/chat/new`); else loadList().catch(fail); };
     dialog(close => h('div', { class: 'dialog-body' },
-      h('h2', null, c.title),
-      h('p', { class: 'muted' }, c.archivedAt ? 'This chat is archived.' : 'Archive it to tidy the list: it moves under “Archived” and you can still open it.'),
+      h('h2', null, c.archivedAt ? 'Archived chat' : 'Archive or delete chat'),
+      h('p', { class: 'chat-quote', title: c.title }, c.title),
+      h('p', { class: 'muted' }, c.archivedAt ? 'Unarchive it to put it back in the chat list.' : 'Archiving moves it under “Archived” at the bottom of the list, where you can still open it.'),
       h('div', { class: 'row end', style: { marginTop: '18px', flexWrap: 'wrap' } },
         h('button', { class: 'btn', onclick: () => close() }, 'Cancel'),
         h('button', { class: 'btn danger', onclick: async () => {

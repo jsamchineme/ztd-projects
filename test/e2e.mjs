@@ -405,6 +405,8 @@ await check('a chat can be archived, unarchived and deleted', async () => {
   const row = page.locator('.chat-list .chat-row', { hasText: 'slow task please' });
   await row.hover();
   await row.locator('.chat-more').click();
+  await page.locator('dialog h2', { hasText: 'Archive or delete chat' }).waitFor();
+  await page.screenshot({ path: `${SHOTS}/12-chat-options.png` });
   await page.click('dialog button:has-text("Archive")');
   await page.waitForURL(/\/chat\/new$/);
   await page.locator('.archived-toggle', { hasText: 'Archived (1)' }).waitFor();
