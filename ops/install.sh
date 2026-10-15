@@ -139,9 +139,18 @@ cat > /etc/systemd/system/studio-chats.slice <<EOF
 Description=ZTD Devs Studio chats
 
 [Slice]
-MemoryMax=2G
+MemoryMax=1536M
 MemorySwapMax=2G
 TasksMax=4096
+EOF
+
+# Project services (ztd-<project>-<service>, every one of them, by systemd's prefix drop-ins): when something in a
+# service goes over its memory limit, such as one of a project's own AI workers, only that process is killed. The
+# default would stop the whole service, taking its website and its other workers down with it.
+mkdir -p /etc/systemd/system/ztd-.service.d
+cat > /etc/systemd/system/ztd-.service.d/oom.conf <<EOF
+[Service]
+OOMPolicy=continue
 EOF
 
 # Admin commands (root only): studio-admin bootstrap | reset-link | import-project | make-admin
