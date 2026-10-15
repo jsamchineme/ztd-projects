@@ -29,6 +29,8 @@ chown studio:ztd /srv/studio-uploads; chmod 2750 /srv/studio-uploads
 rsync -a --delete --exclude node_modules --exclude data --exclude '.env' "$SRC/" "$APP/"
 ( cd "$APP" && npm ci --omit=dev --no-audit --no-fund >/dev/null 2>&1 || npm install --omit=dev --no-audit --no-fund >/dev/null )
 chown -R root:root "$APP"; chmod -R go-w "$APP"
+# The update unpacks into a root-only temp folder, and rsync -a copies that mode onto $APP; Studio must be able to enter it.
+chmod 755 "$APP"
 
 # Root helper and starters
 install -m 755 -o root -g root "$APP/ops/studio-ctl.mjs" /usr/local/lib/studio/studio-ctl.mjs

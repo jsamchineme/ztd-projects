@@ -22,7 +22,8 @@ if [ ! -d "$DIR/repo/.git" ]; then
   echo "Copying studio/ as of the installed commit $COMMIT"
   TMP=$(mktemp -d)
   # --no-local: the objects are copied through upload-pack and checked, and the repo's hooks don't come along.
-  git -c safe.directory="$FROM" clone -q --no-local "$FROM" "$TMP/full"
+  # A local clone drops -c settings before starting upload-pack, and git checks the .git path, so pass both there.
+  git clone -q --no-local --upload-pack="git -c safe.directory=$FROM -c safe.directory=$FROM/.git upload-pack" "$FROM" "$TMP/full"
   git -C "$TMP/full" checkout -q --detach "$COMMIT"
   git -C "$TMP/full" subtree split -q -P studio "$COMMIT" -b studio-only >/dev/null
   mkdir -p "$DIR"
