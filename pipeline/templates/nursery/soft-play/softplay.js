@@ -125,8 +125,8 @@
     });
   });
 
-  /* 7. Entrances: balls drop into the ball row and the stairs settle in,
-     once, when first seen. Nothing moves under reduced motion. */
+  /* 7. Entrances: the stairs settle in once, when first seen. Nothing
+     moves under reduced motion. */
   if (!reduce.matches && 'IntersectionObserver' in window) {
     var once = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
@@ -135,7 +135,6 @@
         once.unobserve(e.target);
       });
     }, { threshold: 0.2 });
-    $$('.ball-row--drop').forEach(function (r) { once.observe(r); });
     $$('.stairs').forEach(function (s) {
       if (s.getBoundingClientRect().top > window.innerHeight) once.observe(s);
     });

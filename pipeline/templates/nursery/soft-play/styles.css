@@ -381,29 +381,26 @@ body.menu-open { overflow: hidden; }
   .door svg { width: 132px; height: 112px; }
 }
 
-/* Book a visit band: deep pool blue, a row of balls along its top edge,
-   one centred white card with one action. */
-.visit { position: relative; background: var(--pool-deep); color: #FFFFFF; padding-block: 0 var(--space-section); }
-.ball-row { display: block; width: 100%; height: 56px; overflow: hidden; margin-bottom: calc(var(--space-section) - 56px); background: var(--floor); }
-.ball-row--footer { background: transparent; margin: 0; }
+/* Book a visit band: deep pool blue, one centred white card with one
+   action, and a pile of foam below it. */
+.visit { position: relative; background: var(--pool-deep); color: #FFFFFF; padding-block: calc(var(--space-section) + 24px) var(--space-section); }
 .visit__card {
   background: var(--paper); color: var(--ink); border-radius: 32px;
   max-width: 640px; margin-inline: auto; padding: 40px 28px 36px; text-align: center;
   box-shadow: 0 10px 0 #174A78;
 }
 .visit__card svg.visit__shape { width: 112px; height: 92px; margin: -92px auto 16px; overflow: visible; }
+.visit__shadow { fill: #1D1B2F; opacity: .14; }
+.visit__ball, .visit__shadow { transform-box: fill-box; transform-origin: 50% 100%; }
 .visit__card p { margin: 16px auto 0; max-width: 32ch; }
 .visit__card .actions { justify-content: center; }
 @media (min-width: 900px) { .visit__card { padding: 56px 56px 48px; } }
 
 /* A pile of foam along the foot of the visit band. */
-.visit__pile { display: flex; justify-content: center; align-items: flex-end; gap: 0; margin-top: 56px; margin-bottom: calc(-1 * var(--space-section) + 8px); }
+.visit__pile { display: flex; justify-content: center; align-items: flex-end; gap: 0; margin-top: 56px; }
 .visit__pile svg { width: min(28vw, 120px); height: auto; aspect-ratio: 6 / 5; overflow: visible; margin-inline: -4px; }
 .visit__pile svg:nth-child(2) { width: min(36vw, 150px); }
 @media (min-width: 900px) { .visit__pile svg { width: 160px; height: 133px; } .visit__pile svg:nth-child(2) { width: 200px; height: 166px; } }
-
-/* Ball row balls drop in once (softplay.js adds .is-in). */
-.ball-row .b { transform-box: fill-box; transform-origin: 50% 100%; }
 
 /* ---------- 8. INNER PAGES (S10) ------------------------------------ */
 /* The page band: eyebrow, H1, intro, one action, and the page's foam
@@ -612,7 +609,7 @@ details > p + p { margin-top: .75rem; }
 @media (min-width: 900px) { .mosaic { columns: 3; column-gap: 16px; } .mosaic li { margin-bottom: 20px; } }
 
 
-/* Scene paint: the hero foam scene and ball rows are inline SVG, so they
+/* Scene paint: the hero foam scene is inline SVG, so they
    take their colours from the tokens. .rnd rounds a polygon's corners
    with a same-colour stroke, like a cut foam block. */
 .scene [class] { stroke-width: 0; }
@@ -641,8 +638,7 @@ details > p + p { margin-top: .75rem; }
 .scene .shadow { fill: var(--ink); opacity: .1; }
 
 /* ---------- 10. FOOTER ---------------------------------------------- */
-.site-footer { background: var(--ink); color: var(--floor); padding-block: 0 48px; }
-.site-footer .ball-row { background: var(--pool-deep); margin-bottom: 48px; }
+.site-footer { background: var(--ink); color: var(--floor); padding-block: 56px 48px; }
 .site-footer a { color: var(--floor); text-decoration-color: var(--sun); }
 .site-footer a:hover { color: var(--sun); }
 .site-footer .wordmark b { color: var(--floor) !important; }
@@ -656,8 +652,6 @@ details > p + p { margin-top: .75rem; }
 @media (prefers-reduced-motion: no-preference) {
   /* Entrances run only once softplay.js adds .is-in; until then
      everything sits at rest, so screenshots and no-JS look complete. */
-  .ball-row--drop.is-in .b { animation: ball-drop .42s cubic-bezier(.35,0,.5,1.4) both; animation-delay: calc(var(--i, 0) * 35ms); }
-  @keyframes ball-drop { 0% { opacity: 0; transform: translateY(-46px); } 70% { opacity: 1; transform: translateY(3px); } 100% { opacity: 1; transform: none; } }
   .stairs.is-in li { animation: step-in .5s cubic-bezier(.3,1.5,.5,1) both; animation-delay: calc(var(--step, 0) * 70ms); }
   @keyframes step-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
@@ -665,6 +659,12 @@ details > p + p { margin-top: .75rem; }
   .hero__scene .rock { animation: rock 5s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
   @keyframes bob { 0%,100% { transform: none; } 50% { transform: translateY(-5px); } }
   @keyframes rock { 0%,100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+
+  /* The visit card's beach ball bounces gently; its shadow shrinks as it rises. */
+  .visit__ball { animation: ball-bounce 2.4s ease-in-out infinite; }
+  .visit__shadow { animation: ball-shadow 2.4s ease-in-out infinite; }
+  @keyframes ball-bounce { 0%,100% { transform: none; } 50% { transform: translateY(-9px); } }
+  @keyframes ball-shadow { 0%,100% { transform: none; opacity: .14; } 50% { transform: scaleX(.8); opacity: .08; } }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -672,7 +672,7 @@ details > p + p { margin-top: .75rem; }
 
 /* ---------- 12. PRINT ----------------------------------------------- */
 @media print {
-  .site-header nav, .menu-button, .phone-bar, .ball-row, .hero__scene, .page-band__shape, .living__toggle { display: none !important; }
+  .site-header nav, .menu-button, .phone-bar, .hero__scene, .page-band__shape, .living__toggle { display: none !important; }
   body { background: #fff; padding: 0; }
   a { text-decoration: underline; }
 }

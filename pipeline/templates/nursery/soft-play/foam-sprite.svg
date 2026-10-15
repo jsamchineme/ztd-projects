@@ -64,6 +64,10 @@
 
   <symbol id="foam-ball" viewBox="0 0 120 100">
     <ellipse cx="60" cy="96" rx="32" ry="4" fill="#1D1B2F" opacity=".14"/>
+    <use href="#foam-ball-body"/>
+  </symbol>
+  <!-- The ball without its shadow, so the visit band's ball can bounce over a shadow that stays put. -->
+  <symbol id="foam-ball-body" viewBox="0 0 120 100">
     <circle cx="60" cy="53" r="38" fill="#FFFFFF"/>
     <path d="M60 15 A38 38 0 0 0 60 91 C34 72 34 34 60 15 Z" style="fill:var(--foam)"/>
     <path d="M60 15 A38 38 0 0 1 60 91 C86 72 86 34 60 15 Z" style="fill:var(--foam-lo)"/>
