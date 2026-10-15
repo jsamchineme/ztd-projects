@@ -21,7 +21,7 @@ It is the most playful of the four spacious directions, and still airy, because 
 | `PHOTO-SHOTLIST.md` | What to ask the nursery to photograph. | Never |
 | `example/` | The worked example, **Leaps and Bounds Nursery, Paisley**: `index.html`, `join-us.html`, `fees-and-funding.html`, `our-nursery.html`, `our-team.html`, `parents.html`, `gallery.html`. | Copy for each nursery |
 | `example/img/` | 10 real photos of the nursery's empty rooms and garden (WebP 400/800/1200 + JPEG), and `CREDITS.txt` (sources, blurring, exclusions). | Each nursery gets its own |
-| `example/media/` | Living photo loop (138 KB) and poster, photo tour film (1.3 MB, 30fps), poster and WebVTT captions. | Each nursery gets its own |
+| `example/media/` | Living photo loop (154 KB, 30fps) and poster, photo tour film (1.3 MB, 30fps), poster and WebVTT captions. | Each nursery gets its own |
 | `thumb.jpg` | Picker thumbnail. Regenerate with `node pipeline/template-thumbs.mjs nursery/soft-play`. | After changes |
 
 Pages link `../styles.css` and `../softplay.js`; fonts load from `../fonts/` through the stylesheet. No build step, no framework, nothing from another server: no Google Fonts, CDNs, analytics, maps or social embeds (GDPR, §6.6).
@@ -190,7 +190,7 @@ Add a **Food** page (cube, with the meal list) only if the nursery publishes men
 ```
 `softplay.js` loads and plays it only at ≥768px when motion is welcome, shows the Pause button, and swaps the label to the honest `data-playing` text. Phones and reduced-motion users get the poster and never download the film. Keep it under 1.5 MB, 6 to 10 seconds, muted, of an **empty** room. From the nursery's own footage, or a slow pan across one real photo made with ffmpeg and labelled as such. A seamless back-and-forth pan:
 ```
-ffmpeg -loop 1 -i room-800.jpg -vf "scale=1600:-1,zoompan=z='1.2':x='(iw-iw/zoom)*(0.5-0.5*cos(2*PI*on/240))':y='(ih-ih/zoom)*0.5':d=240:s=768x432:fps=24,format=yuv420p" -frames:v 240 -an -c:v libx264 -crf 29 -preset slow -movflags +faststart play-room-loop.mp4
+ffmpeg -i room-800.jpg -filter_complex "crop=iw:iw*9/16,scale=7680:4320:flags=lanczos,format=yuv444p,zoompan=z=1.2:x='(iw-iw/zoom)*(0.5-0.5*cos(2*PI*on/300))':y='(ih-ih/zoom)/2':d=300:s=768x432:fps=30,setsar=1,format=yuv420p" -an -c:v libx264 -crf 32 -preset slow -g 150 -movflags +faststart play-room-loop.mp4
 ```
 
 **Tour film** (Our nursery): `<figure class="frame frame--grass film"><video controls preload="none" playsinline crossorigin="anonymous" poster=…><source …><track kind="captions" … default></video><figcaption>…</figcaption></figure>` followed by a `<details class="transcript">`. Empty rooms first, captions always, sound only if the user asks. No YouTube or Vimeo. The example's film is honestly described as "made from still photos, 27 seconds, no sound".
@@ -202,7 +202,7 @@ seg="crop=iw:iw*9/16,scale=7680:4320:flags=lanczos,format=yuv444p,zoompan=z=1.12
 ffmpeg -i a.jpg -i b.jpg … -filter_complex "[0:v]$seg[a];[1:v]$seg[b];…;[a][b]xfade=transition=fade:duration=0.8:offset=5.2[ab];…,format=yuv420p[out]" \
   -map "[out]" -an -c:v libx264 -crf 27 -preset slow -g 60 -movflags +faststart photo-tour.mp4
 ```
-The living-photo recipe above still uses the old method; rebuild it this way if its pan looks jumpy.
+The living-photo recipe above uses the same method, as one 10 s cosine back-and-forth so it loops seamlessly.
 
 **Gallery:** `.filters[data-filters=mosaic]` (foam-block buttons with `aria-pressed`, groups Rooms, Play, Garden, and Food or Artwork when there are photos) over `ul.mosaic#mosaic > li[data-group] > figure > picture + figcaption`: 2 columns with 12px gaps on a phone, 3 on desktop, frame colour by group. Real `<img>` with true alt text and short captions, `loading="lazy"`, WebP 400/800 + JPEG. No slider, no lightbox. The homepage has **no** gallery strip; the Gallery door is the way in.
 
