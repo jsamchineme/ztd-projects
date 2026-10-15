@@ -45,7 +45,8 @@ const ipOf = req => String(req.headers['x-real-ip'] || req.socket.remoteAddress 
 function sse(res){
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
   res.write(': ok\n\n');
-  const ping = setInterval(() => res.write(': ping\n\n'), 20000);
+  // A named event, so pages can tell a quiet but working connection from a dead one (see the chat's connect()).
+  const ping = setInterval(() => res.write('event: ping\ndata: \n\n'), 20000);
   res.on('close', () => clearInterval(ping));
 }
 
@@ -315,9 +316,13 @@ route('GET', '/api/uploads/:id', async ({ user, params }, res) => {
   createReadStream(u.path).on('error', () => res.destroy()).pipe(res);
 });
 route('POST', '/api/chats/:id/stop', async ({ user, params }) => { const { c } = chatFor(user, params.id); return { stopped: A.stop(c.id) }; });
-route('GET', '/api/chats/:id/stream', async ({ user, params }, res) => {
+route('GET', '/api/chats/:id/stream', async ({ user, params, url }, res) => {
   const { c } = chatFor(user, params.id);
   sse(res);
+  // First what the tab missed since the last event it saw (?after=seq), then live events. Both happen in one go, so
+  // nothing can fall between them: a message sent while the page was connecting, or asleep, still shows up.
+  const after = Number(url.searchParams.get('after'));
+  if (Number.isInteger(after)) for (const ev of A.chatEvents(c.id, after)) res.write(`data: ${JSON.stringify(ev)}\n\n`);
   const off = A.watch(c.id, res);
   res.on('close', off);
 });

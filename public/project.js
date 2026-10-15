@@ -375,26 +375,29 @@ function renderChat(ctx, el, chatId, loadList){
     if (node){ inner.insertBefore(node, working); scroll(); }
   }
 
-  let lastSeq = -1;
+  // Live events. Each connection asks for everything after the last event this page has, so reconnecting never
+  // loses anything. Phones can leave a connection dead without an error (asleep, changing networks), so the page
+  // reconnects when the server's 20-second ping stops arriving, and whenever the page comes back into view.
+  let lastSeq = -1, heard = 0, retry = null;
   function connect(){
-    es?.close();
-    es = new EventSource(`/api/chats/${chat.id}/stream`);
+    es?.close(); clearTimeout(retry);
+    if (!chat || !document.body.contains(el)) return;
+    heard = Date.now();
+    es = new EventSource(`/api/chats/${chat.id}/stream?after=${lastSeq}`);
     es.onmessage = m => {
+      heard = Date.now();
       const ev = JSON.parse(m.data);
       if (ev.seq != null){ if (ev.seq <= lastSeq) return; lastSeq = ev.seq; }
       addEvent(ev);
     };
-    es.onerror = () => {
-      // Reconnect and catch up on anything missed.
-      es.close();
-      setTimeout(async () => {
-        if (!document.body.contains(el)) return;
-        try { const r = await api('GET', `/api/chats/${chat.id}`); for (const ev of r.events) if (ev.seq > lastSeq){ lastSeq = ev.seq; addEvent(ev); } setRunning(r.chat.running); } catch {}
-        connect();
-      }, 2000);
-    };
+    es.addEventListener('ping', () => { heard = Date.now(); });
+    es.onerror = () => { es.close(); retry = setTimeout(connect, 2000); };
   }
-  onLeave(() => es?.close());
+  const watchdog = setInterval(() => { if (chat && Date.now() - heard > 50000) connect(); }, 10000);
+  const wake = () => { if (chat && document.visibilityState === 'visible') connect(); };
+  document.addEventListener('visibilitychange', wake);
+  addEventListener('online', wake);
+  onLeave(() => { es?.close(); clearTimeout(retry); clearInterval(watchdog); document.removeEventListener('visibilitychange', wake); removeEventListener('online', wake); });
 
   async function load(){
     if (!chatId){ inner.append(emptyState(), working); setRunning(false); return; }
@@ -424,11 +427,13 @@ function renderChat(ctx, el, chatId, loadList){
         chat = await api('POST', `/api/projects/${id}/chats`, { model: model.value, mode });
         history.replaceState(null, '', `/p/${id}/chat/${chat.id}`);
         inner.replaceChildren(working);
-        connect();
-        await new Promise(r => setTimeout(r, 150));
+        connect();   // it replays from the start, so it doesn't matter whether it's open before the message is sent
       }
       $('.empty-chat', inner)?.remove();
+      const before = lastSeq;
       await api('POST', `/api/chats/${chat.id}/messages`, { prompt, model: model.value, mode, attachments });
+      // The message is saved: if it hasn't come back over the connection soon, that connection is stuck.
+      setTimeout(() => { if (lastSeq === before) connect(); }, 3000);
       ta.value = ''; localStorageSet(draftKey, ''); autosize();
       files = []; paintChips();
       loadList?.().catch(() => {});
