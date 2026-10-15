@@ -7,10 +7,9 @@ const MODELS = [['opus', 'Opus'], ['fable', 'Fable'], ['sonnet', 'Sonnet'], ['ha
 const MAX_FILES = 10, MAX_BYTES = 20 * 1024 * 1024;
 const fileIcon = kind => ({ image: '🖼', pdf: '📄', notebook: '📓', text: '📝' })[kind] || '📦';
 const sizeText = n => n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`;
-// Line icons in the style of Claude.ai's composer (drawn here; they take the button's text colour).
+// A line icon in the style of Claude.ai's composer (drawn here; they take the button's text colour).
 const icon = paths => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
 const MIC_ICON = icon('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>');
-const SPEAKER_ICON = on => icon('<path d="M4 9.5h3l4.5-4v13L7 14.5H4z"/>' + (on ? '<path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>' : '<path d="M16 10l4 4M20 10l-4 4"/>'));
 const TABS = [['chat', 'Chat'], ['services', 'Services'], ['changes', 'Changes'], ['files', 'Files'], ['settings', 'Settings']];
 
 export async function renderProject(main, id, tab, sub){
@@ -185,14 +184,13 @@ function renderChat(ctx, el, chatId, loadList){
     r.onerror = () => reject(new Error('Couldn’t read that file'));
     r.readAsDataURL(file);
   });
-  // Voice: the mic dictates into the box (the browser's own speech recognition), and the speaker reads Claude's new replies aloud.
+  // Voice: the mic dictates into the box, using the browser's own speech recognition.
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let rec = null;
   const micBtn = Recognition ? h('button', { type: 'button', class: 'btn ghost small mic-btn', title: 'Speak your prompt', 'aria-label': 'Speak your prompt', 'aria-pressed': 'false', html: MIC_ICON }) : null;
   const paintMic = () => { micBtn.classList.toggle('on', !!rec); micBtn.setAttribute('aria-pressed', String(!!rec)); micBtn.title = rec ? 'Stop listening' : 'Speak your prompt'; };
   function listen(){
     if (rec){ rec.stop(); return; }
-    speechSynthesis?.cancel();
     const base = ta.value.replace(/\s*$/, '');
     rec = new Recognition();
     rec.lang = navigator.language || 'en-GB';
@@ -212,26 +210,7 @@ function renderChat(ctx, el, chatId, loadList){
     paintMic();
   }
   if (micBtn) onTap(micBtn, listen);
-  const canSpeak = 'speechSynthesis' in window;
-  let readAloud = canSpeak && localStorageGet('readAloud') === '1';
-  const speakBtn = canSpeak ? h('button', { type: 'button', class: 'btn ghost small speak-btn', 'aria-label': 'Read replies aloud' }) : null;
-  const paintSpeak = () => { speakBtn.innerHTML = SPEAKER_ICON(readAloud); speakBtn.classList.toggle('on', readAloud); speakBtn.setAttribute('aria-pressed', String(readAloud)); speakBtn.title = readAloud ? 'Reading replies aloud (tap to stop)' : 'Read replies aloud'; };
-  if (speakBtn){
-    paintSpeak();
-    onTap(speakBtn, () => {
-      readAloud = !readAloud; localStorageSet('readAloud', readAloud ? '1' : '0'); paintSpeak();
-      speechSynthesis.cancel();
-      if (readAloud) speechSynthesis.speak(new SpeechSynthesisUtterance(''));   // phones only allow speech that a tap started
-    });
-  }
-  // Markdown to plain sentences, in short pieces: some browsers cut off long utterances.
-  function speak(text){
-    if (!readAloud) return;
-    const plain = text.replace(/```[\s\S]*?```/g, ' (code) ').replace(/`([^`]*)`/g, '$1').replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
-      .replace(/^\s*[-*+>#|]+\s*/gm, '').replace(/[*_~#|]/g, '');
-    for (const part of plain.split(/(?<=[.!?])\s+|\n+/)) if (part.trim()) speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance(part.trim()), { lang: navigator.language || 'en-GB' }));
-  }
-  onLeave(() => { rec?.abort(); if (canSpeak) speechSynthesis.cancel(); });
+  onLeave(() => rec?.abort());
   ta.addEventListener('paste', e => { if (e.clipboardData?.files.length){ e.preventDefault(); addFiles(e.clipboardData.files); } });
   ta.addEventListener('input', () => { autosize(); localStorageSet(draftKey, ta.value); paintSend(); });
   ta.addEventListener('keydown', e => {
@@ -244,13 +223,9 @@ function renderChat(ctx, el, chatId, loadList){
       h('div', { class: 'spacer' }), gear, micBtn, send));
   const modelRow = h('label', { class: 'opts-row' }, h('span', null, 'Model'));
   const modeRow = h('div', { class: 'opts-row' }, h('span', null, 'Mode'));
-  const voiceRow = speakBtn ? h('div', { class: 'opts-row' }, h('span', null, 'Read replies aloud')) : null;
-  const opts = h('div', { class: 'composer-opts', hidden: true }, modelRow, modeRow, voiceRow);
+  const opts = h('div', { class: 'composer-opts', hidden: true }, modelRow, modeRow);
   form.append(opts);
-  const placeOpts = () => {
-    if (phone.matches){ modelRow.append(model); modeRow.append(seg); voiceRow?.append(speakBtn); }
-    else { attachBtn.after(model, seg); if (speakBtn) gear.before(speakBtn); showOpts(false); }
-  };
+  const placeOpts = () => { if (phone.matches){ modelRow.append(model); modeRow.append(seg); } else { attachBtn.after(model, seg); showOpts(false); } };
   function showOpts(open){ opts.hidden = !open; gear.setAttribute('aria-expanded', String(open)); }
   onTap(gear, () => showOpts(opts.hidden));
   const outside = e => { if (!opts.hidden && !opts.contains(e.target) && !gear.contains(e.target)) showOpts(false); };
@@ -369,7 +344,6 @@ function renderChat(ctx, el, chatId, loadList){
     } else if (ev.type === 'text'){
       live?.remove(); live = null; liveThinking?.remove(); liveThinking = null;
       node = h('div', { class: 'msg md', html: md(ev.text) });
-      if (ev.seq > spokenUpTo) speak(ev.text);
     } else if (ev.type === 'thinking'){
       liveThinking?.remove(); liveThinking = null;
       node = h('details', { class: 'thinking' }, h('summary', null, 'Thought for a moment'), h('div', null, ev.text));
@@ -401,7 +375,7 @@ function renderChat(ctx, el, chatId, loadList){
     if (node){ inner.insertBefore(node, working); scroll(); }
   }
 
-  let lastSeq = -1, spokenUpTo = -1;
+  let lastSeq = -1;
   function connect(){
     es?.close();
     es = new EventSource(`/api/chats/${chat.id}/stream`);
@@ -429,7 +403,6 @@ function renderChat(ctx, el, chatId, loadList){
       chat = r.chat;
       if (chat.model){ model.value = chat.model; paintGear(); }
       inner.replaceChildren(working);
-      spokenUpTo = r.events.at(-1)?.seq ?? -1;   // read aloud only what arrives from now on
       for (const ev of r.events){ lastSeq = ev.seq; addEvent(ev); }
       if (!r.events.length) inner.insertBefore(emptyState(), working);
       setRunning(chat.running);
@@ -465,7 +438,7 @@ function renderChat(ctx, el, chatId, loadList){
       if (e.code === 'no_claude') go('/account#claude');
     } finally { paintSend(); }
   }
-  async function stop(){ if (canSpeak) speechSynthesis.cancel(); if (chat) await api('POST', `/api/chats/${chat.id}/stop`).catch(fail); }
+  async function stop(){ if (chat) await api('POST', `/api/chats/${chat.id}/stop`).catch(fail); }
 
   load().then(() => ta.focus());
 }
