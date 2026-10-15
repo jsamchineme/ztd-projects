@@ -8,7 +8,7 @@ import QRCode from 'qrcode';
 import { PORT, STUDIO_HOST, STUDIO_URL, DOMAIN, APP_DIR, SECURE, APP_NAME } from './lib/config.mjs';
 import { db, audit, now } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
-import { mailEnabled } from './lib/mail.mjs';
+import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail } from './lib/mail.mjs';
 import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
@@ -373,6 +373,17 @@ route('GET', '/api/admin/system', async ({ user }) => {
   const r = await ctl(['status']);
   return { services: r.code === 0 ? JSON.parse(r.out) : {}, mail: mailEnabled(), domain: DOMAIN };
 });
+
+// Email settings (lib/mail.mjs). The password is never sent back to the browser.
+route('GET', '/api/admin/mail', async ({ user }) => { needAdmin(user); return mailSettings(); });
+route('PUT', '/api/admin/mail', async ({ user, body, req }) => {
+  needAdmin(user);
+  await saveMailSettings(body);
+  audit(user.id, 'admin.mail', mailSettings().host, '', ipOf(req));
+  return mailSettings();
+});
+route('DELETE', '/api/admin/mail', async ({ user, req }) => { needAdmin(user); clearMailSettings(); audit(user.id, 'admin.mail-clear', '', '', ipOf(req)); return mailSettings(); });
+route('POST', '/api/admin/mail/test', async ({ user }) => { needAdmin(user); await sendTestMail(user.email); return { ok: true, to: user.email }; });
 
 // Updating Studio itself: installs the last commit of studio/ in the source project (see studio-ctl studio-update).
 const installedVersion = () => { try { return JSON.parse(readFileSync(join(APP_DIR, '.version'), 'utf8')); } catch { return null; } };
