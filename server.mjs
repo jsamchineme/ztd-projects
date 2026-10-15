@@ -291,10 +291,23 @@ route('PATCH', '/api/chats/:id', async ({ user, params, body }) => {
   if (body.title) db.prepare('UPDATE chat SET title = ? WHERE id = ?').run(String(body.title).slice(0, 120), c.id);
   return A.getChat(c.id);
 });
+// Archiving or deleting a chat: the person who started it, or a team admin.
+function chatOwnerFor(user, id, verb){
+  const r = chatFor(user, id);
+  if (r.c.userId !== user.id && !canManage(projectRole(user, r.p))) throw err(403, `Only the person who started a chat, or a team admin, can ${verb} it.`);
+  return r;
+}
+route('POST', '/api/chats/:id/archive', async ({ user, params, body }) => {
+  const { c } = chatOwnerFor(user, params.id, 'archive');
+  A.archiveChat(c.id, body.archived !== false);
+  audit(user.id, body.archived !== false ? 'chat.archive' : 'chat.unarchive', c.id, c.title);
+  return A.getChat(c.id);
+});
 route('DELETE', '/api/chats/:id', async ({ user, params }) => {
-  const { c, p } = chatFor(user, params.id);
-  if (c.userId !== user.id && !canManage(projectRole(user, p))) throw err(403, 'Only the person who started a chat, or a team admin, can delete it.');
-  A.deleteChat(c.id); return { ok: true };
+  const { c } = chatOwnerFor(user, params.id, 'delete');
+  A.deleteChat(c.id);
+  audit(user.id, 'chat.delete', c.id, c.title);
+  return { ok: true };
 });
 route('POST', '/api/chats/:id/messages', async ({ user, params, body }) => {
   const { c, p } = chatFor(user, params.id);

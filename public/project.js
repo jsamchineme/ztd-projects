@@ -91,7 +91,7 @@ async function chatTab(ctx, chatId){
     h('button', { type: 'button', class: 'btn ghost topbar-icon', 'aria-label': 'New chat', title: 'New chat', onclick: () => go(`/p/${id}/chat/new`) }, '＋'));
   listEl.addEventListener('click', e => {
     const a = e.target.closest('a, button');
-    if (!a) return;
+    if (!a || a.closest('.chat-more, .archived-toggle')) return;
     // The open chat: just close the drawer, rather than reloading the conversation.
     if (a.getAttribute('href') === location.pathname){ e.preventDefault(); e.stopPropagation(); }
     showList(false);
@@ -100,21 +100,48 @@ async function chatTab(ctx, chatId){
   document.addEventListener('keydown', onKey);
   onLeave(() => document.removeEventListener('keydown', onKey));
   body.append(listEl, backdrop, chatEl);
-  let chats = [];
+  let chats = [], showArchived = false;
+  const openId = () => location.pathname.split('/').pop();   // a new chat gets its id in the address after the first message
+  const chatLink = (c, open) => h('div', { class: 'chat-row' },
+    h('a', { class: 'nav-item' + (c.id === open ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, 'data-link': '' },
+      c.running ? h('span', { class: 'dot busy' }) : null,
+      h('span', { class: 'name' }, c.title, h('br'), h('span', { class: 'sub' }, `${c.mine ? 'You' : 'Teammate'} · ${ago(c.updatedAt)}`))),
+    c.mine || ctx.project.canManage ? h('button', { type: 'button', class: 'btn ghost small chat-more', 'aria-label': `Options for ${c.title}`, title: 'Archive or delete', onclick: () => chatOptions(c) }, '⋯') : null);
   async function loadList(){
     chats = await api('GET', `/api/projects/${id}/chats`);
-    const open = location.pathname.split('/').pop();   // a new chat gets its id in the address after the first message
+    const open = openId();
     ctx.setSub(chats.find(c => c.id === open)?.title || 'New chat');
+    const active = chats.filter(c => !c.archivedAt), archived = chats.filter(c => c.archivedAt);
     listEl.replaceChildren(...[
       h('button', { class: 'btn block', style: { marginBottom: '8px' }, onclick: () => go(`/p/${id}/chat/new`) }, '+ New chat'),
-      ...chats.map(c => h('a', { class: 'nav-item' + (c.id === open ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, 'data-link': '' },
-        c.running ? h('span', { class: 'dot busy' }) : null,
-        h('span', { class: 'name' }, c.title, h('br'), h('span', { class: 'sub' }, `${c.mine ? 'You' : 'Teammate'} · ${ago(c.updatedAt)}`)))),
-      chats.length ? null : h('p', { class: 'small muted', style: { margin: '6px 10px' } }, 'Chats you start appear here.')].filter(Boolean));
+      ...active.map(c => chatLink(c, open)),
+      active.length ? null : h('p', { class: 'small muted', style: { margin: '6px 10px' } }, archived.length ? 'No open chats.' : 'Chats you start appear here.'),
+      archived.length ? h('button', { type: 'button', class: 'btn ghost small block archived-toggle', 'aria-expanded': String(showArchived), onclick: () => { showArchived = !showArchived; loadList().catch(fail); } },
+        `${showArchived ? '▾' : '▸'} Archived (${archived.length})`) : null,
+      ...(showArchived ? archived.map(c => chatLink(c, open)) : [])].filter(Boolean));
+  }
+  // Archive (hidden under "Archived", and back in the list once someone sends it a message) or delete for good.
+  function chatOptions(c){
+    const leave = () => { if (c.id === openId()) go(`/p/${id}/chat/new`); else loadList().catch(fail); };
+    dialog(close => h('div', { class: 'dialog-body' },
+      h('h2', null, c.title),
+      h('p', { class: 'muted' }, c.archivedAt ? 'This chat is archived.' : 'Archive it to tidy the list: it moves under “Archived” and you can still open it.'),
+      h('div', { class: 'row end', style: { marginTop: '18px', flexWrap: 'wrap' } },
+        h('button', { class: 'btn', onclick: () => close() }, 'Cancel'),
+        h('button', { class: 'btn danger', onclick: async () => {
+          close();
+          if (!await confirmDialog('Delete this chat?', `“${c.title}” and its whole conversation are deleted for everyone. This can’t be undone. Changes Claude made to files stay.`, 'Delete chat', true)) return;
+          try { await api('DELETE', `/api/chats/${c.id}`); toast('Chat deleted'); leave(); } catch (e){ fail(e); }
+        } }, 'Delete'),
+        h('button', { class: 'btn primary', onclick: async e => busy(e.target, async () => {
+          await api('POST', `/api/chats/${c.id}/archive`, { archived: !c.archivedAt });
+          close(); toast(c.archivedAt ? 'Chat restored' : 'Chat archived');
+          if (c.archivedAt) loadList().catch(fail); else leave();
+        }).catch(() => {}) }, c.archivedAt ? 'Unarchive' : 'Archive'))));
   }
   await loadList().catch(fail);
   if (!chatId){
-    const recent = chats.find(c => c.mine);
+    const recent = chats.find(c => c.mine && !c.archivedAt);
     if (recent) return go(`/p/${id}/chat/${recent.id}`, true);
     chatId = 'new';
   }
@@ -257,7 +284,13 @@ function renderChat(ctx, el, chatId, loadList){
     updateBar.hidden = false;
   }
   checkStudioUpdate().catch(() => {});
-  el.append(transcript, h('div', { class: 'composer-wrap' }, updateBar, noClaude, form,
+  const archivedNote = h('div', { class: 'note', hidden: true, style: { maxWidth: '780px', margin: '0 auto 8px' } },
+    'This chat is archived. Sending a message brings it back to the list. ',
+    h('button', { type: 'button', class: 'btn small', onclick: e => busy(e.target, async () => {
+      await api('POST', `/api/chats/${chat.id}/archive`, { archived: false });
+      archivedNote.hidden = true; toast('Chat restored'); loadList?.().catch(() => {});
+    }).catch(() => {}) }, 'Unarchive'));
+  el.append(transcript, h('div', { class: 'composer-wrap' }, updateBar, noClaude, archivedNote, form,
     h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach' + (micBtn ? ' · Tap the mic to speak' : '') + ' · Claude works in this project’s folder on the server')));
   autosize();
   paintSend();
@@ -407,6 +440,7 @@ function renderChat(ctx, el, chatId, loadList){
       const r = await api('GET', `/api/chats/${chatId}`);
       chat = r.chat;
       if (chat.model){ model.value = chat.model; paintGear(); }
+      if (chat.archivedAt) archivedNote.hidden = false;
       inner.replaceChildren(working);
       for (const ev of r.events){ lastSeq = ev.seq; addEvent(ev); }
       if (!r.events.length) inner.insertBefore(emptyState(), working);
@@ -437,7 +471,7 @@ function renderChat(ctx, el, chatId, loadList){
       // The message is saved: if it hasn't come back over the connection soon, that connection is stuck.
       setTimeout(() => { if (lastSeq === before) connect(); }, 3000);
       ta.value = ''; localStorageSet(draftKey, ''); autosize();
-      files = []; paintChips();
+      files = []; paintChips(); archivedNote.hidden = true;
       loadList?.().catch(() => {});
       scroll(true);
     } catch (e){

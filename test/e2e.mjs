@@ -401,6 +401,27 @@ await check('stop button interrupts a long run', async () => {
   await page.click('.send.stop');
   await page.getByText('Stopped.').waitFor({ timeout: 15000 });
 }, page);
+await check('a chat can be archived, unarchived and deleted', async () => {
+  const row = page.locator('.chat-list .chat-row', { hasText: 'slow task please' });
+  await row.hover();
+  await row.locator('.chat-more').click();
+  await page.click('dialog button:has-text("Archive")');
+  await page.waitForURL(/\/chat\/new$/);
+  await page.locator('.archived-toggle', { hasText: 'Archived (1)' }).waitFor();
+  if (await row.count()) throw new Error('the archived chat is still in the list');
+  await page.click('.archived-toggle');
+  await row.locator('a').click();
+  await page.getByText('This chat is archived.').waitFor();
+  await page.click('.note button:has-text("Unarchive")');
+  await page.locator('.archived-toggle').waitFor({ state: 'detached' });
+  await row.hover();
+  await row.locator('.chat-more').click();
+  await page.click('dialog button:has-text("Delete")');
+  await page.click('dialog button:has-text("Delete chat")');
+  await page.getByText('Chat deleted').waitFor();
+  await page.waitForURL(/\/chat\/new$/);
+  if (await row.count()) throw new Error('the deleted chat is still listed');
+}, page);
 await check('delete project needs the short name', async () => {
   await page.goto(projectUrl + '/settings');
   await page.click('button:has-text("Delete project")');
