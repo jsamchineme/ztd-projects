@@ -1,13 +1,13 @@
-// End-to-end test of Studio in a real browser, against a throwaway local instance (see test/README.md).
-//   node studio/test/e2e.mjs http://studio.localhost:4310 localhost:4310 <screenshot dir>
-import { chromium } from '../../pipeline/node_modules/playwright-core/index.mjs';
+// End-to-end test of Studio in a real browser, against a throwaway local instance. Run it with npm test (test/run.sh),
+// which starts that instance; by hand: node test/e2e.mjs http://studio.localhost:4310 localhost:4310 <screenshot dir>
+import { chromium } from 'playwright-core';
 import { createHmac } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import net from 'node:net';
 
 const [BASE, DOMAIN_PORT, SHOTS] = process.argv.slice(2);
 mkdirSync(SHOTS, { recursive: true });
-const CHROME = process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROME = process.env.CHROME_BIN || (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/usr/bin/google-chrome');
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140 Safari/537.36';
 
 function totp(secret, offset = 0){
@@ -33,7 +33,7 @@ async function check(name, fn, page){
   }
 }
 
-const browser = await chromium.launch({ executablePath: CHROME, headless: true });
+const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: process.platform === 'linux' ? ['--no-sandbox'] : [] });
 const ctx = await browser.newContext({ userAgent: UA, viewport: { width: 1280, height: 860 } });
 const page = await ctx.newPage();
 page.on('pageerror', e => console.log('  [page error]', e.message));
@@ -148,6 +148,19 @@ await check('attach an image and a text file and send them', async () => {
   const big = await page.request.post(`${BASE}/api/projects/${projectUrl.split('/p/')[1]}/uploads`, { headers: { Origin: BASE }, data: { name: 'big.bin', data: Buffer.alloc(21 * 1024 * 1024).toString('base64') } });
   if (big.status() !== 413) throw new Error(`21 MB upload gave ${big.status()}`);
   await page.screenshot({ path: `${SHOTS}/05b-attachments.png` });
+}, page);
+await check('a prompt still shows up when the live connection is stuck (no refresh needed)', async () => {
+  // Hold the next chat stream request forever, like a phone's connection that died without an error.
+  let held = false;
+  await page.route('**/api/chats/*/stream*', route => { if (!held){ held = true; return; } route.continue(); });
+  await page.reload();
+  await page.locator('.result-line').first().waitFor();
+  await page.fill('textarea', 'sent over a stuck connection');
+  await page.keyboard.press('Enter');
+  await page.locator('.bubble', { hasText: 'sent over a stuck connection' }).waitFor({ timeout: 8000 });
+  await page.waitForFunction(() => !document.querySelector('.send.stop'), null, { timeout: 15000 });
+  await page.unroute('**/api/chats/*/stream*');
+  if (!held) throw new Error('the stream was never held');
 }, page);
 await check('chat (with its attachments) survives a reload and is listed', async () => {
   await page.reload();
@@ -338,4 +351,6 @@ await check('delete project needs the short name', async () => {
 }, page);
 
 await browser.close();
-console.log('\n' + results.filter(r => r.startsWith('FAIL')).length + ' failed of ' + results.length);
+const failed = results.filter(r => r.startsWith('FAIL')).length;
+console.log('\n' + failed + ' failed of ' + results.length);
+process.exit(failed ? 1 : 0);

@@ -115,19 +115,18 @@ Without email, admins copy invite links from Teams and people, and reset links f
 ## Testing
 
 ```sh
-# a throwaway local instance (no root, no systemd), then the browser test
-STUDIO_ALLOW_FIRST_SIGNUP=1 STUDIO_SECRET=local-test-secret-0123456789abcdefghijklmnop STUDIO_DATA=/tmp/st/data \
-  PORT=4310 STUDIO_DOMAIN=localhost STUDIO_HOST=studio.localhost STUDIO_URL=http://studio.localhost:4310 \
-  STUDIO_CTL=$PWD/studio/test/mock-ctl.mjs STUDIO_CTL_SUDO=0 MOCK_ROOT=/tmp/st/mock node studio/server.mjs &
-node studio/test/e2e.mjs http://studio.localhost:4310 localhost:4310 /tmp/st/shots
+npm test        # the browser test, about a minute; exits 1 if anything fails
+npm run check   # just the syntax check (also run on every commit and before every update)
 ```
+
+`npm test` (`test/run.sh`) copies this folder as it is now, uncommitted changes included, starts a throwaway Studio from the copy on port 4310 (`STUDIO_TEST_PORT` to change it), and drives Chrome through `test/e2e.mjs`. It needs no root or systemd: `test/mock-ctl.mjs` stands in for `studio-ctl` and `ops/fake-claude.mjs` for Claude. Packages are installed once into `~/.cache/studio-test`. Screenshots go to `/tmp/studio-test-shots`, and on a failure Studio's log is printed. Set `CHROME_BIN` if Chrome isn't at the usual place.
 
 The test covers:
 
 - invite-only sign-up and required two-step sign-in
 - teams, invites and roles
 - creating a project, and Connect Claude
-- streaming chat, resume and stop
+- streaming chat, resume and stop, and prompts showing up over a stuck connection
 - the Changes tab and committing
 - services and logs, and the Files tab
 - the project login gate, and that cookies don't leak to projects
