@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs or updates ZTD Studio on an Ubuntu server. Run as root from the folder holding the Studio code:
+# Installs or updates ZTD Devs Studio on an Ubuntu server. Run as root from the folder holding the Studio code:
 #   bash ops/install.sh <domain>
 # Safe to re-run: it updates the code and keeps data, secrets and project folders.
 set -euo pipefail
@@ -82,7 +82,7 @@ chown root:studio /etc/studio/studio.env; chmod 640 /etc/studio/studio.env
 # systemd holds Studio's port, even while Studio restarts, so a project's process can't take it and pose as Studio.
 cat > /etc/systemd/system/studio.socket <<EOF
 [Unit]
-Description=ZTD Studio port
+Description=ZTD Devs Studio port
 
 [Socket]
 ListenStream=127.0.0.1:$PORT
@@ -94,7 +94,7 @@ EOF
 
 cat > /etc/systemd/system/studio.service <<EOF
 [Unit]
-Description=ZTD Studio
+Description=ZTD Devs Studio
 After=network.target studio.socket
 Requires=studio.socket
 
@@ -124,7 +124,7 @@ chmod 700 /usr/local/sbin/studio-admin
 # Nightly backups
 install -m 755 "$APP/ops/backup.sh" /usr/local/sbin/studio-backup
 cat > /etc/cron.d/studio-backup <<'EOF'
-# ZTD Studio nightly backup
+# ZTD Devs Studio nightly backup
 30 3 * * * root /usr/local/sbin/studio-backup >> /var/log/studio-backup.log 2>&1
 EOF
 

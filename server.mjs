@@ -1,4 +1,4 @@
-// ZTD Studio: build and run projects with Claude. Serves the Studio app on STUDIO_HOST and proxies every
+// ZTD Devs Studio: build and run projects with Claude. Serves the Studio app on STUDIO_HOST and proxies every
 // other <sub>.<DOMAIN> to the project that owns it, after checking the visitor may see it.
 import http from 'node:http';
 import { readFileSync, existsSync, createReadStream } from 'node:fs';

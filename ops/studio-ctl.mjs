@@ -77,7 +77,7 @@ const commands = {
       }).join('\n') + '\n';
       writeFileSync(join(ENV_DIR, `${u}.env`), envText, { mode: 0o600 });
       const quoted = s.command.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/%/g, '%%').replace(/\$/g, '$$$$');
-      writeFileSync(join(UNIT_DIR, `${u}.service`), `# Managed by ZTD Studio. Edits here are overwritten.
+      writeFileSync(join(UNIT_DIR, `${u}.service`), `# Managed by ZTD Devs Studio. Edits here are overwritten.
 [Unit]
 Description=Studio ${p}/${name}
 After=network.target
@@ -166,7 +166,7 @@ WantedBy=multi-user.target
       sh('chown', ['-R', `${user}:${user}`, dir]);
       asUser(user, ['git', 'init', '-q', '-b', 'main'], { cwd: repo(p) });
       asUser(user, ['git', 'add', '-A'], { cwd: repo(p) });
-      asUser(user, ['git', '-c', 'user.name=ZTD Studio', '-c', 'user.email=studio@localhost', 'commit', '-qm', 'Start project'], { cwd: repo(p) });
+      asUser(user, ['git', '-c', 'user.name=ZTD Devs Studio', '-c', 'user.email=studio@localhost', 'commit', '-qm', 'Start project'], { cwd: repo(p) });
     }
     log(`project-create ${p}`);
     console.log(JSON.stringify({ ok: true }));
@@ -394,7 +394,7 @@ function gidOf(u){ return Number(sh('id', ['-g', u]).stdout.trim()); }
 
 // Every subdomain goes to Studio, which checks the login and then proxies to the project.
 function apacheSite(host){
-  return `# Managed by ZTD Studio
+  return `# Managed by ZTD Devs Studio
 <VirtualHost *:80>
   ServerName ${host}
   ProxyPreserveHost On

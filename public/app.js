@@ -1,4 +1,4 @@
-// ZTD Studio front end: routing, sign-in screens and the app shell.
+// ZTD Devs Studio front end: routing, sign-in screens and the app shell.
 import { h, $, onTap, api, authApi, toast, fail, busy, dialog, field, initials, ApiError } from './ui.js';
 import { renderProject, newProjectDialog } from './project.js';
 import { renderAccount, renderTeams, renderAdmin } from './people.js';
@@ -134,13 +134,13 @@ async function signOut(){
 // ---------- sign-in screens ----------
 function authPage(...children){
   app.replaceChildren(h('main', { class: 'auth' }, h('div', { class: 'auth-card' },
-    h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Studio'), ...children)));
+    h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'), ...children)));
 }
 const errBox = () => h('div', { class: 'error-box', role: 'alert', hidden: true });
 function showErr(box, e){ box.hidden = false; box.textContent = e.message || String(e); }
 
 function loginScreen(){
-  document.title = 'Sign in · ZTD Studio';
+  document.title = 'Sign in · ZTD Devs Studio';
   const next = safeNext(qs().get('next'));
   const email = h('input', { type: 'email', autocomplete: 'username', required: true, autofocus: true });
   const pw = h('input', { type: 'password', autocomplete: 'current-password', required: true });
@@ -183,7 +183,7 @@ function totpScreen(next){
   } }, 'Use a backup code instead');
   authPage(
     h('h1', null, 'Two-step check'),
-    h('p', { class: 'muted' }, 'Open your authenticator app and enter the 6-digit code for ZTD Studio.'),
+    h('p', { class: 'muted' }, 'Open your authenticator app and enter the 6-digit code for ZTD Devs Studio.'),
     h('form', { onsubmit: async e => {
       e.preventDefault(); box.hidden = true;
       try {
@@ -197,7 +197,7 @@ function totpScreen(next){
 }
 
 function forgotScreen(){
-  document.title = 'Reset password · ZTD Studio';
+  document.title = 'Reset password · ZTD Devs Studio';
   const email = h('input', { type: 'email', autocomplete: 'username', required: true, autofocus: true });
   const box = errBox();
   const btn = h('button', { class: 'btn primary block', type: 'submit', style: { marginTop: '16px' } }, 'Send reset link');
@@ -219,7 +219,7 @@ function passwordFields(){
 }
 
 function resetScreen(){
-  document.title = 'Choose a password · ZTD Studio';
+  document.title = 'Choose a password · ZTD Devs Studio';
   const token = qs().get('token') || location.pathname.split('/').pop();
   const f = passwordFields();
   const box = errBox();
@@ -238,7 +238,7 @@ function resetScreen(){
 }
 
 async function inviteScreen(id){
-  document.title = 'Invitation · ZTD Studio';
+  document.title = 'Invitation · ZTD Devs Studio';
   let inv;
   try { inv = await api('GET', `/api/invite/${encodeURIComponent(id)}`); }
   catch (e){ return authPage(h('h1', null, 'Invitation'), h('div', { class: 'error-box' }, e.message)); }
@@ -280,13 +280,13 @@ async function inviteScreen(id){
 
 // Required for everyone before using Studio.
 export function mfaSetupScreen(){
-  document.title = 'Set up two-step sign-in · ZTD Studio';
+  document.title = 'Set up two-step sign-in · ZTD Devs Studio';
   const pw = h('input', { type: 'password', autocomplete: 'current-password', required: true, autofocus: true });
   const box = errBox();
   const btn = h('button', { class: 'btn primary block', type: 'submit', style: { marginTop: '16px' } }, 'Continue');
   app.replaceChildren(h('main', { class: 'auth' }, h('div', { class: 'auth-card wide', id: 'mfa-card' })));
   const card = $('#mfa-card');
-  card.append(h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Studio'),
+  card.append(h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'),
     h('h1', null, 'Set up two-step sign-in'),
     h('p', { class: 'muted' }, 'Studio can change and run code on the server, so every account needs an authenticator app such as Google Authenticator, Microsoft Authenticator, 1Password or Authy.'),
     h('form', { onsubmit: async e => {
@@ -303,7 +303,7 @@ export function mfaSetupScreen(){
     const code = h('input', { type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', required: true, maxlength: 8 });
     const box2 = errBox();
     const btn2 = h('button', { class: 'btn primary block', type: 'submit', style: { marginTop: '16px' } }, 'Turn on two-step sign-in');
-    card.replaceChildren(h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Studio'),
+    card.replaceChildren(h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'),
       h('h1', null, 'Scan this code'),
       h('p', { class: 'muted' }, '1. In your authenticator app, add an account and scan the QR code.'),
       h('div', { class: 'qr' }, h('img', { src: '/api/qr?text=' + encodeURIComponent(totpURI), width: 200, height: 200, alt: 'QR code for your authenticator app' })),

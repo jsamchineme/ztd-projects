@@ -1,4 +1,4 @@
-# ZTD Studio
+# ZTD Devs Studio
 
 A web app for building and running projects with Claude. It runs on the server at https://studio.ztddevs.com. Each project lives on the server, and Studio gives you:
 

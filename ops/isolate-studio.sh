@@ -49,7 +49,7 @@ fs.writeFileSync(f, JSON.stringify(c, null, 2) + "\n");
 ' "$SLUG" "$U"
 
 # 3. Register it in Studio (no services)
-SPEC=$(mktemp); echo '{"services":[],"description":"ZTD Studio source. Commit here, then Admin → Update and restart Studio."}' > "$SPEC"; chmod 644 "$SPEC"
+SPEC=$(mktemp); echo '{"services":[],"description":"ZTD Devs Studio source. Commit here, then Admin → Update and restart Studio."}' > "$SPEC"; chmod 644 "$SPEC"
 studio-admin import-project "$SLUG" "Studio" "$TEAM" "$SPEC"
 rm -f "$SPEC"
 
