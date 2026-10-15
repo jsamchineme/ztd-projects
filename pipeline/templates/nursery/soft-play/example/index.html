@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaps and Bounds Nursery, Paisley: a nursery for babies to 5 year olds</title>
+<meta name="description" content="Leaps and Bounds is a nursery in the heart of Paisley for babies and children up to 5, open 7.30am to 6pm. Book a visit or phone 0141 887 9955.">
+<link rel="preload" href="../fonts/BagelFatOne-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../styles.css">
+<script src="../softplay.js" defer></script>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+<defs>
+  <!-- ===== Foam shapes (doors and page bands), viewBox 120 x 100 ===== -->
+  <symbol id="foam-step" viewBox="0 0 120 100">
+    <ellipse cx="60" cy="96" rx="52" ry="4" fill="#1D1B2F" opacity=".12"/>
+    <g stroke-width="8" stroke-linejoin="round">
+      <polygon points="10,62 26,50 68,50 52,62" style="fill:var(--foam-hi);stroke:var(--foam-hi)"/>
+      <polygon points="52,38 68,26 110,26 94,38" style="fill:var(--foam-hi);stroke:var(--foam-hi)"/>
+      <polygon points="94,38 110,26 110,80 94,92" style="fill:var(--foam-lo);stroke:var(--foam-lo)"/>
+      <polygon points="10,92 10,62 52,62 52,38 94,38 94,92" style="fill:var(--foam);stroke:var(--foam)"/>
+    </g>
+    <polyline points="15,87 15,67 57,67 57,43 89,43 89,87 15,87" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="4 4" stroke-linejoin="round"/>
+    <rect x="61" y="47" width="18" height="5" rx="2.5" fill="#fff" opacity=".4"/>
+  </symbol>
+
+  <symbol id="foam-wedge" viewBox="0 0 120 100">
+    <ellipse cx="62" cy="96" rx="52" ry="4" fill="#1D1B2F" opacity=".12"/>
+    <g stroke-width="8" stroke-linejoin="round">
+      <polygon points="12,90 92,36 110,22 30,76" style="fill:var(--foam-hi);stroke:var(--foam-hi)"/>
+      <polygon points="92,36 110,22 110,76 92,90" style="fill:var(--foam-lo);stroke:var(--foam-lo)"/>
+      <polygon points="12,90 92,90 92,36" style="fill:var(--foam);stroke:var(--foam)"/>
+    </g>
+    <path d="M30 85 H87 V47 Z" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="4 4" stroke-linejoin="round"/>
+    <path d="M40 66 L62 51" stroke="#fff" stroke-opacity=".4" stroke-width="5" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="foam-cylinder" viewBox="0 0 120 100">
+    <ellipse cx="60" cy="96" rx="40" ry="4" fill="#1D1B2F" opacity=".12"/>
+    <path d="M30 30 V84 A30 9 0 0 0 90 84 V30 Z" style="fill:var(--foam)"/>
+    <path d="M78 30 V91.2 A30 9 0 0 0 90 84 V30 Z" style="fill:var(--foam-lo)"/>
+    <path d="M30 52 V62 A30 9 0 0 0 90 62 V52 A30 9 0 0 1 30 52 Z" style="fill:var(--foam-hi)" opacity=".85"/>
+    <ellipse cx="60" cy="30" rx="30" ry="9" style="fill:var(--foam-hi)"/>
+    <ellipse cx="60" cy="30" rx="22" ry="5.5" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="4 4"/>
+    <rect x="38" y="68" width="6" height="16" rx="3" fill="#fff" opacity=".4"/>
+  </symbol>
+
+  <symbol id="foam-halfmoon" viewBox="0 0 120 100">
+    <ellipse cx="62" cy="95" rx="50" ry="4" fill="#1D1B2F" opacity=".12"/>
+    <path d="M14 90 A44 44 0 0 1 102 90 L116 80 A44 44 0 0 0 28 80 Z" style="fill:var(--foam-hi)"/>
+    <path d="M102 90 L116 80 A44 44 0 0 0 112 61 L104 72 Z" style="fill:var(--foam-lo)" opacity=".9"/>
+    <path d="M14 90 A44 44 0 0 1 102 90 Z" style="fill:var(--foam)"/>
+    <path d="M34 90 A24 24 0 0 1 82 90" fill="none" style="stroke:var(--foam-hi)" stroke-width="9"/>
+    <path d="M21 85 A37 37 0 0 1 95 85" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="4 4"/>
+    <rect x="20" y="86" width="82" height="4" rx="2" style="fill:var(--foam-lo)" opacity=".7"/>
+  </symbol>
+
+  <symbol id="foam-cube" viewBox="0 0 120 100">
+    <ellipse cx="60" cy="96" rx="46" ry="4" fill="#1D1B2F" opacity=".12"/>
+    <g stroke-width="8" stroke-linejoin="round">
+      <polygon points="20,40 40,24 96,24 76,40" style="fill:var(--foam-hi);stroke:var(--foam-hi)"/>
+      <polygon points="76,40 96,24 96,74 76,90" style="fill:var(--foam-lo);stroke:var(--foam-lo)"/>
+      <polygon points="20,40 76,40 76,90 20,90" style="fill:var(--foam);stroke:var(--foam)"/>
+    </g>
+    <rect x="23" y="43" width="50" height="44" rx="7" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="4 4"/>
+    <rect x="29" y="50" width="20" height="5" rx="2.5" fill="#fff" opacity=".4"/>
+  </symbol>
+
+  <symbol id="foam-ball" viewBox="0 0 120 100">
+    <ellipse cx="60" cy="96" rx="32" ry="4" fill="#1D1B2F" opacity=".14"/>
+    <circle cx="60" cy="53" r="38" fill="#FFFFFF"/>
+    <path d="M60 15 A38 38 0 0 0 60 91 C34 72 34 34 60 15 Z" style="fill:var(--foam)"/>
+    <path d="M60 15 A38 38 0 0 1 60 91 C86 72 86 34 60 15 Z" style="fill:var(--foam-lo)"/>
+    <path d="M60 15 C49 34 49 72 60 91 C71 72 71 34 60 15 Z" style="fill:var(--foam-hi)"/>
+    <circle cx="60" cy="53" r="38" fill="none" stroke="#1D1B2F" stroke-width="3"/>
+    <ellipse cx="44" cy="34" rx="8" ry="4.5" transform="rotate(-40 44 34)" fill="#fff" opacity=".75"/>
+  </symbol>
+
+  <!-- Brand mark: a ball resting on a foam cube. Fixed colours. -->
+  <symbol id="brand-mark" viewBox="0 0 48 48">
+    <g stroke-width="4" stroke-linejoin="round">
+      <polygon points="6,24 14,18 40,18 32,24" fill="#FFE08A" stroke="#FFE08A"/>
+      <polygon points="32,24 40,18 40,38 32,44" fill="#D99A00" stroke="#D99A00"/>
+      <polygon points="6,24 32,24 32,44 6,44" fill="#FFC93C" stroke="#FFC93C"/>
+    </g>
+    <circle cx="22" cy="12" r="9" fill="#E8553D"/>
+    <ellipse cx="18.5" cy="8.5" rx="3" ry="1.8" transform="rotate(-35 18.5 8.5)" fill="#fff" opacity=".7"/>
+  </symbol>
+
+  <!-- ===== Small line icons, viewBox 24, ink, for the staircase ===== -->
+  <symbol id="i-ages" viewBox="0 0 24 24"><g fill="none" stroke="#1D1B2F" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="12.5" width="8.5" height="8.5" rx="2"/><rect x="12.5" y="4" width="9" height="17" rx="2"/><path d="M5 9.5 6.8 6.5 8.6 9.5" stroke-linecap="round"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="#1D1B2F" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></g></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><g fill="none" stroke="#1D1B2F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.2"/><path d="M14.6 8.6c-.6-1.4-3.6-1.6-4 .6v6.4M8.6 12.4h4.6M8.4 16.2h7"/></g></symbol>
+  <symbol id="i-chair" viewBox="0 0 24 24"><g fill="none" stroke="#1D1B2F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5v17M7 12.5h10.5v8M7 12.5c0-3 1-4.5 3-4.5"/><path d="M10 8h4"/></g></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.8 6.3.8-4.6 4.4 1.1 6.3L12 17.1l-5.6 3 1.1-6.3L2.9 9.4l6.3-.8z" fill="none" stroke="#1D1B2F" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5h2.8l1.4 4-2 1.3a10.5 10.5 0 0 0 6.4 6.4l1.3-2 4 1.4v2.8a2 2 0 0 1-2.2 2A17 17 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7l8 6 8-6"/></g></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+
+  <!-- ===== Room icons (Our nursery), viewBox 64, line in currentColor ===== -->
+  <symbol id="room-rattle" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="21" r="14"/><path d="M22 14.5c2.5-3 6-4.5 10-4.5"/><circle cx="27" cy="22" r="1.6" fill="currentColor"/><circle cx="37" cy="19" r="1.6" fill="currentColor"/><circle cx="33" cy="28" r="1.6" fill="currentColor"/><path d="M32 35v14"/><path d="M28 36.5h8"/><circle cx="32" cy="54" r="5.5"/></g></symbol>
+  <symbol id="room-duck" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 37c0 9.5 7 15 17 15 10.5 0 18-5.5 18-13.5 0-3-1.2-5.6-3.2-7.5-2.4 2.5-6.6 3.4-10.8 2.2"/><path d="M38 33.2C36 31 35 28 35 25c0-6.4-4.6-11-10.6-11S14 18.6 14 25c0 4.5 2.4 8.4 6 10.4L17 37"/><path d="M14.4 22.8L6 25.4l8.6 2.6"/><circle cx="25" cy="22.5" r="1.8" fill="currentColor"/><path d="M27 42c3 2.5 8 3 12 1"/><path d="M8 57h48" stroke-dasharray="3 5"/></g></symbol>
+  <symbol id="room-rocket" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M32 5c8.5 6.5 12.5 16.5 12.5 28.5V45h-25V33.5C19.5 21.5 23.5 11.5 32 5z"/><circle cx="32" cy="24" r="5"/><path d="M19.5 35L11 45.5V52l8.5-4.5M44.5 35l8.5 10.5V52l-8.5-4.5"/><path d="M27 50l5 9 5-9"/></g></symbol>
+  <symbol id="room-can" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="27" width="28" height="25" rx="5"/><path d="M40 35l14-12M51 20.5l6 5"/><path d="M17 27c0-11 18-11 18 0"/><path d="M57 33v4M54 38.5v4M60 39v4"/><path d="M17 36h18" stroke-dasharray="2 5"/></g></symbol>
+
+  <!-- ===== "What's here" signs, viewBox 52: a foam tile and an ink icon ===== -->
+  <symbol id="sign-areas" viewBox="0 0 52 52"><rect x="2" y="2" width="48" height="44" rx="12" fill="#FFE08A"/><rect x="2" y="40" width="48" height="10" rx="5" fill="#D99A00"/><g fill="none" stroke="#1D1B2F" stroke-width="2.6" stroke-linejoin="round"><rect x="12" y="11" width="12" height="12" rx="3"/><rect x="28" y="11" width="12" height="12" rx="3"/><rect x="12" y="27" width="12" height="10" rx="3"/><rect x="28" y="27" width="12" height="10" rx="3"/></g></symbol>
+  <symbol id="sign-floors" viewBox="0 0 52 52"><rect x="2" y="2" width="48" height="44" rx="12" fill="#8CCBF0"/><rect x="2" y="40" width="48" height="10" rx="5" fill="#2F86C2"/><path d="M11 36h9v-8h9v-8h9v-8" fill="none" stroke="#1D1B2F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="sign-garden" viewBox="0 0 52 52"><rect x="2" y="2" width="48" height="44" rx="12" fill="#8ED3A0"/><rect x="2" y="40" width="48" height="10" rx="5" fill="#27803F"/><g fill="none" stroke="#1D1B2F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="26" cy="18" r="8"/><path d="M26 26v11M26 32l-5-4M10 37h32"/></g></symbol>
+  <symbol id="sign-heart" viewBox="0 0 52 52"><rect x="2" y="2" width="48" height="44" rx="12" fill="#F7A08D"/><rect x="2" y="40" width="48" height="10" rx="5" fill="#B53A26"/><path d="M26 36s-12-7-12-15a6.5 6.5 0 0 1 12-3.4A6.5 6.5 0 0 1 38 21c0 8-12 15-12 15z" fill="none" stroke="#1D1B2F" stroke-width="2.6" stroke-linejoin="round"/></symbol>
+  <symbol id="sign-sessions" viewBox="0 0 52 52"><rect x="2" y="2" width="48" height="44" rx="12" fill="#C3A8EC"/><rect x="2" y="40" width="48" height="10" rx="5" fill="#5E3A9E"/><g fill="none" stroke="#1D1B2F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="19" cy="21" r="5"/><path d="M19 11v2M19 29v2M9 21h2M27 21h2M12 14l1.5 1.5M24.5 26.5 26 28M12 28l1.5-1.5M24.5 15.5 26 14"/><path d="M40 28a8 8 0 1 1-6-12 6.5 6.5 0 0 0 6 12z"/></g></symbol>
+</defs>
+</svg>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><svg aria-hidden="true" focusable="false"><use href="#brand-mark"/></svg><span class="wordmark"><b>Leaps</b> <b>and</b> <b>Bounds</b><small>Nursery, Paisley</small></span></a>
+    <nav class="site-nav" aria-label="Main">
+      <ul><li><a href="join-us.html">Visit and join</a></li><li><a href="fees-and-funding.html">Fees and funding</a></li><li><a href="our-nursery.html">Our nursery</a></li><li><a href="our-team.html">Our team</a></li><li><a href="parents.html">Parents</a></li><li><a href="gallery.html">Gallery</a></li><li><a class="btn btn--small" href="join-us.html#book">Book a visit</a></li></ul>
+    </nav>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+  </div>
+</header>
+<div class="menu-sheet" id="menu" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <div class="menu-sheet__top">
+    <a class="brand" href="index.html"><svg aria-hidden="true" focusable="false"><use href="#brand-mark"/></svg><span class="wordmark"><b>Leaps</b> <b>and</b> <b>Bounds</b></span></a>
+    <button class="menu-button" type="button" data-menu-close>Close</button>
+  </div>
+  <nav aria-label="Menu"><ul><li><a class="door--step" href="join-us.html"><svg aria-hidden="true" focusable="false"><use href="#foam-step"/></svg>Visit and join</a></li><li><a class="door--wedge" href="fees-and-funding.html"><svg aria-hidden="true" focusable="false"><use href="#foam-wedge"/></svg>Fees and funding</a></li><li><a class="door--cylinder" href="our-nursery.html"><svg aria-hidden="true" focusable="false"><use href="#foam-cylinder"/></svg>Our nursery</a></li><li><a class="door--halfmoon" href="our-team.html"><svg aria-hidden="true" focusable="false"><use href="#foam-halfmoon"/></svg>Our team</a></li><li><a class="door--cube" href="parents.html"><svg aria-hidden="true" focusable="false"><use href="#foam-cube"/></svg>Parents</a></li><li><a class="door--ball" href="gallery.html"><svg aria-hidden="true" focusable="false"><use href="#foam-ball"/></svg>Gallery</a></li></ul></nav>
+  <div class="menu-sheet__actions"><a class="btn" href="join-us.html#book">Book a visit</a><a class="phone-link" href="tel:+441418879955"><svg aria-hidden="true" focusable="false"><use href="#i-phone"/></svg>Phone 0141 887 9955</a></div>
+</div>
+<main id="main">
+<section class="hero" aria-labelledby="hero-title" data-bar-after>
+  <div class="wrap">
+    <div class="hero__scene"><svg class="scene" viewBox="0 0 640 420" role="img" aria-labelledby="scene-title" focusable="false">
+<title id="scene-title">A drawing of soft play foam: a red wedge, a blue roll, a purple and a yellow cube, a zebra rocker and coloured balls</title>
+<!-- confetti doodles -->
+<g style="stroke-width:4" class="line" opacity=".9">
+  <path class="line" style="stroke:var(--pool-hi);stroke-width:5" d="M560 60 q10 -14 20 0 t20 0"/>
+  <path class="line" style="stroke:var(--tomato-hi);stroke-width:5" d="M60 96 l12 12 M72 96 l-12 12"/>
+  <path class="line" style="stroke:var(--grass-hi);stroke-width:5" d="M470 128 q10 -14 20 0 t20 0"/>
+  <path class="line" style="stroke:var(--grape-hi);stroke-width:5" d="M120 40 v18 M111 49 h18"/>
+</g>
+<circle class="sh" cx="330" cy="70" r="7"/><circle class="ph" cx="610" cy="200" r="6"/><circle class="th" cx="20" cy="210" r="5"/>
+<!-- floor mat -->
+<ellipse class="shadow" cx="320" cy="398" rx="318" ry="12"/>
+<polygon class="gh rnd" points="18,356 40,342 628,342 606,356"/>
+<rect class="g" x="13" y="352" width="598" height="34" rx="12"/>
+<rect class="gl" x="13" y="378" width="598" height="10" rx="5"/>
+<path class="stitch" d="M26 362 H598"/>
+<!-- wedge -->
+<polygon class="th rnd" points="28,348 206,204 246,176 68,320"/>
+<polygon class="tl rnd" points="206,204 246,176 246,320 206,348"/>
+<polygon class="t rnd" points="28,348 206,348 206,204"/>
+<path class="stitch" d="M52 340 H199 V223 Z"/>
+<path class="shine" style="opacity:.35" d="M76 300 L150 240 l6 7 L82 307 Z"/>
+<!-- bolster roll -->
+<path class="p" d="M92 300 H232 V360 H92 A16 30 0 0 1 92 300 Z"/>
+<rect class="pl" x="80" y="350" width="152" height="10" rx="5"/>
+<rect class="sh" x="146" y="300" width="26" height="60"/>
+<rect class="sl" x="146" y="350" width="26" height="10"/>
+<ellipse class="ph" cx="232" cy="330" rx="16" ry="30"/>
+<ellipse class="stitch" cx="232" cy="330" rx="10" ry="20"/>
+<rect class="shine" x="98" y="308" width="40" height="8" rx="4"/>
+<!-- grape cube -->
+<polygon class="rh rnd" points="268,262 300,238 392,238 360,262"/>
+<polygon class="rl rnd" points="360,262 392,238 392,328 360,352"/>
+<rect class="r" x="263" y="257" width="102" height="100" rx="8"/>
+<rect class="stitch" x="272" y="266" width="84" height="80" rx="6"/>
+<rect class="shine" x="280" y="275" width="34" height="8" rx="4"/>
+<!-- sun cube on top, nudged off-square like a real stack -->
+<g transform="rotate(-4 318 220)">
+<polygon class="sh rnd" points="286,190 310,172 372,172 348,190"/>
+<polygon class="sl rnd" points="348,190 372,172 372,232 348,250"/>
+<rect class="s" x="281" y="185" width="72" height="70" rx="8"/>
+<rect class="stitch" x="289" y="193" width="56" height="54" rx="5"/>
+<rect class="shine" x="295" y="200" width="24" height="7" rx="3.5"/>
+</g>
+<!-- zebra rocker -->
+<g class="rock">
+  <path class="line" style="stroke:var(--tomato-lo);stroke-width:12" d="M418 334 Q510 372 604 334"/>
+  <rect class="ol" x="452" y="288" width="20" height="54" rx="9"/>
+  <rect class="ol" x="542" y="288" width="20" height="54" rx="9"/>
+  <path class="line" style="stroke-width:6" d="M452 304 h20 M452 320 h20 M542 304 h20 M542 320 h20"/>
+  <path class="line" style="stroke-width:4" d="M574 268 q24 4 28 30"/>
+  <circle class="k" cx="602" cy="302" r="7"/>
+  <rect class="ol" x="440" y="250" width="138" height="56" rx="28"/>
+  <path class="line" style="stroke-width:9" d="M486 252 q-6 26 4 52 M512 251 q-7 28 2 54 M538 252 q-6 26 3 52 M562 256 q-5 22 2 44"/>
+  <path class="t" d="M490 252 q24 -18 50 0 v8 h-50 z"/>
+  <path class="ol" d="M456 266 L432 204 Q446 186 464 198 L486 262 Z"/>
+  <path class="line" style="stroke-width:6" d="M440 226 l20 -6 M446 244 l20 -6"/>
+  <path class="line" style="stroke-width:11;stroke-dasharray:7 5;stroke-linecap:butt" d="M448 186 L480 258"/>
+  <path class="ol" d="M440 182 l5 -24 l12 21 z"/>
+  <ellipse class="ol" cx="418" cy="200" rx="36" ry="21" transform="rotate(-20 418 200)"/>
+  <ellipse class="k" cx="391" cy="212" rx="14" ry="12" transform="rotate(-20 391 212)"/>
+  <circle class="w" cx="386" cy="209" r="2.6"/>
+  <path class="line" style="stroke-width:3.5" d="M412 192 q6 -6 12 0"/>
+</g>
+<!-- balls -->
+<g><circle class="s" cx="48" cy="372" r="17"/><ellipse class="shine" cx="41.54" cy="364.86" rx="5.8" ry="3.4" transform="rotate(-35 41.54 364.86)"/></g><g><circle class="t" cx="258" cy="374" r="19"/><ellipse class="shine" cx="250.78" cy="366.02" rx="6.5" ry="3.8" transform="rotate(-35 250.78 366.02)"/></g><g><circle class="p" cx="296" cy="372" r="14"/><ellipse class="shine" cx="290.68" cy="366.12" rx="4.8" ry="2.8" transform="rotate(-35 290.68 366.12)"/></g><g><circle class="g" cx="336" cy="378" r="18"/><ellipse class="shine" cx="329.16" cy="370.44" rx="6.1" ry="3.6" transform="rotate(-35 329.16 370.44)"/></g><g><circle class="rh" cx="380" cy="370" r="15"/><ellipse class="shine" cx="374.3" cy="363.7" rx="5.1" ry="3.0" transform="rotate(-35 374.3 363.7)"/></g><g><circle class="p" cx="612" cy="368" r="17"/><ellipse class="shine" cx="605.54" cy="360.86" rx="5.8" ry="3.4" transform="rotate(-35 605.54 360.86)"/></g><g><circle class="s" cx="578" cy="380" r="13"/><ellipse class="shine" cx="573.06" cy="374.54" rx="4.4" ry="2.6" transform="rotate(-35 573.06 374.54)"/></g>
+<g class="bob"><circle class="s" cx="232" cy="140" r="14"/><ellipse class="shine" cx="226.68" cy="134.12" rx="4.8" ry="2.8" transform="rotate(-35 226.68 134.12)"/></g><g class="bob"><circle class="t" cx="410" cy="112" r="11"/><ellipse class="shine" cx="405.82" cy="107.38" rx="3.7" ry="2.2" transform="rotate(-35 405.82 107.38)"/></g>
+</svg></div>
+    <div>
+      <p class="hero__name"><b>Leaps</b> <b>and</b> <b>Bounds</b> <b>Nursery</b></p>
+      <h1 id="hero-title">Big play for little people</h1>
+      <p class="hero__sentence">A nursery in the heart of Paisley for babies and children up to 5, open 7.30am to 6pm.</p>
+      <div class="actions"><a class="btn" href="join-us.html#book">Book a visit</a><a class="phone-link" href="tel:+441418879955"><svg aria-hidden="true" focusable="false"><use href="#i-phone"/></svg>Phone 0141 887 9955</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section essentials" aria-labelledby="ess-title">
+  <div class="wrap">
+    <h2 id="ess-title">The essentials</h2>
+    <ol class="stairs" role="list">
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-ages"/></svg><span>Babies and children up to 5</span></li>
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><span>Open 7.30am to 6pm. Days: phone to check</span></li>
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-coin"/></svg><span>1,140 funded hours, with Renfrewshire Council</span></li>
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-chair"/></svg><span>Places: phone to check</span></li>
+      <li><svg aria-hidden="true" focusable="false"><use href="#i-star"/></svg><a href="https://www.careinspectorate.scot/find-care?search=Leaps%20and%20Bounds%20Nursery">Care Inspectorate: all Very good, April 2021</a></li>
+    </ol>
+    <div class="more"><a class="arrow-link" href="join-us.html">All the details<svg aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a></div>
+  </div>
+</section>
+
+<section class="section playroom" aria-labelledby="play-title">
+  <div class="wrap">
+    <figure class="frame frame--pool living" data-living>
+      <video muted loop playsinline preload="none" width="768" height="432" poster="media/play-room-poster.jpg" data-src="media/play-room-loop.mp4" aria-label="Our block play room: wooden blocks, tree slices and two tyres set out on a rug"></video>
+      <figcaption class="living__label" data-playing="Our block play room, as a slow pan across one photo">Our block play room</figcaption>
+      <button class="living__toggle" type="button" aria-pressed="false" hidden><svg aria-hidden="true" focusable="false"><use href="#i-pause"/></svg><span class="living__text">Pause</span></button>
+    </figure>
+    <div>
+      <h2 id="play-title">Climb in and look around</h2>
+      <p class="lede">Four play areas over two floors, from the baby room to preschool. Every playroom opens onto its own garden.</p>
+      <div class="more"><a class="arrow-link" href="our-nursery.html">See the rooms<svg aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section doors-section" aria-labelledby="doors-title">
+  <div class="wrap">
+    <div class="tumble" aria-hidden="true"><svg class="door--cube"><use href="#foam-cube"/></svg><svg class="door--ball"><use href="#foam-ball"/></svg><svg class="door--wedge"><use href="#foam-wedge"/></svg></div>
+    <h2 id="doors-title">Find out more</h2>
+    <ul class="doors" role="list">
+      <li><a class="door door--step" href="join-us.html"><svg aria-hidden="true" focusable="false"><use href="#foam-step"/></svg><span><span class="door__label">Visit and join</span><span class="door__line">Come and see us</span></span></a></li>
+      <li><a class="door door--wedge" href="fees-and-funding.html"><svg aria-hidden="true" focusable="false"><use href="#foam-wedge"/></svg><span><span class="door__label">Fees and funding</span><span class="door__line">What it costs, and help with fees</span></span></a></li>
+      <li><a class="door door--cylinder" href="our-nursery.html"><svg aria-hidden="true" focusable="false"><use href="#foam-cylinder"/></svg><span><span class="door__label">Our nursery</span><span class="door__line">The rooms, the garden and the day</span></span></a></li>
+      <li><a class="door door--halfmoon" href="our-team.html"><svg aria-hidden="true" focusable="false"><use href="#foam-halfmoon"/></svg><span><span class="door__label">Our team</span><span class="door__line">Who will look after your child</span></span></a></li>
+      <li><a class="door door--cube" href="parents.html"><svg aria-hidden="true" focusable="false"><use href="#foam-cube"/></svg><span><span class="door__label">Parents</span><span class="door__line">Sessions, contacts and everyday answers</span></span></a></li>
+      <li><a class="door door--ball" href="gallery.html"><svg aria-hidden="true" focusable="false"><use href="#foam-ball"/></svg><span><span class="door__label">Gallery</span><span class="door__line">Photos of the rooms and garden</span></span></a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="visit" aria-labelledby="visit-title" data-bar-hide>
+  <svg class="ball-row scene ball-row--drop" viewBox="0 0 1600 56" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><rect x="0" y="38" width="1600" height="18" style="fill:var(--pool-deep)"/><g class="b" style="--i:0"><circle class="t" cx="10" cy="37" r="18"/><ellipse class="shine" cx="3.16" cy="29.8" rx="5.8" ry="3.6" transform="rotate(-35 3.16 29.8)"/></g><g class="b" style="--i:1"><circle class="s" cx="38" cy="32" r="17"/><ellipse class="shine" cx="31.54" cy="25.2" rx="5.4" ry="3.4" transform="rotate(-35 31.54 25.2)"/></g><g class="b" style="--i:2"><circle class="p" cx="71" cy="39" r="16"/><ellipse class="shine" cx="64.92" cy="32.6" rx="5.1" ry="3.2" transform="rotate(-35 64.92 32.6)"/></g><g class="b" style="--i:3"><circle class="g" cx="105" cy="31" r="18"/><ellipse class="shine" cx="98.16" cy="23.8" rx="5.8" ry="3.6" transform="rotate(-35 98.16 23.8)"/></g><g class="b" style="--i:4"><circle class="rh" cx="141" cy="34" r="20"/><ellipse class="shine" cx="133.4" cy="26" rx="6.4" ry="4.0" transform="rotate(-35 133.4 26)"/></g><g class="b" style="--i:5"><circle class="t" cx="174" cy="34" r="17"/><ellipse class="shine" cx="167.54" cy="27.2" rx="5.4" ry="3.4" transform="rotate(-35 167.54 27.2)"/></g><g class="b" style="--i:6"><circle class="sh" cx="203" cy="36" r="19"/><ellipse class="shine" cx="195.78" cy="28.4" rx="6.1" ry="3.8" transform="rotate(-35 195.78 28.4)"/></g><g class="b" style="--i:7"><circle class="p" cx="232" cy="36" r="15"/><ellipse class="shine" cx="226.3" cy="30" rx="4.8" ry="3.0" transform="rotate(-35 226.3 30)"/></g><g class="b" style="--i:8"><circle class="t" cx="271" cy="36" r="16"/><ellipse class="shine" cx="264.92" cy="29.6" rx="5.1" ry="3.2" transform="rotate(-35 264.92 29.6)"/></g><g class="b" style="--i:9"><circle class="s" cx="309" cy="32" r="16"/><ellipse class="shine" cx="302.92" cy="25.6" rx="5.1" ry="3.2" transform="rotate(-35 302.92 25.6)"/></g><g class="b" style="--i:10"><circle class="p" cx="343" cy="35" r="20"/><ellipse class="shine" cx="335.4" cy="27" rx="6.4" ry="4.0" transform="rotate(-35 335.4 27)"/></g><g class="b" style="--i:11"><circle class="g" cx="372" cy="32" r="22"/><ellipse class="shine" cx="363.64" cy="23.2" rx="7.0" ry="4.4" transform="rotate(-35 363.64 23.2)"/></g><g class="b" style="--i:12"><circle class="rh" cx="402" cy="35" r="19"/><ellipse class="shine" cx="394.78" cy="27.4" rx="6.1" ry="3.8" transform="rotate(-35 394.78 27.4)"/></g><g class="b" style="--i:13"><circle class="t" cx="431" cy="31" r="20"/><ellipse class="shine" cx="423.4" cy="23" rx="6.4" ry="4.0" transform="rotate(-35 423.4 23)"/></g><g class="b" style="--i:14"><circle class="sh" cx="462" cy="39" r="16"/><ellipse class="shine" cx="455.92" cy="32.6" rx="5.1" ry="3.2" transform="rotate(-35 455.92 32.6)"/></g><g class="b" style="--i:15"><circle class="p" cx="492" cy="32" r="21"/><ellipse class="shine" cx="484.02" cy="23.6" rx="6.7" ry="4.2" transform="rotate(-35 484.02 23.6)"/></g><g class="b" style="--i:16"><circle class="t" cx="522" cy="36" r="19"/><ellipse class="shine" cx="514.78" cy="28.4" rx="6.1" ry="3.8" transform="rotate(-35 514.78 28.4)"/></g><g class="b" style="--i:17"><circle class="s" cx="558" cy="30" r="20"/><ellipse class="shine" cx="550.4" cy="22" rx="6.4" ry="4.0" transform="rotate(-35 550.4 22)"/></g><g class="b" style="--i:18"><circle class="p" cx="588" cy="34" r="18"/><ellipse class="shine" cx="581.16" cy="26.8" rx="5.8" ry="3.6" transform="rotate(-35 581.16 26.8)"/></g><g class="b" style="--i:19"><circle class="g" cx="616" cy="34" r="18"/><ellipse class="shine" cx="609.16" cy="26.8" rx="5.8" ry="3.6" transform="rotate(-35 609.16 26.8)"/></g><g class="b" style="--i:20"><circle class="rh" cx="651" cy="35" r="22"/><ellipse class="shine" cx="642.64" cy="26.2" rx="7.0" ry="4.4" transform="rotate(-35 642.64 26.2)"/></g><g class="b" style="--i:21"><circle class="t" cx="683" cy="32" r="18"/><ellipse class="shine" cx="676.16" cy="24.8" rx="5.8" ry="3.6" transform="rotate(-35 676.16 24.8)"/></g><g class="b" style="--i:22"><circle class="sh" cx="720" cy="36" r="18"/><ellipse class="shine" cx="713.16" cy="28.8" rx="5.8" ry="3.6" transform="rotate(-35 713.16 28.8)"/></g><g class="b" style="--i:23"><circle class="p" cx="750" cy="34" r="17"/><ellipse class="shine" cx="743.54" cy="27.2" rx="5.4" ry="3.4" transform="rotate(-35 743.54 27.2)"/></g><g class="b" style="--i:0"><circle class="t" cx="779" cy="38" r="17"/><ellipse class="shine" cx="772.54" cy="31.2" rx="5.4" ry="3.4" transform="rotate(-35 772.54 31.2)"/></g><g class="b" style="--i:1"><circle class="s" cx="816" cy="35" r="22"/><ellipse class="shine" cx="807.64" cy="26.2" rx="7.0" ry="4.4" transform="rotate(-35 807.64 26.2)"/></g><g class="b" style="--i:2"><circle class="p" cx="853" cy="37" r="20"/><ellipse class="shine" cx="845.4" cy="29" rx="6.4" ry="4.0" transform="rotate(-35 845.4 29)"/></g><g class="b" style="--i:3"><circle class="g" cx="887" cy="31" r="15"/><ellipse class="shine" cx="881.3" cy="25" rx="4.8" ry="3.0" transform="rotate(-35 881.3 25)"/></g><g class="b" style="--i:4"><circle class="rh" cx="918" cy="36" r="17"/><ellipse class="shine" cx="911.54" cy="29.2" rx="5.4" ry="3.4" transform="rotate(-35 911.54 29.2)"/></g><g class="b" style="--i:5"><circle class="t" cx="953" cy="31" r="20"/><ellipse class="shine" cx="945.4" cy="23" rx="6.4" ry="4.0" transform="rotate(-35 945.4 23)"/></g><g class="b" style="--i:6"><circle class="sh" cx="991" cy="36" r="15"/><ellipse class="shine" cx="985.3" cy="30" rx="4.8" ry="3.0" transform="rotate(-35 985.3 30)"/></g><g class="b" style="--i:7"><circle class="p" cx="1025" cy="30" r="18"/><ellipse class="shine" cx="1018.16" cy="22.8" rx="5.8" ry="3.6" transform="rotate(-35 1018.16 22.8)"/></g><g class="b" style="--i:8"><circle class="t" cx="1064" cy="39" r="18"/><ellipse class="shine" cx="1057.16" cy="31.8" rx="5.8" ry="3.6" transform="rotate(-35 1057.16 31.8)"/></g><g class="b" style="--i:9"><circle class="s" cx="1098" cy="30" r="18"/><ellipse class="shine" cx="1091.16" cy="22.8" rx="5.8" ry="3.6" transform="rotate(-35 1091.16 22.8)"/></g><g class="b" style="--i:10"><circle class="p" cx="1135" cy="35" r="21"/><ellipse class="shine" cx="1127.02" cy="26.6" rx="6.7" ry="4.2" transform="rotate(-35 1127.02 26.6)"/></g><g class="b" style="--i:11"><circle class="g" cx="1162" cy="34" r="16"/><ellipse class="shine" cx="1155.92" cy="27.6" rx="5.1" ry="3.2" transform="rotate(-35 1155.92 27.6)"/></g><g class="b" style="--i:12"><circle class="rh" cx="1197" cy="39" r="20"/><ellipse class="shine" cx="1189.4" cy="31" rx="6.4" ry="4.0" transform="rotate(-35 1189.4 31)"/></g><g class="b" style="--i:13"><circle class="t" cx="1227" cy="30" r="21"/><ellipse class="shine" cx="1219.02" cy="21.6" rx="6.7" ry="4.2" transform="rotate(-35 1219.02 21.6)"/></g><g class="b" style="--i:14"><circle class="sh" cx="1254" cy="33" r="16"/><ellipse class="shine" cx="1247.92" cy="26.6" rx="5.1" ry="3.2" transform="rotate(-35 1247.92 26.6)"/></g><g class="b" style="--i:15"><circle class="p" cx="1287" cy="35" r="21"/><ellipse class="shine" cx="1279.02" cy="26.6" rx="6.7" ry="4.2" transform="rotate(-35 1279.02 26.6)"/></g><g class="b" style="--i:16"><circle class="t" cx="1316" cy="33" r="18"/><ellipse class="shine" cx="1309.16" cy="25.8" rx="5.8" ry="3.6" transform="rotate(-35 1309.16 25.8)"/></g><g class="b" style="--i:17"><circle class="s" cx="1346" cy="29" r="18"/><ellipse class="shine" cx="1339.16" cy="21.8" rx="5.8" ry="3.6" transform="rotate(-35 1339.16 21.8)"/></g><g class="b" style="--i:18"><circle class="p" cx="1377" cy="35" r="17"/><ellipse class="shine" cx="1370.54" cy="28.2" rx="5.4" ry="3.4" transform="rotate(-35 1370.54 28.2)"/></g><g class="b" style="--i:19"><circle class="g" cx="1413" cy="30" r="16"/><ellipse class="shine" cx="1406.92" cy="23.6" rx="5.1" ry="3.2" transform="rotate(-35 1406.92 23.6)"/></g><g class="b" style="--i:20"><circle class="rh" cx="1440" cy="34" r="19"/><ellipse class="shine" cx="1432.78" cy="26.4" rx="6.1" ry="3.8" transform="rotate(-35 1432.78 26.4)"/></g><g class="b" style="--i:21"><circle class="t" cx="1472" cy="32" r="16"/><ellipse class="shine" cx="1465.92" cy="25.6" rx="5.1" ry="3.2" transform="rotate(-35 1465.92 25.6)"/></g><g class="b" style="--i:22"><circle class="sh" cx="1504" cy="38" r="15"/><ellipse class="shine" cx="1498.3" cy="32" rx="4.8" ry="3.0" transform="rotate(-35 1498.3 32)"/></g><g class="b" style="--i:23"><circle class="p" cx="1536" cy="31" r="20"/><ellipse class="shine" cx="1528.4" cy="23" rx="6.4" ry="4.0" transform="rotate(-35 1528.4 23)"/></g><g class="b" style="--i:0"><circle class="t" cx="1574" cy="37" r="20"/><ellipse class="shine" cx="1566.4" cy="29" rx="6.4" ry="4.0" transform="rotate(-35 1566.4 29)"/></g><g class="b" style="--i:1"><circle class="s" cx="1604" cy="30" r="18"/><ellipse class="shine" cx="1597.16" cy="22.8" rx="5.8" ry="3.6" transform="rotate(-35 1597.16 22.8)"/></g></svg>
+  <div class="wrap">
+    <div class="visit__card door--ball">
+      <svg class="visit__shape" aria-hidden="true" focusable="false"><use href="#foam-ball"/></svg>
+      <h2 id="visit-title">Come and play</h2>
+      <p>Come and see the rooms, and ask us anything you like.</p>
+      <div class="actions"><a class="btn" href="join-us.html#book">Book a visit</a><a class="phone-link" href="tel:+441418879955"><svg aria-hidden="true" focusable="false"><use href="#i-phone"/></svg>Phone 0141 887 9955</a></div>
+    </div>
+    <div class="visit__pile" aria-hidden="true"><svg class="door--cylinder"><use href="#foam-cylinder"/></svg><svg class="door--step"><use href="#foam-step"/></svg><svg class="door--cube"><use href="#foam-cube"/></svg></div>
+  </div>
+</section>
+</main>
+<footer class="site-footer" data-bar-hide>
+  <svg class="ball-row scene ball-row--footer" viewBox="0 0 1600 56" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><rect x="0" y="38" width="1600" height="18" style="fill:var(--ink)"/><g class="b" style="--i:0"><circle class="t" cx="10" cy="37" r="18"/><ellipse class="shine" cx="3.16" cy="29.8" rx="5.8" ry="3.6" transform="rotate(-35 3.16 29.8)"/></g><g class="b" style="--i:1"><circle class="s" cx="38" cy="32" r="17"/><ellipse class="shine" cx="31.54" cy="25.2" rx="5.4" ry="3.4" transform="rotate(-35 31.54 25.2)"/></g><g class="b" style="--i:2"><circle class="p" cx="71" cy="39" r="16"/><ellipse class="shine" cx="64.92" cy="32.6" rx="5.1" ry="3.2" transform="rotate(-35 64.92 32.6)"/></g><g class="b" style="--i:3"><circle class="g" cx="105" cy="31" r="18"/><ellipse class="shine" cx="98.16" cy="23.8" rx="5.8" ry="3.6" transform="rotate(-35 98.16 23.8)"/></g><g class="b" style="--i:4"><circle class="rh" cx="141" cy="34" r="20"/><ellipse class="shine" cx="133.4" cy="26" rx="6.4" ry="4.0" transform="rotate(-35 133.4 26)"/></g><g class="b" style="--i:5"><circle class="t" cx="174" cy="34" r="17"/><ellipse class="shine" cx="167.54" cy="27.2" rx="5.4" ry="3.4" transform="rotate(-35 167.54 27.2)"/></g><g class="b" style="--i:6"><circle class="sh" cx="203" cy="36" r="19"/><ellipse class="shine" cx="195.78" cy="28.4" rx="6.1" ry="3.8" transform="rotate(-35 195.78 28.4)"/></g><g class="b" style="--i:7"><circle class="p" cx="232" cy="36" r="15"/><ellipse class="shine" cx="226.3" cy="30" rx="4.8" ry="3.0" transform="rotate(-35 226.3 30)"/></g><g class="b" style="--i:8"><circle class="t" cx="271" cy="36" r="16"/><ellipse class="shine" cx="264.92" cy="29.6" rx="5.1" ry="3.2" transform="rotate(-35 264.92 29.6)"/></g><g class="b" style="--i:9"><circle class="s" cx="309" cy="32" r="16"/><ellipse class="shine" cx="302.92" cy="25.6" rx="5.1" ry="3.2" transform="rotate(-35 302.92 25.6)"/></g><g class="b" style="--i:10"><circle class="p" cx="343" cy="35" r="20"/><ellipse class="shine" cx="335.4" cy="27" rx="6.4" ry="4.0" transform="rotate(-35 335.4 27)"/></g><g class="b" style="--i:11"><circle class="g" cx="372" cy="32" r="22"/><ellipse class="shine" cx="363.64" cy="23.2" rx="7.0" ry="4.4" transform="rotate(-35 363.64 23.2)"/></g><g class="b" style="--i:12"><circle class="rh" cx="402" cy="35" r="19"/><ellipse class="shine" cx="394.78" cy="27.4" rx="6.1" ry="3.8" transform="rotate(-35 394.78 27.4)"/></g><g class="b" style="--i:13"><circle class="t" cx="431" cy="31" r="20"/><ellipse class="shine" cx="423.4" cy="23" rx="6.4" ry="4.0" transform="rotate(-35 423.4 23)"/></g><g class="b" style="--i:14"><circle class="sh" cx="462" cy="39" r="16"/><ellipse class="shine" cx="455.92" cy="32.6" rx="5.1" ry="3.2" transform="rotate(-35 455.92 32.6)"/></g><g class="b" style="--i:15"><circle class="p" cx="492" cy="32" r="21"/><ellipse class="shine" cx="484.02" cy="23.6" rx="6.7" ry="4.2" transform="rotate(-35 484.02 23.6)"/></g><g class="b" style="--i:16"><circle class="t" cx="522" cy="36" r="19"/><ellipse class="shine" cx="514.78" cy="28.4" rx="6.1" ry="3.8" transform="rotate(-35 514.78 28.4)"/></g><g class="b" style="--i:17"><circle class="s" cx="558" cy="30" r="20"/><ellipse class="shine" cx="550.4" cy="22" rx="6.4" ry="4.0" transform="rotate(-35 550.4 22)"/></g><g class="b" style="--i:18"><circle class="p" cx="588" cy="34" r="18"/><ellipse class="shine" cx="581.16" cy="26.8" rx="5.8" ry="3.6" transform="rotate(-35 581.16 26.8)"/></g><g class="b" style="--i:19"><circle class="g" cx="616" cy="34" r="18"/><ellipse class="shine" cx="609.16" cy="26.8" rx="5.8" ry="3.6" transform="rotate(-35 609.16 26.8)"/></g><g class="b" style="--i:20"><circle class="rh" cx="651" cy="35" r="22"/><ellipse class="shine" cx="642.64" cy="26.2" rx="7.0" ry="4.4" transform="rotate(-35 642.64 26.2)"/></g><g class="b" style="--i:21"><circle class="t" cx="683" cy="32" r="18"/><ellipse class="shine" cx="676.16" cy="24.8" rx="5.8" ry="3.6" transform="rotate(-35 676.16 24.8)"/></g><g class="b" style="--i:22"><circle class="sh" cx="720" cy="36" r="18"/><ellipse class="shine" cx="713.16" cy="28.8" rx="5.8" ry="3.6" transform="rotate(-35 713.16 28.8)"/></g><g class="b" style="--i:23"><circle class="p" cx="750" cy="34" r="17"/><ellipse class="shine" cx="743.54" cy="27.2" rx="5.4" ry="3.4" transform="rotate(-35 743.54 27.2)"/></g><g class="b" style="--i:0"><circle class="t" cx="779" cy="38" r="17"/><ellipse class="shine" cx="772.54" cy="31.2" rx="5.4" ry="3.4" transform="rotate(-35 772.54 31.2)"/></g><g class="b" style="--i:1"><circle class="s" cx="816" cy="35" r="22"/><ellipse class="shine" cx="807.64" cy="26.2" rx="7.0" ry="4.4" transform="rotate(-35 807.64 26.2)"/></g><g class="b" style="--i:2"><circle class="p" cx="853" cy="37" r="20"/><ellipse class="shine" cx="845.4" cy="29" rx="6.4" ry="4.0" transform="rotate(-35 845.4 29)"/></g><g class="b" style="--i:3"><circle class="g" cx="887" cy="31" r="15"/><ellipse class="shine" cx="881.3" cy="25" rx="4.8" ry="3.0" transform="rotate(-35 881.3 25)"/></g><g class="b" style="--i:4"><circle class="rh" cx="918" cy="36" r="17"/><ellipse class="shine" cx="911.54" cy="29.2" rx="5.4" ry="3.4" transform="rotate(-35 911.54 29.2)"/></g><g class="b" style="--i:5"><circle class="t" cx="953" cy="31" r="20"/><ellipse class="shine" cx="945.4" cy="23" rx="6.4" ry="4.0" transform="rotate(-35 945.4 23)"/></g><g class="b" style="--i:6"><circle class="sh" cx="991" cy="36" r="15"/><ellipse class="shine" cx="985.3" cy="30" rx="4.8" ry="3.0" transform="rotate(-35 985.3 30)"/></g><g class="b" style="--i:7"><circle class="p" cx="1025" cy="30" r="18"/><ellipse class="shine" cx="1018.16" cy="22.8" rx="5.8" ry="3.6" transform="rotate(-35 1018.16 22.8)"/></g><g class="b" style="--i:8"><circle class="t" cx="1064" cy="39" r="18"/><ellipse class="shine" cx="1057.16" cy="31.8" rx="5.8" ry="3.6" transform="rotate(-35 1057.16 31.8)"/></g><g class="b" style="--i:9"><circle class="s" cx="1098" cy="30" r="18"/><ellipse class="shine" cx="1091.16" cy="22.8" rx="5.8" ry="3.6" transform="rotate(-35 1091.16 22.8)"/></g><g class="b" style="--i:10"><circle class="p" cx="1135" cy="35" r="21"/><ellipse class="shine" cx="1127.02" cy="26.6" rx="6.7" ry="4.2" transform="rotate(-35 1127.02 26.6)"/></g><g class="b" style="--i:11"><circle class="g" cx="1162" cy="34" r="16"/><ellipse class="shine" cx="1155.92" cy="27.6" rx="5.1" ry="3.2" transform="rotate(-35 1155.92 27.6)"/></g><g class="b" style="--i:12"><circle class="rh" cx="1197" cy="39" r="20"/><ellipse class="shine" cx="1189.4" cy="31" rx="6.4" ry="4.0" transform="rotate(-35 1189.4 31)"/></g><g class="b" style="--i:13"><circle class="t" cx="1227" cy="30" r="21"/><ellipse class="shine" cx="1219.02" cy="21.6" rx="6.7" ry="4.2" transform="rotate(-35 1219.02 21.6)"/></g><g class="b" style="--i:14"><circle class="sh" cx="1254" cy="33" r="16"/><ellipse class="shine" cx="1247.92" cy="26.6" rx="5.1" ry="3.2" transform="rotate(-35 1247.92 26.6)"/></g><g class="b" style="--i:15"><circle class="p" cx="1287" cy="35" r="21"/><ellipse class="shine" cx="1279.02" cy="26.6" rx="6.7" ry="4.2" transform="rotate(-35 1279.02 26.6)"/></g><g class="b" style="--i:16"><circle class="t" cx="1316" cy="33" r="18"/><ellipse class="shine" cx="1309.16" cy="25.8" rx="5.8" ry="3.6" transform="rotate(-35 1309.16 25.8)"/></g><g class="b" style="--i:17"><circle class="s" cx="1346" cy="29" r="18"/><ellipse class="shine" cx="1339.16" cy="21.8" rx="5.8" ry="3.6" transform="rotate(-35 1339.16 21.8)"/></g><g class="b" style="--i:18"><circle class="p" cx="1377" cy="35" r="17"/><ellipse class="shine" cx="1370.54" cy="28.2" rx="5.4" ry="3.4" transform="rotate(-35 1370.54 28.2)"/></g><g class="b" style="--i:19"><circle class="g" cx="1413" cy="30" r="16"/><ellipse class="shine" cx="1406.92" cy="23.6" rx="5.1" ry="3.2" transform="rotate(-35 1406.92 23.6)"/></g><g class="b" style="--i:20"><circle class="rh" cx="1440" cy="34" r="19"/><ellipse class="shine" cx="1432.78" cy="26.4" rx="6.1" ry="3.8" transform="rotate(-35 1432.78 26.4)"/></g><g class="b" style="--i:21"><circle class="t" cx="1472" cy="32" r="16"/><ellipse class="shine" cx="1465.92" cy="25.6" rx="5.1" ry="3.2" transform="rotate(-35 1465.92 25.6)"/></g><g class="b" style="--i:22"><circle class="sh" cx="1504" cy="38" r="15"/><ellipse class="shine" cx="1498.3" cy="32" rx="4.8" ry="3.0" transform="rotate(-35 1498.3 32)"/></g><g class="b" style="--i:23"><circle class="p" cx="1536" cy="31" r="20"/><ellipse class="shine" cx="1528.4" cy="23" rx="6.4" ry="4.0" transform="rotate(-35 1528.4 23)"/></g><g class="b" style="--i:0"><circle class="t" cx="1574" cy="37" r="20"/><ellipse class="shine" cx="1566.4" cy="29" rx="6.4" ry="4.0" transform="rotate(-35 1566.4 29)"/></g><g class="b" style="--i:1"><circle class="s" cx="1604" cy="30" r="18"/><ellipse class="shine" cx="1597.16" cy="22.8" rx="5.8" ry="3.6" transform="rotate(-35 1597.16 22.8)"/></g></svg>
+  <div class="wrap footer-grid">
+    <div>
+      <a class="brand" href="index.html"><svg aria-hidden="true" focusable="false"><use href="#brand-mark"/></svg><span class="wordmark"><b>Leaps</b> <b>and</b> <b>Bounds</b></span></a>
+      <p>Leaps and Bounds Nursery<br>23 Clarence Street, Paisley PA1 1PX</p>
+    </div>
+    <div>
+      <p><a href="tel:+441418879955">0141 887 9955</a><br><a href="mailto:info@labnursery.co.uk">info@labnursery.co.uk</a></p>
+    </div>
+    <div>
+      <p class="footer-links"><a href="parents.html#policies">Policies</a> <a href="parents.html#privacy">Privacy</a> <a href="parents.html#accessibility">Accessibility</a> <a href="parents.html#complaints">Complaints</a> <a href="https://www.careinspectorate.scot/find-care?search=Leaps%20and%20Bounds%20Nursery">Care Inspectorate record</a></p>
+      <p>Page last reviewed: 14 October 2026</p>
+    </div>
+  </div>
+</footer>
+<div class="phone-bar" data-phone-bar aria-hidden="true"><a class="btn btn--small" href="join-us.html#book">Book a visit</a><a class="phone-link" href="tel:+441418879955"><svg aria-hidden="true" focusable="false"><use href="#i-phone"/></svg>Phone 0141 887 9955</a></div>
+</body>
+</html>

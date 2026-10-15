@@ -1,6 +1,6 @@
 # Garden Gate
 
-A place-led website template for independent Scottish nurseries: private, and voluntary or not-for-profit. Part of the **Doorway** family (`uk-inside`).
+A place-led website template for independent Scottish nurseries: private, and voluntary or not-for-profit. Part of the **Doorway** family (`practice/doorway`).
 
 **The idea in one line:** walk through the gate before you visit. The homepage answers "Is this for us?" first: ages, hours, funding, places and inspection grades, with "Book a visit" and "Join the waiting list". Then it walks a parent through the nursery with real photos, in the order their child will meet each place: the gate, the cloakroom, each room, the garden. A day-at-nursery timeline sits over a photo of the place.
 
@@ -24,7 +24,7 @@ The example links `../styles.css`, `../gardengate.js` and `../fonts/`. Keep that
 
 ## 2. How Garden Gate differs from its relatives
 
-- **Doorway (`uk-inside`, dental):** the same idea, "see inside before you visit", the same numbered route of stops with photos and practical answers, the same caption and alt text rules. Garden Gate changes the tasks (a parent choosing childcare, not a nervous patient), adds the key facts strip, the grades panel, the day timeline and dated closure notices, and swaps NHS colours and urgent-care cards for a calm, place-sampled palette.
+- **Doorway (`practice/doorway`, dental):** the same idea, "see inside before you visit", the same numbered route of stops with photos and practical answers, the same caption and alt text rules. Garden Gate changes the tasks (a parent choosing childcare, not a nervous patient), adds the key facts strip, the grades panel, the day timeline and dated closure notices, and swaps NHS colours and urgent-care cards for a calm, place-sampled palette.
 - **Front Desk Nursery (direction A) and Key Worker (direction B):** A is task-first with almost no photos; B makes the staff the hero. Garden Gate makes the **place** the second thing on the page, after the facts. Use A for nurseries with few photos, B where the team is the strongest asset.
 - **What the owner rejected:** generic, trend-driven and twee designs. Garden Gate has no rainbows, crayon or bubble fonts, clip art or cartoon animals [7.1]. Its only ornament is a small arch (the gate) used for the eyebrow mark, the step markers and the first photo's frame. Everything else is information: facts, grades, a timeline, fees. The colour comes from the nursery's own photos.
 

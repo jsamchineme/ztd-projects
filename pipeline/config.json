@@ -26,14 +26,14 @@
     "Results"
   ],
   "templateFiles": {
-    "Front Desk GP": "templates/uk-gp",
-    "Front Desk Dental": "templates/uk-dental",
-    "Front Desk Local": "templates/uk-local",
-    "Familiar Faces GP": "templates/uk-people-gp",
-    "Familiar Faces Dental": "templates/uk-team",
-    "Doorway": "templates/uk-inside",
-    "Studio": "templates/uk-studio",
-    "Results": "templates/uk-results"
+    "Front Desk GP": "templates/practice/front-desk-gp",
+    "Front Desk Dental": "templates/practice/front-desk-dental",
+    "Front Desk Local": "templates/practice/front-desk-local",
+    "Familiar Faces GP": "templates/practice/familiar-faces-gp",
+    "Familiar Faces Dental": "templates/practice/familiar-faces-dental",
+    "Doorway": "templates/practice/doorway",
+    "Studio": "templates/practice/studio",
+    "Results": "templates/practice/results"
   },
   "templateSummaries": {
     "Front Desk GP": "GP practices. Task-first NHS look: live open status, top tasks, staff rota. Needs no photos.",
@@ -230,7 +230,7 @@
             "previewUrl"
           ],
           "next": "ai_review",
-          "instructions": "Build the redesign on the chosen `template`, following `findings` and `plan`. Read the template's BRIEF.md and its worked example first (you're given the paths), copy its styles.css into the site unchanged except for the custom properties at the top, and follow the example's homepage structure and quality bar. Reuse the business's real content, logo and brand colours. If the card was planned as a new site (there's no working website), build it from the details gathered in `findings`, `plan` and the notes, and never invent services, prices, staff or reviews. Deploy a preview and set `previewUrl`. If the card came back from review, address everything in `review` first. Then complete the card.\n\nBuild every page listed in `pages`, not just the homepage. Every page uses the same header, footer, navigation, tokens and components as the template's example, with one h1, a short intro and clear sections; mark the current page in the menu. Take each page's content from the source pages named in `pages` (source/pages/NN-slug.md): rewrite it in plain English at a reading age of 9 to 11 and the NHS content style, but keep every fact, and never add facts that aren't there. Copy the photos named in `pages` and `plan` from source/img into site/img, resize them sensibly, and write real alt text. Link pages with relative links (`treatments.html`). Run the audit on the finished site: it crawls every page. Previews are sandboxed, so never reference SVG drawings in another file with `<use href=\"file.svg#id\">` (it draws nothing): put the SVG sprite inline in each page and use `<use href=\"#id\">`."
+          "instructions": "Build the redesign on the chosen `template`, following `findings` and `plan`. Read the template's BRIEF.md and its worked example first (you're given the paths), copy its styles.css into the site unchanged except for the custom properties at the top, and follow the example's homepage structure and quality bar. Reuse the business's real content, logo and brand colours. If the card was planned as a new site (there's no working website), build it from the details gathered in `findings`, `plan` and the notes, and never invent services, prices, staff or reviews. Deploy a preview and set `previewUrl`. If the card came back from review, address everything in `review` first. Then complete the card.\n\nBuild every page listed in `pages`, not just the homepage. Every page uses the same header, footer, navigation, tokens and components as the template's example, with one h1, a short intro and clear sections; mark the current page in the menu. Take each page's content from the source pages named in `pages` (source/pages/NN-slug.md): rewrite it in plain English at a reading age of 9 to 11 and the NHS content style, but keep every fact, and never add facts that aren't there. Copy the photos named in `pages` and `plan` from source/img into site/img, resize them sensibly, and write real alt text. Link pages with relative links (`treatments.html`). Run the audit on the finished site: it crawls every page. Previews are sandboxed, so never reference SVG drawings in another file with `<use href=\"file.svg#id\">` (it draws nothing): put the SVG sprite inline in each page and use `<use href=\"#id\">`. Any <video> with a captions <track> needs crossorigin=\"anonymous\", or the captions don't load in the sandboxed preview."
         },
         {
           "id": "ai_review",

@@ -1,5 +1,5 @@
 # Front Desk GP: a website template for UK GP practices
-> Pipeline name: **Front Desk GP** (folder `templates/uk-gp/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Front Desk", it means this template.
+> Pipeline name: **Front Desk GP** (folder `templates/practice/front-desk-gp/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Front Desk", it means this template.
 
 
 **Front Desk** makes a practice website do what a good receptionist does all day: say whether the practice is open, tell people the answer to their question straight away, and point them to the right place when the practice is not the right place. It is built on the NHS.UK look and the NHS design system, because patients trust it and NHS England's GP website benchmark rewards it. The premium comes from doing the NHS patterns exceptionally well, not from fashion: a live "are you open?" panel, answers printed on the task cards, a week-at-a-glance rota of who works when, and a full staff list with qualifications.

@@ -16,3 +16,6 @@ node_modules/
 # Nursery prospects: screenshots and the raw datastore CSV (re-download monthly)
 prospects/nursery/shots/
 prospects/nursery/source/
+
+# Email notification settings (Gmail app password)
+pipeline/notify.local.json

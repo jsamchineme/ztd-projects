@@ -1,0 +1,42 @@
+Open House worked example: My Second Home Nursery, 50 Tweedsmuir Road, Cardonald, Glasgow G52 2RX
+Every photo below is the nursery's own, taken from its current website (https://mysecondhomenursery.co.uk/,
+pages /, /about-us and /programs) on 14 October 2026. Files were cropped inside the site's black rounded
+frame, resized to 400px and 800px (WebP and JPEG) and re-saved with no metadata (no EXIF, no location).
+This is a sales mock-up: the nursery must confirm it is happy for these photos to be reused before launch.
+
+USED
+cosy-corner-400/800.(webp|jpg)  Source: https://assets.cdn.filesafe.space/W2yTpLu4J5aUiR0CHHEY/media/6abe21e210ee4f15560ebf20.png (home page gallery). Empty cosy corner: floor cushions, shelves,
+                                 fairy-light canopy. The four children's paintings on the wall carry the children's
+                                 first names on labels: the whole artwork board is softly blurred so no name can be read.
+den-400/800                      Source: https://assets.cdn.filesafe.space/W2yTpLu4J5aUiR0CHHEY/media/2ac09087-8733-4ef8-99b9-0a54eb1674f7.png (home page gallery). Empty sensory corner with lights and books. No people.
+loose-parts-400/800              Source: https://assets.cdn.filesafe.space/W2yTpLu4J5aUiR0CHHEY/media/6abe1f26612cffc49a1d9e6c.png (home page). Children's and an adult's hands at a dough table.
+                                 Hands only, no faces (allowed: "hands at work", research brief 5.2).
+light-table-400/800              Source: https://assets.cdn.filesafe.space/W2yTpLu4J5aUiR0CHHEY/media/6abe20762cc4aa198bb7673e.png (home page gallery). Cropped to the lower half: shapes on the light table.
+                                 The top half (children's arms and a cartoon bear sticker) was cut away.
+light-rope-400/800               Source: https://assets.cdn.filesafe.space/W2yTpLu4J5aUiR0CHHEY/media/6abe21eb2cc4aa198bb78bf2.png (home page gallery). Cropped to the lower 45%: rope lights and fabric.
+                                 The top of the photo shows a baby: cut away entirely.
+shelves-330                      Source: https://assets.cdn.filesafe.space/W2yTpLu4J5aUiR0CHHEY/media/664f02cbbc8a8e7217f7eb99.png (home page and /programs). Cropped to the left 30%: the shelf
+                                 unit only. The rest of the photo shows a child's face: cut away.
+tour.mp4, tour-poster.jpg        31-second film made with ffmpeg from the five photos above (slow pans and fades).
+tour.vtt                         Captions describing each shot. The film has no sound. Labelled on the page as
+                                 "Made from our own photos, with no sound".
+living-den.mp4, -poster.jpg      8-second slow pan across den.png. Labelled "A slow pan across one photo".
+
+EXCLUDED (and why)
+- Two children at a craft table ("Potions" sign), 3 versions: identifiable faces and uniform with nursery name.
+- Child sitting on the floor among blocks (full photo): identifiable face (only the empty shelf crop is used).
+- Child holding a magnet; child with a wooden box: identifiable faces, nursery T-shirts.
+- Baby on a sensory light mat; baby by rope lights (full photo): identifiable children.
+- Children doing yoga (with "Qualified early years yoga instructor" badge): identifiable faces.
+- Group of children jumping outdoors: identifiable faces (and looks like a stock image).
+- Child in a graduation gown; nativity scene with children: identifiable children.
+- Staff member in a Cat in the Hat costume at graduation: a person, no confirmed consent for reuse; not needed.
+- Adult and child in the garden with tyres: child identifiable from the front.
+- "Parent Pack" and "Top 10 checklist" mock-ups, icons, logos (Care Inspectorate, Education Scotland, SSSC,
+  Scottish Government, Glasgow City Council): marketing graphics or third-party logos. Never use the CI logo.
+- "Best Golden Tour Award 2025" and "Steampunks" badges: third-party marketing badges, not used.
+- The nursery's own logo (a hand-drawn house): not used in the example; the drawn house mark is ours. If the
+  nursery wants its logo, put it in the header in place of #house-mark.
+
+No garden, kitchen, food or building-front photos exist on the current site, so the example uses the template's
+drawings for those (#room-garden, #room-kitchen and the #house-villa front).

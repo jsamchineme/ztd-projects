@@ -7,6 +7,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve, sep, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRunner } from './workers.mjs';
+import { createNotifier } from './notify.mjs';
 
 // The browser audit needs Playwright and axe-core (npm --prefix pipeline install). Without them the board still runs.
 // The source-site study (crawl.mjs) uses the same Playwright stack; without it, Redesign study works from WebFetch alone.
@@ -42,6 +43,8 @@ for (const [name, dir] of Object.entries(config.templateFiles || {}))
 const firstStage = config.pipelines[0].stages[0].id;
 const fieldKeys = new Set(config.fields.map(f => f.key));
 const claimMs = (config.claimMinutes || 90) * 60000;
+const notifier = createNotifier({ root: ROOT, title: config.title || 'Pipeline', boardUrl: process.env.PUBLIC_URL || `http://localhost:${PORT}` });
+const reviewStage = config.reviewStage || (stages.has('human_review') ? 'human_review' : null);
 
 // ---------- store ----------
 let db = { nextId: 1, cards: [] };
@@ -83,6 +86,12 @@ function enter(c, to, by, note, outcome){
   const from = c.stage;
   c.stage = to; c.enteredAt = now(); c.claim = null;
   log(c, by, 'move', { from, to, ...(outcome && { outcome }), ...(note && { note }) });
+  if (to === from) return;
+  if (to === config.attentionStage) notifier.notify({ kind: 'attention', card: c, subject: `Needs attention: ${c.name}`,
+    body: `${by} moved #${c.id} ${c.name} to ${stages.get(to).name}.${note ? `\n${note}` : ''}`, lines: [c.url && `Website: ${c.url}`].filter(Boolean) });
+  else if (to === reviewStage) notifier.notify({ kind: 'review', card: c, subject: `Ready for review: ${c.name}`,
+    body: `#${c.id} ${c.name} is waiting in ${stages.get(to).name}${by ? ` (moved by ${by})` : ''}.${note ? `\n${note}` : ''}`,
+    lines: [c.fields.previewUrl && `Redesign: ${c.fields.previewUrl}`, c.url && `Current site: ${c.url}`].filter(Boolean) });
 }
 
 function ratingFor(score){
@@ -260,7 +269,7 @@ const runner = createRunner({
   stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter, previewUrl,
   workDir: id => join(WORK, String(id)),
   auditCard: auditMod && auditCard, hasPreview, crawlCard: crawlMod && crawlCard,
-  auditScript: join(ROOT, 'audit.mjs'), root: ROOT
+  auditScript: join(ROOT, 'audit.mjs'), root: ROOT, notify: notifier.notify
 });
 
 // ---------- http ----------
@@ -300,6 +309,11 @@ async function api(req, res, url){
     const ping = setInterval(() => res.write(': ping\n\n'), 25000);
     req.on('close', () => { clearInterval(ping); listeners.delete(res); });
     return;
+  }
+  if (parts[0] === 'notifications'){
+    if (m === 'GET') return send(res, 200, { latest: notifier.latest(), email: notifier.emailReady(), notifications: notifier.since(Number(url.searchParams.get('after')) || 0) });
+    if (parts[1] === 'test' && m === 'POST'){ notifier.test(); broadcast(); return send(res, 200, { ok: true, email: notifier.emailReady() }); }
+    throw new ApiError(404, 'Not found');
   }
   if (parts[0] === 'workflows'){
     const withRun = w => ({ ...w, run: runner.status(w.id) });
@@ -378,6 +392,8 @@ async function api(req, res, url){
       return send(res, 200, { deleted: c.id });
     }
   }
+  // What AI workers did on this card, step by step; live while one is on it.
+  if (action === 'activity' && m === 'GET') return send(res, 200, { sessions: runner.activity(c.id) });
   if (m !== 'POST') throw new ApiError(405, 'Method not allowed');
   if (action === 'audit'){ await auditCard(c, by); return send(res, 200, { card: withInstructions(c) }); }
   if (action === 'study-site'){ await crawlCard(c, by, { force: true }); return send(res, 200, { card: withInstructions(c) }); }
@@ -399,7 +415,11 @@ async function api(req, res, url){
 // AI-built preview sites (/preview/<card>/) and their audit reports (/audit/<card>/).
 // Sandboxed so their scripts run in an opaque origin and can't call this API.
 const TYPES = { '.md': 'text/plain; charset=utf-8', '.pdf': 'application/pdf', '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml',
-  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.woff': 'font/woff',
+  '.mp4': 'video/mp4', '.webm': 'video/webm', '.vtt': 'text/vtt; charset=utf-8', '.txt': 'text/plain; charset=utf-8' };
+// A sandboxed page has an opaque origin, so its own fonts and caption files count as cross-origin requests and are
+// refused without this header. These are static, read-only files, so allowing any origin is safe.
+const OPEN = { 'Access-Control-Allow-Origin': '*' };
 async function preview(res, pathname){
   const [, kind, id, ...rest] = pathname.split('/');
   if (!/^\d+$/.test(id || '')) return send(res, 404, 'Not found', 'text/plain');
@@ -411,7 +431,7 @@ async function preview(res, pathname){
   if (file.endsWith(sep) || file === root) file = join(file, 'index.html');
   try {
     const body = await readFile(file);
-    res.writeHead(200, { 'Content-Type': TYPES[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store',
+    res.writeHead(200, { ...OPEN, 'Content-Type': TYPES[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store',
       'Content-Security-Policy': 'sandbox allow-scripts allow-forms allow-popups', 'X-Content-Type-Options': 'nosniff' });
     res.end(body);
   } catch { send(res, 404, 'Not found', 'text/plain'); }
@@ -426,7 +446,7 @@ async function template(res, pathname){
   if (pathname.endsWith('/')) file = join(file, 'index.html');
   try {
     const body = await readFile(file);
-    res.writeHead(200, { 'Content-Type': extname(file) === '.md' ? 'text/plain; charset=utf-8' : TYPES[extname(file).toLowerCase()] || 'application/octet-stream',
+    res.writeHead(200, { ...OPEN, 'Content-Type': extname(file) === '.md' ? 'text/plain; charset=utf-8' : TYPES[extname(file).toLowerCase()] || 'application/octet-stream',
       'Cache-Control': 'no-store', 'Content-Security-Policy': 'sandbox allow-scripts allow-forms allow-popups', 'X-Content-Type-Options': 'nosniff' });
     res.end(body);
   } catch { send(res, 404, 'Not found', 'text/plain'); }

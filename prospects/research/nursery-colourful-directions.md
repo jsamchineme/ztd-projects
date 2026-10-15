@@ -79,7 +79,7 @@ Every parent fact still has to be there, presented in a new way.
 - All illustration is hand-coded SVG. Animals, plants, objects, buildings and weather are fine; **people are not**.
 - Audit 0/0/0, clean at all 9 widths, homepage under about 1 MB on a phone (the video loads on demand).
 
-## 1. Sidekick (`uk-nursery-sidekick`), mascot-led
+## 1. Sidekick (`nursery/sidekick`), mascot-led
 
 - **Inspired by:** Busy Bees Melrose's bee in every section, Banana Moon's characters and Buttercups' butterfly.
 - **Concept:** the nursery gets a drawn **mascot** that guides parents through the site.
@@ -96,7 +96,7 @@ Every parent fact still has to be there, presented in a new way.
 - **Look:** a white ground with bold blocks in two strong accents (for example tomato red and sunflower yellow) plus a deep ink colour. Heavy rounded display type in short headings, and a friendly sans for body text.
 - **Suits:** nurseries with an animal or creature name or logo, mid-size private nurseries, and nurseries with few usable photos.
 
-## 2. Make Waves (`uk-nursery-waves`), colour bands and a local theme
+## 2. Make Waves (`nursery/make-waves`), colour bands and a local theme
 
 - **Inspired by:**
   - Banana Moon's flat colour bands with choppy wave seams and the animals sitting on them;
@@ -116,7 +116,7 @@ Every parent fact still has to be there, presented in a new way.
 - **Look:** 5 or 6 saturated colours used as whole bands (turquoise, teal, sun yellow, apricot, coral, deep navy), with deeper shades wherever text sits. Rounded heavy display type, with a single word coloured in a headline.
 - **Suits:** nurseries in places with a strong local identity, such as seaside, riverside, rural or hill towns; bigger private nurseries that want a big, bright brand.
 
-## 3. Meadow (`uk-nursery-meadow`), light, charming and painterly
+## 3. Meadow (`nursery/meadow`), light, charming and painterly
 
 - **Inspired by:**
   - Heads of Ayr: 165 homepage words, a watercolour header, blob-shaped photos, pastel room blocks each with a doodle, photo tiles with one-word labels, and a video inside a photo collage;

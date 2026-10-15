@@ -1,0 +1,42 @@
+Soft Play worked example: Leaps and Bounds Nursery, 23 Clarence Street, Paisley PA1 1PX
+Every photo is the nursery's own, downloaded from https://labnursery.co.uk/ on 14 October 2026
+by pipeline/crawl.mjs. All are photos of EMPTY rooms and the garden. No child appears in any of them.
+
+Processing for every file: re-saved with Pillow (all EXIF and other metadata stripped), resized to
+400, 800 and (where the source allowed) 1200px wide, WebP quality 72 plus a JPEG fallback.
+
+Blurring: several room walls carry pinned family photos and children's display photos in which small
+faces are visible at full size. Those wall areas were softly blurred (feathered Gaussian blur) so no
+face can be made out, in: big-room, dining-room, baby-room, cosy-room, block-play, quiet-room,
+book-corner (small frames), dress-up (framed photos on the wall). Nothing else was altered.
+
+Used                Source file on the site (_assets/media/...)          Size used
+big-room            bccaa7bbbfc87491b5e0c243d3b9c587.jpg (1440x1080)   400/800/1200
+dining-room         35e3b5b0b08a989f38e555763979a175.jpg (1600x1044)   400/800/1200
+baby-room           8c502fb6ed27f19311b09a72fa938f0e.jpg (799x524)     400/799
+cosy-room           6d1a7e3d9f9752c625525da0fe745247.jpg (800x533)     400/800
+block-play          737c1cc277aae0d1710f41b195ada768.jpg (800x533)     400/800
+quiet-room          83b0ec5c20fc79e53bac94ff87a17202.jpg (1599x1066)   400/800/1200
+book-corner         f00054afe25dbe16bceb0fe38a1557d2.png (462x617)     400
+sand-tray           c1480646d01c00a6a2c2f05bcc1df8b9.png (319x398)     319 (native)
+dress-up            3e1ef6604eb4e7ec4a106f7fa720f649.png (346x461)     346 (native)
+garden              e72f8ad07cc1d0c528dfc03b2b379dcd.png (377x283)     377 (native)
+
+Video (../media/), both made by us with ffmpeg from the blurred photos above, silent, and labelled
+honestly on the page as made from still photos:
+- play-room-loop.mp4 (138 KB, 10 s, 768x432): a slow back-and-forth pan across block-play.
+  Poster: play-room-poster.jpg (its first frame).
+- photo-tour.mp4 (0.9 MB, 27 s, 768x432): slow pans across big-room, baby-room, cosy-room,
+  quiet-room and block-play with cross-fades. Captions: photo-tour.vtt. Poster: photo-tour-poster.jpg.
+
+NOT used, and why:
+- a0e29d9fc9b93adcb9414c14c6eaea16.png, the nursery's round logo: it contains drawn children, and
+  our templates draw no people. The example uses a typeset wordmark instead. Ask the nursery
+  whether it wants its logo back in the header.
+- 396ea01b01e65f14a3ce40d9916d3a10.png (the home corner): the wall above is covered with family
+  photos showing children's faces at a size that blurring would ruin the picture. Excluded.
+- 2b254efe1c473b06bf768a075951c196.jpg, 6c488a523204dbad38c24a6a346e6cec.jpg and
+  b78a79ceb6a29a25e80f13f29a4fc7ca.jpg: duplicates of dining-room and quiet-room.
+
+All drawings (foam shapes, the zebra rocker, balls, icons, room icons, signs) are hand-coded SVG
+made for this template. No stock, no AI-generated images, no people.

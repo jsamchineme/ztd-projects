@@ -1,6 +1,6 @@
 # Studio
 
-> Pipeline name: **Studio** (folder `templates/uk-studio/`). A template for **private and mixed private/NHS dental practices**. It sits beside the **Front Desk** family (task-first, little imagery), the **Familiar Faces** family (people-led) and **Doorway** (premises-led). When this brief says "Studio", it means this template.
+> Pipeline name: **Studio** (folder `templates/practice/studio/`). A template for **private and mixed private/NHS dental practices**. It sits beside the **Front Desk** family (task-first, little imagery), the **Familiar Faces** family (people-led) and **Doorway** (premises-led). When this brief says "Studio", it means this template.
 
 **The idea in one line:** the room is the brand. A private patient is choosing where to spend money and, often, where to face a fear. Studio shows them the actual rooms, the actual prices and the actual people, in an editorial voice that feels like a well-run private clinic, after it has answered the four questions every patient arrives with.
 
@@ -143,7 +143,7 @@ Re-theme by editing only the **Brand** block (and, if the rooms are cold and mod
 
 **Re-theming steps**
 1. Sample the logo's main colour exactly from the file: that's `--brand`.
-2. Darken it in the same hue until it passes 4.5:1 on `--stone` (the darkest light ground): that's `--brand-text`. `node ../uk-dental/retheme.mjs "#MAIN"` gives a good starting value for the same hue.
+2. Darken it in the same hue until it passes 4.5:1 on `--stone` (the darkest light ground): that's `--brand-text`. `node ../front-desk-dental/retheme.mjs "#MAIN"` gives a good starting value for the same hue.
 3. Make `--brand-deep` a near-black in the brand hue (lightness about 12%), and `--brand-on-deep` a light tint of the brand (≥ 4.5:1 on it).
 4. Pick `--accent-text` from the rooms (timber, brick, upholstery) or a second logo colour, and darken it to ≥ 4.5:1 on `--stone`. Make `--accent-on-deep` a light tint of it. The accent must be clearly a different hue from `--brand-text` and must not be red (red means urgent).
 5. If the practice's rooms are cool and white, cool the grounds (for example `--page: #F3F5F5`, `--stone: #E6EBEB`) and re-check `--ink-soft`.

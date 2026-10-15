@@ -4,7 +4,7 @@ A photography-led website template for UK dental practices (NHS, private or mixe
 
 **The idea in one line:** see inside before you visit. The homepage does the patient's jobs first (call, join, toothache, open now, costs). Then it walks a nervous patient through the visit with real photos of the practice, in the order they'll see each place: the car park, reception, the chair and the people.
 
-Doorway sits beside the approved "Front Desk" family (`uk-dental`, `uk-gp`, `uk-local`). It keeps their discipline: tasks first, plain English, live status, NHS patterns and no pop-ups. Front Desk is deliberately light on imagery. Doorway makes the practice's own photographs the second thing on the page, and gives every one a job: **orientation** (recognise the building, find the door) or **reassurance** (this is the room, these are the people). No photo is decoration.
+Doorway sits beside the approved "Front Desk" family (`practice/front-desk-dental`, `practice/front-desk-gp`, `practice/front-desk-local`). It keeps their discipline: tasks first, plain English, live status, NHS patterns and no pop-ups. Front Desk is deliberately light on imagery. Doorway makes the practice's own photographs the second thing on the page, and gives every one a job: **orientation** (recognise the building, find the door) or **reassurance** (this is the room, these are the people). No photo is decoration.
 
 Worked example: **Family Dental Care East Lothian, Prestonpans**, a four-page site: `example/index.html` (homepage), `see-inside.html`, `new-patients.html` and `our-team.html`.
 

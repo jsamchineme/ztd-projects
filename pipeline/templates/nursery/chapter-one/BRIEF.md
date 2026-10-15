@@ -1,6 +1,6 @@
 # Chapter One: a storybook website template for Scottish nurseries
 
-> Pipeline name: **Chapter One** (folder `templates/uk-nursery-chapter/`). One of the five engaging nursery templates (Cut and Stick, Full Stop, Chapter One, Weatherproof, Big Table). Its calm siblings are Front Desk Nursery (`uk-nursery`), Key Worker and Garden Gate. Chapter One sells **settling in, the people and the feeling of a safe, cosy day**.
+> Pipeline name: **Chapter One** (folder `templates/nursery/chapter-one/`). One of the five engaging nursery templates (Cut and Stick, Full Stop, Chapter One, Weatherproof, Big Table). Its calm siblings are Front Desk Nursery (`nursery/front-desk`), Key Worker and Garden Gate. Chapter One sells **settling in, the people and the feeling of a safe, cosy day**.
 
 **The idea in one line:** a warm storybook site where the hero of every page is the reader's own child, never drawn. Drawn scenes wait for them (a peg with small wellies, a cup of tea for you, a lit window at home time), and starting nursery is told as the first chapter.
 
@@ -21,7 +21,7 @@ It is the "after" in a before-and-after pitch, and the system AI build workers r
 | `example/` | Worked six-page site for **Cosy Cottage Nursery School**, Northfield, Edinburgh (CS2013314940), built only from its own website and Care Inspectorate record. | Copy it for each nursery |
 | `example/img/CREDITS.txt` | Image sources, and every image on the old site that was not used and why. | Each nursery |
 | `PHOTO-SHOTLIST.md` | The 3 to 9 photos to ask for. | No |
-| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs uk-nursery-chapter`. | After changes |
+| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs nursery/chapter-one`. | After changes |
 
 Pages link `../styles.css` and `../chapter.js`; fonts load from `../fonts/`. No build step, no framework, nothing from another server (no Google Fonts, CDNs, analytics, maps, social embeds).
 

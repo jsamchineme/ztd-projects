@@ -229,6 +229,28 @@ dialog .row{justify-content:flex-end;margin-top:14px}
 .bar{flex:1;height:6px;border-radius:999px;background:var(--chrome-2);overflow:hidden}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}
 .bar.hot i{background:var(--bad-ink)}
+.wknow{display:block;margin:1px 0 3px 12px;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}
+/* AI activity feed in the card panel */
+.sess-h{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.sess-h b{color:var(--ink)}
+.sess-h .st{font-weight:600} .sess-h .st.working{color:var(--accent)} .sess-h .st.done{color:var(--good-ink)} .sess-h .st.failed,.sess-h .st.stopped{color:var(--danger)}
+.feed{list-style:none;margin:0;padding:0 2px 0 0;display:flex;flex-direction:column;gap:5px;max-height:420px;overflow:auto;font-size:13px;line-height:1.4}
+.feed li{display:flex;gap:8px;align-items:flex-start;min-width:0}
+.feed .ic{width:16px;flex:none;display:flex;justify-content:center;padding-top:2px;color:var(--muted);font-size:12px}
+.feed .ic .spin{color:var(--accent);margin-top:2px}
+.feed .bd{flex:1;min-width:0;overflow-wrap:anywhere}
+.feed .tool.ok .ic{color:var(--good-ink)} .feed .tool.error .ic{color:var(--danger)}
+.feed .tool.running .tx{color:var(--ink);font-weight:600}
+.feed .say .bd{white-space:pre-wrap;color:var(--ink)}
+.feed .think .tt{color:var(--muted);font-style:italic}
+.feed .think summary{cursor:pointer;color:var(--muted);font-style:italic;list-style:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feed .think summary::-webkit-details-marker{display:none}
+.feed .think[open] summary{white-space:normal}
+.feed .think p,.feed .det{margin:4px 0 0;white-space:pre-wrap;color:var(--muted);font-size:12.5px}
+.feed .out{display:block;color:var(--danger);font-size:12px;margin-top:2px}
+.feed .when{margin-left:6px;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.older{margin-top:12px} .older>summary,.older details>summary{cursor:pointer;font-size:12.5px;color:var(--muted)}
+.older details{margin:8px 0 0 10px}
 .runlog{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px;max-height:140px;overflow:auto}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:420px){ .grid2{grid-template-columns:1fr} }
@@ -253,6 +275,7 @@ dialog .row{justify-content:flex-end;margin-top:14px}
   <div class="grow"></div>
   <input type="search" id="q" placeholder="Search sites" aria-label="Search sites">
   <button class="btn" id="meBtn" title="Your name on claims and history"></button>
+  <button class="btn" id="ntBtn" hidden></button>
   <button class="btn" id="wfBtn" aria-expanded="false">Workflows</button>
   <button class="btn primary" id="addBtn">Add sites</button>
   <span class="live" id="live">Live</span>
@@ -298,6 +321,8 @@ dialog .row{justify-content:flex-end;margin-top:14px}
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : null;
+// Workers save previews as http://localhost:<port>/preview/…; link them through whatever address the board is opened on.
+const boardLink = u => String(u || '').replace(/^http:\/\/(localhost|127\.0\.0\.1):\d+(?=\/)/i, '');
 const domain = u => String(u || '').replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
 const LS = { get(k, d){ try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
 
@@ -486,7 +511,7 @@ function stageBox(c){
   const allStages = cfg.pipelines.map(p => `<optgroup label="${esc(p.name)}">${p.stages.map(x => `<option value="${x.id}" ${x.id === c.stage ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</optgroup>`).join('');
   return `
         <h3>${esc(s.name)}</h3>
-        ${(a => a?.kind === 'working' ? `<p class="hint" style="margin:0 0 10px;display:flex;gap:7px;align-items:center;color:var(--accent)"><span class="spin" aria-hidden="true"></span><span><b>${esc(a.who)}</b> is working on this, started ${ago(a.at)}. Its results appear here when it finishes.</span></p>`
+        ${(a => a?.kind === 'working' ? `<p class="hint" style="margin:0 0 10px;display:flex;gap:7px;align-items:center;color:var(--accent)"><span class="spin" aria-hidden="true"></span><span><b>${esc(a.who)}</b> is working on this, started ${ago(a.at)}. Follow along under <b>AI activity</b>.</span></p>`
           : a?.kind === 'failed' ? `<p class="hint warn" style="margin:0 0 10px"><b>${esc(a.who)}</b>: ${esc(a.note)}</p>`
           : c.claim ? `<p class="hint" style="margin:0 0 10px">${cl ? 'Being worked on by' : 'Claim expired for'} <b>${esc(c.claim.by)}</b>, taken ${ago(c.claim.at)}.</p>` : '')(aiStatus(c))}
         <div class="row">
@@ -512,6 +537,7 @@ function refreshPanelParts(){
   if ($('#sourceBox')) $('#sourceBox').innerHTML = sourceBox(c);
 }
 function renderPanel(){
+  const feedState = captureFeed();
   const c = cards.find(c => c.id === openId);
   if (!c){ closePanel(); return; }
   const s = stages[c.stage], f = c.fields;
@@ -522,10 +548,11 @@ function renderPanel(){
     <div class="ph"><div class="t"><h2>${esc(c.name)}</h2><div class="sub">#${c.id} · ${esc(s.name)} · <span class="who ${s.who}">${whoLabel(s.who)}</span></div></div>
       <button class="x" id="pClose" aria-label="Close">×</button></div>
     <div class="pb">
-      <div class="links">${safeUrl(c.url) ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">Before: current site ↗</a>` : ''}${safeUrl(f.previewUrl) ? `<a href="${esc(f.previewUrl)}" target="_blank" rel="noopener">After: redesign ↗</a>` : ''}</div>
+      <div class="links">${safeUrl(c.url) ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">Before: current site ↗</a>` : ''}${safeUrl(f.previewUrl) ? `<a href="${esc(boardLink(f.previewUrl))}" target="_blank" rel="noopener">After: redesign ↗</a>` : ''}</div>
       <div id="sourceBox">${sourceBox(c)}</div>
       <div id="auditBox">${auditBox(c)}</div>
       <div class="box" id="stageBox">${stageBox(c)}</div>
+      <div class="box" id="actBox" hidden></div>
       <div class="box">
         <h3>Work</h3>
         ${fields.map(x => x.type === 'template' ? fieldInput({ ...x, _req: req.has(x.key) }, f[x.key] ?? '')
@@ -545,14 +572,66 @@ function renderPanel(){
       </div>
       <button class="btn danger" data-delete style="align-self:flex-start">Delete card</button>
     </div>`;
+  paintActivity(feedState);
+}
+
+// ---------- AI activity ----------
+// What AI workers did on the open card, step by step. Polled every 2s while one is on it.
+let actFor = null, actData = [], actTimer = null;
+const secs = (a, b) => { const t = Math.max(0, Math.round(((b ? Date.parse(b) : Date.now()) - Date.parse(a)) / 1000)); return t >= 3600 ? `${Math.floor(t / 3600)}h ${Math.floor(t % 3600 / 60)}m` : t >= 60 ? `${Math.floor(t / 60)}m ${t % 60}s` : `${t}s`; };
+function stepHtml(x, k){
+  if (x.kind === 'think'){
+    const [first, ...rest] = x.text.split('\n'), more = rest.join('\n').trim();
+    return `<li class="think"><span class="ic" aria-hidden="true">✻</span>${more ? `<details class="bd" data-k="${k}"><summary>${esc(first)}</summary><p>${esc(more)}</p></details>` : `<div class="bd"><span class="tt">${esc(first)}</span></div>`}</li>`;
+  }
+  if (x.kind === 'say') return `<li class="say"><span class="ic" aria-hidden="true">●</span><div class="bd">${esc(x.text)}</div></li>`;
+  const ic = x.state === 'running' ? '<span class="spin"></span>' : x.state === 'ok' ? '✓' : x.state === 'error' ? '✕' : '–';
+  const took = x.doneAt ? `<span class="when">${secs(x.at, x.doneAt)}</span>` : '';
+  return `<li class="tool ${x.state}"><span class="ic" aria-label="${esc(x.state)}">${ic}</span><div class="bd"><span class="tx">${esc(x.text)}</span>${took}
+    ${x.detail ? `<details data-k="${k}"><summary class="hint" style="margin:0;cursor:pointer">Details</summary><p class="det">${esc(x.detail)}</p></details>` : ''}${x.out ? `<span class="out">${esc(x.out)}</span>` : ''}</div></li>`;
+}
+function sessHead(s){
+  const st = s.status === 'working' ? `Working · ${secs(s.startedAt)}` : s.status === 'done' ? `Done${s.outcome ? `: ${s.outcome}` : ''} · ${secs(s.startedAt, s.endedAt)}`
+    : s.status === 'failed' ? `Couldn’t finish · ${secs(s.startedAt, s.endedAt)}` : `Stopped · ${secs(s.startedAt, s.endedAt)}`;
+  return `<div class="sess-h"><b>${esc(s.worker)}</b><span>${esc(s.stageName)} · ${esc(s.model)}</span><span class="st ${s.status}">${esc(st)}</span>${s.cost != null ? `<span>$${s.cost.toFixed(2)}</span>` : ''}<span title="${esc(new Date(s.startedAt).toLocaleString())}">${ago(s.startedAt)}</span></div>`;
+}
+const feedHtml = (s, live) => `<ol class="feed${live ? ' follow' : ''}" aria-live="off">${s.steps.map((x, i) => stepHtml(x, `${s.id}:${i}`)).join('') || '<li><span class="ic"><span class="spin"></span></span><div class="bd">Getting ready…</div></li>'}</ol>
+  ${s.note && s.status !== 'working' ? `<p class="hint${s.status === 'done' ? '' : ' warn'}">${esc(s.note)}</p>` : ''}`;
+// Where the reader is in the feed (following the end, or scrolled back) and what they've opened, to keep across redraws.
+function captureFeed(){
+  const box = $('#actBox'), feed = box?.querySelector('.feed.follow');
+  return { stick: !feed || feed.scrollHeight - feed.scrollTop - feed.clientHeight < 40, top: feed?.scrollTop || 0,
+    open: new Set(box ? [...box.querySelectorAll('details[open]')].map(d => d.dataset.k) : []) };
+}
+function paintActivity({ stick, top, open } = captureFeed()){
+  const box = $('#actBox'); if (!box) return;
+  if (actFor !== openId || !actData.length){ box.hidden = true; box.innerHTML = ''; return; }
+  const [cur, ...prev] = actData;
+  box.innerHTML = `<h3>AI activity</h3>${sessHead(cur)}${feedHtml(cur, true)}
+    ${prev.length ? `<details class="older" data-k="older"><summary>Earlier sessions (${prev.length})</summary>${prev.map(s => `<details data-k="${s.id}"><summary>${esc(s.stageName)} · ${esc(s.worker)} · ${ago(s.startedAt)}</summary>${sessHead(s)}${feedHtml(s)}</details>`).join('')}</details>` : ''}`;
+  box.hidden = false;
+  box.querySelectorAll('details[data-k]').forEach(d => { if (open.has(d.dataset.k)) d.open = true; });
+  const feed = box.querySelector('.feed.follow');
+  if (feed) feed.scrollTop = stick ? feed.scrollHeight : top;
+}
+async function loadActivity(id){
+  clearTimeout(actTimer); actTimer = null;
+  if (openId !== id) return;
+  try {
+    const r = await api('GET', `/cards/${id}/activity`);
+    if (openId !== id) return;
+    actFor = id; actData = r.sessions || []; paintActivity();
+  } catch {}
+  if (openId === id && actData[0]?.status === 'working') actTimer = setTimeout(() => loadActivity(id), 2000);
 }
 function openPanel(id){
-  openId = id; renderPanel();
+  if (actFor !== id){ actFor = null; actData = []; }
+  openId = id; renderPanel(); loadActivity(id);
   $('#panel').classList.add('open'); $('#panel').setAttribute('aria-hidden', 'false'); $('#scrim').hidden = false;
   render();
 }
 function closePanel(){
-  openId = null;
+  openId = null; clearTimeout(actTimer); actTimer = null;
   $('#panel').classList.remove('open'); $('#panel').setAttribute('aria-hidden', 'true'); $('#scrim').hidden = !wfOpen;
   document.querySelectorAll('.card[aria-current="true"]').forEach(el => el.setAttribute('aria-current', 'false'));
 }
@@ -563,13 +642,17 @@ async function load(){
   if (loading){ again = true; return loading; }
   loading = (async () => {
     try {
-      const [r, w] = await Promise.all([api('GET', '/cards'), api('GET', '/workflows')]);
+      const [r, w, n] = await Promise.all([api('GET', '/cards'), api('GET', '/workflows'), api('GET', `/notifications?after=${lastNote ?? 0}`).catch(() => null)]);
+      if (n) gotNotes(n);
       cards = r.cards; workflows = w.workflows; auditing = new Set(r.auditing || []); crawling = new Set(r.crawling || []);
       render();
       renderWfButton();
       if (wfOpen && !wfEdit) renderWf();
       // Don't redraw the panel under someone who's typing in it.
       if (openId != null) $('#panel').contains(document.activeElement) ? refreshPanelParts() : renderPanel();
+      // An AI worker just picked up (or put down) the open card: refresh its activity.
+      const oc = cards.find(c => c.id === openId);
+      if (oc && !actTimer && (aiStatus(oc)?.kind === 'working') !== (actData[0]?.status === 'working')) loadActivity(openId);
     } finally { loading = null; if (again){ again = false; load(); } }
   })();
   return loading;
@@ -579,6 +662,39 @@ function connect(){
   es.onmessage = () => { $('#live').removeAttribute('data-off'); $('#live').textContent = 'Live'; load(); };
   es.onerror = () => { $('#live').dataset.off = ''; $('#live').textContent = 'Reconnecting'; };
 }
+
+// ---------- notifications ----------
+// Desktop notifications for what the server flags (needs attention, ready for review, workflow ended, workers gave up).
+// Emails go out from the server; this tab only shows them. Old ones from before the page loaded aren't replayed.
+let lastNote = null, emailOn = false;
+const canNotify = () => 'Notification' in window;
+function gotNotes(n){
+  emailOn = n.email;
+  if (lastNote == null){ lastNote = n.latest; return renderNtBtn(); }
+  for (const x of n.notifications){
+    lastNote = Math.max(lastNote, x.id);
+    toast(x.title);
+    if (!canNotify() || Notification.permission !== 'granted') continue;
+    const note = new Notification(x.title, { body: x.body, tag: `${location.port}-${x.id}`, requireInteraction: x.kind !== 'test' });
+    note.onclick = () => { window.focus(); note.close(); if (x.card) openPanel(x.card.id); else if (x.kind === 'run' || x.kind === 'workers') openWf(); };
+  }
+  renderNtBtn();
+}
+function renderNtBtn(){
+  const b = $('#ntBtn'), perm = canNotify() ? Notification.permission : 'unsupported';
+  b.hidden = false;
+  b.textContent = perm === 'granted' ? 'Notifications on' : 'Turn on notifications';
+  b.title = (perm === 'denied' ? 'Desktop notifications are blocked: allow them for this site in the browser’s site settings. '
+    : perm === 'granted' ? 'Desktop notifications are on. Click to send a test. ' : 'Get a desktop notification when a card needs you or a workflow ends. ')
+    + (emailOn ? 'Emails are on.' : 'Emails are off: add pipeline/notify.local.json.');
+}
+$('#ntBtn').addEventListener('click', async () => {
+  if (canNotify() && Notification.permission === 'default') await Notification.requestPermission();
+  renderNtBtn();
+  if (canNotify() && Notification.permission === 'denied') return toast('Notifications are blocked. Allow them in this site’s settings in your browser.', 'err');
+  const r = await act(() => api('POST', '/notifications/test', {}));
+  if (r) toast(r.email ? 'Test sent to your desktop and email' : 'Test sent. Email is off until pipeline/notify.local.json is set up');
+});
 
 // ---------- events ----------
 function needMe(){ if (me) return true; $('#meName').value = ''; $('#meDlg').showModal(); return false; }
@@ -746,7 +862,7 @@ function runHtml(run){
   const waitFor = st => [st.stage, ...(stages[st.stage].pullFrom || [])].reduce((n, id) => n + cards.filter(c => c.stage === id && !claimed(c)).length, 0);
   const rows = run.steps.map(st => `<tr>
     <td><b>${esc(stages[st.stage].name)}</b>${run.status === 'running' ? `<br><span class="hint" style="margin:0">${waitFor(st)} waiting</span>` : ''}</td>
-    <td>${st.workers.map(k => `<span class="wk ${k.state}"><span class="dot"></span>${k.state === 'working' && k.card ? `<a href="#" class="lnk" data-open="${k.card}">#${k.card} ${esc(k.cardName || '')}</a>` : esc(k.state)}</span>`).join('')}</td>
+    <td>${st.workers.map(k => `<span class="wk ${k.state}"><span class="dot"></span>${k.state === 'working' && k.card ? `<a href="#" class="lnk" data-open="${k.card}">#${k.card} ${esc(k.cardName || '')}</a><span class="wknow" data-wknow="${esc(k.name)}">${esc(k.now || 'Starting')}</span>` : esc(k.state)}</span>`).join('')}</td>
     <td class="num">${st.done} done${st.failed ? `<br>${st.failed} given back` : ''}${st.limit ? `<br>${st.taken} of ${st.limit} taken` : ''}</td></tr>`).join('');
   const meta = [run.status === 'running' ? `Started ${ago(run.startedAt)}` : `Ended ${ago(run.endedAt || run.startedAt)}`, run.cost ? `$${run.cost.toFixed(2)} spent` : ''].filter(Boolean).join(' · ');
   return `<p class="hint">${meta}</p>
@@ -934,6 +1050,20 @@ $('#wf').addEventListener('click', async e => {
   setMe(me);
   await load();
   connect();
+  // Links from emails: #card-12 opens that card, #workflows the workflows drawer.
+  const deep = () => { const m = /^#card-(\d+)$/.exec(location.hash); if (m) openPanel(Number(m[1])); else if (location.hash === '#workflows') openWf(); };
+  deep(); addEventListener('hashchange', deep);
+  // While the workflows drawer is open, keep each worker's current step fresh without redrawing the drawer.
+  setInterval(async () => {
+    if (!wfOpen || wfEdit || !workflows.some(w => w.run?.status === 'running')) return;
+    try {
+      const r = await api('GET', '/workflows');
+      for (const w of r.workflows) for (const st of w.run?.steps || []) for (const k of st.workers){
+        const el = k.state === 'working' && document.querySelector(`[data-wknow="${CSS.escape(k.name)}"]`);
+        if (el) el.textContent = k.now || 'Starting';
+      }
+    } catch {}
+  }, 3000);
   // Keep "12m ago" fresh; tick faster while AI workers are busy so their timers move.
   let ticks = 0;
   setInterval(() => {

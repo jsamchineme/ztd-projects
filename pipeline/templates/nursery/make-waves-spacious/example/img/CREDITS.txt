@@ -1,0 +1,35 @@
+Image and video credits: Make Waves worked example (Oban's 1st Steps Day Nursery, Oban)
+
+All photos are the nursery's own, from its current website https://firststepsoban.co.uk/
+(downloaded 13 October 2026). None shows a child or a member of staff. Each was re-saved
+with Pillow, which drops all EXIF, GPS and colour-profile metadata, as WebP at 400px and at
+500px wide. 500px is the largest size the nursery's site holds, so there is no 800px file:
+we do not upscale. Ask the nursery for the originals at handover and re-export at 400 and 800.
+
+File (400 and 500 wide)        Source on firststepsoban.co.uk     What it shows
+building-*.webp                /img/about/1.jpg                   The stone school (1888) and the newer wing
+entrance-*.webp                /img/about/2.jpg                   The entrance, gate and planters ("Please shut the gate")
+playground-*.webp              /img/about/3.jpg                   Playground: soft red surface, picnic tables, tyres
+playroom-red-*.webp            /img/about/4.jpg                   Playroom with red floor, book corner, rainbow drapes
+treehouse-*.webp               /img/about/5.jpg                   Tree house and slide; the bay shows through the trees
+garden-*.webp                  /img/about/6.jpg                   Big lawn, play tent, climbing dome, tall tree
+conservatory-*.webp            /img/facilities/1.jpg              Conservatory playroom with baby chairs (the Baby Room's conservatory, per the 2018 handbook; confirm)
+washroom-*.webp                /img/facilities/2.jpg              Washroom with low sinks and a skylight
+playroom-skylights-*.webp      /img/facilities/4.jpg              Playroom with skylights and a coloured-pencil mural
+playroom-blue-*.webp           /img/facilities/5.jpg              Playroom with blue curtains and a music table
+playroom-lilac-*.webp          /img/facilities/6.jpg              Playroom with home corner, dolls' house, tree painting
+
+Videos (made by us with ffmpeg from the photos above; no footage was filmed, no sound track)
+living-garden.mp4 / living-garden-poster.webp   5 s pan across the garden photo (about/6.jpg) and 5 s back, a 10 s seamless loop, 480x480, 194 KB. Labelled "A slow pan across one photo".
+tour.mp4 / tour-poster.webp / tour.en.vtt       39 s photo tour of the 11 photos above with slow zooms and fades, 640x480, 1.5 MB, captions in tour.en.vtt. Labelled "made from still photos, not film".
+
+Excluded, and why
+/img/facilities/3.jpg        A child (seen side-on, in a dressing-up costume) stands in the playroom. Identifiable child: excluded.
+/img/slideshow/*.png          Website hero graphics (clouds, sun, land, waves) from the site builder: not the nursery's photos, not used.
+/img/work.jpg                 Education Scotland "Early Years Matters" graphic: third-party artwork, not used.
+/img/client_logo/*.jpg        Care Inspectorate, Education Scotland, NDNA, Eat Safe logos: not used (we never use the Care Inspectorate logo).
+Logo (001-575ce7.png)          The nursery's logo was not copied. The header mark (six rounded squares as steps, over a wave) is our redrawing of its coloured-square idea in code.
+
+All illustrations (hero scene, wave seams, seal, gulls, boats, ferry, crab, creel, buoy, lighthouse,
+starfish, otter, icons) are hand-coded SVG made for this template. No people, no faces, no stock,
+no AI-generated images.

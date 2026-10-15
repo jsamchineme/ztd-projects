@@ -1,6 +1,6 @@
 # Front Desk Nursery: a website template for independent Scottish nurseries
 
-> Pipeline name: **Front Desk Nursery** (folder `templates/uk-nursery/`). It belongs to the **Front Desk** family (GP `uk-gp`, Dental `uk-dental`, Local `uk-local`): task-first, little imagery, answers printed on the page. Its siblings for nurseries are Key Worker (people-led, Familiar Faces family) and Garden Gate (place-led, Doorway family). When this brief says "Front Desk", it means this template.
+> Pipeline name: **Front Desk Nursery** (folder `templates/nursery/front-desk/`). It belongs to the **Front Desk** family (GP `practice/front-desk-gp`, Dental `practice/front-desk-dental`, Local `practice/front-desk-local`): task-first, little imagery, answers printed on the page. Its siblings for nurseries are Key Worker (people-led, Familiar Faces family) and Garden Gate (place-led, Doorway family). When this brief says "Front Desk", it means this template.
 
 **The idea in one line:** the homepage does what a good nursery office does at the door. It says who the nursery is for, whether it's open today (or closed for the holidays), what it costs, how good it is, and how to visit, all on the first phone screen. Then it gives current parents their four everyday answers in one panel.
 
@@ -18,7 +18,7 @@ The research behind every decision is `prospects/research/nursery-websites.md` (
 | `example/index.html` | Worked homepage for **Clarkston Nursery**, a real parent-run charity nursery in Clarkston, East Renfrewshire, built only from its own website, its 2026/27 handbook and its Care Inspectorate record. | Copy it for each nursery |
 | `example/join-us.html`, `fees-and-funding.html`, `our-nursery.html`, `our-team.html`, `parents.html` | The five worked inner pages, one per menu item. | Yes |
 | `example/img/` | The example's one photo (the garden, WebP and JPEG at 720 and 1200px) and `CREDITS.txt`, which also lists every photo on the old site that was **not** used and why. | Each nursery gets its own `img/` |
-| `thumb.jpg` | Picker thumbnail. Regenerate with `node pipeline/template-thumbs.mjs uk-nursery`. | After changes |
+| `thumb.jpg` | Picker thumbnail. Regenerate with `node pipeline/template-thumbs.mjs nursery/front-desk`. | After changes |
 
 Pages link `../styles.css` and `../frontdesk.js`, and fonts load from `../fonts/` through the stylesheet. Keep that folder shape. No build step, no framework, and nothing loads from another server: no Google Fonts, no CDNs, no analytics, no maps, no social embeds (GDPR, §6.6).
 
@@ -210,7 +210,7 @@ Don't add a component until you have checked that one of these won't do. If you 
 | `--gutter`, `--section`, `--wrap` | fluid, fluid, 72rem | Layout. |
 
 ### How to re-theme for a new nursery
-1. Copy the whole `uk-nursery/` folder, or copy `example/` to a sibling folder, keeping `../styles.css`, `../frontdesk.js` and `../fonts/` resolving.
+1. Copy the whole `nursery/front-desk/` folder, or copy `example/` to a sibling folder, keeping `../styles.css`, `../frontdesk.js` and `../fonts/` resolving.
 2. **Gather facts** (section 9's list) and note where each came from. Read the nursery's handbook if it has one: it is usually newer and fuller than its website.
 3. **Brand colour.** Take the nursery's main colour (logo, sign or uniform). Darken it until white on it is 7:1 or more, and set `--brand`, `--brand-strong` (about 15% darker), `--brand-tint` (95 to 97% lightness, same hue) and `--brand-line` (85 to 88%). Calm, natural hues work best; if the nursery's colour is a bright primary, use it only as `--mark-accent` and keep the green. Don't touch link, status, focus or button tokens.
 4. **Mark.** Draw a simple inline SVG at 44×44 from something real about the place (Clarkston's is the arched window of its church hall), using `.brand__bg`, `.brand__line` and `.brand__accent` so it follows the tokens. If the nursery has a simple logo, redraw it. Never clip art.

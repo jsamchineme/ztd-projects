@@ -1,6 +1,6 @@
 # Front Desk Local
 
-> Pipeline name: **Front Desk Local** (folder `templates/uk-local/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Front Desk", it means this template.
+> Pipeline name: **Front Desk Local** (folder `templates/practice/front-desk-local/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Front Desk", it means this template.
 
 A website template for small and rural UK dental practices and GP surgeries.
 
@@ -262,7 +262,7 @@ Checked at 320, 360, 390, 430, 600, 768, 834, 1024, 1280 and 1440px, and at 320p
 
 ## 6. How to re-theme for a new practice
 
-1. Copy the whole `uk-local/` folder. Make `practice-name/index.html` from `example/index.html`, keeping `../styles.css`, `../frontdesk.js` and `../fonts/`. If the folder layout changes, fix the relative paths and the font `preload`.
+1. Copy the whole `practice/front-desk-local/` folder. Make `practice-name/index.html` from `example/index.html`, keeping `../styles.css`, `../frontdesk.js` and `../fonts/`. If the folder layout changes, fix the relative paths and the font `preload`.
 2. **Gather the facts.** Use the practice site, the NHS listing (NHS inform service directory or nhs.uk) and the job card. Write down where each fact came from. Flag anything undated or contradictory.
 3. **Set the brand colour.** Sample the logo's main colour and darken it until white text on it is 7:1 or more. Set `--brand`, `--brand-strong` (darker), `--brand-tint` (95–97% lightness of the same hue) and `--brand-line` (88–90%). Set `--mark-accent` to the logo's second colour. Don't touch the NHS tokens.
 4. **Make the mark.** Redraw the practice's logo as a simple inline SVG at 44×44, using `class="brand__bg"` and `class="brand__accent"` so it follows the tokens. If the logo is too complex, use a rounded square in `--brand` with a simple tooth (dental) or the initial (GP). Never use `<img src=".svg">`.

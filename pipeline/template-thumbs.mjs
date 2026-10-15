@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Takes a thumbnail of each template's worked example (top of the page at desktop width) for the board's template picker.
-// Writes templates/<folder>/thumb.jpg. Re-run after changing a template.
-// Usage: node pipeline/template-thumbs.mjs [folder ...]   (no folders: every template)
+// Writes templates/<group>/<name>/thumb.jpg. Re-run after changing a template.
+// Usage: node pipeline/template-thumbs.mjs [folder ...]   (e.g. nursery/make-waves, or a group like nursery; none: every template)
 import http from 'node:http';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { join, extname, dirname, resolve, sep } from 'node:path';
@@ -24,8 +24,13 @@ const base = `http://127.0.0.1:${server.address().port}`;
 
 const browser = await chromium.launch({ executablePath: CHROME });
 try {
-  const only = process.argv.slice(2);
-  for (const dir of (await readdir(ROOT)).sort().filter(d => !only.length || only.includes(d))){
+  const only = process.argv.slice(2).map(d => d.replace(/^(pipeline\/)?templates\//, '').replace(/\/+$/, ''));
+  // Templates sit in group folders (practice/, nursery/); a template is any folder with example/index.html.
+  const dirs = [];
+  for (const group of (await readdir(ROOT, { withFileTypes: true })).filter(d => d.isDirectory()))
+    for (const t of await readdir(join(ROOT, group.name), { withFileTypes: true }))
+      if (t.isDirectory()) dirs.push(`${group.name}/${t.name}`);
+  for (const dir of dirs.sort().filter(d => !only.length || only.some(o => d === o || d.startsWith(o + '/')))){
     try { await stat(join(ROOT, dir, 'example', 'index.html')); } catch { continue; }
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 0.5 });
     await page.goto(`${base}/${dir}/example/`, { waitUntil: 'networkidle' });

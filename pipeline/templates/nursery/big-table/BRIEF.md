@@ -1,6 +1,6 @@
 # Big Table: a website template for Scottish nurseries that sell through food and family
 
-> Pipeline name: **Big Table** (folder `templates/uk-nursery-table/`). It is direction 5 of `prospects/research/nursery-engaging-patterns.md` (§4.5). Its siblings are the calm, information-first nursery templates (Front Desk Nursery `uk-nursery`, Key Worker `uk-people-nursery`, Garden Gate `uk-inside-nursery`) and the other engaging directions (Cut and Stick, Full Stop, Chapter One, Weatherproof). When this brief says "Big Table", it means this template.
+> Pipeline name: **Big Table** (folder `templates/nursery/big-table/`). It is direction 5 of `prospects/research/nursery-engaging-patterns.md` (§4.5). Its siblings are the calm, information-first nursery templates (Front Desk Nursery `nursery/front-desk`, Key Worker `nursery/key-worker`, Garden Gate `nursery/garden-gate`) and the other engaging directions (Cut and Stick, Full Stop, Chapter One, Weatherproof). When this brief says "Big Table", it means this template.
 
 **The idea in one line:** an earthy, 70s-warm kitchen-table site that sells the nursery through its food and its family feel: this week's lunches on a recipe card, the cook in their own kitchen, how mealtimes really work, and colour cards with leaf-shaped corners and hand-drawn doodles on speckled paper.
 
@@ -24,7 +24,7 @@ Research behind every decision:
 | `PHOTO-SHOTLIST.md` | What to photograph (food, table, kitchen, hands, rooms) and what never to. Send it to the nursery. | No |
 | `example/` | Worked example for **Sheephouse Nursery, Fauldhouse** (a real West Lothian prospect), built only from its own website, its PDFs and its Care Inspectorate record. 7 pages. | Copy it for each nursery |
 | `example/img/` | 5 cropped photos (WebP + JPEG) and `CREDITS.txt`, which also lists every photo on the old site that was **not** used and why. | Each nursery gets its own |
-| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs uk-nursery-table` | After changes |
+| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs nursery/big-table` | After changes |
 
 Pages link `../styles.css` and `../table.js`; fonts and `paper.webp` load through the stylesheet. Keep that folder shape. No build step, no framework, nothing from another server: no Google Fonts, no CDNs, no analytics, no maps, no social embeds, no review widgets (FB §6.6).
 
@@ -230,7 +230,7 @@ Rules:
 
 ## 8. The schedule (`#nursery-schedule`)
 
-Same JSON and behaviour as Front Desk Nursery (`templates/uk-nursery/BRIEF.md` §8). Put it at the end of `body` on every page.
+Same JSON and behaviour as Front Desk Nursery (`templates/nursery/front-desk/BRIEF.md` §8). Put it at the end of `body` on every page.
 
 ```json
 {

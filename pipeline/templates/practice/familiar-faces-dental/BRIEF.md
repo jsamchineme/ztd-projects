@@ -1,12 +1,12 @@
 # Familiar Faces Dental
 
-> Pipeline name: **Familiar Faces Dental** (folder `templates/uk-team/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Familiar Faces", it means this template.
+> Pipeline name: **Familiar Faces Dental** (folder `templates/practice/familiar-faces-dental/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Familiar Faces", it means this template.
 
 A people-led website template for UK dental practices (NHS, private or mixed), adaptable for GP surgeries.
 
 **The idea in one line:** patients choose people, not buildings. So the homepage shows the people they'll actually see, by name, face and personality, without ever making them hunt for the phone number, how to join or what to do in pain.
 
-Familiar Faces is the people-first sibling of the approved **Front Desk** family (`uk-dental/`, `uk-gp/`, `uk-local/`). It keeps Front Desk's discipline (tasks first, live status, plain English, no pop-ups) and moves the practice's own team from the bottom of the page to the centre of it.
+Familiar Faces is the people-first sibling of the approved **Front Desk** family (`practice/front-desk-dental/`, `practice/front-desk-gp/`, `practice/front-desk-local/`). It keeps Front Desk's discipline (tasks first, live status, plain English, no pop-ups) and moves the practice's own team from the bottom of the page to the centre of it.
 
 ## 1. Files
 

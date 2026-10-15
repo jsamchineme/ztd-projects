@@ -1,6 +1,6 @@
 # Make Waves: a website template for independent Scottish nurseries
 
-> Pipeline name: **Make Waves** (folder `templates/uk-nursery-waves/`). It is direction 2 of `prospects/research/nursery-colourful-directions.md`: colour bands and a local theme. Its siblings in that document are Sidekick (mascot-led) and Meadow (painterly).
+> Pipeline name: **Make Waves** (folder `templates/nursery/make-waves/`). It is direction 2 of `prospects/research/nursery-colourful-directions.md`: colour bands and a local theme. Its siblings in that document are Sidekick (mascot-led) and Meadow (painterly).
 
 **The idea in one line:** the page is a stack of full-width flat colour bands that change hue as you scroll, joined by hand-drawn wave seams, with small drawn things from **one local theme** riding on the seams. For Oban that is the bay: a seal on a rock, gulls, a ferry, a fishing boat, a creel and a lighthouse, under a hero scene of the town, McCaig's Tower and the nursery's own stone school.
 
@@ -21,7 +21,7 @@ Sources behind every decision:
 | `example/*.html` | A finished 7-page site for **Oban's 1st Steps Day Nursery**, a real private nursery in Oban, Argyll and Bute, built only from its website, its parents' handbook and its Care Inspectorate record and July 2026 report. | Copy for each nursery |
 | `example/img/` | 11 real photos (WebP, 400 and 500px), a living-photo loop, a photo tour with captions, posters and `CREDITS.txt` (sources, exclusions and why). | Each nursery gets its own |
 | `PHOTO-SHOTLIST.md` | What to ask the nursery to photograph and film. | No |
-| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs uk-nursery-waves`. | After changes |
+| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs nursery/make-waves`. | After changes |
 
 Pages link `../styles.css`, `../waves.js` and `../fonts/`. Every page carries the same inline SVG sprite (waves, riders, icons) after the skip link. Nothing loads from another server: no Google Fonts, no CDNs, no maps, no analytics, no social embeds, no YouTube or Vimeo (§6.6).
 
@@ -277,7 +277,7 @@ Any "no" blocks handover.
 - [ ] Homepage under about 1 MB on a phone; living photo under 1.5 MB; tour under 4 MB.
 - [ ] Live status tested with Playwright's clock (section 8).
 - [ ] Keyboard only: skip link, menu (Esc closes), chips, filters, lightbox (Esc returns focus), video controls.
-- [ ] `node pipeline/template-thumbs.mjs uk-nursery-waves` after template changes.
+- [ ] `node pipeline/template-thumbs.mjs nursery/make-waves` after template changes.
 
 ## 12. Oban example: sources, and facts to confirm
 

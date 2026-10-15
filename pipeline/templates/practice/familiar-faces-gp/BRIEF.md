@@ -1,12 +1,12 @@
 # Familiar Faces GP: a people-led website template for UK GP practices
-> Pipeline name: **Familiar Faces GP** (folder `templates/uk-people-gp/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Familiar Faces", it means this template.
+> Pipeline name: **Familiar Faces GP** (folder `templates/practice/familiar-faces-gp/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Familiar Faces", it means this template.
 
 
 **Familiar Faces** shows patients the real people behind their practice: who answers the phone, who they might see, and which doctor they can ask for again. It still does every job a good GP site must do first. The live status, the phone number and 8 top tasks come before any team content on a phone.
 
 It is the "after" in a sales pitch, and a design system that AI build workers reuse. Follow this brief exactly.
 
-- **Sister family:** Front Desk (`uk-gp/`, `uk-dental/`, `uk-local/`) is the task-led, nearly image-free option. Familiar Faces is the people-led option for practices that have, or will pay for, real staff photos. It keeps Front Desk's discipline: NHS patterns, plain English, no pop-ups, live status and verb-led links.
+- **Sister family:** Front Desk (`practice/front-desk-gp/`, `practice/front-desk-dental/`, `practice/front-desk-local/`) is the task-led, nearly image-free option. Familiar Faces is the people-led option for practices that have, or will pay for, real staff photos. It keeps Front Desk's discipline: NHS patterns, plain English, no pop-ups, live status and verb-led links.
 - **Worked example:** Linlithgow Group Medical Practice, West Lothian (prospect `p057-04`, graded Average). It is a 4-page site: the homepage, Our team, Appointments and Register. Every fact comes from its current website, lgmp.gpsurgery.net (crawled on 12 October 2026), or from NHS inform, which the pages link to.
 
 ## Files

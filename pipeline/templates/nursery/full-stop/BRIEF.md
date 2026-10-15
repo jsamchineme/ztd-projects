@@ -1,6 +1,6 @@
 # Full Stop: a nursery website template for busy working parents
 
-> Pipeline name: **Full Stop** (folder `templates/uk-nursery-fullstop/`). One of the five "engaging" nursery templates in `prospects/research/nursery-engaging-patterns.md` §4 (this is §4.2). Its siblings are Front Desk Nursery (`uk-nursery`), Key Worker, Garden Gate, Cut and Stick, Chapter One, Weatherproof and Big Table.
+> Pipeline name: **Full Stop** (folder `templates/nursery/full-stop/`). One of the five "engaging" nursery templates in `prospects/research/nursery-engaging-patterns.md` §4 (this is §4.2). Its siblings are Front Desk Nursery (`nursery/front-desk`), Key Worker, Garden Gate, Cut and Stick, Chapter One, Weatherproof and Big Table.
 
 **The idea in one line:** a confident, modern colour-block brand for working parents. Everything a parent needs sits in big, friendly blocks, and every statement heading ends with the nursery's own coloured full stop.
 
@@ -25,7 +25,7 @@ Section references below like **E§1.4** point into the engaging-patterns brief 
 | `PHOTO-SHOTLIST.md` | The 2 to 6 place photos this template can use, and the fallbacks. | Read it |
 | `example/` | Worked example for **KingsWellies Nursery**, a real 173-place private nursery at Prime Four Business Park, Kingswells, Aberdeen. Six pages, built only from its website, its PDFs (fees from April 2026, the 2026/27 funding pack, the January 2026 menu, its newsletters) and its Care Inspectorate report of October 2024. | Copy it for each nursery |
 | `example/img/` | Five photos of the real building and empty rooms (WebP and JPEG at 720 and up to 1200px) and `CREDITS.txt`, which also lists every photo excluded and why. | Each nursery gets its own |
-| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs uk-nursery-fullstop`. | After changes |
+| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs nursery/full-stop`. | After changes |
 
 Pages link `../styles.css` and `../fullstop.js`; fonts load from `../fonts/`. Keep that shape. No build step, no framework, nothing from another server: no Google Fonts, no CDNs, no analytics, no map embeds, no social widgets, no review widgets (N§6.6).
 

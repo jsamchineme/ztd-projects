@@ -1,0 +1,37 @@
+Photo credits: worked example (The Secret Garden Outdoor Nursery, Letham, Fife)
+
+All photos are the nursery's own, as published on its current website, secretgardenoutdoor-nursery.co.uk.
+They are used here for a sales mock-up only. Before handover, the nursery must confirm it owns them (or holds
+a licence) and is happy for them to be reused. Every file was resized and re-encoded, which strips all metadata
+(EXIF and GPS). Each size has a .jpg and a .webp of the same image.
+
+Child photo rule (research brief section 5): no identifiable child appears in any file. Children are shown only
+from behind or far away. Photos on the site with a child's face were left out (see "Not used" below).
+
+FILE                     SOURCE (original upload on the nursery's site)                                 NOTES
+woods-480/800/1200       wp-content/uploads/2018/04/sg_05.jpg (5616 x 3744)                              Full frame. One child, far off, from behind.
+walk-480/800/1200        wp-content/uploads/2019/05/IMG_9251.png (5184 x 3456)                          Cropped (left 20% and bottom 20% removed) to lose a bag tag with a child's
+                                                                                                         name. A second wooden tag on a bag was blurred. Children only from behind.
+kit-480/800/1200         wp-content/uploads/2019/06/fireplacearea.png (5184 x 3456)                     Cropped to the kit on the ground. The blurred children sitting behind it are
+                                                                                                         cut out of the frame.
+leaves-480/800/1200      wp-content/uploads/2019/05/IMG_9831.png (5184 x 3456)                          Full frame. Two children from behind.
+arch-480/800/1180        wp-content/uploads/2026/09/Yurt_through_willow_arch-1.jpg (1180 x 422)         No people. Published at this size only, so it stays a wide, small photo.
+yurt-snow-480/800/1200   wp-content/uploads/2023/12/Yurt-in-snow.jpg (1440 x 1080)                      No people.
+yurt-chalk-480/800/1065  wp-content/uploads/2022/12/Yurt-1.jpeg (1065 x 696)                            No people. Children's chalk drawings, no names.
+logo-mark.png            wp-content/uploads/2019/05/logo-horizontal.png                                 The tree from the nursery's logo, cropped. The name is live text beside it.
+
+Not used, and why
+- Home page banner (2026/09/SG_website_home_page_banner_1180.jpg): a child's face.
+- 150px thumbnails on the home, nursery information and get involved pages: too small to use, and several show faces.
+- girls-at-fire-place.png: three children from behind, but at close range. Left out to keep children out of close-ups.
+- IMG_9442 (den) and IMG_9507: children's faces in profile.
+- Blog photos with children (IMG_2737, IMG_3236, IMG_1850, IMG_2938, IMG_3409 and others): faces, or children too close.
+- Staff team group photo (2021/09/Staff-Team.jpg): from 2021. We can't confirm everyone in it still works there.
+- Staff headshots (SecretGarden-9750, Vicky, Naomi-edit, Karen): the file names don't confirm every person, and the
+  template lists the team by name only. Use consented headshots from the shoot instead (PHOTO-SHOTLIST.md).
+- Cathy Bache (founder): not a current staff member.
+- Blog photos of lunch boxes, thermoses and soup recipes: some look like third-party images.
+- shutterstock_367445123.jpg (Easter blog post): a stock photo.
+- Nature-shelf blog photos (2024/11): taken in a staff member's home, not at the nursery.
+
+Fonts: see ../../fonts/OFL.txt.

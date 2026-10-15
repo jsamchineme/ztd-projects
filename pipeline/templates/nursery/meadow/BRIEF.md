@@ -1,6 +1,6 @@
 # Meadow: a website template for small, charming Scottish nurseries
 
-> Pipeline name: **Meadow** (folder `templates/uk-nursery-meadow/`). It is direction 3 of `prospects/research/nursery-colourful-directions.md`: light, charming and painterly, with the fewest words of the three colourful directions. It suits small owner-run nurseries, rural and farm nurseries, and any nursery with good photos of rooms, the garden or animals.
+> Pipeline name: **Meadow** (folder `templates/nursery/meadow/`). It is direction 3 of `prospects/research/nursery-colourful-directions.md`: light, charming and painterly, with the fewest words of the three colourful directions. It suits small owner-run nurseries, rural and farm nurseries, and any nursery with good photos of rooms, the garden or animals.
 
 **The idea in one line:** open with a painted watercolour picture of the nursery's own place, then let parents wander: a collage of blob-shaped photos with one gently moving "living photo", then big one-word tiles (Animals, Outdoors, Rooms, Team, Fees, Gallery) that lead to every answer.
 
@@ -23,7 +23,7 @@ Research behind it:
 | `example/` | Seven worked pages for **Bardykes Farm Nursery School**, a real family farm nursery in Blantyre, South Lanarkshire, built only from its website (crawled 13 October 2026) and its Care Inspectorate record. | Copy for each nursery |
 | `example/img/` | 31 place and animal photos and 15 staff portraits, WebP at 2 sizes, plus `CREDITS.txt` (sources, and every excluded photo and why). | Each nursery gets its own |
 | `example/media/` | The living photo loop, the farm film, posters and captions. | Each nursery gets its own |
-| `thumb.jpg` | Picker thumbnail: `node pipeline/template-thumbs.mjs uk-nursery-meadow`. | After changes |
+| `thumb.jpg` | Picker thumbnail: `node pipeline/template-thumbs.mjs nursery/meadow`. | After changes |
 
 Pages link `../styles.css`, `../meadow.js` and `../meadow-scene.svg`. No build step, no framework, nothing from another server: no Google Fonts, CDNs, analytics, maps, social embeds or YouTube (GDPR, §6.6).
 
@@ -299,7 +299,7 @@ Every page copies the head, header, sprite, footer, call bar, schedule and scrip
 - [ ] Homepage under about 1 MB on a phone after a full scroll.
 - [ ] Keyboard: skip link, menu (Escape closes), living photo button, gallery filters, lightbox (Esc, arrows, focus return), video controls.
 - [ ] Reduced motion: the loop doesn't start. Text at 200%: no sideways scroll.
-- [ ] `node pipeline/template-thumbs.mjs uk-nursery-meadow` after template changes.
+- [ ] `node pipeline/template-thumbs.mjs nursery/meadow` after template changes.
 
 ## 15. Bardykes example: sources, and facts to confirm
 

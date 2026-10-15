@@ -1,6 +1,6 @@
 # Key Worker: a people-led website template for Scottish nurseries
 
-> Pipeline name: **Key Worker** (folder `templates/uk-people-nursery/`). It is direction **B** in `prospects/research/nursery-websites.md` (section 7.2) and belongs to the **Familiar Faces** family (`uk-people-gp/`, `uk-team/`). Its sister nursery directions are **Front Desk Nursery** (A, task-first) and **Garden Gate** (C, place-led).
+> Pipeline name: **Key Worker** (folder `templates/nursery/key-worker/`). It is direction **B** in `prospects/research/nursery-websites.md` (section 7.2) and belongs to the **Familiar Faces** family (`practice/familiar-faces-gp/`, `practice/familiar-faces-dental/`). Its sister nursery directions are **Front Desk Nursery** (A, task-first) and **Garden Gate** (C, place-led).
 
 **Key Worker** shows parents the real people who will look after their child: the manager who runs the place, the room leads, every practitioner with their qualifications, the cook and the office. It explains the key-worker system in plain words and routes each question to the right person. It still answers "Is this for us?" first: ages, hours, weeks a year, funded status, places and grades sit above the fold on a 390px phone.
 
@@ -269,7 +269,7 @@ Initials are the first letters of the first and last names as printed (a first n
 - [ ] `node pipeline/audit.mjs http://127.0.0.1:<port>/example/ <out>` reports **0 blockers, 0 major, 0 minor** across every page.
 - [ ] `node pipeline/viewports.mjs` on every page shows no flags; screenshots reviewed by eye.
 - [ ] Every external link returns 200 (`curl -sL -o /dev/null -w "%{http_code}"`).
-- [ ] After changing the template, re-run `node pipeline/template-thumbs.mjs uk-people-nursery`.
+- [ ] After changing the template, re-run `node pipeline/template-thumbs.mjs nursery/key-worker`.
 
 ## 11. Heads of Ayr example: facts to confirm with the nursery
 

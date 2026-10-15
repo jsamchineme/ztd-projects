@@ -1,6 +1,6 @@
 # Front Desk Dental
 
-> Pipeline name: **Front Desk Dental** (folder `templates/uk-dental/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Front Desk", it means this template.
+> Pipeline name: **Front Desk Dental** (folder `templates/practice/front-desk-dental/`). The **Front Desk** family (GP, Dental, Local) is task-first with little imagery; the **Familiar Faces** family (GP, Dental) and **Doorway** are people- and photo-led. When this brief says "Front Desk", it means this template.
 
 A website template for UK dental practices (NHS, private or mixed), adaptable for GP surgeries.
 

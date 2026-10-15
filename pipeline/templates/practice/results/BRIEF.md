@@ -1,6 +1,6 @@
 # Results
 
-> Pipeline name: **Results** (folder `templates/uk-results/`). A template for **private and mixed private/NHS dental practices** that do cosmetic and restorative work. It sits beside the **Front Desk** family (task-first, little imagery), **Familiar Faces** (people-led) and **Doorway** (premises-led). When this brief says "Results", it means this template.
+> Pipeline name: **Results** (folder `templates/practice/results/`). A template for **private and mixed private/NHS dental practices** that do cosmetic and restorative work. It sits beside the **Front Desk** family (task-first, little imagery), **Familiar Faces** (people-led) and **Doorway** (premises-led). When this brief says "Results", it means this template.
 
 **The idea in one line:** answer the patient's tasks first, then *show the outcome*: real before-and-after cases from the practice's own surgery, the patients' own words, a clear 4-step journey and prices in plain sight.
 

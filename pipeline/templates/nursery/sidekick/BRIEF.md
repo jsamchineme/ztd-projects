@@ -1,6 +1,6 @@
 # Sidekick: a mascot-led website template for Scottish nurseries
 
-> Pipeline name: **Sidekick** (folder `templates/uk-nursery-sidekick/`). It is direction 1 of `prospects/research/nursery-colourful-directions.md`: colourful, fun and light on words, built around a **drawn mascot** that guides parents through the site. Its siblings in that document are Make Waves (colour bands, a local theme) and Meadow (painterly, photo-led).
+> Pipeline name: **Sidekick** (folder `templates/nursery/sidekick/`). It is direction 1 of `prospects/research/nursery-colourful-directions.md`: colourful, fun and light on words, built around a **drawn mascot** that guides parents through the site. Its siblings in that document are Make Waves (colour bands, a local theme) and Meadow (painterly, photo-led).
 
 **The idea in one line:** the nursery gets its own cartoon character, drawn from its name or logo, and the character does every job on the page: it waves hello in the hero, holds the clock for the opening hours, carries lunch, explores, naps at cosy time, reads the map to find you, and peeks over the phone booking bar. The page stays white with two loud accents, so the character and the facts pop.
 
@@ -26,7 +26,7 @@ Sources behind the decisions:
 | `example/` | Seven finished pages for Jaybees: `index.html`, `join-us.html`, `fees-and-funding.html`, `our-nursery.html`, `our-team.html`, `parents.html`, `gallery.html`. | Copy for each nursery |
 | `example/img/` | 14 child-free crops of the nursery's own photos (WebP 400 and up to 800px), two posters, `favicon.svg` and `CREDITS.txt` (every source, and every photo **not** used and why). | Each nursery gets its own |
 | `example/media/` | `forest-loop.mp4` (living photo, 10 s, 165 KB), `tour.mp4` (film, 32 s, 745 KB), `tour.vtt` (captions). | Each nursery gets its own |
-| `thumb.jpg` | Picker thumbnail: `node pipeline/template-thumbs.mjs uk-nursery-sidekick`. | After changes |
+| `thumb.jpg` | Picker thumbnail: `node pipeline/template-thumbs.mjs nursery/sidekick`. | After changes |
 
 Pages link `../styles.css` and `../sidekick.js`. **The mascot and icon sprites are inlined into every page, never referenced as files:** board previews are sandboxed (an opaque origin), and `<use href="../mascot.svg#…">` silently draws nothing there. After editing `mascot.svg` or `icons.svg`, paste their contents (without the outer `<svg>`) into each page's hidden sprite block again. Keep that folder shape. Nothing loads from another server: no Google Fonts, CDNs, analytics, maps, social embeds, YouTube or Vimeo (§6.6).
 
@@ -288,7 +288,7 @@ Every page reuses the head, header, footer, booking bar, schedule JSON and scrip
 - The lightbox is a real `<dialog>`: Esc and the backdrop close it, and focus returns to the photo that opened it. No slider, no arrows.
 
 ### The schedule (`#nursery-schedule`)
-Same format as Front Desk Nursery (`templates/uk-nursery/BRIEF.md` section 8): `days` with 24-hour sessions, optional `term`, and `closures` with whole-day `from`/`to` and a `label` that reads after "Closed for". Status text: "Open now until 6pm", "Open now. Home time soon, at 6pm", "Closed now. Opens tomorrow at 7:30am", "Closed for Christmas Day. Opens on Tuesday 29 December at 7:30am". Keep the closures table rows in step. The example was tested with Playwright's clock at 8am and 5:45pm on a weekday, a Saturday, Christmas Day and Christmas Eve evening.
+Same format as Front Desk Nursery (`templates/nursery/front-desk/BRIEF.md` section 8): `days` with 24-hour sessions, optional `term`, and `closures` with whole-day `from`/`to` and a `label` that reads after "Closed for". Status text: "Open now until 6pm", "Open now. Home time soon, at 6pm", "Closed now. Opens tomorrow at 7:30am", "Closed for Christmas Day. Opens on Tuesday 29 December at 7:30am". Keep the closures table rows in step. The example was tested with Playwright's clock at 8am and 5:45pm on a weekday, a Saturday, Christmas Day and Christmas Eve evening.
 
 ## 10. Video
 

@@ -1,6 +1,6 @@
 # Weatherproof: a website template for outdoor nurseries in Scotland
 
-> Pipeline name: **Weatherproof** (folder `templates/uk-nursery-weatherproof/`). One of the five engaging nursery directions (Cut and Stick, Full Stop, Chapter One, **Weatherproof**, Big Table) that sit beside the calmer Front Desk Nursery (`uk-nursery`), Key Worker (`uk-people-nursery`) and Garden Gate (`uk-inside-nursery`). When this brief says "Weatherproof", it means this template.
+> Pipeline name: **Weatherproof** (folder `templates/nursery/weatherproof/`). One of the five engaging nursery directions (Cut and Stick, Full Stop, Chapter One, **Weatherproof**, Big Table) that sit beside the calmer Front Desk Nursery (`nursery/front-desk`), Key Worker (`nursery/key-worker`) and Garden Gate (`nursery/garden-gate`). When this brief says "Weatherproof", it means this template.
 
 **The idea in one line:** a bold two-colour outdoor brand (deep loch and gorse yellow, a drawn emblem, wide capitals, a hi-vis stripe) that sells the outdoors as a promise, in Scottish weather, and proves it with the places, the kit and the inspector's own words.
 
@@ -24,7 +24,7 @@ The research behind it:
 | `example/index.html` | Worked homepage for **Earthtime's Forest School Nursery**, a real, fully outdoor charity nursery on Duffus Estate near Elgin, Moray. Built only from its own website and its Care Inspectorate record and report. | Copy it for each nursery |
 | `example/join-us.html`, `our-nursery.html`, `fees-and-funding.html`, `our-team.html`, `parents.html` | The five worked inner pages, one per menu item. | Yes |
 | `example/img/` | Six of the nursery's own photos (no children) as WebP and JPEG, and `CREDITS.txt`, which also lists every photo **not** used and why. | Each nursery gets its own `img/` |
-| `thumb.jpg` | Picker thumbnail. Regenerate with `node pipeline/template-thumbs.mjs uk-nursery-weatherproof`. | After changes |
+| `thumb.jpg` | Picker thumbnail. Regenerate with `node pipeline/template-thumbs.mjs nursery/weatherproof`. | After changes |
 
 Pages link `../styles.css` and `../weatherproof.js`; fonts load from `../fonts/` through the stylesheet. Keep that folder shape. No build step, no framework, and nothing loads from another server: no Google Fonts, no CDNs, no analytics, no maps, no social embeds, no booking widgets (GDPR, §6.6).
 
@@ -328,7 +328,7 @@ Any "no" blocks handover. This adds to §8 of the first brief.
 - [ ] Keyboard: skip link, menu (Escape closes), visible focus on gorse, stone and loch.
 - [ ] Text at 200%: no sideways scroll at 390px or 1280px.
 - [ ] The live status has been tested with Playwright's clock (section 9).
-- [ ] Re-run `node pipeline/template-thumbs.mjs uk-nursery-weatherproof`.
+- [ ] Re-run `node pipeline/template-thumbs.mjs nursery/weatherproof`.
 
 ## 15. Earthtime example: sources, and facts to confirm
 

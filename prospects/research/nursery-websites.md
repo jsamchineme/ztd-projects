@@ -437,7 +437,7 @@ What reads as trustworthy and premium to UK parents in 2026 is evidence presente
 ### 7.2 Three template directions
 These mirror our GP and dental families, so build workers can reuse the systems.
 
-#### A. Front Desk Nursery (task-first; Front Desk family, `uk-nursery`)
+#### A. Front Desk Nursery (task-first; Front Desk family, `nursery/front-desk`)
 - **For:**
   - funded providers whose parents mostly come through the council;
   - voluntary playgroups and community nurseries;
@@ -455,7 +455,7 @@ These mirror our GP and dental families, so build workers can reuse the systems.
   - Answer them first.
 - **Photos needed:** one exterior or entrance photo, optional (desktop only). Children's artwork for texture, optional. It needs **no photos of people**.
 
-#### B. Key Worker (people-led; Familiar Faces family, `uk-people-nursery`)
+#### B. Key Worker (people-led; Familiar Faces family, `nursery/key-worker`)
 - **For:**
   - owner-run private nurseries with a stable, qualified team;
   - baby rooms, where parents weigh up trusting staff with an infant.
@@ -472,9 +472,9 @@ These mirror our GP and dental families, so build workers can reuse the systems.
   - a consented head-and-shoulders portrait of each named staff member, in natural light against a real nursery wall;
   - 2 or 3 staff-at-work shots where children are unidentifiable (hands, from behind);
   - one room photo per age group.
-  - Write a `PHOTO-SHOTLIST.md` as for `uk-team`, with the staff consent wording.
+  - Write a `PHOTO-SHOTLIST.md` as for `practice/familiar-faces-dental`, with the staff consent wording.
 
-#### C. Garden Gate (place-led; Doorway family, `uk-inside-nursery`)
+#### C. Garden Gate (place-led; Doorway family, `nursery/garden-gate`)
 - **For:**
   - nurseries with a distinctive place: a converted villa or church hall, a big garden, woodland or beach access, a forest-kindergarten approach (only if the nursery says so), or a rural setting;
   - often premium private nurseries in Edinburgh, Glasgow's West End, Aberdeenshire and Perthshire.

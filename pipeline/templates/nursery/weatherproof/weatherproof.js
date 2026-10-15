@@ -9,7 +9,7 @@
       and [data-next-closure] gets the next closure in words.
    5. Motion, once: the route map draws itself and the weather glyphs nudge
       as they scroll into view. Skipped under prefers-reduced-motion.
-   Parts 1 to 4 are the shared Front Desk logic (uk-nursery/frontdesk.js),
+   Parts 1 to 4 are the shared Front Desk logic (nursery/front-desk/frontdesk.js),
    unchanged. Without JavaScript the menu is simply open, every notice shows,
    the status shows the plain hours written in the HTML, and the map is drawn.
    Nothing is lost.                                                         */

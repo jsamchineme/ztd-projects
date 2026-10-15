@@ -1,6 +1,6 @@
 # Cut and Stick: a website template for playful, making-led Scottish nurseries
 
-> Pipeline name: **Cut and Stick** (folder `templates/uk-nursery-cutpaper/`). It is one of the five "engaging" nursery templates (with Full Stop, Chapter One, Weatherproof and Big Table) that sit beside the three calm ones (Front Desk Nursery `uk-nursery`, Key Worker `uk-people-nursery`, Garden Gate `uk-inside-nursery`). It sells mainly by **play, making and belonging**.
+> Pipeline name: **Cut and Stick** (folder `templates/nursery/cut-and-stick/`). It is one of the five "engaging" nursery templates (with Full Stop, Chapter One, Weatherproof and Big Table) that sit beside the three calm ones (Front Desk Nursery `nursery/front-desk`, Key Worker `nursery/key-worker`, Garden Gate `nursery/garden-gate`). It sells mainly by **play, making and belonging**.
 
 **The idea in one line:** a nursery site made like a nursery wall. Cut paper, stickers of Scottish wildlife, children's own paintings, and a noticeboard of honest proof, with every fact a parent needs printed plainly underneath.
 
@@ -25,7 +25,7 @@ Read E4.1, F3.6, F5.2 and this brief before your first build.
 | `example/` | Worked example for **Little Bugs at Abercorn**, a real fully outdoor nursery on the Hopetoun Estate near South Queensferry: `index.html`, `join-us.html`, `our-nursery.html`, `fees-and-funding.html`, `our-team.html`, `parents.html`. | Copy it for each nursery |
 | `example/img/` | 8 photos (JPEG plus WebP) and `CREDITS.txt`, which lists every photo on the old site that was **not** used and why. | Each nursery gets its own |
 | `PHOTO-SHOTLIST.md` | What to ask the nursery to shoot and scan. | Send to the nursery |
-| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs uk-nursery-cutpaper`. | After changes |
+| `thumb.jpg` | Picker thumbnail. `node pipeline/template-thumbs.mjs nursery/cut-and-stick`. | After changes |
 
 Pages link `../styles.css` and `../cutpaper.js`; fonts and the texture load through the stylesheet. Nothing loads from another server: no Google Fonts, no CDNs, no analytics, no maps, no social embeds (F6.6).
 
@@ -223,7 +223,7 @@ Drawn for this template in code: each shape is cut into short straight facets wi
 
 ## 8. The schedule (`#nursery-schedule`)
 
-Identical to Front Desk Nursery (see `templates/uk-nursery/BRIEF.md` §8): `timeZone`, `closingSoonMinutes`, `days` (24-hour sessions per weekday), optional `term` for term-time nurseries, and `closures` (whole days, `from`/`to`, a `label` that reads after "Closed for …"). Put it on every page. The example is all-year, 8am to 6pm, Monday to Friday, with **no closures listed** because the nursery hasn't published its bank holiday and Christmas dates: add them as soon as it does, or the status will say "Open" on those days.
+Identical to Front Desk Nursery (see `templates/nursery/front-desk/BRIEF.md` §8): `timeZone`, `closingSoonMinutes`, `days` (24-hour sessions per weekday), optional `term` for term-time nurseries, and `closures` (whole days, `from`/`to`, a `label` that reads after "Closed for …"). Put it on every page. The example is all-year, 8am to 6pm, Monday to Friday, with **no closures listed** because the nursery hasn't published its bank holiday and Christmas dates: add them as soon as it does, or the status will say "Open" on those days.
 
 Tested with Playwright's clock: a weekday at 7:15am ("Closed now. Opens today at 8am"), 10am ("Open now. Home time is 6pm"), 5:40pm ("Home time soon, at 6pm"), Friday 6:30pm and Saturday ("Opens on Monday at 8am"), and the open-evening notice hiding after 4 November 2026.
 

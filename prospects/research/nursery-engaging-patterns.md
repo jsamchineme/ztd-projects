@@ -2,7 +2,7 @@
 
 For template designers and AI build workers. Written 13 October 2026.
 
-This is the companion to `nursery-websites.md` (the first brief). That brief made our first three nursery templates calm and information-first: Front Desk Nursery (`uk-nursery`), Key Worker (`uk-people-nursery`) and Garden Gate (`uk-inside-nursery`). The owner now wants templates that are **more fun and more engaging**, and that **sell the nursery to parents emotionally**, while still giving every fact a parent needs.
+This is the companion to `nursery-websites.md` (the first brief). That brief made our first three nursery templates calm and information-first: Front Desk Nursery (`nursery/front-desk`), Key Worker (`nursery/key-worker`) and Garden Gate (`nursery/garden-gate`). The owner now wants templates that are **more fun and more engaging**, and that **sell the nursery to parents emotionally**, while still giving every fact a parent needs.
 
 **What doesn't change.** Every rule in the first brief still holds:
 - never invent facts (fees, places, grades, reviews, awards, staff, menus, ratios, apps);
@@ -336,14 +336,14 @@ What we saw, what makes each theme feel fun rather than twee or cheap, and how t
 
 | Template | Folder | Sells mainly by | Look | Photos needed |
 |---|---|---|---|---|
-| Front Desk Nursery | `uk-nursery` | Answers first | Calm, paper and green, serif | 0 to 1 |
-| Key Worker | `uk-people-nursery` | The people | Calm, pine and heather | Staff portraits |
-| Garden Gate | `uk-inside-nursery` | The place, walked through | Calm, oat and moss, arch | 10 to 16 place photos |
-| **Cut and Stick** | `uk-nursery-cutpaper` | **Play, making and belonging** | Cut paper, stickers, kraft, Scottish wildlife | 0 to 6, plus children's artwork |
-| **Full Stop** | `uk-nursery-fullstop` | **Ease for working parents** | Bold colour blocks, chunky grotesque, accent dot | 2 to 6 rooms |
-| **Chapter One** | `uk-nursery-chapter` | **Settling in and the emotional journey** | Storybook: dusk blue, cream, soft serif, drawn scenes | 0 to 6 |
-| **Weatherproof** | `uk-nursery-weatherproof` | **Outdoors, all weathers** | Two-colour outdoor brand, emblem, wide caps | 3 to 8 outdoor and kit |
-| **Big Table** | `uk-nursery-table` | **Food, home and family** | Earthy 70s colour cards, leaf corners, paper texture | 3 to 8 food and kitchen |
+| Front Desk Nursery | `nursery/front-desk` | Answers first | Calm, paper and green, serif | 0 to 1 |
+| Key Worker | `nursery/key-worker` | The people | Calm, pine and heather | Staff portraits |
+| Garden Gate | `nursery/garden-gate` | The place, walked through | Calm, oat and moss, arch | 10 to 16 place photos |
+| **Cut and Stick** | `nursery/cut-and-stick` | **Play, making and belonging** | Cut paper, stickers, kraft, Scottish wildlife | 0 to 6, plus children's artwork |
+| **Full Stop** | `nursery/full-stop` | **Ease for working parents** | Bold colour blocks, chunky grotesque, accent dot | 2 to 6 rooms |
+| **Chapter One** | `nursery/chapter-one` | **Settling in and the emotional journey** | Storybook: dusk blue, cream, soft serif, drawn scenes | 0 to 6 |
+| **Weatherproof** | `nursery/weatherproof` | **Outdoors, all weathers** | Two-colour outdoor brand, emblem, wide caps | 3 to 8 outdoor and kit |
+| **Big Table** | `nursery/big-table` | **Food, home and family** | Earthy 70s colour cards, leaf corners, paper texture | 3 to 8 food and kitchen |
 
 Each new direction must still pass the first brief's checks (§8) and look complete with no photos of children.
 
@@ -365,7 +365,7 @@ Each direction re-skins these parts. None of them changes how they behave.
 
 ### 4.1 Cut and Stick
 
-**Folder:** `templates/uk-nursery-cutpaper/`
+**Folder:** `templates/nursery/cut-and-stick/`
 
 **One line:** a nursery site made like a nursery wall: cut paper, stickers of Scottish wildlife, the children's own paintings, and a noticeboard of honest proof.
 
@@ -503,7 +503,7 @@ Sample lines (bracketed parts come from the nursery):
 
 ### 4.2 Full Stop
 
-**Folder:** `templates/uk-nursery-fullstop/`
+**Folder:** `templates/nursery/full-stop/`
 
 **One line:** a confident, modern colour-block brand for busy working parents: everything a parent needs, in big friendly blocks, each statement finished with the nursery's own coloured full stop.
 
@@ -639,7 +639,7 @@ Sample lines:
 
 ### 4.3 Chapter One
 
-**Folder:** `templates/uk-nursery-chapter/`
+**Folder:** `templates/nursery/chapter-one/`
 
 **One line:** a warm storybook site where the hero of every page is the reader's own child, never drawn: drawn scenes wait for them (a peg with their wellies, an empty reading chair, a lit window at home time), and settling in is told as the first chapter.
 
@@ -778,7 +778,7 @@ Sample lines:
 
 ### 4.4 Weatherproof
 
-**Folder:** `templates/uk-nursery-weatherproof/`
+**Folder:** `templates/nursery/weatherproof/`
 
 **One line:** a bold two-colour outdoor brand (deep loch and gorse yellow, a strong emblem, wide capitals) that sells the outdoors as a promise, in Scottish weather, with the kit list to prove it.
 
@@ -908,7 +908,7 @@ Sample lines:
 
 ### 4.5 Big Table
 
-**Folder:** `templates/uk-nursery-table/`
+**Folder:** `templates/nursery/big-table/`
 
 **One line:** an earthy, 70s-warm kitchen-table site that sells the nursery through its food and its family feel: the cook named, this week's menu on a recipe card, mealtimes described, and colour cards with leaf-shaped corners on speckled paper.
 

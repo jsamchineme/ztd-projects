@@ -1,0 +1,51 @@
+Image and video credits: Signpost worked example (Kilbarchan Community Nursery)
+=================================================================================
+
+Every photo comes from the nursery's own website, kilbarchancn.com, crawled on
+14 October 2026. All were cropped so that no child can be identified: only hands,
+the backs of sleeves, toys, food and empty spaces remain. Each crop was checked at
+full size. EXIF and all other metadata were stripped (re-encoded with Pillow).
+Sizes: WebP at 400px and 800px wide (the sources are 2020-21 phone photos).
+
+Used (name: source on kilbarchancn.com, what was cut out)
+- playroom: /wp-content/uploads/2021/03/20210111_132959594_iOS (gallery page). Two children playing on the floor cut out; top-left shelves kept.
+- checkin-wall: /wp-content/uploads/2021/06/IMG_2351 (healthy eating and team pages). A child at the wall cut out; the display kept.
+- mud-kitchen: /wp-content/uploads/2021/03/7FE13444-... (gallery). A child at the left cut out; the hob kept.
+- snow-garden: /wp-content/uploads/2021/03/20210114_142647174_iOS. Top 29% only; the child below cut out.
+- garden-boat: /wp-content/uploads/2021/05/IMG_2301 (eco topics). Child at the left cut out; boat kept.
+- raised-bed: /wp-content/uploads/2021/05/IMG_2352 (eco topics). Faces cut out; a hand and watering can kept.
+- bee-bot: /wp-content/uploads/2021/05/IMG_2278 (maths). Faces cut out; finger and robot kept.
+- snakes-ladders: /wp-content/uploads/2021/05/IMG_2465 (maths). Face and body cut out; board and hand kept.
+- dominoes: /wp-content/uploads/2021/05/IMG_2481 (maths). Four faces cut out; dominoes and hands kept.
+- peg-plates: /wp-content/uploads/2021/05/IMG_2563 (maths). Faces cut out; plates and pegs kept.
+- snack: /wp-content/uploads/2021/05/IMG_1854 (eco topics). Three faces cut out; the table kept.
+- rain-catcher: /wp-content/uploads/2021/05/IMG_1474 (eco topics). Child cut out; a hand and sleeve remain.
+- handprints: /wp-content/uploads/2021/03/20201111_141555709_iOS. Face cut out; hands and paint kept.
+- drawing: /wp-content/uploads/2021/03/20201105_104853450_iOS. Child and most of a book cover cut out; pen pots kept.
+- pumpkin: /wp-content/uploads/2021/03/20201028_140705825_iOS. Face and the logo on the sweatshirt cut out; hands, pumpkin and bowl kept.
+
+Video (both made by us from the photos above, and labelled as such on the pages)
+- living-garden.mp4 (9 s, 175 KB, no audio) and living-garden-poster.webp: a slow pan across
+  the snow-garden crop, forward then reversed. Labelled "A slow pan across one photo, not a film."
+- tour.mp4 (35 s, 870 KB, no audio), tour-poster.webp, tour.en.vtt: the 12 crops above
+  with slow zooms and fades. Portrait photos are letterboxed on a blurred copy of themselves.
+  Labelled "Made from 12 still photos, not film." Captions describe each photo.
+- The nursery has its own tour film, "Nursery Tour 8 6 21", embedded from YouTube on
+  kilbarchancn.com/nursery-tour/. It was NOT used: it is on YouTube (a third-party embed we
+  don't allow), we could not check it for children, and we don't know who holds the rights.
+  Ask the nursery for the original file to replace tour.mp4.
+
+Excluded (and why)
+- Every other photo on the site (about 40): identifiable children's faces, in the gallery
+  (dancing, Christmas, snow, water play, mud kitchen), the news posts and the home page polaroids.
+- 001 logo (drawn children's faces in a raster logo): replaced by our own drawn mark.
+- 012 "Menu" illustration and 013 sandwich-face photo: probably stock; can't confirm they are the nursery's own.
+- 017 Eco-Schools, 018 Living Wage, 019 SSSC, 021 Early Years Scotland logos: third-party
+  marks. We state the facts in text instead, and draw our own green flag.
+- 020 staff montage: 188 x 300 px, too small, and dated 2022 (roles have changed since).
+- Care Inspectorate widget/logo: not used (third-party embed; no permission to use the logo).
+
+Drawings
+- Every illustration (fingerpost, robin, thistle, bird box, waymark, flag, lantern, snail,
+  the "You are here" scene, page-band drawings, pictograms and mark) is hand-coded SVG made
+  for this template. No people, no stock, no AI images.

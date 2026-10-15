@@ -8,6 +8,10 @@ This repo holds three things:
 
 The business: redesign the websites of NHS dental and GP practices in Scotland, then pitch the before and after. The audience is patients, often older or anxious, and practice managers.
 
+## Studio (`studio/`)
+
+The hosted web app for building and running these projects with Claude: https://studio.ztddevs.com, on the server `root@129.121.95.175` (key `~/.ssh/ztddevs`). Projects live in `/srv/projects/<slug>/repo` and run as systemd services behind Studio's login at `<sub>.ztddevs.com`. If you're running inside Studio, the system prompt gives the service names. Restart a service after changing its server code with `sudo studio-ctl svc <project> <service> restart`. Don't commit: people commit from Studio's Changes tab. See `studio/README.md` for the architecture, deploys and security model. The server also hosts an unrelated site (revisaacmpamaugo.online, Apache, MySQL), so never touch its config.
+
 ## Running it
 
 - `make pipeline` starts the board at http://localhost:4390. It installs `pipeline/node_modules` (Playwright, axe-core, Playwright MCP) on the first run and uses the installed Chrome.
@@ -27,6 +31,7 @@ The business: redesign the websites of NHS dental and GP practices in Scotland, 
 | `pipeline/crawl.mjs` | Crawls a practice's current site into `work/<card>/source/` (SITE.md, page texts, photos, documents). Runs before Redesign study. `node pipeline/crawl.mjs <url> <outdir> [max pages]` |
 | `pipeline/viewports.mjs` | Screenshots and layout flags at 9 widths from 360 to 1440px. `node pipeline/viewports.mjs <url> <outdir> [widths]` |
 | `pipeline/template-thumbs.mjs` | Regenerates `templates/*/thumb.jpg` for the picker |
+| `pipeline/notify.mjs` | Notifications (needs attention, ready for review, workflow ended, workers gave up): desktop via the board, email via Gmail SMTP. Settings in `pipeline/notify.local.json` (git-ignored) |
 | `pipeline/cli.mjs` | CLI for agents. See `pipeline/AGENTS.md` |
 | `pipeline/import-prospects.mjs` | Loads graded prospects into Bad and Average |
 
@@ -37,13 +42,14 @@ Live board data lives in `pipeline/data/` (cards.json, plus `work/<card>/` with 
 - Previews are on localhost, and Claude's WebFetch can't reach localhost. Reviewers get the audit report and screenshots instead.
 - Browser workers use the Playwright MCP and need `MCP_CONNECTION_NONBLOCKING=false`, or the tools aren't loaded in `-p` mode.
 - The server refuses `/api/` requests whose user agent contains `HeadlessChrome`, so browser workers can't drive the board. Playwright tests that use the board must set a normal `userAgent`.
-- Build workers may only run `Bash(node <abs path>/audit.mjs:*)`.
+- Build workers get Bash without approval prompts, inside Claude Code's macOS sandbox (`--settings` sandbox: writes only in the card's folder, no network). `node <abs path>/audit.mjs` is the one command excluded from the sandbox, because it needs Chrome and localhost. Exclusions need the `:*` form or they don't match.
 - Worker names must start with "AI ": the board uses that prefix to show AI status.
+- Workers run `claude -p --output-format stream-json --verbose`. Each step (thinking, tool calls, messages) feeds the card panel's "AI activity" feed through `GET /api/cards/<id>/activity`, and the last 8 sessions are saved to `work/<card>/activity.json`. A fake `CLAUDE_BIN` must print stream-json lines ending with a `{"type":"result",…}` event.
 - Models: `fable`, `opus`, `sonnet`, `haiku`. Build steps default to Fable with a $6 cap per card.
 
 ## Templates (`pipeline/templates/`)
 
-There are six. The **Front Desk** family is task-first with little imagery (GP `uk-gp`, Dental `uk-dental`, Local `uk-local`). The **Familiar Faces** family is people-led (GP `uk-people-gp`, Dental `uk-team`). **Doorway** (`uk-inside`) is led by photos of the practice premises. The nursery board has its own three: **Front Desk Nursery** (`uk-nursery`), **Key Worker** (`uk-people-nursery`) and **Garden Gate** (`uk-inside-nursery`), built from `prospects/research/nursery-websites.md`; nursery builds never show identifiable children. Each one has `BRIEF.md`, `styles.css` (tokens at the top), `fonts/`, a small JS file and `example/`. The people-led ones also have `PHOTO-SHOTLIST.md`.
+There are six. The **Front Desk** family is task-first with little imagery (GP `practice/front-desk-gp`, Dental `practice/front-desk-dental`, Local `practice/front-desk-local`). The **Familiar Faces** family is people-led (GP `practice/familiar-faces-gp`, Dental `practice/familiar-faces-dental`). **Doorway** (`practice/doorway`) is led by photos of the practice premises. The nursery board has its own three: **Front Desk Nursery** (`nursery/front-desk`), **Key Worker** (`nursery/key-worker`) and **Garden Gate** (`nursery/garden-gate`), built from `prospects/research/nursery-websites.md`; nursery builds never show identifiable children. Each one has `BRIEF.md`, `styles.css` (tokens at the top), `fonts/`, a small JS file and `example/`. The people-led ones also have `PHOTO-SHOTLIST.md`.
 
 Rules for any template or built site:
 - **Never invent facts:** no made-up prices, reviews, staff, online booking or policies. Write "phone to check" when a fact is unclear. Check NHS facts against nhsinform.scot or nhs.uk.

@@ -1,0 +1,35 @@
+Sunny Side worked example: Sunshine Nursery, Glenrothes (Care Inspectorate CS2024000070)
+Photo sources and decisions. Crawled from https://mysunshinenursery.co.uk/ on 14 October 2026.
+Every file was resized and re-saved with Python Pillow, which writes no EXIF or location data.
+Sizes: -sm.webp is 400px wide; .webp and .jpg are the full source width (640px, or 520px after cropping).
+Reuse needs the nursery's consent at handover. No child is identifiable in any file below.
+
+USED
+building-gable   <- /wp-content/uploads/2025/04/IMG_9148.jpg (front gable, sign and cloud boards). Gallery; first frame of tour.mp4.
+building-front   <- /wp-content/uploads/2025/04/IMG_9147.jpg (front of the building under a blue sky). Gallery; tour poster.
+sign             <- /wp-content/uploads/2025/04/IMG_9146.jpg (roadside sign). Visit and join; gallery.
+garden           <- /wp-content/uploads/2024/03/IMG_1504.jpg (empty garden and learning shed). Home living photo poster; Our nursery; gallery.
+room-blocks      <- /wp-content/uploads/2024/03/IMG_1437.jpg, CROPPED to the left 520 x 390px to remove an adult standing at the right edge (body only, but removed anyway).
+room-construction<- /wp-content/uploads/2024/03/IMG_1432.jpg (empty room).
+room-baby        <- /wp-content/uploads/2024/03/IMG_1438.jpg (empty under-2s room; room identity per the site's Services page, phone to confirm).
+room-tunnel      <- /wp-content/uploads/2024/03/IMG_1494.jpg (empty room).
+room-tables      <- /wp-content/uploads/2024/03/IMG_1497.jpg (empty room; the wall art is unnamed handprints).
+
+VIDEO (made by us, labelled honestly on the page)
+garden-loop.mp4  8-second muted loop: a slow pan right and back across garden.jpg (ffmpeg zoompan). No real footage. 135 KB.
+tour.mp4         33-second silent "look round": eight of the photos above (all but the sign) in a row with slow zooms and cross-fades (ffmpeg). 1.2 MB.
+                 Not real footage. Captions in tour.vtt; the text transcript is on Our nursery.
+
+EXCLUDED, and why
+IMG_1606.jpg     Three children at a table; faces visible.
+IMG_1594.jpg     Children and an adult on outdoor play equipment; faces visible.
+IMG_1585-rotated.jpg  A child sitting on a cushion; identifiable.
+IMG_1612.jpg     Two children playing; faces visible.
+image002-5.png, image006.png, image002-7.png, image001.jpg, image002-1.png
+                 Five staff portraits from the Team page. The site does not say which photo is which person, and we have no
+                 record of each person's consent for a new use. Our team uses initials instead. Add consented portraits at handover.
+aset-2/3/5.png   Generic clip-art illustrations (books, atoms, light bulb). Not the nursery's own, and off-brand.
+Google-...png    Google logo from a review widget.
+Sunshine_Logo*.png, Logo_Web.png, Poppings_Web..., Asset-9@2x...
+                 The nursery's and its sister nurseries' logos. The logo's sun has a face and glasses; the template redraws
+                 the emblem without a face, as its rules require. Ask the nursery whether they want the original logo too.
