@@ -50,10 +50,24 @@ async function chatTab(ctx, chatId){
   const { id, body } = ctx;
   const listEl = h('div', { class: 'chat-list', id: 'chat-list' });
   const chatEl = h('div', { class: 'chat' });
-  body.append(listEl, chatEl);
+  // Phones: the chat list is a drawer, opened from a bar above the conversation.
+  const showList = open => body.classList.toggle('chats-open', open);
+  const backdrop = h('div', { class: 'chat-list-backdrop', onclick: () => showList(false) });
+  const phoneTitle = h('span', { class: 'chat-phonebar-title' });
+  const phoneBar = h('div', { class: 'chat-phonebar only-phone' },
+    h('button', { type: 'button', class: 'btn ghost small', 'aria-label': 'Show chats', onclick: () => showList(true) }, '☰ Chats'),
+    phoneTitle,
+    h('button', { type: 'button', class: 'btn ghost small', onclick: () => go(`/p/${id}/chat/new`) }, '+ New'));
+  listEl.addEventListener('click', e => { if (e.target.closest('a, button')) showList(false); });
+  const onKey = e => { if (e.key === 'Escape') showList(false); };
+  document.addEventListener('keydown', onKey);
+  onLeave(() => document.removeEventListener('keydown', onKey));
+  chatEl.append(phoneBar);
+  body.append(listEl, backdrop, chatEl);
   let chats = [];
   async function loadList(){
     chats = await api('GET', `/api/projects/${id}/chats`);
+    phoneTitle.textContent = chats.find(c => c.id === chatId)?.title || 'New chat';
     listEl.replaceChildren(...[
       h('button', { class: 'btn block', style: { marginBottom: '8px' }, onclick: () => go(`/p/${id}/chat/new`) }, '+ New chat'),
       ...chats.map(c => h('a', { class: 'nav-item' + (c.id === chatId ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, 'data-link': '' },
@@ -135,7 +149,6 @@ function renderChat(ctx, el, chatId, loadList){
     'Connect your Claude account before sending prompts. ', h('a', { href: '/account#claude', 'data-link': '' }, 'Connect Claude')) : null;
   const form = h('form', { class: 'composer', onsubmit: e => { e.preventDefault(); running ? stop() : submit(); } },
     chips, ta, picker, h('div', { class: 'composer-bar' }, attachBtn, model, seg,
-      h('button', { type: 'button', class: 'btn ghost small only-phone', onclick: () => $('#chat-list')?.classList.toggle('show') }, 'Chats'),
       h('div', { class: 'spacer' }), send));
   const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
   form.addEventListener('dragover', e => { if (hasFiles(e)){ e.preventDefault(); form.classList.add('drop'); } });
