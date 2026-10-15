@@ -209,10 +209,11 @@ export async function renderAdmin(main){
   const usersCard = h('div', { class: 'card table-wrap' });
   const auditCard = h('div', { class: 'card table-wrap' });
   const studioCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Checking…'));
+  const mailCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
   inner.append(
     h('h1', null, 'Admin'),
     h('h2', null, 'Studio version'), studioCard,
-    !state.me.mailEnabled ? h('div', { class: 'note' }, 'Email isn’t set up, so password reset links and invites aren’t emailed. Use “Reset link” below and send the link yourself. To turn email on, add SMTP settings to /etc/studio/studio.env on the server (see HANDOVER.md).') : null,
+    h('h2', null, 'Email'), mailCard,
     h('h2', null, 'People'), h('p', { class: 'muted small' }, 'To add someone, invite them to a team from Teams and people.'), usersCard,
     h('h2', null, 'Activity log'), auditCard);
 
@@ -249,6 +250,7 @@ export async function renderAdmin(main){
     else auditCard.replaceChildren(h('table', { class: 'list' }, h('thead', null, h('tr', null, h('th', null, 'When'), h('th', null, 'Who'), h('th', null, 'What'), h('th', null, 'Detail'), h('th', null, 'IP'))), h('tbody', null, trs)),
       h('button', { class: 'btn small', style: { marginTop: '10px' }, onclick: () => loadAudit(true).catch(fail) }, 'Older'));
   }
+  loadMail(mailCard).catch(e => mailCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadStudio(studioCard).catch(e => studioCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadUsers().catch(e => usersCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadAudit().catch(e => auditCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
@@ -295,4 +297,37 @@ async function loadStudio(card){
     }
     toast('The update is taking a long time. Check the server.', true);
   }
+}
+
+// Email for password resets and invites. Saving checks the settings with the mail server first.
+async function loadMail(card){
+  const paint = m => {
+    state.me.mailEnabled = m.source !== 'none';
+    const inp = (v, attrs = {}) => h('input', { value: v ?? '', autocomplete: 'off', ...attrs });
+    const host = inp(m.host || 'smtp.gmail.com'), port = inp(m.port || 465, { type: 'number', min: 1, max: 65535, style: { maxWidth: '120px' } });
+    const user = inp(m.user, { type: 'email', placeholder: 'you@gmail.com' }), from = inp(m.from, { type: 'email', placeholder: 'Same as the user name' });
+    const pass = inp('', { type: 'password', autocomplete: 'new-password', placeholder: m.source === 'studio' && m.hasPassword ? 'Saved. Leave empty to keep it.' : 'For Gmail, a 16-character app password' });
+    const secure = h('input', { type: 'checkbox', checked: m.secure !== false });
+    port.oninput = () => { if (port.value === '587') secure.checked = false; if (port.value === '465') secure.checked = true; };
+    const act = (label, fn, cls = '') => h('button', { class: 'btn ' + cls, type: 'button', onclick: e => busy(e.target, fn).catch(() => {}) }, label);
+    card.replaceChildren(
+      m.source === 'none' ? h('div', { class: 'note', style: { marginTop: 0 } }, 'Email isn’t set up, so password reset links and invitations aren’t emailed. Admins copy them from this page and from Teams and people instead.')
+        : h('p', { class: 'ok-box', style: { marginTop: 0 } }, `Sending through ${m.host} as ${m.user}`, m.source === 'server' ? ', using the settings in /etc/studio/studio.env on the server. Saving here replaces them.' : '.'),
+      h('p', { class: 'muted small' }, 'For Gmail, turn on two-step verification for the account, then create an app password at ',
+        h('a', { href: 'https://myaccount.google.com/apppasswords', target: '_blank', rel: 'noopener' }, 'myaccount.google.com/apppasswords'), '. The password is stored encrypted and never shown again.'),
+      h('div', { style: { display: 'grid', gap: '10px', maxWidth: '480px' } },
+        field('Mail server', host),
+        h('div', { class: 'row', style: { alignItems: 'end' } }, field('Port', port), h('label', { class: 'check', style: { marginBottom: '10px' } }, secure, ' Secure connection (TLS), on for port 465')),
+        field('User name', user, 'usually the email address'), field('Password', pass), field('From address', from, 'optional')),
+      h('div', { class: 'row', style: { marginTop: '14px' } },
+        act('Check and save', async () => {
+          const r = await api('PUT', '/api/admin/mail', { host: host.value, port: Number(port.value), secure: secure.checked, user: user.value, pass: pass.value, from: from.value });
+          toast('Email settings saved'); paint(r);
+        }, 'primary'),
+        m.source !== 'none' ? act('Send a test email', async () => { const r = await api('POST', '/api/admin/mail/test'); toast(`Test email sent to ${r.to}`); }) : null,
+        m.source === 'studio' ? act('Remove', async () => {
+          if (await confirmDialog('Remove the email settings?', 'Studio stops sending email, unless the server has its own settings in /etc/studio/studio.env.', 'Remove', true)) paint(await api('DELETE', '/api/admin/mail'));
+        }, 'danger') : null));
+  };
+  paint(await api('GET', '/api/admin/mail'));
 }

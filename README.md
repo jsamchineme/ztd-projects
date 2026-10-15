@@ -77,7 +77,7 @@ Restarting Studio stops any Claude runs in progress.
 
 **Or update from Studio itself.** Commit the changes to `studio/` in the pipeline project's Changes tab, then press **Update and restart Studio** on the Admin page (Studio admins only). It runs `studio-ctl studio-update`, which installs the last commit of `studio/` with its own `ops/install.sh` in a separate systemd unit (`studio-update`) and shows the log as it goes. Uncommitted changes aren't installed. The page lists the new commits first: read them, because the install script runs as root. Agents can't run this. The first time, deploy by hand as above, because the button needs the new `studio-ctl`.
 
-**Turn on email** (password resets and invites). Add these to `/etc/studio/studio.env`, then run `systemctl restart studio`:
+**Turn on email** (password resets and invites). The easy way: Admin page → Email. Enter the settings, then press Check and save. Studio signs in to the mail server before saving, and stores the password encrypted in its database. Settings saved there replace any in the server file. Or add these to `/etc/studio/studio.env`, then run `systemctl restart studio`:
 
 ```
 SMTP_HOST=smtp.gmail.com

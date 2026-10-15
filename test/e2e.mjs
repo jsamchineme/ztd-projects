@@ -3,6 +3,7 @@
 import { chromium } from '../../pipeline/node_modules/playwright-core/index.mjs';
 import { createHmac } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
+import net from 'node:net';
 
 const [BASE, DOMAIN_PORT, SHOTS] = process.argv.slice(2);
 mkdirSync(SHOTS, { recursive: true });
@@ -270,6 +271,45 @@ await check('admin page: people and activity log; reset link for teammate', asyn
   await p2.click('button[type=submit]');
   await p2.getByRole('heading', { name: 'Two-step check' }).waitFor();
   await c2.close();
+}, page);
+// A tiny SMTP server: accepts the password "right" only, and keeps what it receives.
+const mails = [];
+const smtp = net.createServer(sock => {
+  let data = null;
+  sock.write('220 test\r\n');
+  sock.on('data', d => { for (const line of d.toString().split('\r\n').filter((l, i, a) => l || i < a.length - 1)){
+    if (data !== null){ if (line === '.'){ mails.push(data); data = null; sock.write('250 ok\r\n'); } else data += line + '\n'; continue; }
+    const cmd = line.slice(0, 4).toUpperCase();
+    if (cmd === 'EHLO') sock.write('250-test\r\n250 AUTH PLAIN\r\n');
+    else if (cmd === 'AUTH') sock.write(Buffer.from(line.split(' ')[2] || '', 'base64').toString().endsWith('\0right') ? '235 ok\r\n' : '535 bad password\r\n');
+    else if (cmd === 'DATA'){ data = ''; sock.write('354 go\r\n'); }
+    else if (cmd === 'QUIT'){ sock.end('221 bye\r\n'); }
+    else sock.write('250 ok\r\n');
+  } });
+}).listen(2526, '127.0.0.1');
+await check('admin sets up email: wrong password refused, test email sent, password never returned', async () => {
+  await page.goto(BASE + '/admin');
+  await page.getByText('Email isn’t set up').waitFor();
+  await page.fill('#' + await page.locator('label:has-text("Mail server")').getAttribute('for'), '127.0.0.1');
+  await page.fill('input[type=number]', '2526');
+  await page.locator('label.check:has-text("Secure connection") input').uncheck();
+  await page.fill('#' + await page.locator('label:has-text("User name")').getAttribute('for'), 'studio@example.com');
+  await page.fill('input[type=password]', 'wrong');
+  await page.click('button:has-text("Check and save")');
+  await page.getByText('refused these settings').waitFor();
+  await page.fill('input[type=password]', 'right');
+  await page.click('button:has-text("Check and save")');
+  await page.getByText('Sending through 127.0.0.1 as studio@example.com').waitFor();
+  await page.click('button:has-text("Send a test email")');
+  await page.getByText('Test email sent to owner@example.com').waitFor();
+  if (!mails.some(m => /To: owner@example.com/i.test(m) && /Test email from/.test(m))) throw new Error('no test email arrived');
+  const r = await (await page.request.get(`${BASE}/api/admin/mail`)).text();
+  if (r.includes('right')) throw new Error('password was returned');
+  await page.screenshot({ path: `${SHOTS}/09-email.png`, fullPage: true });
+  await page.click('button:has-text("Remove")');
+  await page.click('dialog button:has-text("Remove")');
+  await page.getByText('Email isn’t set up').waitFor();
+  smtp.close();
 }, page);
 await check('phone layout: chat usable at 390px', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
