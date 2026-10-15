@@ -45,7 +45,7 @@ if (args[0] === 'setup-token'){
       out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 't2', name: 'Write', input: { file_path: process.cwd() + '/STUDIO-TEST.md', content: '…' } }] } });
       out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 't2', content: 'File created', is_error: false }] } });
     }
-    const reply = `**Fake Claude** got your prompt (${prompt.length} characters) in \`${process.cwd()}\`${edited ? ' and wrote `STUDIO-TEST.md`' : ''}.\n\n- model: ${args[args.indexOf('--model') + 1]}\n- mode: ${args[args.indexOf('--permission-mode') + 1]}\n- resumed: ${i >= 0 ? 'yes' : 'no'}`;
+    const reply = `**Fake Claude** got your prompt (${prompt.length} characters) in \`${process.cwd()}\`${edited ? ' and wrote `STUDIO-TEST.md`' : ''}.\n\n- model: ${args[args.indexOf('--model') + 1]}\n- mode: ${args[args.indexOf('--permission-mode') + 1]}\n- resumed: ${i >= 0 ? 'yes' : 'no'}\n- attached: ${(prompt.match(/^- \//gm) || []).length}`;
     out({ type: 'assistant', message: { content: [{ type: 'text', text: reply }] } });
     out({ type: 'result', subtype: 'success', is_error: false, result: reply, session_id: session, total_cost_usd: 0.0123, duration_ms: 1500, num_turns: 3 });
   });

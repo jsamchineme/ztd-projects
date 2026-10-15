@@ -15,6 +15,9 @@ usermod -aG systemd-journal ztd
 mkdir -p "$APP" "$DATA" /srv/projects /etc/studio/env /usr/local/lib/studio /var/backups/ztd
 chown studio:studio /srv/studio "$DATA"; chmod 750 "$DATA"
 chown ztd:ztd /srv/projects; chmod 755 /srv/projects
+# Chat attachments: Studio writes them, Claude (group ztd) can only read them. setgid keeps the group on new folders.
+mkdir -p /srv/studio-uploads
+chown studio:ztd /srv/studio-uploads; chmod 2750 /srv/studio-uploads
 
 # Code (owned by root, so neither Studio nor agents can change it)
 rsync -a --delete --exclude node_modules --exclude data --exclude '.env' "$SRC/" "$APP/"
@@ -62,6 +65,7 @@ STUDIO_SECRET=$(openssl rand -base64 48 | tr -d '\n')
 # SMTP_FROM=you@gmail.com
 EOF
 fi
+grep -q '^STUDIO_UPLOADS=' /etc/studio/studio.env || echo 'STUDIO_UPLOADS=/srv/studio-uploads' >> /etc/studio/studio.env
 chown root:studio /etc/studio/studio.env; chmod 640 /etc/studio/studio.env
 
 cat > /etc/systemd/system/studio.service <<EOF

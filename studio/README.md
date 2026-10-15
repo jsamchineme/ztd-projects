@@ -29,6 +29,7 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `lib/gate.mjs` | Login gate and reverse proxy for project subdomains. It uses a one-time hand-off and a host-only cookie, so Studio's session cookie never reaches project code. |
 | `lib/projects.mjs` | Projects and services: validation, systemd specs, status, certificates |
 | `lib/agent.mjs` | Chats: runs `claude -p --output-format stream-json`, saves events and streams them over SSE. Chats resume their Claude session. |
+| `lib/uploads.mjs` | Files attached in chat (paste, drop or the paperclip): up to 20 MB each and 10 per message, saved to `/srv/studio-uploads/<slug>/<id>/`. That folder is owned by `studio` with group `ztd`, so Claude can read the files but not change them, and they stay out of git. The prompt lists the paths and Claude opens them with Read, which handles images, PDFs, notebooks and text. |
 | `lib/claude.mjs` | Each user's Claude connection: a subscription token via `claude setup-token`, or an API key. Stored encrypted (AES-256-GCM). |
 | `lib/ctl.mjs` | Runs `studio-ctl` through sudo |
 | `ops/studio-ctl.mjs` | The root helper. It's the only privileged code. AI agents (user `ztd`) may run only `status`, `svc` and `logs`. |
@@ -73,6 +74,8 @@ ssh -i ~/.ssh/ztddevs root@129.121.95.175 'bash /root/studio-src/ops/install.sh 
 ```
 
 Restarting Studio stops any Claude runs in progress.
+
+**Or update from Studio itself.** Commit the changes to `studio/` in the pipeline project's Changes tab, then press **Update and restart Studio** on the Admin page (Studio admins only). It runs `studio-ctl studio-update`, which installs the last commit of `studio/` with its own `ops/install.sh` in a separate systemd unit (`studio-update`) and shows the log as it goes. Uncommitted changes aren't installed. The page lists the new commits first: read them, because the install script runs as root. Agents can't run this. The first time, deploy by hand as above, because the button needs the new `studio-ctl`.
 
 **Turn on email** (password resets and invites). Add these to `/etc/studio/studio.env`, then run `systemctl restart studio`:
 

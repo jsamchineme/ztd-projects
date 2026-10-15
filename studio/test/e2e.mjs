@@ -131,9 +131,27 @@ await check('follow-up prompt resumes the same Claude session', async () => {
   await page.keyboard.press('Enter');
   await page.getByText('resumed: yes').waitFor({ timeout: 15000 });
 }, page);
-await check('chat survives a reload and is listed', async () => {
+await check('attach an image and a text file and send them', async () => {
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+  await page.setInputFiles('.composer input[type=file]', [
+    { name: 'shot.png', mimeType: 'image/png', buffer: png },
+    { name: 'notes.md', mimeType: 'text/markdown', buffer: Buffer.from('# Notes\n') }]);
+  await page.locator('.attach-chip img').waitFor();
+  await page.locator('.attach-chip', { hasText: 'notes.md' }).getByText('B').waitFor();
+  await page.fill('textarea', 'what is in these files');
+  await page.keyboard.press('Enter');
+  await page.getByText('attached: 2').waitFor({ timeout: 15000 });
+  await page.locator('.sent-image img').waitFor();
+  if (!(await page.evaluate(() => document.querySelector('.sent-image img').naturalWidth === 1))) throw new Error('thumbnail did not load');
+  await page.locator('a.attach-chip', { hasText: 'notes.md' }).waitFor();
+  const big = await page.request.post(`${BASE}/api/projects/${projectUrl.split('/p/')[1]}/uploads`, { headers: { Origin: BASE }, data: { name: 'big.bin', data: Buffer.alloc(21 * 1024 * 1024).toString('base64') } });
+  if (big.status() !== 413) throw new Error(`21 MB upload gave ${big.status()}`);
+  await page.screenshot({ path: `${SHOTS}/05b-attachments.png` });
+}, page);
+await check('chat (with its attachments) survives a reload and is listed', async () => {
   await page.reload();
-  await page.getByText('resumed: yes').waitFor();
+  await page.getByText('resumed: yes').first().waitFor();
+  await page.locator('.sent-image img').waitFor();
   await page.locator('.chat-list .nav-item', { hasText: 'Please edit the homepage' }).waitFor();
 }, page);
 await check('Changes tab shows the new file and diff, then commits', async () => {
@@ -232,6 +250,12 @@ await check('admin page: people and activity log; reset link for teammate', asyn
   if (!link.includes('/reset-password?token=')) throw new Error('bad link ' + link);
   await page.click('dialog button:has-text("Done")');
   await page.locator('td.mono', { hasText: 'chat.prompt' }).first().waitFor();
+  await page.getByText('Latest commit to studio/').waitFor();
+  await page.getByText('uncommitted change in studio/').waitFor();
+  await page.click('button:has-text("Update and restart Studio")');
+  await page.click('dialog button:has-text("Update and restart")');
+  await page.getByText('Studio updated').waitFor({ timeout: 15000 });
+  await page.waitForLoadState('load');
   await page.screenshot({ path: `${SHOTS}/10-admin.png`, fullPage: true });
   // Use the link in a fresh browser
   const c2 = await browser.newContext({ userAgent: UA });

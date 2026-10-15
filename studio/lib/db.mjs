@@ -74,6 +74,17 @@ CREATE TABLE IF NOT EXISTS gate_token (
   expiresAt INTEGER NOT NULL
 );
 CREATE TABLE IF NOT EXISTS setting (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS upload (
+  id TEXT PRIMARY KEY,
+  projectId TEXT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  userId TEXT NOT NULL,
+  name TEXT NOT NULL,
+  kind TEXT NOT NULL,                   -- image | pdf | notebook | text | file
+  mime TEXT NOT NULL,
+  size INTEGER NOT NULL,
+  path TEXT NOT NULL,                   -- UPLOADS_DIR/<slug>/<id>/<name>
+  createdAt INTEGER NOT NULL
+);
 `);
 
 export const now = () => Date.now();

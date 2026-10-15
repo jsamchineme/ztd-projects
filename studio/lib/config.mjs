@@ -12,6 +12,8 @@ export const STUDIO_HOST = env.STUDIO_HOST || `studio.${DOMAIN}`;      // the St
 export const STUDIO_URL = env.STUDIO_URL || `https://${STUDIO_HOST}`;
 export const SECURE = STUDIO_URL.startsWith('https://');
 export const DATA_DIR = env.STUDIO_DATA || join(APP_DIR, 'data');
+// Chat attachments. On the server this is /srv/studio-uploads: Studio writes it and Claude (ztd) may only read it.
+export const UPLOADS_DIR = env.STUDIO_UPLOADS || join(DATA_DIR, 'uploads');
 export const SECRET = env.STUDIO_SECRET || '';
 export const CTL = env.STUDIO_CTL || '/usr/local/sbin/studio-ctl';    // root helper, run through sudo
 export const CTL_SUDO = env.STUDIO_CTL_SUDO !== '0';

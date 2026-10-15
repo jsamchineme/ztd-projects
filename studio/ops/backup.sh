@@ -9,6 +9,7 @@ chmod 700 "$DEST"
 # A consistent copy of the live SQLite database
 sqlite3 /srv/studio/data/studio.db ".backup '$DEST/studio-$STAMP.db'"
 tar -czf "$DEST/projects-$STAMP.tar.gz" --exclude='node_modules' --exclude='.trash' -C /srv projects
+tar -czf "$DEST/uploads-$STAMP.tar.gz" -C /srv studio-uploads 2>/dev/null || true
 tar -czf "$DEST/config-$STAMP.tar.gz" -C / etc/studio etc/apache2/sites-available etc/letsencrypt 2>/dev/null || true
 gzip -f "$DEST/studio-$STAMP.db"
 find "$DEST" -type f -mtime +14 -delete
