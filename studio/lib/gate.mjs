@@ -151,6 +151,14 @@ function upstreamHeaders(req, svc, host, user){
   return h;
 }
 
+// Project code isn't trusted: it may only set cookies for its own host. A Domain= cookie would reach studio.<domain>
+// and every other project, and could shadow Studio's session cookie. Studio's and the gate's cookie names are refused.
+function safeCookies(list){
+  return [].concat(list)
+    .filter(c => { const name = String(c).split('=')[0].trim(); return name !== COOKIE && !/^(__Secure-|__Host-)?studio\./.test(name); })
+    .map(c => String(c).replace(/;\s*domain\s*=[^;]*/gi, ''));
+}
+
 // resBase: the /__studio_res/<token> prefix this request came through, if any.
 // navSid: set on a signed-in page navigation, so a sandboxed page can be moved under a token prefix.
 function proxy(req, res, svc, host, user, resBase = null, navSid = null){
@@ -160,6 +168,7 @@ function proxy(req, res, svc, host, user, resBase = null, navSid = null){
       return redirect(res, RES_PREFIX + resToken(navSid, host) + req.url);
     }
     const headers = { ...r.headers };
+    if (headers['set-cookie']) headers['set-cookie'] = safeCookies(headers['set-cookie']);
     if (headers.location) headers.location = headers.location.replace(new RegExp(`^https?://(localhost|127\\.0\\.0\\.1|\\[::1\\]):${svc.port}`), `${SECURE ? 'https' : 'http'}://${host}`);
     if (resBase){
       // Keep redirects inside the token prefix, and don't leak the token to other sites through Referer.
@@ -195,7 +204,21 @@ export function handleProjectUpgrade(req, socket, head, sub){
     for (const [k, v] of Object.entries(h)) for (const val of [].concat(v)) head1 += `${k}: ${val}\r\n`;
     upstream.write(head1 + '\r\n');
     if (head?.length) upstream.write(head);
-    upstream.pipe(socket); socket.pipe(upstream);
+    socket.pipe(upstream);
+    // The project's handshake reply passes through safeCookies too; the frames after it are piped untouched.
+    let buf = Buffer.alloc(0);
+    const onData = d => {
+      buf = Buffer.concat([buf, d]);
+      const end = buf.indexOf('\r\n\r\n');
+      if (end < 0){ if (buf.length > 65536) socket.destroy(); return; }
+      upstream.off('data', onData);
+      const lines = buf.subarray(0, end).toString('latin1').split('\r\n');
+      const kept = lines.filter((l, i) => i === 0 || !/^set-cookie:/i.test(l));
+      const cookies = safeCookies(lines.filter((l, i) => i > 0 && /^set-cookie:/i.test(l)).map(l => l.slice(l.indexOf(':') + 1).trim()));
+      socket.write(Buffer.concat([Buffer.from([...kept, ...cookies.map(c => 'Set-Cookie: ' + c)].join('\r\n') + '\r\n\r\n', 'latin1'), buf.subarray(end + 4)]));
+      upstream.pipe(socket);
+    };
+    upstream.on('data', onData);
   });
   upstream.on('error', () => socket.destroy());
   socket.on('error', () => upstream.destroy());

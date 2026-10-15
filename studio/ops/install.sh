@@ -12,9 +12,15 @@ PORT=4300
 id studio >/dev/null 2>&1 || useradd --system --create-home --home-dir /srv/studio --shell /usr/sbin/nologin studio
 id ztd >/dev/null 2>&1 || useradd --create-home --home-dir /home/ztd --shell /bin/bash ztd
 usermod -aG systemd-journal ztd
+# The Studio source project runs as its own user, so other projects' agents (ztd) can't change the code that
+# studio-update installs as root. It's in group ztd only to read chat attachments.
+id studiodev >/dev/null 2>&1 || useradd --create-home --home-dir /home/studiodev --shell /bin/bash studiodev
+usermod -aG ztd studiodev
+chmod 750 /home/studiodev
 mkdir -p "$APP" "$DATA" /srv/projects /etc/studio/env /usr/local/lib/studio /var/backups/ztd
 chown studio:studio /srv/studio "$DATA"; chmod 750 "$DATA"
-chown ztd:ztd /srv/projects; chmod 755 /srv/projects
+# Root owns the projects folder, so an agent can't rename a project's folder and put its own in its place.
+chown root:root /srv/projects; chmod 755 /srv/projects
 # Chat attachments: Studio writes them, Claude (group ztd) can only read them. setgid keeps the group on new folders.
 mkdir -p /srv/studio-uploads
 chown studio:ztd /srv/studio-uploads; chmod 2750 /srv/studio-uploads
@@ -38,12 +44,15 @@ EOF
 fi
 chmod 644 /etc/studio/ctl.json
 
-# Studio may run studio-ctl; agents (ztd) may run it too, and studio-ctl limits them to svc, logs and status.
+# Studio may run studio-ctl; agents (ztd, studiodev) may run it too, and studio-ctl limits them to svc, logs and
+# status for their own projects.
 cat > /etc/sudoers.d/studio <<'EOF'
 Defaults:studio !requiretty
 Defaults:ztd !requiretty
+Defaults:studiodev !requiretty
 studio ALL=(root) NOPASSWD: /usr/local/sbin/studio-ctl, /usr/local/sbin/studio-ctl *
 ztd ALL=(root) NOPASSWD: /usr/local/sbin/studio-ctl, /usr/local/sbin/studio-ctl *
+studiodev ALL=(root) NOPASSWD: /usr/local/sbin/studio-ctl, /usr/local/sbin/studio-ctl *
 EOF
 chmod 440 /etc/sudoers.d/studio
 visudo -cf /etc/sudoers.d/studio >/dev/null
@@ -68,10 +77,24 @@ fi
 grep -q '^STUDIO_UPLOADS=' /etc/studio/studio.env || echo 'STUDIO_UPLOADS=/srv/studio-uploads' >> /etc/studio/studio.env
 chown root:studio /etc/studio/studio.env; chmod 640 /etc/studio/studio.env
 
+# systemd holds Studio's port, even while Studio restarts, so a project's process can't take it and pose as Studio.
+cat > /etc/systemd/system/studio.socket <<EOF
+[Unit]
+Description=ZTD Studio port
+
+[Socket]
+ListenStream=127.0.0.1:$PORT
+NoDelay=true
+
+[Install]
+WantedBy=sockets.target
+EOF
+
 cat > /etc/systemd/system/studio.service <<EOF
 [Unit]
 Description=ZTD Studio
-After=network.target
+After=network.target studio.socket
+Requires=studio.socket
 
 [Service]
 User=studio
@@ -106,7 +129,9 @@ EOF
 # Apache: the modules Studio's sites need
 a2enmod -q proxy proxy_http proxy_wstunnel headers rewrite ssl >/dev/null
 systemctl daemon-reload
-systemctl enable studio >/dev/null 2>&1
+systemctl enable studio studio.socket >/dev/null 2>&1
+# The first time, Studio still holds the port itself: stop it so the socket can take it over.
+if ! systemctl is-active --quiet studio.socket; then systemctl stop studio; systemctl start studio.socket; fi
 systemctl restart studio
 sleep 2
 systemctl is-active studio

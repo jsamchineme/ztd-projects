@@ -21,7 +21,7 @@ Update this section when the focus changes.
 
 ## Studio (`studio/`)
 
-The hosted web app for building and running these projects with Claude: https://studio.ztddevs.com, on the server `root@129.121.95.175` (key `~/.ssh/ztddevs`). Projects live in `/srv/projects/<slug>/repo` and run as systemd services behind Studio's login at `<sub>.ztddevs.com`. If you're running inside Studio, the system prompt gives the service names. Restart a service after changing its server code with `sudo studio-ctl svc <project> <service> restart`. Don't commit: people commit from Studio's Changes tab. See `studio/README.md` for the architecture, deploys and security model. The server also hosts an unrelated site (revisaacmpamaugo.online, Apache, MySQL), so never touch its config.
+The hosted web app for building and running these projects with Claude: https://studio.ztddevs.com, on the server `root@129.121.95.175` (key `~/.ssh/ztddevs`). Projects live in `/srv/projects/<slug>/repo` and run as systemd services behind Studio's login at `<sub>.ztddevs.com`. If you're running inside Studio, the system prompt gives the service names. Restart a service after changing its server code with `sudo studio-ctl svc <project> <service> restart`. Don't commit: people commit from Studio's Changes tab. See `studio/README.md` for the architecture, deploys and security model. The Studio source is moving out of this repo into its own **Studio** project (`/srv/projects/studio-src`, run as the user `studiodev`), so team members' chats can't change it: see "Moving the Studio source" in that README. Once it has moved, change Studio there, not here. The server also hosts an unrelated site (revisaacmpamaugo.online, Apache, MySQL), so never touch its config.
 
 ## Running it
 
