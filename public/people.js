@@ -210,10 +210,12 @@ export async function renderAdmin(main){
   const auditCard = h('div', { class: 'card table-wrap' });
   const studioCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Checking…'));
   const mailCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
+  const focusCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
   inner.append(
     h('h1', null, 'Admin'),
     h('h2', null, 'Studio version'), studioCard,
     h('h2', null, 'Email'), mailCard,
+    h('h2', null, 'Project focus'), focusCard,
     h('h2', null, 'People'), h('p', { class: 'muted small' }, 'To add someone, invite them to a team from Teams and people.'), usersCard,
     h('h2', null, 'Activity log'), auditCard);
 
@@ -250,6 +252,7 @@ export async function renderAdmin(main){
     else auditCard.replaceChildren(h('table', { class: 'list' }, h('thead', null, h('tr', null, h('th', null, 'When'), h('th', null, 'Who'), h('th', null, 'What'), h('th', null, 'Detail'), h('th', null, 'IP'))), h('tbody', null, trs)),
       h('button', { class: 'btn small', style: { marginTop: '10px' }, onclick: () => loadAudit(true).catch(fail) }, 'Older'));
   }
+  loadFocus(focusCard).catch(e => focusCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadMail(mailCard).catch(e => mailCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadStudio(studioCard).catch(e => studioCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadUsers().catch(e => usersCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
@@ -306,6 +309,21 @@ export async function runStudioUpdate(btn, logBox){
 }
 
 // Email for password resets and invites. Saving checks the settings with the mail server first.
+// Focus checks: flag prompts that don't fit their project's description (see checkScope in lib/agent.mjs).
+async function loadFocus(card){
+  const s = await api('GET', '/api/admin/settings');
+  const box = h('input', { type: 'checkbox', checked: s.scopeCheck });
+  box.onchange = async () => {
+    box.disabled = true;
+    try { const r = await api('PUT', '/api/admin/settings', { scopeCheck: box.checked }); box.checked = r.scopeCheck; toast(r.scopeCheck ? 'Off-topic prompts will be flagged' : 'Focus checks are off'); }
+    catch (e){ box.checked = !box.checked; fail(e); }
+    finally { box.disabled = false; }
+  };
+  card.replaceChildren(
+    h('label', { class: 'check', style: { marginTop: 0 } }, box, ' Flag prompts that don’t fit their project'),
+    h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'Each prompt is compared with its project’s Description (in the project’s Settings) by a quick check with Haiku, on the sender’s Claude connection, while Claude works. Prompts that don’t fit still run, and are marked in the chat and listed here in the Activity log as chat.off-topic. Projects without a description aren’t checked.'));
+}
+
 async function loadMail(card){
   const paint = m => {
     state.me.mailEnabled = m.source !== 'none';

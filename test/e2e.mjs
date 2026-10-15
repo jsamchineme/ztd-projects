@@ -324,6 +324,33 @@ await check('admin sets up email: wrong password refused, test email sent, passw
   await page.getByText('Email isn’t set up').waitFor();
   smtp.close();
 }, page);
+await check('focus checks: an admin turns them on; off-topic prompts are flagged, on-topic ones aren’t', async () => {
+  await page.goto(projectUrl + '/settings');
+  await page.locator('form textarea').first().fill('A website for a local dental practice: pages, booking form and contact details.');
+  await page.click('button:has-text("Save")');
+  await page.locator('.toast', { hasText: 'Saved' }).waitFor();
+  await page.goto(BASE + '/admin');
+  await page.locator('label:has-text("Flag prompts that don’t fit their project") input').check();
+  await page.getByText('Off-topic prompts will be flagged').waitFor();
+  await page.goto(projectUrl + '/chat/new');
+  await page.fill('textarea', 'Add opening hours to the contact page');
+  await page.keyboard.press('Enter');
+  await page.locator('.result-line').waitFor({ timeout: 15000 });
+  await page.waitForFunction(() => !document.querySelector('.send.stop'));
+  await page.waitForTimeout(1500);   // the check runs alongside Claude; give it time to (not) flag
+  if (await page.locator('.flag-note').count()) throw new Error('an on-topic prompt was flagged');
+  await page.fill('textarea', 'Build me an unrelated recipe-sharing app');
+  await page.keyboard.press('Enter');
+  await page.locator('.flag-note', { hasText: 'unrelated app' }).waitFor({ timeout: 15000 });
+  await page.waitForFunction(() => !document.querySelector('.send.stop'), null, { timeout: 15000 });
+  await page.screenshot({ path: `${SHOTS}/10b-flag.png` });
+  await page.reload();
+  await page.locator('.flag-note').waitFor();   // kept with the chat
+  await page.goto(BASE + '/admin');
+  await page.locator('td.mono', { hasText: 'chat.off-topic' }).first().waitFor();
+  await page.locator('label:has-text("Flag prompts that don’t fit their project") input').uncheck();
+  await page.getByText('Focus checks are off').waitFor();
+}, page);
 await check('phone layout: chat usable at 390px', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(projectUrl + '/chat');

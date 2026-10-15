@@ -6,7 +6,7 @@ import { join, extname } from 'node:path';
 import { toNodeHandler } from 'better-auth/node';
 import QRCode from 'qrcode';
 import { PORT, STUDIO_HOST, STUDIO_URL, DOMAIN, APP_DIR, SECURE, APP_NAME } from './lib/config.mjs';
-import { db, audit, now } from './lib/db.mjs';
+import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
 import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail } from './lib/mail.mjs';
 import * as P from './lib/projects.mjs';
@@ -381,6 +381,14 @@ route('GET', '/api/admin/system', async ({ user }) => {
 
 // Email settings (lib/mail.mjs). The password is never sent back to the browser.
 route('GET', '/api/admin/mail', async ({ user }) => { needAdmin(user); return mailSettings(); });
+// Studio-wide switches that admins can flip on the Admin page.
+const adminSettings = () => ({ scopeCheck: getSetting('scopeCheck', false) });
+route('GET', '/api/admin/settings', async ({ user }) => { needAdmin(user); return adminSettings(); });
+route('PUT', '/api/admin/settings', async ({ user, body, req }) => {
+  needAdmin(user);
+  if (typeof body.scopeCheck === 'boolean'){ setSetting('scopeCheck', body.scopeCheck); audit(user.id, 'admin.focus-check', body.scopeCheck ? 'on' : 'off', '', ipOf(req)); }
+  return adminSettings();
+});
 route('PUT', '/api/admin/mail', async ({ user, body, req }) => {
   needAdmin(user);
   await saveMailSettings(body);

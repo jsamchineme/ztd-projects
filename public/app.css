@@ -184,6 +184,8 @@ table.list td { padding: 10px; border-bottom: 1px solid var(--line); vertical-al
 .thinking div { white-space: pre-wrap; padding: 6px 0 0 14px; border-left: 2px solid var(--line); margin-top: 4px; }
 .result-line { font-size: 12.5px; color: var(--faint); margin: -6px 0 22px; }
 .notice { font-size: 13.5px; color: var(--muted); text-align: center; margin: 10px 0 18px; }
+.flag-note { font-size: 13.5px; color: var(--muted); background: var(--bad-soft); border-left: 3px solid var(--bad); padding: 8px 12px; border-radius: 8px; margin: 0 0 18px; }
+.flag-note strong { color: var(--bad); font-weight: 600; }
 .chat-error { background: var(--bad-soft); color: var(--bad); padding: 10px 12px; border-radius: 8px; margin: 0 0 18px; white-space: pre-wrap; font-size: 14px; }
 .working { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; margin: 4px 0 16px; }
 .composer-wrap { padding: 8px 24px 18px; }

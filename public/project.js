@@ -369,6 +369,8 @@ function renderChat(ctx, el, chatId, loadList){
       api('GET', `/api/projects/${id}/git/status`).then(s => { for (const c of document.querySelectorAll('.tab .count, .proj-sheet .count')){ c.hidden = !s.files?.length; c.textContent = s.files?.length || ''; } }).catch(() => {});
     } else if (ev.type === 'error'){
       node = h('div', { class: 'chat-error' }, ev.text);
+    } else if (ev.type === 'flag'){
+      node = h('div', { class: 'flag-note' }, h('strong', null, 'Flagged as off-topic for this project. '), ev.text, ' Admins can see this in the Activity log.');
     } else if (ev.type === 'notice'){
       node = h('div', { class: 'notice' }, ev.text);
     }
@@ -645,7 +647,7 @@ function settingsTab(ctx){
         toast('Saved'); refreshProjects().catch(() => {});
       }, 'Saving…').catch(() => {});
     } },
-      field('Name', name), field('Description', desc, 'Claude reads this at the start of every chat'), field('Team', team, 'everyone in this team can open and work on it'),
+      field('Name', name), field('Description', desc, 'Claude reads this at the start of every chat. If an admin turns on focus checks, prompts are compared with it'), field('Team', team, 'everyone in this team can open and work on it'),
       field('Claude for the project’s own AI workers', worker, 'some projects (like the pipeline) run Claude themselves; they use this connection'),
       h('p', { class: 'small muted' }, `Folder on the server: /srv/projects/${p.slug}/repo`),
       h('button', { class: 'btn primary', type: 'submit', style: { marginTop: '8px' } }, 'Save')),

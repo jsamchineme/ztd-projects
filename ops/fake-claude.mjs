@@ -20,6 +20,11 @@ if (args[0] === 'setup-token'){
     console.log('\n\n✓ Long-lived authentication token created successfully!\n\nYour OAuth token (valid for 1 year):\n\nsk-ant-oat01-FAKE' + 'x'.repeat(80) + '\n\nStore this token securely.');
     process.exit(0);
   });
+} else if (args.includes('--no-session-persistence')){
+  // A scope check (studio-ctl scope-check): anything mentioning "unrelated" is off-topic.
+  let input = '';
+  process.stdin.on('data', d => { input += d; });
+  process.stdin.on('end', () => console.log(/<request>[\s\S]*unrelated/i.test(input) ? 'OFF: Asks for an unrelated app, not work on this project.' : 'ON'));
 } else {
   let prompt = '';
   process.stdin.on('data', d => { prompt += d; });

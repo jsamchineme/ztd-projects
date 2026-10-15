@@ -93,6 +93,11 @@ switch (cmd){
     c.on('exit', code => process.exit(code ?? 1));
     break;
   }
+  case 'scope-check': {
+    const req = JSON.parse(readStdin());
+    const r = spawnSync('node', [FAKE, '-p', '--model', 'haiku', '--no-session-persistence'], { encoding: 'utf8', input: `<purpose>\n${req.purpose}\n</purpose>\n<request>\n${req.prompt}\n</request>` });
+    process.stdout.write(r.stdout); process.exit(r.status ?? 1);
+  }
   case 'claude-token': {
     const c = spawn('node', [FAKE, 'setup-token'], { stdio: 'inherit' });
     process.on('SIGTERM', () => c.kill('SIGTERM'));
