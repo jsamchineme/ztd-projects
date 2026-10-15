@@ -1,5 +1,6 @@
 {
   "claimMinutes": 90,
+  "maxWorkers": 1,
   "attentionStage": "attention",
   "ratingBands": {
     "bad": [
