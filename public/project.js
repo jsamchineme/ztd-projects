@@ -1,6 +1,6 @@
 // A project: chat with Claude, running services, changes, files and settings.
 import { h, $, fill, onTap, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy } from './ui.js';
-import { state, go, onLeave, refreshProjects, setTitle, localStorageSet, localStorageGet, renderSideProjects } from './app.js';
+import { state, go, onLeave, refreshProjects, setTitle, setTopbar, hideTopbar, localStorageSet, localStorageGet, renderSideProjects } from './app.js';
 import { runStudioUpdate } from './people.js';
 
 const MODELS = [['opus', 'Opus'], ['fable', 'Fable'], ['sonnet', 'Sonnet'], ['haiku', 'Haiku']];
@@ -28,14 +28,43 @@ export async function renderProject(main, id, tab, sub){
     h('nav', { class: 'tabs', 'aria-label': 'Project sections' }, TABS.map(([k, label]) =>
       h('a', { class: 'tab' + (k === tab ? ' active' : ''), href: `/p/${id}/${k}`, 'data-link': '', 'aria-current': k === tab ? 'page' : null }, label, k === 'changes' ? changeCount : null))));
   const body = h('div', { class: 'proj-body' });
-  main.append(head, body);
 
-  const paintLinks = p => $('#svc-links')?.replaceChildren(...p.services.filter(s => s.url).map(s =>
-    h('a', { class: 'svc-link', href: s.url, target: '_blank', rel: 'noopener', title: `${s.label}: ${s.status.state} · ${s.subdomain}.${state.me.domain}` },
-      h('span', { class: 'dot ' + s.status.state.replace(' ', '-') }), h('span', null, s.subdomain, h('span', { class: 'svc-domain' }, '.' + state.me.domain)), ' ↗')));
+  // Phones: the header above is hidden, and its tabs and web addresses live in a sheet opened from the top bar's title.
+  const sheetCount = h('span', { class: 'count', hidden: true });
+  const sheetLinks = h('div', { class: 'sheet-links' });
+  const sheet = h('div', { class: 'proj-sheet', hidden: true, role: 'dialog', 'aria-label': `${project.name} sections` },
+    h('nav', { 'aria-label': 'Project sections' }, TABS.map(([k, label]) =>
+      h('a', { class: 'nav-item' + (k === tab ? ' active' : ''), href: `/p/${id}/${k}`, 'data-link': '' }, h('span', { class: 'name' }, label, k === 'changes' ? sheetCount : null), k === tab ? '✓' : null))),
+    sheetLinks);
+  const sheetBackdrop = h('div', { class: 'sheet-backdrop', hidden: true, onclick: () => showSheet(false) });
+  const subLine = h('span', { class: 'topbar-sub' });
+  const titleBtn = h('button', { type: 'button', class: 'topbar-proj', 'aria-haspopup': 'dialog', 'aria-expanded': 'false' },
+    h('span', { class: 'topbar-name' }, project.name, h('span', { class: 'caret', 'aria-hidden': 'true' }, ' ▾')), subLine);
+  function showSheet(open){
+    if (open){ hideTopbar(false); sheet.style.top = ($('.topbar')?.offsetHeight || 0) + 'px'; }   // the bar sits at the top once shown
+    sheet.hidden = sheetBackdrop.hidden = !open;
+    titleBtn.setAttribute('aria-expanded', String(open));
+  }
+  onTap(titleBtn, () => showSheet(sheet.hidden));
+  sheet.addEventListener('click', e => { if (e.target.closest('a')) showSheet(false); });
+  const onKey = e => { if (e.key === 'Escape') showSheet(false); };
+  document.addEventListener('keydown', onKey);
+  onLeave(() => document.removeEventListener('keydown', onKey));
+  setTopbar(titleBtn);
+  main.append(head, body, sheetBackdrop, sheet);
+
+  const svcLink = (s, full) => h('a', { class: full ? 'nav-item' : 'svc-link', href: s.url, target: '_blank', rel: 'noopener', title: `${s.label}: ${s.status.state} · ${s.subdomain}.${state.me.domain}` },
+    h('span', { class: 'dot ' + s.status.state.replace(' ', '-') }), h('span', { class: full ? 'name' : null }, s.subdomain + '.' + state.me.domain), ' ↗');
+  const paintLinks = p => {
+    const live = p.services.filter(s => s.url);
+    $('#svc-links')?.replaceChildren(...live.map(s => svcLink(s)));
+    sheetLinks.replaceChildren(...live.map(s => svcLink(s, true)));
+  };
   paintLinks(project);
-  api('GET', `/api/projects/${id}/git/status`).then(s => { if (s.files?.length){ changeCount.hidden = false; changeCount.textContent = s.files.length; } }).catch(() => {});
-  const ctx = { project, id, body, paintLinks, reload: async () => { ctx.project = await api('GET', `/api/projects/${id}`); paintLinks(ctx.project); return ctx.project; } };
+  api('GET', `/api/projects/${id}/git/status`).then(s => { if (s.files?.length){ for (const c of [changeCount, sheetCount]){ c.hidden = false; c.textContent = s.files.length; } } }).catch(() => {});
+  const setSub = t => { subLine.textContent = t || ''; };
+  const topbarActions = (...actions) => setTopbar(titleBtn, ...actions);
+  const ctx = { project, id, body, paintLinks, setSub, topbarActions, reload: async () => { ctx.project = await api('GET', `/api/projects/${id}`); paintLinks(ctx.project); return ctx.project; } };
 
   if (tab === 'chat') return chatTab(ctx, sub);
   if (tab === 'services') return servicesTab(ctx);
@@ -51,14 +80,12 @@ async function chatTab(ctx, chatId){
   const { id, body } = ctx;
   const listEl = h('div', { class: 'chat-list', id: 'chat-list' });
   const chatEl = h('div', { class: 'chat' });
-  // Phones: the chat list is a drawer, opened from a bar above the conversation.
-  const showList = open => body.classList.toggle('chats-open', open);
+  // Phones: the chat list is a drawer, opened from the top bar, which also shows the open chat's title.
+  const showList = open => { body.classList.toggle('chats-open', open); if (open) hideTopbar(false); };
   const backdrop = h('div', { class: 'chat-list-backdrop', onclick: () => showList(false) });
-  const phoneTitle = h('span', { class: 'chat-phonebar-title' });
-  const phoneBar = h('div', { class: 'chat-phonebar only-phone' },
-    onTap(h('button', { type: 'button', class: 'btn ghost small', 'aria-label': 'Show chats' }, '☰ Chats'), () => showList(true)),
-    phoneTitle,
-    h('button', { type: 'button', class: 'btn ghost small', onclick: () => go(`/p/${id}/chat/new`) }, '+ New'));
+  ctx.topbarActions(
+    onTap(h('button', { type: 'button', class: 'btn ghost topbar-icon', 'aria-label': 'Show chats', title: 'Chats' }, '💬'), () => showList(true)),
+    h('button', { type: 'button', class: 'btn ghost topbar-icon', 'aria-label': 'New chat', title: 'New chat', onclick: () => go(`/p/${id}/chat/new`) }, '＋'));
   listEl.addEventListener('click', e => {
     const a = e.target.closest('a, button');
     if (!a) return;
@@ -69,13 +96,12 @@ async function chatTab(ctx, chatId){
   const onKey = e => { if (e.key === 'Escape') showList(false); };
   document.addEventListener('keydown', onKey);
   onLeave(() => document.removeEventListener('keydown', onKey));
-  chatEl.append(phoneBar);
   body.append(listEl, backdrop, chatEl);
   let chats = [];
   async function loadList(){
     chats = await api('GET', `/api/projects/${id}/chats`);
     const open = location.pathname.split('/').pop();   // a new chat gets its id in the address after the first message
-    phoneTitle.textContent = chats.find(c => c.id === open)?.title || 'New chat';
+    ctx.setSub(chats.find(c => c.id === open)?.title || 'New chat');
     listEl.replaceChildren(...[
       h('button', { class: 'btn block', style: { marginBottom: '8px' }, onclick: () => go(`/p/${id}/chat/new`) }, '+ New chat'),
       ...chats.map(c => h('a', { class: 'nav-item' + (c.id === open ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, 'data-link': '' },
@@ -102,16 +128,23 @@ function renderChat(ctx, el, chatId, loadList){
   const transcript = h('div', { class: 'transcript', role: 'log', 'aria-label': 'Conversation' }, inner);
   const working = h('div', { class: 'working', hidden: true }, h('span', { class: 'dot busy' }), h('span', null, 'Claude is working…'));
 
+  // Phones: model and mode sit in a small panel behind ⚙, whose label shows any choice other than Opus and Edit.
+  const phone = matchMedia('(max-width: 860px)');
+  const gear = h('button', { type: 'button', class: 'btn ghost small gear only-phone', 'aria-label': 'Model and mode', 'aria-expanded': 'false' });
+  const paintGear = () => {
+    const bits = [model.value !== 'opus' && MODELS.find(m => m[0] === model.value)?.[1], mode === 'plan' && 'Plan'].filter(Boolean);
+    gear.textContent = bits.length ? `⚙ ${bits.join(' · ')}` : '⚙';
+  };
   const model = h('select', { 'aria-label': 'Model' }, MODELS.map(([v, l]) => h('option', { value: v }, l)));
   model.value = localStorageGet('model') || 'opus';
-  model.onchange = () => localStorageSet('model', model.value);
+  model.onchange = () => { localStorageSet('model', model.value); paintGear(); };
   let mode = localStorageGet('mode') || 'edit';
   const seg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Mode' });
-  const paintSeg = () => seg.replaceChildren(
+  const paintSeg = () => { paintGear(); seg.replaceChildren(
     h('button', { type: 'button', class: mode === 'edit' ? 'on' : '', 'aria-pressed': String(mode === 'edit'), title: 'Claude edits files and runs commands', onclick: () => { mode = 'edit'; localStorageSet('mode', mode); paintSeg(); } }, 'Edit'),
-    h('button', { type: 'button', class: mode === 'plan' ? 'on' : '', 'aria-pressed': String(mode === 'plan'), title: 'Claude reads and plans, but changes nothing', onclick: () => { mode = 'plan'; localStorageSet('mode', mode); paintSeg(); } }, 'Plan only'));
+    h('button', { type: 'button', class: mode === 'plan' ? 'on' : '', 'aria-pressed': String(mode === 'plan'), title: 'Claude reads and plans, but changes nothing', onclick: () => { mode = 'plan'; localStorageSet('mode', mode); paintSeg(); } }, 'Plan only')); };
   paintSeg();
-  const ta = h('textarea', { rows: 2, placeholder: `Tell Claude what to build or change in ${project.name}…`, 'aria-label': 'Prompt' });
+  const ta = h('textarea', { rows: phone.matches ? 1 : 2, placeholder: `Tell Claude what to build or change in ${project.name}…`, 'aria-label': 'Prompt' });
   const draftKey = `draft.${id}.${chatId || 'new'}`;
   ta.value = localStorageGet(draftKey) || '';
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Send', title: 'Send (Enter)' }, '↑');
@@ -157,7 +190,21 @@ function renderChat(ctx, el, chatId, loadList){
     'Connect your Claude account before sending prompts. ', h('a', { href: '/account#claude', 'data-link': '' }, 'Connect Claude')) : null;
   const form = h('form', { class: 'composer', onsubmit: e => { e.preventDefault(); running ? stop() : submit(); } },
     chips, ta, picker, h('div', { class: 'composer-bar' }, attachBtn, model, seg,
-      h('div', { class: 'spacer' }), send));
+      h('div', { class: 'spacer' }), gear, send));
+  const modelRow = h('label', { class: 'opts-row' }, h('span', null, 'Model'));
+  const modeRow = h('div', { class: 'opts-row' }, h('span', null, 'Mode'));
+  const opts = h('div', { class: 'composer-opts', hidden: true }, modelRow, modeRow);
+  form.append(opts);
+  const placeOpts = () => { if (phone.matches){ modelRow.append(model); modeRow.append(seg); } else { attachBtn.after(model, seg); showOpts(false); } };
+  function showOpts(open){ opts.hidden = !open; gear.setAttribute('aria-expanded', String(open)); }
+  onTap(gear, () => showOpts(opts.hidden));
+  const outside = e => { if (!opts.hidden && !opts.contains(e.target) && !gear.contains(e.target)) showOpts(false); };
+  const optsKey = e => { if (e.key === 'Escape') showOpts(false); };
+  document.addEventListener('pointerdown', outside);
+  document.addEventListener('keydown', optsKey);
+  phone.addEventListener('change', placeOpts);
+  onLeave(() => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', optsKey); phone.removeEventListener('change', placeOpts); });
+  placeOpts();
   const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
   form.addEventListener('dragover', e => { if (hasFiles(e)){ e.preventDefault(); form.classList.add('drop'); } });
   form.addEventListener('dragleave', e => { if (!form.contains(e.relatedTarget)) form.classList.remove('drop'); });
@@ -186,7 +233,20 @@ function renderChat(ctx, el, chatId, loadList){
   paintSend();
 
   const atBottom = () => transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 120;
-  const scroll = (force) => { if (force || atBottom()) transcript.scrollTop = transcript.scrollHeight; };
+  let autoUntil = 0;   // scrolls made by the code (following new output) don't count as the reader scrolling
+  const scroll = (force) => { if (force || atBottom()){ autoUntil = Date.now() + 200; transcript.scrollTop = transcript.scrollHeight; } };
+  // Phones: the top bar slides away while reading on through a long conversation, and comes back when scrolling back.
+  let lastTop = 0, moved = 0, touchedAt = 0;
+  for (const type of ['touchstart', 'touchmove', 'wheel']) transcript.addEventListener(type, () => { touchedAt = Date.now(); }, { passive: true });
+  transcript.addEventListener('scroll', () => {
+    const t = transcript.scrollTop, d = t - lastTop;
+    lastTop = t;
+    // Only the reader's own scrolling (including the glide after a swipe) counts.
+    if (!d || !phone.matches || Date.now() < autoUntil || Date.now() - touchedAt > 3000) return;
+    moved = Math.sign(d) === Math.sign(moved) ? moved + d : d;
+    if (t < 20 || moved < -40) hideTopbar(false);
+    else if (moved > 40) hideTopbar(true);
+  }, { passive: true });
 
   function setRunning(r){
     if (running && !r) checkStudioUpdate().catch(() => {});   // a run just finished: it may have committed something
@@ -276,7 +336,7 @@ function renderChat(ctx, el, chatId, loadList){
       if (!ev.ok && ev.text) inner.insertBefore(h('div', { class: 'chat-error' }, ev.text), working);
       node = h('div', { class: 'result-line' }, [secs != null ? `${secs < 60 ? secs + ' s' : Math.round(secs / 60) + ' min'}` : null, ev.turns ? `${ev.turns} steps` : null, ev.costUsd ? `$${ev.costUsd.toFixed(2)} if billed by usage` : null].filter(Boolean).join(' · '));
       for (const t of pendingTools.values()) if (t.st.textContent === '…') t.st.textContent = '';
-      api('GET', `/api/projects/${id}/git/status`).then(s => { const c = $('.tab .count'); if (c){ c.hidden = !s.files?.length; c.textContent = s.files?.length || ''; } }).catch(() => {});
+      api('GET', `/api/projects/${id}/git/status`).then(s => { for (const c of document.querySelectorAll('.tab .count, .proj-sheet .count')){ c.hidden = !s.files?.length; c.textContent = s.files?.length || ''; } }).catch(() => {});
     } else if (ev.type === 'error'){
       node = h('div', { class: 'chat-error' }, ev.text);
     } else if (ev.type === 'notice'){
@@ -311,7 +371,7 @@ function renderChat(ctx, el, chatId, loadList){
     try {
       const r = await api('GET', `/api/chats/${chatId}`);
       chat = r.chat;
-      if (chat.model) model.value = chat.model;
+      if (chat.model){ model.value = chat.model; paintGear(); }
       inner.replaceChildren(working);
       for (const ev of r.events){ lastSeq = ev.seq; addEvent(ev); }
       if (!r.events.length) inner.insertBefore(emptyState(), working);

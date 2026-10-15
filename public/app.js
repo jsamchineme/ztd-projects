@@ -37,6 +37,7 @@ export async function refreshProjects(){
 
 async function route(){
   leave();
+  setTopbar(null); hideTopbar(false);
   const path = location.pathname;
   if (path === '/login') return loginScreen();
   if (path === '/forgot') return forgotScreen();
@@ -96,7 +97,9 @@ function shell(){
     h('div', { class: 'main' },
       h('div', { class: 'topbar' },
         onTap(h('button', { class: 'btn ghost menu-btn', 'aria-label': 'Menu' }, h('span', { class: 'bars', 'aria-hidden': 'true' })), () => $('.shell').classList.toggle('menu-open')),
-        h('strong', { id: 'topbar-title' }, state.me.appName || 'Studio')),
+        h('strong', { id: 'topbar-title' }, state.me.appName || 'Studio'),
+        h('div', { id: 'topbar-slot', class: 'topbar-slot' }),
+        h('div', { id: 'topbar-actions', class: 'topbar-actions' })),
       h('div', { id: 'main', class: 'main', style: { flex: '1' } }))));
   $('.shell').addEventListener('click', e => {
     if (e.target.closest('.nav-item') || (e.target === $('.shell'))) $('.shell').classList.remove('menu-open');
@@ -122,6 +125,21 @@ function markNav(path){
     const href = a.getAttribute('href');
     a.classList.toggle('active', !!href && (path === href || (href.startsWith('/p/') && path.startsWith(href + '/')) || (href.startsWith('/p/') && path === href)));
   });
+}
+// Phones: a page can put its own title control (e.g. the project switcher) and buttons in the top bar. Reset on every route.
+export function setTopbar(titleNode, ...actions){
+  const t = $('#topbar-title'), slot = $('#topbar-slot'), act = $('#topbar-actions');
+  if (!t) return;
+  t.hidden = !!titleNode;
+  slot.replaceChildren(...(titleNode ? [titleNode] : []));
+  act.replaceChildren(...actions.filter(Boolean));
+}
+// Slides the phone top bar out of the way (e.g. while reading a long chat) and back.
+export function hideTopbar(hidden){
+  const bar = $('.topbar');
+  if (!bar || bar.classList.contains('away') === hidden) return;
+  bar.style.marginTop = hidden ? `-${bar.offsetHeight}px` : '';
+  bar.classList.toggle('away', hidden);
 }
 export function setTitle(t){ document.title = t ? `${t} · ${state.me?.appName || 'Studio'}` : (state.me?.appName || 'Studio'); const tt = $('#topbar-title'); if (tt) tt.textContent = t || 'Studio'; }
 
