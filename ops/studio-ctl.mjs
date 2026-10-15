@@ -280,8 +280,18 @@ WantedBy=multi-user.target
     if (x.status !== 0){ rmSync(tmp, { recursive: true, force: true }); die(x.stderr || 'Unpacking failed', 1); }
     const src = path === '.' ? tmp : join(tmp, path);
     writeFileSync(join(src, '.version'), JSON.stringify({ commit: head[0], subject: head[1], installedAt: new Date().toISOString() }));
+    // After a successful install, the source branch is pushed to its upstream (if it has one, e.g. GitHub) as the
+    // source project's user, with that user's SSH key. A failed push is logged but doesn't fail the update.
     const r = sh('systemd-run', ['--unit=studio-update', '--collect', '--quiet', '/bin/bash', '-c',
-      'bash "$1/ops/install.sh" "$2"; code=$?; rm -rf "$0"; echo "studio-update finished: $code"; exit $code', tmp, src, CONF.domain]);
+      `bash "$1/ops/install.sh" "$2"; code=$?; rm -rf "$0"; echo "studio-update finished: $code"
+      if [ $code = 0 ]; then
+        u="$3" repo="$4" home="$5"
+        git_() { ${RUNUSER} -u "$u" -- env HOME="$home" PATH=/usr/local/bin:/usr/bin:/bin GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=15" timeout 90 git -c safe.directory="$repo" -C "$repo" "$@"; }
+        if up=$(git_ rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null); then
+          if git_ push --quiet 2>&1; then echo "Pushed to $up"; else echo "Push to $up failed (Studio is updated anyway)"; fi
+        else echo "No upstream branch set, so nothing was pushed"; fi
+      fi
+      exit $code`, tmp, src, CONF.domain, user, cwd, homeOf(user)]);
     if (r.status !== 0){ rmSync(tmp, { recursive: true, force: true }); die(r.stderr || 'Could not start the update', 1); }
     log(`studio-update ${head[0]}`);
     console.log(JSON.stringify({ ok: true, commit: head[0] }));
