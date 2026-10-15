@@ -95,7 +95,7 @@ function shell(){
         h('button', { class: 'nav-item', onclick: signOut }, h('span', { class: 'name muted' }, 'Sign out')))),
     h('div', { class: 'main' },
       h('div', { class: 'topbar' },
-        onTap(h('button', { class: 'btn ghost small', 'aria-label': 'Menu' }, '☰'), () => $('.shell').classList.toggle('menu-open')),
+        onTap(h('button', { class: 'btn ghost menu-btn', 'aria-label': 'Menu' }, '☰'), () => $('.shell').classList.toggle('menu-open')),
         h('strong', { id: 'topbar-title' }, state.me.appName || 'Studio')),
       h('div', { id: 'main', class: 'main', style: { flex: '1' } }))));
   $('.shell').addEventListener('click', e => {
