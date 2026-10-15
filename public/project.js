@@ -3,6 +3,9 @@ import { h, $, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, co
 import { state, go, onLeave, refreshProjects, setTitle, localStorageSet, localStorageGet, renderSideProjects } from './app.js';
 
 const MODELS = [['opus', 'Opus'], ['fable', 'Fable'], ['sonnet', 'Sonnet'], ['haiku', 'Haiku']];
+const MAX_FILES = 10, MAX_BYTES = 20 * 1024 * 1024;
+const fileIcon = kind => ({ image: '🖼', pdf: '📄', notebook: '📓', text: '📝' })[kind] || '📦';
+const sizeText = n => n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`;
 const TABS = [['chat', 'Chat'], ['services', 'Services'], ['changes', 'Changes'], ['files', 'Files'], ['settings', 'Settings']];
 
 export async function renderProject(main, id, tab, sub){
@@ -91,20 +94,57 @@ function renderChat(ctx, el, chatId, loadList){
   ta.value = localStorageGet(draftKey) || '';
   const send = h('button', { class: 'send', type: 'submit', 'aria-label': 'Send', title: 'Send (Enter)' }, '↑');
   const autosize = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, window.innerHeight * 0.4) + 'px'; };
-  ta.addEventListener('input', () => { autosize(); localStorageSet(draftKey, ta.value); send.disabled = !running && !ta.value.trim(); });
+  // Attached files: each uploads as soon as it's added; the message carries their ids.
+  let files = [];
+  const chips = h('div', { class: 'attach-list', hidden: true });
+  const canSend = () => !!ta.value.trim() || files.some(f => f.id);
+  const paintSend = () => { send.disabled = !running && !canSend(); };
+  const picker = h('input', { type: 'file', multiple: true, hidden: true, onchange: () => { addFiles(picker.files); picker.value = ''; } });
+  const attachBtn = h('button', { type: 'button', class: 'btn ghost small attach-btn', title: 'Attach files: images, PDFs, notebooks, text or code (or paste or drop them)', 'aria-label': 'Attach files', onclick: () => picker.click() }, '📎');
+  function paintChips(){
+    chips.hidden = !files.length;
+    chips.replaceChildren(...files.map(f => h('div', { class: 'attach-chip' + (f.error ? ' err' : '') },
+      f.id && f.kind === 'image' ? h('img', { src: `/api/uploads/${f.id}`, alt: '' }) : h('span', { class: 'attach-icon', 'aria-hidden': 'true' }, f.id ? fileIcon(f.kind) : '…'),
+      h('span', { class: 'attach-name', title: f.name }, f.name),
+      h('span', { class: 'attach-meta' }, f.error || (f.id ? sizeText(f.size) : 'Uploading…')),
+      h('button', { type: 'button', class: 'attach-x', 'aria-label': `Remove ${f.name}`, onclick: () => { files = files.filter(x => x !== f); paintChips(); } }, '×'))));
+    paintSend();
+  }
+  function addFiles(list){
+    for (const file of [...list]){
+      if (files.length >= MAX_FILES){ toast(`Attach ${MAX_FILES} files at most per message.`, true); break; }
+      const f = { name: file.name || 'pasted file', size: file.size };
+      if (file.size > MAX_BYTES) f.error = 'Too large (max 20 MB)';
+      files.push(f);
+      if (!f.error) upload(file).then(u => Object.assign(f, u), e => { f.error = e.message || 'Upload failed'; }).finally(paintChips);
+    }
+    paintChips();
+  }
+  const upload = file => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(api('POST', `/api/projects/${id}/uploads`, { name: file.name || 'pasted file', data: String(r.result).split(',')[1] || '' }));
+    r.onerror = () => reject(new Error('Couldn’t read that file'));
+    r.readAsDataURL(file);
+  });
+  ta.addEventListener('paste', e => { if (e.clipboardData?.files.length){ e.preventDefault(); addFiles(e.clipboardData.files); } });
+  ta.addEventListener('input', () => { autosize(); localStorageSet(draftKey, ta.value); paintSend(); });
   ta.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !matchMedia('(max-width: 860px)').matches){ e.preventDefault(); form.requestSubmit(); }
   });
   const noClaude = !state.me.claude?.connected ? h('div', { class: 'note', style: { maxWidth: '780px', margin: '0 auto 8px' } },
     'Connect your Claude account before sending prompts. ', h('a', { href: '/account#claude', 'data-link': '' }, 'Connect Claude')) : null;
   const form = h('form', { class: 'composer', onsubmit: e => { e.preventDefault(); running ? stop() : submit(); } },
-    ta, h('div', { class: 'composer-bar' }, model, seg,
+    chips, ta, picker, h('div', { class: 'composer-bar' }, attachBtn, model, seg,
       h('button', { type: 'button', class: 'btn ghost small only-phone', onclick: () => $('#chat-list')?.classList.toggle('show') }, 'Chats'),
       h('div', { class: 'spacer' }), send));
+  const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
+  form.addEventListener('dragover', e => { if (hasFiles(e)){ e.preventDefault(); form.classList.add('drop'); } });
+  form.addEventListener('dragleave', e => { if (!form.contains(e.relatedTarget)) form.classList.remove('drop'); });
+  form.addEventListener('drop', e => { form.classList.remove('drop'); if (e.dataTransfer?.files.length){ e.preventDefault(); addFiles(e.dataTransfer.files); } });
   el.append(transcript, h('div', { class: 'composer-wrap' }, noClaude, form,
-    h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Claude works in this project’s folder on the server')));
+    h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach · Claude works in this project’s folder on the server')));
   autosize();
-  send.disabled = !ta.value.trim();
+  paintSend();
 
   const atBottom = () => transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 120;
   const scroll = (force) => { if (force || atBottom()) transcript.scrollTop = transcript.scrollHeight; };
@@ -116,7 +156,7 @@ function renderChat(ctx, el, chatId, loadList){
     send.textContent = r ? '■' : '↑';
     send.setAttribute('aria-label', r ? 'Stop' : 'Send');
     send.title = r ? 'Stop Claude' : 'Send (Enter)';
-    send.disabled = !r && !ta.value.trim();
+    paintSend();
     if (!r){ live?.remove(); live = null; liveThinking?.remove(); liveThinking = null; }
     inner.append(working);
   }
@@ -165,7 +205,12 @@ function renderChat(ctx, el, chatId, loadList){
     let node = null;
     if (ev.type === 'user'){
       const mine = ev.userId === state.me.user.id;
-      node = h('div', null, mine ? null : h('div', { class: 'who' }, ev.userName), h('div', { class: 'msg user' }, h('div', { class: 'bubble' }, ev.text)));
+      node = h('div', null, mine ? null : h('div', { class: 'who' }, ev.userName),
+        ev.attachments?.length ? h('div', { class: 'msg user' }, h('div', { class: 'sent-files' }, ev.attachments.map(a => a.kind === 'image'
+          ? h('a', { class: 'sent-image', href: `/api/uploads/${a.id}`, target: '_blank', rel: 'noopener', title: a.name }, h('img', { src: `/api/uploads/${a.id}`, alt: a.name, loading: 'lazy' }))
+          : h('a', { class: 'attach-chip', href: `/api/uploads/${a.id}`, title: `Download ${a.name}` }, h('span', { class: 'attach-icon', 'aria-hidden': 'true' }, fileIcon(a.kind)),
+            h('span', { class: 'attach-name' }, a.name), h('span', { class: 'attach-meta' }, sizeText(a.size)))))) : null,
+        ev.text ? h('div', { class: 'msg user' }, h('div', { class: 'bubble' }, ev.text)) : null);
     } else if (ev.type === 'text'){
       live?.remove(); live = null; liveThinking?.remove(); liveThinking = null;
       node = h('div', { class: 'msg md', html: md(ev.text) });
@@ -238,7 +283,9 @@ function renderChat(ctx, el, chatId, loadList){
 
   async function submit(){
     const prompt = ta.value.trim();
-    if (!prompt) return;
+    if (files.some(f => !f.id && !f.error)) return toast('Wait for the files to finish uploading.', true);
+    const attachments = files.filter(f => f.id).map(f => f.id);
+    if (!prompt && !attachments.length) return;
     if (!state.me.claude?.connected) return toast('Connect your Claude account first (Account page).', true);
     send.disabled = true;
     try {
@@ -250,14 +297,15 @@ function renderChat(ctx, el, chatId, loadList){
         await new Promise(r => setTimeout(r, 150));
       }
       $('.empty-chat', inner)?.remove();
-      await api('POST', `/api/chats/${chat.id}/messages`, { prompt, model: model.value, mode });
+      await api('POST', `/api/chats/${chat.id}/messages`, { prompt, model: model.value, mode, attachments });
       ta.value = ''; localStorageSet(draftKey, ''); autosize();
+      files = []; paintChips();
       loadList?.().catch(() => {});
       scroll(true);
     } catch (e){
       fail(e);
       if (e.code === 'no_claude') go('/account#claude');
-    } finally { send.disabled = !running && !ta.value.trim(); }
+    } finally { paintSend(); }
   }
   async function stop(){ if (chat) await api('POST', `/api/chats/${chat.id}/stop`).catch(fail); }
 

@@ -24,6 +24,7 @@ const need = (v, re, what) => { if (typeof v !== 'string' || !re.test(v)) die(`I
 const slug = v => need(v, SLUG, 'name');
 const unit = (p, s) => `ztd-${slug(p)}-${slug(s)}`;
 const repo = p => join(PROJECTS, slug(p), 'repo');
+const uploads = p => join(CONF.uploadsDir || '/srv/studio-uploads', slug(p));   // chat attachments, written by Studio
 const sh = (cmd, args, opts = {}) => spawnSync(cmd, args, { encoding: 'utf8', ...opts });
 const asUser = (args, opts = {}) => sh(RUNUSER, ['-u', RUN_USER, '--', ...args], { env: userEnv(), ...opts });
 function userEnv(extra = {}){
@@ -236,6 +237,45 @@ WantedBy=multi-user.target
     process.stdout.write(r.stdout);
   },
 
+  // ----- updating Studio itself, from the committed code in a project (by default pipeline/studio) -----
+  'studio-source'(since = '-'){
+    // Prints the newest commit of the Studio source and, given the installed commit, what an update would bring.
+    const { cwd, path, g } = studioSource();
+    const fmt = '--format=%H%x1f%an%x1f%cI%x1f%s';
+    const parse = l => { const [hash, author, date, subject] = l.split('\x1f'); return { hash, author, date, subject }; };
+    const head = g('log', '-1', fmt, 'HEAD', '--', path).stdout.trim();
+    if (!head) die('No commits found for the Studio source', 1);
+    let pending = null;
+    if (since !== '-' && need(since, /^[0-9a-f]{40}$/, 'commit') && g('cat-file', '-e', since + '^{commit}').status === 0)
+      pending = g('log', '-n', '50', fmt, `${since}..HEAD`, '--', path).stdout.split('\n').filter(Boolean).map(parse);
+    const dirty = g('status', '--porcelain=v1', '--untracked-files=all', '--', path).stdout.split('\n').filter(Boolean).map(l => l.slice(3));
+    console.log(JSON.stringify({ project: cwd.split('/').slice(-2)[0], path, head: parse(head), pending, dirty, updating: updating() }));
+  },
+  'studio-update'(){
+    // Installs the last commit of the Studio source with its own ops/install.sh, which restarts Studio. It runs in a
+    // separate systemd unit, because restarting Studio stops everything Studio started (including this command).
+    if (updating()) die('An update is already running', 1);
+    const { cwd, path, g } = studioSource();
+    const head = g('log', '-1', '--format=%H%x1f%s', 'HEAD', '--', path).stdout.trim().split('\x1f');
+    const tmp = join('/var/tmp', `studio-update-${Date.now()}`);
+    mkdirSync(tmp, { mode: 0o700 });
+    const tar = asUser(['git', '-c', `safe.directory=${cwd}`, '-C', cwd, 'archive', '--format=tar', 'HEAD', path], { encoding: 'buffer', maxBuffer: 256 * 1024 * 1024 });
+    if (tar.status !== 0){ rmSync(tmp, { recursive: true, force: true }); die(String(tar.stderr) || 'git archive failed', 1); }
+    const x = sh('tar', ['-x', '-C', tmp, '--no-same-owner'], { input: tar.stdout });
+    if (x.status !== 0){ rmSync(tmp, { recursive: true, force: true }); die(x.stderr || 'Unpacking failed', 1); }
+    const src = join(tmp, path);
+    writeFileSync(join(src, '.version'), JSON.stringify({ commit: head[0], subject: head[1], installedAt: new Date().toISOString() }));
+    const r = sh('systemd-run', ['--unit=studio-update', '--collect', '--quiet', '/bin/bash', '-c',
+      'bash "$1/ops/install.sh" "$2"; code=$?; rm -rf "$0"; echo "studio-update finished: $code"; exit $code', tmp, src, CONF.domain]);
+    if (r.status !== 0){ rmSync(tmp, { recursive: true, force: true }); die(r.stderr || 'Could not start the update', 1); }
+    log(`studio-update ${head[0]}`);
+    console.log(JSON.stringify({ ok: true, commit: head[0] }));
+  },
+  'studio-update-log'(){
+    const r = sh('journalctl', ['-u', 'studio-update', '-n', '80', '--no-pager', '-o', 'short-iso']);
+    console.log(JSON.stringify({ updating: updating(), log: r.stdout || '' }));
+  },
+
   // ----- Claude -----
   agent(p, model, mode, resume){
     // stdin: {"prompt","token"?,"apiKey"?,"system"?}. Streams Claude Code's stream-json on stdout.
@@ -254,6 +294,7 @@ WantedBy=multi-user.target
     const args = ['-p', '--output-format', 'stream-json', '--verbose', '--include-partial-messages', '--model', model,
       '--permission-mode', mode === 'plan' ? 'plan' : 'bypassPermissions'];
     if (resume && resume !== '-') args.push('--resume', resume);
+    if (existsSync(uploads(p))) args.push('--add-dir', uploads(p));   // chat attachments, readable in Plan mode too
     if (req.system) args.push('--append-system-prompt', String(req.system).slice(0, 20000));
     const child = spawn(RUNUSER, ['-u', RUN_USER, '--', bin, ...args], {
       cwd, env: userEnv({ ...extra, MCP_CONNECTION_NONBLOCKING: 'false', CHROME_BIN: '/usr/bin/google-chrome', DISABLE_AUTOUPDATER: '1', STUDIO_PROJECT: p }),
@@ -304,6 +345,15 @@ WantedBy=multi-user.target
     console.log(JSON.stringify({ ok: true }));
   }
 };
+
+function studioSource(){
+  const src = CONF.studioSource || { project: 'pipeline', path: 'studio' };
+  const cwd = repo(src.project), path = need(src.path, /^[\w-]+(\/[\w-]+)*$/, 'source path');
+  if (!existsSync(join(cwd, '.git'))) die('The Studio source project has no git repository', 1);
+  const g = (...args) => asUser(['git', '-c', `safe.directory=${cwd}`, '-c', 'core.quotepath=off', ...args], { cwd });
+  return { cwd, path, g };
+}
+const updating = () => sh('systemctl', ['is-active', '--quiet', 'studio-update']).status === 0;
 
 function uidOf(u){ return Number(sh('id', ['-u', u]).stdout.trim()); }
 function gidOf(u){ return Number(sh('id', ['-g', u]).stdout.trim()); }

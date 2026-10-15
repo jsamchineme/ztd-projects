@@ -208,8 +208,10 @@ export async function renderAdmin(main){
   if (state.me.user.role !== 'admin'){ inner.append(h('p', null, 'Admins only.')); return; }
   const usersCard = h('div', { class: 'card table-wrap' });
   const auditCard = h('div', { class: 'card table-wrap' });
+  const studioCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Checking…'));
   inner.append(
     h('h1', null, 'Admin'),
+    h('h2', null, 'Studio version'), studioCard,
     !state.me.mailEnabled ? h('div', { class: 'note' }, 'Email isn’t set up, so password reset links and invites aren’t emailed. Use “Reset link” below and send the link yourself. To turn email on, add SMTP settings to /etc/studio/studio.env on the server (see HANDOVER.md).') : null,
     h('h2', null, 'People'), h('p', { class: 'muted small' }, 'To add someone, invite them to a team from Teams and people.'), usersCard,
     h('h2', null, 'Activity log'), auditCard);
@@ -247,6 +249,50 @@ export async function renderAdmin(main){
     else auditCard.replaceChildren(h('table', { class: 'list' }, h('thead', null, h('tr', null, h('th', null, 'When'), h('th', null, 'Who'), h('th', null, 'What'), h('th', null, 'Detail'), h('th', null, 'IP'))), h('tbody', null, trs)),
       h('button', { class: 'btn small', style: { marginTop: '10px' }, onclick: () => loadAudit(true).catch(fail) }, 'Older'));
   }
+  loadStudio(studioCard).catch(e => studioCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadUsers().catch(e => usersCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadAudit().catch(e => auditCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
+}
+
+// Updating Studio: installs the last commit of studio/ from the source project and restarts, then waits for it to come back.
+const short = c => c?.slice(0, 7) || '';
+async function loadStudio(card){
+  const { installed, source, sourceError } = await api('GET', '/api/admin/studio');
+  const commitLine = c => h('li', null, h('span', { class: 'mono' }, short(c.hash)), ' ', c.subject, h('span', { class: 'muted small' }, ` · ${c.author}, ${ago(Date.parse(c.date))}`));
+  const upToDate = installed && source && installed.commit === source.head.hash;
+  const logBox = h('pre', { class: 'update-log', hidden: true });
+  const btn = h('button', { class: 'btn primary', disabled: !source || source.updating, onclick: () => update() }, upToDate ? 'Reinstall and restart Studio' : 'Update and restart Studio');
+  card.replaceChildren(
+    h('p', null, 'Running: ', installed ? [h('span', { class: 'mono' }, short(installed.commit)), ` ${installed.subject} `, h('span', { class: 'muted small' }, `(installed ${ago(Date.parse(installed.installedAt))})`)]
+      : h('span', { class: 'muted' }, 'a version installed by hand, so Studio can’t tell which commit it is.')),
+    sourceError ? h('div', { class: 'error-box' }, sourceError) : null,
+    source ? h('p', null, `Latest commit to ${source.path}/ in the ${source.project} project: `, h('span', { class: 'mono' }, short(source.head.hash)), ` ${source.head.subject}`) : null,
+    upToDate ? h('p', { class: 'ok-box' }, 'Studio is up to date.') : null,
+    source?.pending?.length ? [h('p', null, `${source.pending.length} new commit${source.pending.length > 1 ? 's' : ''} to install. Check these are changes you expect, because the update runs the install script as root:`), h('ul', { class: 'small' }, source.pending.map(commitLine))] : null,
+    source?.dirty?.length ? h('div', { class: 'note' }, `${source.dirty.length} uncommitted change${source.dirty.length > 1 ? 's' : ''} in ${source.path}/ won’t be installed. Commit them in the ${source.project} project’s Changes tab first: `, h('span', { class: 'mono small' }, source.dirty.slice(0, 8).join(', ') + (source.dirty.length > 8 ? ' …' : ''))) : null,
+    source?.updating ? h('div', { class: 'note' }, 'An update is running now.') : null,
+    h('div', { class: 'row' }, btn), logBox);
+
+  async function update(){
+    if (!await confirmDialog('Update and restart Studio?', 'Studio installs the latest committed code and restarts. Any Claude chats that are running stop, and Studio is unavailable for about a minute.', 'Update and restart')) return;
+    btn.disabled = true; btn.textContent = 'Updating…';
+    let started;
+    try { started = (await api('POST', '/api/admin/studio/update')).at; } catch (e){ fail(e); btn.disabled = false; btn.textContent = 'Update and restart Studio'; return; }
+    logBox.hidden = false; logBox.textContent = 'Starting…';
+    // Studio goes away while it restarts, so keep polling through errors.
+    const until = Date.now() + 10 * 60000;
+    while (Date.now() < until){
+      await new Promise(r => setTimeout(r, 3000));
+      let st; try { st = await api('GET', '/api/admin/studio/log'); } catch { logBox.textContent += '.'; continue; }
+      logBox.textContent = st.log.split('\n').slice(-25).join('\n');
+      if (st.updating) continue;
+      // The journal keeps earlier runs too: only trust a "finished" line stamped after this run started.
+      const done = st.log.split('\n').filter(l => /studio-update finished: \d+/.test(l)).pop();
+      if (!done || Date.parse(done.split(' ')[0]) < started - 5000) continue;
+      if (/finished: 0\b/.test(done)){ toast('Studio updated. Reloading…'); setTimeout(() => location.reload(), 1200); }
+      else { toast('The update failed. See the log below.', true); btn.disabled = false; btn.textContent = 'Try again'; }
+      return;
+    }
+    toast('The update is taking a long time. Check the server.', true);
+  }
 }

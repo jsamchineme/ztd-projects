@@ -1,7 +1,7 @@
 // ZTD Studio: build and run projects with Claude. Serves the Studio app on STUDIO_HOST and proxies every
 // other <sub>.<DOMAIN> to the project that owns it, after checking the visitor may see it.
 import http from 'node:http';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, createReadStream } from 'node:fs';
 import { join, extname } from 'node:path';
 import { toNodeHandler } from 'better-auth/node';
 import QRCode from 'qrcode';
@@ -12,7 +12,8 @@ import { mailEnabled } from './lib/mail.mjs';
 import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
-import { ctl, ctlOk, spawnCtl } from './lib/ctl.mjs';
+import * as U from './lib/uploads.mjs';
+import { ctl, ctlOk, ctlJson, spawnCtl } from './lib/ctl.mjs';
 import { subdomainOf, handleProjectRequest, handleProjectUpgrade, issueGateToken, canAccessOrg } from './lib/gate.mjs';
 
 await migrate();
@@ -299,6 +300,20 @@ route('POST', '/api/chats/:id/messages', async ({ user, params, body }) => {
   await A.sendPrompt(c, p, user, body);
   return { ok: true };
 });
+// Files attached to chat messages (see lib/uploads.mjs). Sent as base64 JSON, so allow a bigger body here.
+route('POST', '/api/projects/:id/uploads', async ({ user, params, body }) => {
+  const p = P.getProject(params.id); projectRole(user, p);
+  return U.saveUpload(p, user, body);
+}, { limit: 28_000_000 });
+route('GET', '/api/uploads/:id', async ({ user, params }, res) => {
+  const u = U.getUpload(params.id);
+  if (!u) throw err(404, 'File not found');
+  projectRole(user, P.getProject(u.projectId));
+  const image = u.kind === 'image';
+  res.writeHead(200, { ...SECURITY, 'Content-Type': image ? u.mime : 'application/octet-stream', 'Content-Length': u.size, 'Cache-Control': 'private, max-age=86400',
+    'Content-Disposition': `${image ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(u.name)}` });
+  createReadStream(u.path).on('error', () => res.destroy()).pipe(res);
+});
 route('POST', '/api/chats/:id/stop', async ({ user, params }) => { const { c } = chatFor(user, params.id); return { stopped: A.stop(c.id) }; });
 route('GET', '/api/chats/:id/stream', async ({ user, params }, res) => {
   const { c } = chatFor(user, params.id);
@@ -359,6 +374,22 @@ route('GET', '/api/admin/system', async ({ user }) => {
   return { services: r.code === 0 ? JSON.parse(r.out) : {}, mail: mailEnabled(), domain: DOMAIN };
 });
 
+// Updating Studio itself: installs the last commit of studio/ in the source project (see studio-ctl studio-update).
+const installedVersion = () => { try { return JSON.parse(readFileSync(join(APP_DIR, '.version'), 'utf8')); } catch { return null; } };
+route('GET', '/api/admin/studio', async ({ user }) => {
+  needAdmin(user);
+  const installed = installedVersion();
+  const r = await ctl(['studio-source', installed?.commit || '-']);
+  return { installed, source: r.code === 0 ? JSON.parse(r.out) : null, sourceError: r.code === 0 ? null : r.err };
+});
+route('GET', '/api/admin/studio/log', async ({ user }) => { needAdmin(user); return ctlJson(['studio-update-log']); });
+route('POST', '/api/admin/studio/update', async ({ user, req }) => {
+  needAdmin(user);
+  const r = JSON.parse(await ctlOk(['studio-update']));
+  audit(user.id, 'studio.update', r.commit, '', ipOf(req));
+  return { ...r, at: Date.now() };   // server time, so the page can tell this run's log from earlier ones
+});
+
 // ---------- server ----------
 function serveStatic(req, res, pathname){
   let file = join(PUBLIC, pathname === '/' ? 'index.html' : pathname);
@@ -393,6 +424,7 @@ async function handleStudio(req, res){
     try {
       if (req.method !== 'GET'){
         if (req.headers.origin !== STUDIO_URL) throw err(403, 'Bad origin');
+        if (Number(req.headers['content-length']) > (r.limit || 1_000_000)){ res.setHeader('Connection', 'close'); throw err(413, r.limit ? 'That file is too large (20 MB at most).' : 'Too large'); }
         if (!String(req.headers['content-type'] || '').includes('application/json') && req.headers['content-length'] !== '0' && req.headers['content-length']) throw err(415, 'Send JSON');
       }
       const s = await sessionFrom(req.headers);
@@ -400,7 +432,7 @@ async function handleStudio(req, res){
       if (s && !r.public && r.mfa !== false && !s.user.twoFactorEnabled) throw err(403, 'Set up two-factor authentication first.', 'mfa_required');
       if (s?.user?.banned) throw err(403, 'This account is suspended.');
       const params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(m[i + 1])]));
-      const body = req.method === 'GET' ? {} : await readBody(req);
+      const body = req.method === 'GET' ? {} : await readBody(req, r.limit);
       const out = await r.handler({ req, url, params, body, user: s?.user, session: s?.session }, res);
       if (!res.headersSent && out !== undefined) send(res, 200, out);
     } catch (e){
