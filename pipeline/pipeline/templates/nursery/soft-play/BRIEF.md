@@ -15,13 +15,13 @@ It is the most playful of the four spacious directions, and still airy, because 
 | Path | What it is | Edit per nursery? |
 |---|---|---|
 | `styles.css` | The whole design system. Section 1 holds every token. | Tokens only (section 1) |
-| `softplay.js` | About 170 lines of plain JavaScript, no dependencies: phone menu sheet, sticky phone bar, living photo, dated notices, live open/closed status, gallery filters, ball-row and staircase entrances. Reads everything from the page. | Never |
+| `softplay.js` | About 170 lines of plain JavaScript, no dependencies: phone menu sheet, sticky phone bar, living photo, dated notices, live open/closed status, gallery filters and the staircase entrance. Reads everything from the page. | Never |
 | `foam-sprite.svg` | The source of every reusable drawing as `<symbol>`s: 6 foam shapes, the brand mark, staircase icons, room icons and "What's here" signs. **Paste its `<svg>` inline straight after `<body>` on every page** and draw with `<svg><use href="#id"/></svg>`. | Add symbols if needed |
 | `fonts/` | Bagel Fat One (display) and Albert Sans (variable, body), latin and latin-ext woff2 subsets, 82 KB in all. SIL OFL in `fonts/OFL.txt`. | Never |
 | `PHOTO-SHOTLIST.md` | What to ask the nursery to photograph. | Never |
 | `example/` | The worked example, **Leaps and Bounds Nursery, Paisley**: `index.html`, `join-us.html`, `fees-and-funding.html`, `our-nursery.html`, `our-team.html`, `parents.html`, `gallery.html`. | Copy for each nursery |
 | `example/img/` | 10 real photos of the nursery's empty rooms and garden (WebP 400/800/1200 + JPEG), and `CREDITS.txt` (sources, blurring, exclusions). | Each nursery gets its own |
-| `example/media/` | Living photo loop (138 KB) and poster, photo tour film (0.9 MB), poster and WebVTT captions. | Each nursery gets its own |
+| `example/media/` | Living photo loop (154 KB, 30fps) and poster, photo tour film (1.3 MB, 30fps), poster and WebVTT captions. | Each nursery gets its own |
 | `thumb.jpg` | Picker thumbnail. Regenerate with `node pipeline/template-thumbs.mjs nursery/soft-play`. | After changes |
 
 Pages link `../styles.css` and `../softplay.js`; fonts load from `../fonts/` through the stylesheet. No build step, no framework, nothing from another server: no Google Fonts, CDNs, analytics, maps or social embeds (GDPR, §6.6).
@@ -37,7 +37,7 @@ The owner's complaint about our first 11 nursery templates: *"a bit cramped, esp
 - **Few things per screen.** Each 844px phone screen holds at most one H2, six text blocks and three boxed elements (S5). The homepage is 172 words.
 - **One thing per row on a phone.** The staircase bars, the doors and the play-room photo each take a whole row.
 - **Real doors to detail.** Six foam-shape doors lead to inner pages; every inner page opens with the same band, an "On this page" list, short sections and a "Next" door.
-- **Fun through shape, colour and touch,** not through characters, slogans or clip art: a drawn foam scene, chunky photo frames like foam mat edges, a row of ball-pit balls along the visit band and footer, and buttons that squish.
+- **Fun through shape, colour and touch,** not through characters, slogans or clip art: a drawn foam scene, chunky photo frames like foam mat edges, a beach ball that bounces gently on the visit card, and buttons that squish.
 
 It deliberately avoids every signature device of our earlier templates (luggage tags, cork boards, full-stop headlines, storybook chapters, weather tiles, recipe cards, leaf corners, torn paper, boxed key-fact rows, a posing mascot, highlighted-word headings, clock boxes, dashed day paths, wave seams, ringed circle photos, big-number cards, watercolour, one-word photo tiles, pastel room blocks, arch frames, hi-vis stripes).
 
@@ -50,7 +50,7 @@ It deliberately avoids every signature device of our earlier templates (luggage 
 | 3 | Grades line links to the Care Inspectorate record; every quality theme, with its date, is on Visit and join. | S9; §3.2; §4.1 (every grade, the date and a link; never only the best). |
 | 4 | **One play-room photo**, full row, 4:5 on a phone, with a chunky foam-mat frame; a living photo on wide screens. | S12: 35% of the phone homepage is picture or colour field; one full-width picture every 2 screens. Playhouse feels open because photos fill rows. |
 | 5 | **Six foam-shape doors** (step, wedge, cylinder, half-moon, cube, ball), one per row on a phone with hairlines drawn as backgrounds, 3 by 2 on desktop. Label ≤3 words in Bagel, one line ≤8 words with intent wording. | S6, S7, S9; Sunflower's intent wording ("What it costs, and help with fees", "Come and see us"). |
-| 6 | **Book a visit band**: deep pool blue, ball row along its top edge, one centred white card with a beach ball on its edge, one button and Phone, and a pile of foam at its foot. | S13 one primary action; Sunflower's single-card visit band; Playhouse's cloud scallop developed into ball-pit balls. |
+| 6 | **Book a visit band**: deep pool blue with generous padding, one centred white card with a gently bouncing beach ball on its edge, one button and Phone, and a pile of foam at its foot. | S13 one primary action; Sunflower's single-card visit band; Ball-pit edging removed on the owner's feedback (too busy). |
 | 7 | **"Book a visit"** in tomato-deep everywhere; Phone is always a plain text link with a handset icon. | S13. Playhouse's repeated "Enquire now" is the model. |
 | 8 | Inner pages: page band (eyebrow with Home, H1 ≤6 words, intro ≤35 words, one action, the page's foam shape large in its colour), "On this page" with foam-cube bullets, sections of ≤120 words, `<details>` for reference, a **Next** door, the visit band. | S10. Sunflower's calm band on every inner page; Playhouse's room colour coding. |
 | 9 | Menu of 6 items plus Book a visit; on phones a full-height sheet, one 56px link per row with the page's foam shape, Phone and Book a visit at the bottom. | S11; §6.1. Playhouse's 12 flat items shown twice is the anti-pattern. |
@@ -100,7 +100,7 @@ It deliberately avoids every signature device of our earlier templates (luggage 
 | The essentials | H2, `ol.stairs` with 5 `<li>` (icon + text), one `.more` "All the details →" | each line ≤8 words, no sub-notes |
 | The play room (`.playroom`) | `figure.frame.living` (video with poster), H2, one `.lede`, one door link | body ≤30 words |
 | Doors (`.doors-section`) | `.tumble` (3 small foam shapes), H2, `ul.doors` with 6 `a.door.door--{shape}` | label ≤3 words, line ≤8 words |
-| Visit band (`.visit`, `data-bar-hide`) | ball row, `.visit__card` with a beach ball, H2, one line, Book a visit + Phone, `.visit__pile` | ≤20 words |
+| Visit band (`.visit`, `data-bar-hide`) | `.visit__card` with a bouncing beach ball (`foam-ball-body` over a still shadow), H2, one line, Book a visit + Phone, `.visit__pile` | ≤20 words |
 
 The H2s are placed so each falls on its own 844px phone screen. If you change copy length, re-run the density check and adjust (the `.tumble` drawing above the doors heading and the 4:5 photo exist partly to keep the doors H2 on its own screen).
 
@@ -122,7 +122,7 @@ The H2s are placed so each falls on its own 844px phone screen. If you change co
 - **Foam staircase** `ol.stairs[role=list] > li` (`<svg><use href="#i-ages|i-clock|i-coin|i-chair|i-star"/></svg><span>…</span>`). Colours come from `:nth-child`; don't add a 6th line.
 - **Foam-shape door** `a.door.door--step|wedge|cylinder|halfmoon|cube|ball` > `svg > use#foam-*` + `.door__label` + `.door__line`. The whole row is the link. The shape colours come from `--foam`, `--foam-hi`, `--foam-lo` set by the `door--*` class.
 - **Page colours:** Visit and join = step, tomato; Fees and funding = wedge, sun; Our nursery = cylinder, grass; Our team = half-moon, grape; Parents = cube, pool; Gallery = beach ball. Set `body.page--visit|fees|nursery|team|parents|gallery`; it sets the band tint and the foam colours for the band shape, the "On this page" bullets, `<details>` markers and quote bars. **Keep the same shape and colour per page across the menu sheet, doors, band and Next door.**
-- **Ball row** `svg.ball-row` (inline, generated: ~50 overlapping balls with highlights over a strip of the band colour). `ball-row--drop` on the visit band drops the balls in once. The footer row sits on the visit band's blue.
+- **Visit ball** `svg.visit__shape`: the `foam-ball-body` symbol in `g.visit__ball` over `ellipse.visit__shadow`. The ball bounces about 9px and the shadow shrinks as it rises (2.4s loop, off under reduced motion). The ball-pit rows along the visit band and footer were removed on the owner's feedback that they were too much.
 - **Chunky photo frame** `.frame` + `.frame--pool|grass|tomato|grape`: the 6px border is on the `<img>`/`<video>` itself.
 - **Page band** `.page-band` + `.page-band__shape` + `.eyebrow` (Home / Section) + H1 + `.page-band__intro` + one action.
 - **On this page** `nav.on-this-page > h2 + ol > li > a` (only when the page has 3+ sections).
@@ -190,10 +190,19 @@ Add a **Food** page (cube, with the meal list) only if the nursery publishes men
 ```
 `softplay.js` loads and plays it only at ≥768px when motion is welcome, shows the Pause button, and swaps the label to the honest `data-playing` text. Phones and reduced-motion users get the poster and never download the film. Keep it under 1.5 MB, 6 to 10 seconds, muted, of an **empty** room. From the nursery's own footage, or a slow pan across one real photo made with ffmpeg and labelled as such. A seamless back-and-forth pan:
 ```
-ffmpeg -loop 1 -i room-800.jpg -vf "scale=1600:-1,zoompan=z='1.2':x='(iw-iw/zoom)*(0.5-0.5*cos(2*PI*on/240))':y='(ih-ih/zoom)*0.5':d=240:s=768x432:fps=24,format=yuv420p" -frames:v 240 -an -c:v libx264 -crf 29 -preset slow -movflags +faststart play-room-loop.mp4
+ffmpeg -i room-800.jpg -filter_complex "crop=iw:iw*9/16,scale=7680:4320:flags=lanczos,format=yuv444p,zoompan=z=1.2:x='(iw-iw/zoom)*(0.5-0.5*cos(2*PI*on/300))':y='(ih-ih/zoom)/2':d=300:s=768x432:fps=30,setsar=1,format=yuv420p" -an -c:v libx264 -crf 32 -preset slow -g 150 -movflags +faststart play-room-loop.mp4
 ```
 
 **Tour film** (Our nursery): `<figure class="frame frame--grass film"><video controls preload="none" playsinline crossorigin="anonymous" poster=…><source …><track kind="captions" … default></video><figcaption>…</figcaption></figure>` followed by a `<details class="transcript">`. Empty rooms first, captions always, sound only if the user asks. No YouTube or Vimeo. The example's film is honestly described as "made from still photos, 27 seconds, no sound".
+
+Making a tour from stills without judder: crop each photo to 16:9 (never squash it), scale it up 10 times, and use full-resolution colour (`yuv444p`) before `zoompan`. `zoompan` moves in whole source pixels, and with `yuv420p` only in even ones, so on a small photo a slow pan stalls every few frames. Use 30fps, eased pans of 6 s each, and 0.8 s cross-fades, so captions change every 5.2 s:
+```
+seg="crop=iw:iw*9/16,scale=7680:4320:flags=lanczos,format=yuv444p,zoompan=z=1.12:x='(iw-iw/zoom)*(0.5-0.5*cos(PI*on/179))':y='(ih-ih/zoom)/2':d=180:s=768x432:fps=30,setsar=1"
+# Pan right to left on alternate photos: (0.5+0.5*cos(PI*on/179)).
+ffmpeg -i a.jpg -i b.jpg … -filter_complex "[0:v]$seg[a];[1:v]$seg[b];…;[a][b]xfade=transition=fade:duration=0.8:offset=5.2[ab];…,format=yuv420p[out]" \
+  -map "[out]" -an -c:v libx264 -crf 27 -preset slow -g 60 -movflags +faststart photo-tour.mp4
+```
+The living-photo recipe above uses the same method, as one 10 s cosine back-and-forth so it loops seamlessly.
 
 **Gallery:** `.filters[data-filters=mosaic]` (foam-block buttons with `aria-pressed`, groups Rooms, Play, Garden, and Food or Artwork when there are photos) over `ul.mosaic#mosaic > li[data-group] > figure > picture + figcaption`: 2 columns with 12px gaps on a phone, 3 on desktop, frame colour by group. Real `<img>` with true alt text and short captions, `loading="lazy"`, WebP 400/800 + JPEG. No slider, no lightbox. The homepage has **no** gallery strip; the Gallery door is the way in.
 

@@ -4,6 +4,7 @@
  "businessNoun": "nursery",
  "research": "../prospects/research/nursery-websites.md",
  "claimMinutes": 90,
+ "maxWorkers": 1,
  "attentionStage": "attention",
  "ratingBands": {
   "bad": [

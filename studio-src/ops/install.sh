@@ -131,6 +131,28 @@ KillMode=mixed
 WantedBy=multi-user.target
 EOF
 
+# Chats (Claude and everything it runs) each get their own scope in this slice (studio-ctl agent), outside
+# studio.service, so a chat that uses too much memory can't take Studio down. This caps all chats together, leaving
+# room for Studio and the projects' services on this server.
+cat > /etc/systemd/system/studio-chats.slice <<EOF
+[Unit]
+Description=ZTD Devs Studio chats
+
+[Slice]
+MemoryMax=1536M
+MemorySwapMax=2G
+TasksMax=4096
+EOF
+
+# Project services (ztd-<project>-<service>, every one of them, by systemd's prefix drop-ins): when something in a
+# service goes over its memory limit, such as one of a project's own AI workers, only that process is killed. The
+# default would stop the whole service, taking its website and its other workers down with it.
+mkdir -p /etc/systemd/system/ztd-.service.d
+cat > /etc/systemd/system/ztd-.service.d/oom.conf <<EOF
+[Service]
+OOMPolicy=continue
+EOF
+
 # Admin commands (root only): studio-admin bootstrap | reset-link | import-project | make-admin
 cat > /usr/local/sbin/studio-admin <<EOF
 #!/bin/sh

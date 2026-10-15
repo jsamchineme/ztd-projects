@@ -118,6 +118,10 @@ export function createRunner(ctx){
   const browserReady = !!CHROME && existsSync(MCP_CLI);
   const attention = config.attentionStage;
   const runs = new Map(); // workflow id -> latest run
+  // Config `maxWorkers` caps how many cards this board's AI workers have in hand at once, across all workflows.
+  // It covers the whole job on a card (crawl, Claude, audit), since each local Chrome is heavy on a small server.
+  const maxWorkers = config.maxWorkers > 0 ? config.maxWorkers : Infinity;
+  let busy = 0;
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const now = () => new Date().toISOString();
@@ -441,7 +445,8 @@ export function createRunner(ctx){
       checkLimits(run);
       if (run.winding){ w.state = 'done'; w.card = null; break; }
       if (limitReached(step)){ w.state = 'done'; break; }
-      const c = claim(step.stage, w.name, null, { exclude: run.skip, run: run.id });
+      // Over the board's worker limit, wait as if there were no card, without claiming one.
+      const c = busy < maxWorkers ? claim(step.stage, w.name, null, { exclude: run.skip, run: run.id }) : null;
       if (!c){
         if (w.state !== 'waiting'){ w.state = 'waiting'; w.card = null; broadcast(); }
         if (idle(run)) return finish(run, 'finished');
@@ -460,6 +465,7 @@ export function createRunner(ctx){
       Object.assign(w, { state: 'working', card: c.id, cardName: c.name, since: now() });
       openSession(c, step, w);
       save();
+      busy++;
       try {
         const r = await work(run, step, w, c);
         await closeSession(w.session, 'done', { note: r.note || '' });
@@ -474,7 +480,7 @@ export function createRunner(ctx){
           run.skip.add(c.id); // don't hand the same card straight back in this run
           note(run, `${w.name} couldn't finish #${c.id} ${c.name}: ${e.message}`);
         }
-      }
+      } finally { busy--; }
       w.card = null; w.session = null;
       save();
       if (fails >= MAX_FAILS_IN_A_ROW){
