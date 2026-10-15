@@ -181,6 +181,53 @@ function renderChat(ctx, el, chatId, loadList){
     r.onerror = () => reject(new Error('Couldn’t read that file'));
     r.readAsDataURL(file);
   });
+  // Voice: 🎤 dictates into the box (the browser's own speech recognition), and 🔊 reads Claude's new replies aloud.
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+  const micBtn = Recognition ? h('button', { type: 'button', class: 'btn ghost small mic-btn', title: 'Speak your prompt', 'aria-label': 'Speak your prompt', 'aria-pressed': 'false' }, '🎤') : null;
+  const paintMic = () => { micBtn.classList.toggle('on', !!rec); micBtn.setAttribute('aria-pressed', String(!!rec)); micBtn.title = rec ? 'Stop listening' : 'Speak your prompt'; };
+  function listen(){
+    if (rec){ rec.stop(); return; }
+    speechSynthesis?.cancel();
+    const base = ta.value.replace(/\s*$/, '');
+    rec = new Recognition();
+    rec.lang = navigator.language || 'en-GB';
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.onresult = e => {
+      const said = [...e.results].map(r => r[0].transcript).join('').trim();
+      ta.value = base && said ? `${base} ${said}` : base || said;
+      autosize(); localStorageSet(draftKey, ta.value); paintSend();
+    };
+    rec.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('Allow the microphone for this site to speak your prompts.', true);
+      else if (e.error !== 'no-speech' && e.error !== 'aborted') toast(`Voice input stopped: ${e.error}`, true);
+    };
+    rec.onend = () => { rec = null; paintMic(); };
+    try { rec.start(); } catch (e){ rec = null; fail(e); }
+    paintMic();
+  }
+  if (micBtn) onTap(micBtn, listen);
+  const canSpeak = 'speechSynthesis' in window;
+  let readAloud = canSpeak && localStorageGet('readAloud') === '1';
+  const speakBtn = canSpeak ? h('button', { type: 'button', class: 'btn ghost small speak-btn', 'aria-label': 'Read replies aloud' }) : null;
+  const paintSpeak = () => { speakBtn.textContent = readAloud ? '🔊' : '🔈'; speakBtn.classList.toggle('on', readAloud); speakBtn.setAttribute('aria-pressed', String(readAloud)); speakBtn.title = readAloud ? 'Reading replies aloud (tap to stop)' : 'Read replies aloud'; };
+  if (speakBtn){
+    paintSpeak();
+    onTap(speakBtn, () => {
+      readAloud = !readAloud; localStorageSet('readAloud', readAloud ? '1' : '0'); paintSpeak();
+      speechSynthesis.cancel();
+      if (readAloud) speechSynthesis.speak(new SpeechSynthesisUtterance(''));   // phones only allow speech that a tap started
+    });
+  }
+  // Markdown to plain sentences, in short pieces: some browsers cut off long utterances.
+  function speak(text){
+    if (!readAloud) return;
+    const plain = text.replace(/```[\s\S]*?```/g, ' (code) ').replace(/`([^`]*)`/g, '$1').replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/^\s*[-*+>#|]+\s*/gm, '').replace(/[*_~#|]/g, '');
+    for (const part of plain.split(/(?<=[.!?])\s+|\n+/)) if (part.trim()) speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance(part.trim()), { lang: navigator.language || 'en-GB' }));
+  }
+  onLeave(() => { rec?.abort(); if (canSpeak) speechSynthesis.cancel(); });
   ta.addEventListener('paste', e => { if (e.clipboardData?.files.length){ e.preventDefault(); addFiles(e.clipboardData.files); } });
   ta.addEventListener('input', () => { autosize(); localStorageSet(draftKey, ta.value); paintSend(); });
   ta.addEventListener('keydown', e => {
@@ -190,12 +237,16 @@ function renderChat(ctx, el, chatId, loadList){
     'Connect your Claude account before sending prompts. ', h('a', { href: '/account#claude', 'data-link': '' }, 'Connect Claude')) : null;
   const form = h('form', { class: 'composer', onsubmit: e => { e.preventDefault(); running ? stop() : submit(); } },
     chips, ta, picker, h('div', { class: 'composer-bar' }, attachBtn, model, seg,
-      h('div', { class: 'spacer' }), gear, send));
+      h('div', { class: 'spacer' }), gear, micBtn, send));
   const modelRow = h('label', { class: 'opts-row' }, h('span', null, 'Model'));
   const modeRow = h('div', { class: 'opts-row' }, h('span', null, 'Mode'));
-  const opts = h('div', { class: 'composer-opts', hidden: true }, modelRow, modeRow);
+  const voiceRow = speakBtn ? h('div', { class: 'opts-row' }, h('span', null, 'Read replies aloud')) : null;
+  const opts = h('div', { class: 'composer-opts', hidden: true }, modelRow, modeRow, voiceRow);
   form.append(opts);
-  const placeOpts = () => { if (phone.matches){ modelRow.append(model); modeRow.append(seg); } else { attachBtn.after(model, seg); showOpts(false); } };
+  const placeOpts = () => {
+    if (phone.matches){ modelRow.append(model); modeRow.append(seg); voiceRow?.append(speakBtn); }
+    else { attachBtn.after(model, seg); if (speakBtn) gear.before(speakBtn); showOpts(false); }
+  };
   function showOpts(open){ opts.hidden = !open; gear.setAttribute('aria-expanded', String(open)); }
   onTap(gear, () => showOpts(opts.hidden));
   const outside = e => { if (!opts.hidden && !opts.contains(e.target) && !gear.contains(e.target)) showOpts(false); };
@@ -228,7 +279,7 @@ function renderChat(ctx, el, chatId, loadList){
   }
   checkStudioUpdate().catch(() => {});
   el.append(transcript, h('div', { class: 'composer-wrap' }, updateBar, noClaude, form,
-    h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach · Claude works in this project’s folder on the server')));
+    h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach' + (micBtn ? ' · 🎤 to speak' : '') + ' · Claude works in this project’s folder on the server')));
   autosize();
   paintSend();
 
@@ -314,6 +365,7 @@ function renderChat(ctx, el, chatId, loadList){
     } else if (ev.type === 'text'){
       live?.remove(); live = null; liveThinking?.remove(); liveThinking = null;
       node = h('div', { class: 'msg md', html: md(ev.text) });
+      if (ev.seq > spokenUpTo) speak(ev.text);
     } else if (ev.type === 'thinking'){
       liveThinking?.remove(); liveThinking = null;
       node = h('details', { class: 'thinking' }, h('summary', null, 'Thought for a moment'), h('div', null, ev.text));
@@ -345,7 +397,7 @@ function renderChat(ctx, el, chatId, loadList){
     if (node){ inner.insertBefore(node, working); scroll(); }
   }
 
-  let lastSeq = -1;
+  let lastSeq = -1, spokenUpTo = -1;
   function connect(){
     es?.close();
     es = new EventSource(`/api/chats/${chat.id}/stream`);
@@ -373,6 +425,7 @@ function renderChat(ctx, el, chatId, loadList){
       chat = r.chat;
       if (chat.model){ model.value = chat.model; paintGear(); }
       inner.replaceChildren(working);
+      spokenUpTo = r.events.at(-1)?.seq ?? -1;   // read aloud only what arrives from now on
       for (const ev of r.events){ lastSeq = ev.seq; addEvent(ev); }
       if (!r.events.length) inner.insertBefore(emptyState(), working);
       setRunning(chat.running);
@@ -387,6 +440,7 @@ function renderChat(ctx, el, chatId, loadList){
     const attachments = files.filter(f => f.id).map(f => f.id);
     if (!prompt && !attachments.length) return;
     if (!state.me.claude?.connected) return toast('Connect your Claude account first (Account page).', true);
+    rec?.stop();
     send.disabled = true;
     try {
       if (!chat){
@@ -407,7 +461,7 @@ function renderChat(ctx, el, chatId, loadList){
       if (e.code === 'no_claude') go('/account#claude');
     } finally { paintSend(); }
   }
-  async function stop(){ if (chat) await api('POST', `/api/chats/${chat.id}/stop`).catch(fail); }
+  async function stop(){ if (canSpeak) speechSynthesis.cancel(); if (chat) await api('POST', `/api/chats/${chat.id}/stop`).catch(fail); }
 
   load().then(() => ta.focus());
 }
