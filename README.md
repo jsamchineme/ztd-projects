@@ -28,7 +28,7 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `lib/auth.mjs` | Better Auth: email and password, TOTP and backup codes, teams (Better Auth "organizations"), admin. Sign-up is invite-only. |
 | `lib/gate.mjs` | Login gate and reverse proxy for project subdomains. It uses a one-time hand-off and a host-only cookie, so Studio's session cookie never reaches project code. |
 | `lib/projects.mjs` | Projects and services: validation, systemd specs, status, certificates |
-| `lib/agent.mjs` | Chats: runs `claude -p --output-format stream-json`, saves events and streams them over SSE. Chats resume their Claude session. |
+| `lib/agent.mjs` | Chats: runs `claude -p --output-format stream-json`, saves events and streams them over SSE. Chats resume their Claude session. Each chat runs in its own systemd scope in `studio-chats.slice`, outside `studio.service`: 1.5 GB per chat (`chatMemoryMB` in ctl.json), 2 GB for all chats together. A chat that goes over its limit only loses the process that did, never Studio or other chats. |
 | `lib/uploads.mjs` | Files attached in chat (paste, drop or the paperclip): up to 20 MB each and 10 per message, saved to `/srv/studio-uploads/<slug>/<id>/`. That folder is owned by `studio` with group `ztd`, so Claude can read the files but not change them, and they stay out of git. The prompt lists the paths and Claude opens them with Read, which handles images, PDFs, notebooks and text. |
 | `lib/claude.mjs` | Each user's Claude connection: a subscription token via `claude setup-token`, or an API key. Stored encrypted (AES-256-GCM). |
 | `lib/ctl.mjs` | Runs `studio-ctl` through sudo |

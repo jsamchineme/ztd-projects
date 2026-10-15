@@ -19,6 +19,7 @@ const UNIT_DIR = '/etc/systemd/system';
 const ENV_DIR = '/etc/studio/env';
 const caller = process.env.SUDO_USER || 'root';
 const RUNUSER = '/usr/sbin/runuser';
+const CHAT_MEMORY_MB = Number(CONF.chatMemoryMB) || 1536;   // each chat (Claude and what it runs); all chats share studio-chats.slice
 
 const SLUG = /^[a-z][a-z0-9-]{0,30}[a-z0-9]$/;
 const RESERVED = new Set(['studio', 'www', 'mail', 'smtp', 'imap', 'ftp', 'admin', 'api', 'ns1', 'ns2', 'webmail', 'cpanel']);
@@ -415,17 +416,58 @@ WantedBy=multi-user.target
     if (resume && resume !== '-') args.push('--resume', resume);
     if (existsSync(uploads(p))) args.push('--add-dir', uploads(p));   // chat attachments, readable in Plan mode too
     if (req.system) args.push('--append-system-prompt', String(req.system).slice(0, 20000));
-    const child = spawn(RUNUSER, ['-u', userOf(p), '--', bin, ...args], {
-      cwd, env: userEnv(userOf(p), { ...extra, MCP_CONNECTION_NONBLOCKING: 'false', CHROME_BIN: '/usr/bin/google-chrome', DISABLE_AUTOUPDATER: '1', STUDIO_PROJECT: p }),
-      stdio: ['pipe', 'inherit', 'inherit'], detached: true
-    });
-    child.on('error', e => die(e.message, 1));
-    child.stdin.end(req.prompt);
+    const command = [RUNUSER, '-u', userOf(p), '--', bin, ...args];
+    const env = userEnv(userOf(p), { ...extra, MCP_CONNECTION_NONBLOCKING: 'false', CHROME_BIN: '/usr/bin/google-chrome', DISABLE_AUTOUPDATER: '1', STUDIO_PROJECT: p });
+    // Each chat runs in its own systemd scope, in studio-chats.slice (see install.sh), with its own memory limit. Before,
+    // chats ran inside studio.service, so one heavy command could make systemd stop Studio and every other chat with it.
+    // Now going over the limit kills only the process that did (OOMPolicy=continue), and Claude sees that command fail.
+    // BindsTo: when Studio stops or restarts, its chats stop too, as they did when they ran inside it.
+    const scope = `studio-chat-${p}-${createHash('sha1').update(`${process.pid}${Date.now()}${Math.random()}`).digest('hex').slice(0, 8)}`;
+    const memMB = CHAT_MEMORY_MB;
+    const scoped = ['/usr/bin/systemd-run', '--scope', '--quiet', '--collect', `--unit=${scope}`, '--slice=studio-chats.slice',
+      '-p', `MemoryMax=${memMB}M`, '-p', 'MemorySwapMax=1G', '-p', 'TasksMax=1024', '-p', 'OOMPolicy=continue',
+      '-p', 'BindsTo=studio.service', '-p', 'After=studio.service', ...command];
+    let child, ooms = 0, poll = null;
+    const start = inScope => {
+      const [exe, ...argv] = inScope ? scoped : command;
+      const c = spawn(exe, argv, { cwd, env, stdio: ['pipe', 'inherit', 'pipe'], detached: true });
+      c.on('error', e => die(e.message, 1));
+      c.stdin.on('error', () => {});
+      c.stdin.end(req.prompt);
+      // If systemd-run can't make the scope, it fails at once with one of these; then Claude runs without a scope.
+      let early = '', started = !inScope;
+      c.stderr.on('data', d => { if (started) process.stderr.write(d); else early += d; });
+      if (inScope) setTimeout(() => { started = true; if (early) process.stderr.write(early); }, 3000).unref();
+      c.on('exit', (code, signal) => {
+        clearInterval(poll);
+        if (inScope && !started && code !== 0 && /^(Failed to (start transient|connect to bus|create bus|parse)|Unknown assignment|Invalid)/m.test(early)){
+          log(`agent ${p}: no scope (${early.trim().split('\n').pop()}), running without one`);
+          child = start(false);
+          return;
+        }
+        if (early && !started) process.stderr.write(early);
+        countOoms();
+        if (ooms) process.stderr.write(`This chat ran out of memory: it can use ${memMB} MB, and something it ran went over that, so the system stopped it.\n`);
+        process.exit(code ?? (signal === 'SIGKILL' ? 137 : 1));
+      });
+      return c;
+    };
+    // The scope's memory.events counts processes killed for going over its limit.
+    let events = '';
+    const countOoms = () => {
+      try {
+        if (!events) events = join('/sys/fs/cgroup', readFileSync(`/proc/${child.pid}/cgroup`, 'utf8').trim().split('::').pop(), 'memory.events');
+        if (!events.includes(scope)) return;
+        const n = Number(/^oom_kill (\d+)/m.exec(readFileSync(events, 'utf8'))?.[1] || 0);
+        if (n > ooms) ooms = n;
+      } catch {}
+    };
+    child = start(true);
+    poll = setInterval(countOoms, 2000);
     // Stopping: interrupt the whole process group (Claude and anything it started), then kill it.
     const group = sig => { try { process.kill(-child.pid, sig); } catch {} };
     for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP']) process.on(sig, () => { group('SIGINT'); setTimeout(() => group('SIGKILL'), 5000).unref(); });
     log(`agent ${p} ${model} ${mode}`);
-    child.on('exit', code => process.exit(code ?? 1));
   },
   'scope-check'(p){
     // stdin: {"prompt","name","purpose","token"?,"apiKey"?}. Prints ON, or OFF: <reason>, from a quick Haiku call with
