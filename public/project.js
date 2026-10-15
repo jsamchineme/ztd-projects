@@ -7,6 +7,10 @@ const MODELS = [['opus', 'Opus'], ['fable', 'Fable'], ['sonnet', 'Sonnet'], ['ha
 const MAX_FILES = 10, MAX_BYTES = 20 * 1024 * 1024;
 const fileIcon = kind => ({ image: '🖼', pdf: '📄', notebook: '📓', text: '📝' })[kind] || '📦';
 const sizeText = n => n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`;
+// Line icons in the style of Claude.ai's composer (drawn here; they take the button's text colour).
+const icon = paths => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+const MIC_ICON = icon('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>');
+const SPEAKER_ICON = on => icon('<path d="M4 9.5h3l4.5-4v13L7 14.5H4z"/>' + (on ? '<path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>' : '<path d="M16 10l4 4M20 10l-4 4"/>'));
 const TABS = [['chat', 'Chat'], ['services', 'Services'], ['changes', 'Changes'], ['files', 'Files'], ['settings', 'Settings']];
 
 export async function renderProject(main, id, tab, sub){
@@ -181,10 +185,10 @@ function renderChat(ctx, el, chatId, loadList){
     r.onerror = () => reject(new Error('Couldn’t read that file'));
     r.readAsDataURL(file);
   });
-  // Voice: 🎤 dictates into the box (the browser's own speech recognition), and 🔊 reads Claude's new replies aloud.
+  // Voice: the mic dictates into the box (the browser's own speech recognition), and the speaker reads Claude's new replies aloud.
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let rec = null;
-  const micBtn = Recognition ? h('button', { type: 'button', class: 'btn ghost small mic-btn', title: 'Speak your prompt', 'aria-label': 'Speak your prompt', 'aria-pressed': 'false' }, '🎤') : null;
+  const micBtn = Recognition ? h('button', { type: 'button', class: 'btn ghost small mic-btn', title: 'Speak your prompt', 'aria-label': 'Speak your prompt', 'aria-pressed': 'false', html: MIC_ICON }) : null;
   const paintMic = () => { micBtn.classList.toggle('on', !!rec); micBtn.setAttribute('aria-pressed', String(!!rec)); micBtn.title = rec ? 'Stop listening' : 'Speak your prompt'; };
   function listen(){
     if (rec){ rec.stop(); return; }
@@ -211,7 +215,7 @@ function renderChat(ctx, el, chatId, loadList){
   const canSpeak = 'speechSynthesis' in window;
   let readAloud = canSpeak && localStorageGet('readAloud') === '1';
   const speakBtn = canSpeak ? h('button', { type: 'button', class: 'btn ghost small speak-btn', 'aria-label': 'Read replies aloud' }) : null;
-  const paintSpeak = () => { speakBtn.textContent = readAloud ? '🔊' : '🔈'; speakBtn.classList.toggle('on', readAloud); speakBtn.setAttribute('aria-pressed', String(readAloud)); speakBtn.title = readAloud ? 'Reading replies aloud (tap to stop)' : 'Read replies aloud'; };
+  const paintSpeak = () => { speakBtn.innerHTML = SPEAKER_ICON(readAloud); speakBtn.classList.toggle('on', readAloud); speakBtn.setAttribute('aria-pressed', String(readAloud)); speakBtn.title = readAloud ? 'Reading replies aloud (tap to stop)' : 'Read replies aloud'; };
   if (speakBtn){
     paintSpeak();
     onTap(speakBtn, () => {
@@ -279,7 +283,7 @@ function renderChat(ctx, el, chatId, loadList){
   }
   checkStudioUpdate().catch(() => {});
   el.append(transcript, h('div', { class: 'composer-wrap' }, updateBar, noClaude, form,
-    h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach' + (micBtn ? ' · 🎤 to speak' : '') + ' · Claude works in this project’s folder on the server')));
+    h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach' + (micBtn ? ' · Tap the mic to speak' : '') + ' · Claude works in this project’s folder on the server')));
   autosize();
   paintSend();
 

@@ -205,9 +205,10 @@ table.list td { padding: 10px; border-bottom: 1px solid var(--line); vertical-al
 .update-log { max-height: 320px; overflow: auto; background: var(--code-bg); padding: 10px; border-radius: 8px; font-size: 12px; white-space: pre-wrap; margin-top: 12px; }
 .composer.drop { border-style: dashed; background: var(--accent-soft); }
 .attach-btn { min-width: 32px; padding: 3px 6px; font-size: 16px; }
-.mic-btn, .speak-btn { min-width: 32px; padding: 3px 6px; font-size: 16px; }
+.mic-btn, .speak-btn { min-width: 32px; padding: 3px 6px; display: inline-grid; place-items: center; color: var(--muted); }
+.mic-btn:hover, .speak-btn:hover { color: var(--text); }
 .mic-btn.on { background: var(--bad-soft); color: var(--bad); animation: listening 1.4s ease-in-out infinite; }
-.speak-btn.on { background: var(--accent-soft); }
+.speak-btn.on { background: var(--accent-soft); color: var(--accent); }
 @keyframes listening { 50% { box-shadow: 0 0 0 4px var(--bad-soft); } }
 @media (prefers-reduced-motion: reduce) { .mic-btn.on { animation: none; } }
 .attach-list, .sent-files { display: flex; flex-wrap: wrap; gap: 6px; }
