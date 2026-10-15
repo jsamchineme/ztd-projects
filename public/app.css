@@ -190,6 +190,9 @@ table.list td { padding: 10px; border-bottom: 1px solid var(--line); vertical-al
 .chat-error { background: var(--bad-soft); color: var(--bad); padding: 10px 12px; border-radius: 8px; margin: 0 0 18px; white-space: pre-wrap; font-size: 14px; }
 .working { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; margin: 4px 0 16px; }
 .composer-wrap { padding: 8px 24px 18px; }
+.update-bar { max-width: 780px; margin: 0 auto 8px; padding: 8px 10px 8px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--accent-soft); font-size: 14px; }
+.update-bar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.update-bar .update-log { margin: 8px 0 0; max-height: 30vh; overflow: auto; }
 .composer { max-width: 780px; margin: 0 auto; background: var(--panel); border: 1px solid var(--line-strong); border-radius: 16px; box-shadow: var(--shadow); padding: 10px 10px 8px 14px; }
 .composer:focus-within { border-color: var(--accent); }
 .composer textarea { border: 0; padding: 4px 0; min-height: 52px; max-height: 40vh; resize: none; background: transparent; outline: none; line-height: 1.5; }

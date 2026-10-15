@@ -276,28 +276,33 @@ async function loadStudio(card){
     source?.updating ? h('div', { class: 'note' }, 'An update is running now.') : null,
     h('div', { class: 'row' }, btn), logBox);
 
-  async function update(){
-    if (!await confirmDialog('Update and restart Studio?', 'Studio installs the latest committed code and restarts. Any Claude chats that are running stop, and Studio is unavailable for about a minute.', 'Update and restart')) return;
-    btn.disabled = true; btn.textContent = 'Updating…';
-    let started;
-    try { started = (await api('POST', '/api/admin/studio/update')).at; } catch (e){ fail(e); btn.disabled = false; btn.textContent = 'Update and restart Studio'; return; }
-    logBox.hidden = false; logBox.textContent = 'Starting…';
-    // Studio goes away while it restarts, so keep polling through errors.
-    const until = Date.now() + 10 * 60000;
-    while (Date.now() < until){
-      await new Promise(r => setTimeout(r, 3000));
-      let st; try { st = await api('GET', '/api/admin/studio/log'); } catch { logBox.textContent += '.'; continue; }
-      logBox.textContent = st.log.split('\n').slice(-25).join('\n');
-      if (st.updating) continue;
-      // The journal keeps earlier runs too: only trust a "finished" line stamped after this run started.
-      const done = st.log.split('\n').filter(l => /studio-update finished: \d+/.test(l)).pop();
-      if (!done || Date.parse(done.split(' ')[0]) < started - 5000) continue;
-      if (/finished: 0\b/.test(done)){ toast('Studio updated. Reloading…'); setTimeout(() => location.reload(), 1200); }
-      else { toast('The update failed. See the log below.', true); btn.disabled = false; btn.textContent = 'Try again'; }
-      return;
-    }
-    toast('The update is taking a long time. Check the server.', true);
+  const update = () => runStudioUpdate(btn, logBox);
+}
+
+// Installs the latest Studio commit and restarts Studio, showing progress in logBox (a <pre>) and reloading the page
+// when it's done. Used by Admin and by the update bar in the Studio source project's chats.
+export async function runStudioUpdate(btn, logBox){
+  if (!await confirmDialog('Update and restart Studio?', 'Studio installs the latest committed code and restarts. Any Claude chats that are running stop, and Studio is unavailable for about a minute.', 'Update and restart')) return;
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Updating…';
+  let started;
+  try { started = (await api('POST', '/api/admin/studio/update')).at; } catch (e){ fail(e); btn.disabled = false; btn.textContent = label; return; }
+  logBox.hidden = false; logBox.textContent = 'Starting…';
+  // Studio goes away while it restarts, so keep polling through errors.
+  const until = Date.now() + 10 * 60000;
+  while (Date.now() < until){
+    await new Promise(r => setTimeout(r, 3000));
+    let st; try { st = await api('GET', '/api/admin/studio/log'); } catch { logBox.textContent += '.'; continue; }
+    logBox.textContent = st.log.split('\n').slice(-25).join('\n');
+    if (st.updating) continue;
+    // The journal keeps earlier runs too: only trust a "finished" line stamped after this run started.
+    const done = st.log.split('\n').filter(l => /studio-update finished: \d+/.test(l)).pop();
+    if (!done || Date.parse(done.split(' ')[0]) < started - 5000) continue;
+    if (/finished: 0\b/.test(done)){ toast('Studio updated. Reloading…'); setTimeout(() => location.reload(), 1200); }
+    else { toast('The update failed. See the log below.', true); btn.disabled = false; btn.textContent = 'Try again'; }
+    return;
   }
+  toast('The update is taking a long time. Check the server.', true);
 }
 
 // Email for password resets and invites. Saving checks the settings with the mail server first.

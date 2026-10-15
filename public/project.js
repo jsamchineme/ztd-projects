@@ -1,6 +1,7 @@
 // A project: chat with Claude, running services, changes, files and settings.
 import { h, $, fill, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy } from './ui.js';
 import { state, go, onLeave, refreshProjects, setTitle, localStorageSet, localStorageGet, renderSideProjects } from './app.js';
+import { runStudioUpdate } from './people.js';
 
 const MODELS = [['opus', 'Opus'], ['fable', 'Fable'], ['sonnet', 'Sonnet'], ['haiku', 'Haiku']];
 const MAX_FILES = 10, MAX_BYTES = 20 * 1024 * 1024;
@@ -161,7 +162,25 @@ function renderChat(ctx, el, chatId, loadList){
   form.addEventListener('dragover', e => { if (hasFiles(e)){ e.preventDefault(); form.classList.add('drop'); } });
   form.addEventListener('dragleave', e => { if (!form.contains(e.relatedTarget)) form.classList.remove('drop'); });
   form.addEventListener('drop', e => { form.classList.remove('drop'); if (e.dataTransfer?.files.length){ e.preventDefault(); addFiles(e.dataTransfer.files); } });
-  el.append(transcript, h('div', { class: 'composer-wrap' }, noClaude, form,
+  // In the Studio source project, admins get a one-click update once committed work is waiting to be installed.
+  const updateBar = h('div', { class: 'update-bar', hidden: true });
+  async function checkStudioUpdate(){
+    if (state.me.user.role !== 'admin') return;
+    const { installed, source } = await api('GET', '/api/admin/studio');
+    if (!source || source.project !== project.slug || source.updating || installed?.commit === source.head.hash){ updateBar.hidden = true; return; }
+    const n = source.pending?.length;
+    const btn = h('button', { type: 'button', class: 'btn primary small', onclick: () => runStudioUpdate(btn, log) }, 'Update and restart Studio');
+    const log = h('pre', { class: 'update-log', hidden: true });
+    fill(updateBar,
+      h('div', { class: 'update-bar-row' },
+        h('span', null, n ? `${n} new commit${n > 1 ? 's' : ''} ready to install` : 'A new commit is ready to install',
+          source.dirty?.length ? h('span', { class: 'muted' }, ` · ${source.dirty.length} uncommitted file${source.dirty.length > 1 ? 's' : ''} won’t be included`) : null),
+        h('div', { class: 'spacer' }), btn),
+      log);
+    updateBar.hidden = false;
+  }
+  checkStudioUpdate().catch(() => {});
+  el.append(transcript, h('div', { class: 'composer-wrap' }, updateBar, noClaude, form,
     h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach · Claude works in this project’s folder on the server')));
   autosize();
   paintSend();
@@ -170,6 +189,7 @@ function renderChat(ctx, el, chatId, loadList){
   const scroll = (force) => { if (force || atBottom()) transcript.scrollTop = transcript.scrollHeight; };
 
   function setRunning(r){
+    if (running && !r) checkStudioUpdate().catch(() => {});   // a run just finished: it may have committed something
     running = r;
     working.hidden = !r;
     send.classList.toggle('stop', r);
