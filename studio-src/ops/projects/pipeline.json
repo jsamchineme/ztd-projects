@@ -1,0 +1,8 @@
+{
+  "description": "Website-redesign pipeline for Scottish GP and dental practices, plus the nursery board and Mapboard.",
+  "services": [
+    { "name": "board", "label": "GP and dental pipeline", "command": "node pipeline/server.mjs", "port": 4390, "subdomain": "pipeline", "memoryMB": 1500, "autostart": true },
+    { "name": "nurseries", "label": "Nursery pipeline", "command": "PIPELINE_CONFIG=pipeline/nursery.config.json PIPELINE_DATA=pipeline/data-nursery/cards.json node pipeline/server.mjs", "port": 4391, "subdomain": "nurseries", "memoryMB": 1200, "autostart": true },
+    { "name": "mapboard", "label": "Mapboard", "command": "node server.mjs", "port": 4380, "subdomain": "mapboard", "memoryMB": 600, "autostart": false }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "studio",
+  "private": true,
+  "type": "module",
+  "description": "Studio: build and run projects with Claude",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "bash test/run.sh",
+    "check": "bash ops/check.sh"
+  },
+  "dependencies": {
+    "better-auth": "^1.7.8",
+    "better-sqlite3": "^13.0.3",
+    "nodemailer": "^10.1.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1"
+  }
+}
