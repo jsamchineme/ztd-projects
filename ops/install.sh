@@ -21,6 +21,8 @@ usermod -aG systemd-journal ztd
 # studio-update installs as root. It's in group ztd only to read chat attachments.
 id studiodev >/dev/null 2>&1 || useradd --create-home --home-dir /home/studiodev --shell /bin/bash studiodev
 usermod -aG ztd studiodev
+# New projects each get their own user (zp-<name>, made by studio-ctl project-create), all in this group.
+groupadd -f studio-agents
 chmod 750 /home/studiodev
 mkdir -p "$APP" "$DATA" /srv/projects /etc/studio/env /usr/local/lib/studio /var/backups/ztd
 chown studio:studio /srv/studio "$DATA"; chmod 750 "$DATA"
@@ -28,7 +30,8 @@ chown studio:studio /srv/studio "$DATA"; chmod 750 "$DATA"
 chown root:root /srv/projects; chmod 755 /srv/projects
 # Chat attachments: Studio writes them, Claude (group ztd) can only read them. setgid keeps the group on new folders.
 mkdir -p /srv/studio-uploads
-chown studio:ztd /srv/studio-uploads; chmod 2750 /srv/studio-uploads
+# 2751: project users can't list the folder, but can reach their own project's folder in it (studio:<project user>).
+chown studio:ztd /srv/studio-uploads; chmod 2751 /srv/studio-uploads
 
 # Code (owned by root, so neither Studio nor agents can change it)
 if [ -f "$APP/server.mjs" ]; then
@@ -59,15 +62,17 @@ EOF
 fi
 chmod 644 /etc/studio/ctl.json
 
-# Studio may run studio-ctl; agents (ztd, studiodev) may run it too, and studio-ctl limits them to svc, logs and
-# status for their own projects.
+# Studio may run studio-ctl; agents (ztd, studiodev and every project user in studio-agents) may run it too, and
+# studio-ctl limits them to svc, logs and status for their own projects.
 cat > /etc/sudoers.d/studio <<'EOF'
 Defaults:studio !requiretty
 Defaults:ztd !requiretty
 Defaults:studiodev !requiretty
+Defaults:%studio-agents !requiretty
 studio ALL=(root) NOPASSWD: /usr/local/sbin/studio-ctl, /usr/local/sbin/studio-ctl *
 ztd ALL=(root) NOPASSWD: /usr/local/sbin/studio-ctl, /usr/local/sbin/studio-ctl *
 studiodev ALL=(root) NOPASSWD: /usr/local/sbin/studio-ctl, /usr/local/sbin/studio-ctl *
+%studio-agents ALL=(root) NOPASSWD: /usr/local/sbin/studio-ctl, /usr/local/sbin/studio-ctl *
 EOF
 chmod 440 /etc/sudoers.d/studio
 visudo -cf /etc/sudoers.d/studio >/dev/null
