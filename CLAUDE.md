@@ -8,6 +8,17 @@ This repo holds three things:
 
 The business: redesign the websites of NHS dental and GP practices in Scotland, then pitch the before and after. The audience is patients, often older or anxious, and practice managers.
 
+## Current focus (October 2026)
+
+**Making the templates good enough to send to prospects.** Samuel is generating templates and improving them by studying more real websites, both nurseries and NHS dental and GP practices. Over time the templates should look more standard and more polished, ready for distribution.
+
+- **How it's done:** study real sites, write up the findings in `prospects/research/`, then make new templates or revise existing ones from them. Ground each change in the research or the owner's feedback, and say which.
+- **Owner's feedback so far:** the nursery templates felt cramped, especially on phones. This led to the `-spacious` variants (`prospects/research/nursery-spacious-directions.md`): more space, less on the home page, and clear routes to separate pages for detail.
+- **What "ready" means:** every template passes the rules below (0 audit issues, clean at every width). Each one has an up-to-date `BRIEF.md`, a worked `example/` and a fresh `thumb.jpg`.
+- **Then:** send the templates to prospects.
+
+Update this section when the focus changes.
+
 ## Studio (`studio/`)
 
 The hosted web app for building and running these projects with Claude: https://studio.ztddevs.com, on the server `root@129.121.95.175` (key `~/.ssh/ztddevs`). Projects live in `/srv/projects/<slug>/repo` and run as systemd services behind Studio's login at `<sub>.ztddevs.com`. If you're running inside Studio, the system prompt gives the service names. Restart a service after changing its server code with `sudo studio-ctl svc <project> <service> restart`. Don't commit: people commit from Studio's Changes tab. See `studio/README.md` for the architecture, deploys and security model. The server also hosts an unrelated site (revisaacmpamaugo.online, Apache, MySQL), so never touch its config.
@@ -49,7 +60,19 @@ Live board data lives in `pipeline/data/` (cards.json, plus `work/<card>/` with 
 
 ## Templates (`pipeline/templates/`)
 
-There are six. The **Front Desk** family is task-first with little imagery (GP `practice/front-desk-gp`, Dental `practice/front-desk-dental`, Local `practice/front-desk-local`). The **Familiar Faces** family is people-led (GP `practice/familiar-faces-gp`, Dental `practice/familiar-faces-dental`). **Doorway** (`practice/doorway`) is led by photos of the practice premises. The nursery board has its own three: **Front Desk Nursery** (`nursery/front-desk`), **Key Worker** (`nursery/key-worker`) and **Garden Gate** (`nursery/garden-gate`), built from `prospects/research/nursery-websites.md`; nursery builds never show identifiable children. Each one has `BRIEF.md`, `styles.css` (tokens at the top), `fonts/`, a small JS file and `example/`. The people-led ones also have `PHOTO-SHOTLIST.md`.
+**Health practices (`practice/`):**
+- The **Front Desk** family is task-first with little imagery: GP `front-desk-gp`, Dental `front-desk-dental` and Local `front-desk-local`.
+- The **Familiar Faces** family is people-led: GP `familiar-faces-gp` and Dental `familiar-faces-dental`.
+- **Doorway** (`doorway`) is led by photos of the practice premises.
+- **Results** and **Studio** are for mainly private dental practices (`prospects/research/private-dental-patterns.md`).
+
+**Nurseries (`nursery/`):**
+- About 15 templates, most with a `-spacious` variant. They include `front-desk`, `key-worker`, `garden-gate` and `meadow`, among others.
+- They're built from the research in `prospects/research/nursery-*.md` and the site studies in `nursery-sites*/`.
+- `templates/compare.html` shows each original next to its spacious variant.
+- Nursery builds never show identifiable children.
+
+Every template has `BRIEF.md`, `styles.css` (tokens at the top), `fonts/`, a small JS file and `example/`. The people-led ones also have `PHOTO-SHOTLIST.md`.
 
 Rules for any template or built site:
 - **Never invent facts:** no made-up prices, reviews, staff, online booking or policies. Write "phone to check" when a fact is unclear. Check NHS facts against nhsinform.scot or nhs.uk.
@@ -58,6 +81,11 @@ Rules for any template or built site:
 - **Accessibility:** WCAG 2.2 AA. `audit.mjs` must report 0 blockers, 0 major and 0 minor, and `viewports.mjs` must show clean layouts at every width.
 - **Performance:** self-hosted fonts, no CDNs (GDPR), and a small page weight.
 - After changing a template, re-run `node pipeline/template-thumbs.mjs`.
+
+Audit fixes that work:
+- **Google Maps embeds:** the audit flags a cross-origin Google Maps `<iframe>` as "no visible focus". CSS can't fix that. Put `tabindex="-1" aria-hidden="true"` on the iframe, and add a visible, focusable "Open in Google Maps" link next to it, at least 44px tall.
+- **Tap targets:** these are measured per element. Links that don't use the `.btn` class, such as `.emergency a.call`, need their own `min-height: 44px`.
+- **Contrast:** failures usually come from white text on mid-tone brand colours. Darken the colour used for text and buttons until it reaches 4.5:1.
 
 ## Testing safely
 

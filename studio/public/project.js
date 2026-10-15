@@ -509,7 +509,7 @@ function settingsTab(ctx){
         toast('Saved'); refreshProjects().catch(() => {});
       }, 'Saving…').catch(() => {});
     } },
-      field('Name', name), field('Description', desc), field('Team', team, 'everyone in this team can open and work on it'),
+      field('Name', name), field('Description', desc, 'Claude reads this at the start of every chat'), field('Team', team, 'everyone in this team can open and work on it'),
       field('Claude for the project’s own AI workers', worker, 'some projects (like the pipeline) run Claude themselves; they use this connection'),
       h('p', { class: 'small muted' }, `Folder on the server: /srv/projects/${p.slug}/repo`),
       h('button', { class: 'btn primary', type: 'submit', style: { marginTop: '8px' } }, 'Save')),
@@ -552,6 +552,6 @@ export function newProjectDialog(){
   } },
     h('h2', null, 'New project'),
     field('Name', name), field('Short name', slug, 'lowercase; also its web address'), h('p', { class: 'small muted', style: { margin: '4px 0 0' } }, hint),
-    field('Team', team), field('Start from', start), gitField, field('Description', desc),
+    field('Team', team), field('Start from', start), gitField, field('Description', desc, 'Claude reads this at the start of every chat'),
     h('div', { class: 'row end', style: { marginTop: '18px' } }, h('button', { class: 'btn', type: 'button', onclick: () => close() }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Create project'))));
 }
