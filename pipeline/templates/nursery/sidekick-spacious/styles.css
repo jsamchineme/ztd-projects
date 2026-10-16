@@ -706,6 +706,22 @@ table { border-collapse: collapse; width: 100%; }
 .lightbox__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1rem; }
 .lightbox__bar p { margin: 0; }
 .lightbox__close { min-height: var(--tap); padding: .4rem 1rem; border-radius: var(--radius-pill); border: 2px solid var(--ink); background: var(--sun); color: var(--ink); font: 600 1rem/1 var(--font-display); cursor: pointer; flex: none; }
+/* Previous / Next: a row under the photo on phones, on its sides from 40em */
+.lightbox__img { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; position: relative; }
+.lightbox__img img { grid-column: 1 / -1; grid-row: 1; }
+.lightbox__img:has(.lightbox__step:not([hidden])) { padding-bottom: .5rem; border-bottom: 2px dashed var(--line); }
+.lightbox__step { display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; min-width: var(--tap); min-height: var(--tap); padding: 0; border-radius: 50%; border: 3px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; grid-row: 2; }
+.lightbox__prev { justify-self: end; }
+.lightbox__step[hidden] { display: none; }
+.lightbox__bar { flex-wrap: wrap; }
+.lightbox__bar [data-caption] { flex: 1 1 10rem; }
+.lightbox__count { font-size: var(--text-small); color: var(--ink-soft); white-space: nowrap; }
+@media (min-width: 40em) {
+  .lightbox__img:has(.lightbox__step:not([hidden])) { padding-bottom: 0; border-bottom: 0; }
+  .lightbox__step { position: absolute; grid-area: auto; top: 50%; transform: translateY(-50%); box-shadow: 0 0 0 3px rgba(255, 255, 255, .6); }
+  .lightbox__prev { left: .75rem; }
+  .lightbox__next { right: .75rem; }
+}
 
 /* ---------- 11. Footer --------------------------------------------- */
 .site-footer { background: var(--ink); color: #EDE8F5; margin-top: 0; position: relative; padding: 4.5rem 0 2.5rem; }

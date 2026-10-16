@@ -8,8 +8,9 @@
    4. Living photo: a short muted loop that plays only when the viewer hasn't
       asked for reduced motion and the screen is wider than a phone. Phones
       get the poster. A visible Pause / Play button is always there.
-   5. Gallery: filter buttons (aria-pressed) and a <dialog> lightbox that
-      closes with Esc, moves with the arrow keys and returns focus.
+   5. Gallery: filter buttons (aria-pressed) and a <dialog> lightbox with
+      Previous / Next icon buttons, an "n of N" count, arrow keys and swipe
+      (wrapping round the photos shown), Esc to close and focus return.
    Without JavaScript: the menu is open, every notice shows, the status shows
    the hours written in the HTML, the living photo shows its poster, and the
    gallery is a plain grid of every photo. Nothing is lost.                  */
@@ -85,7 +86,7 @@
 
   var dialog = document.querySelector("dialog.lightbox");
   if (dialog && typeof dialog.showModal === "function") {
-    var big = dialog.querySelector("img"), cap = dialog.querySelector("[data-caption]");
+    var big = dialog.querySelector("img"), cap = dialog.querySelector("[data-caption]"), count = dialog.querySelector("[data-count]");
     var opener = null, index = 0, list = [];
     var buttons = document.querySelectorAll(".mosaic button[data-full]");
     function visible() { return Array.prototype.filter.call(buttons, function (b) { var sec = b.closest("[data-group-title]"); return !(sec && sec.hidden); }); }
@@ -95,6 +96,7 @@
       var b = list[index], img = b.querySelector("img");
       big.src = b.getAttribute("data-full"); big.alt = img.alt;
       cap.textContent = (b.closest("figure").querySelector("figcaption") || {}).textContent || img.alt;
+      if (count) count.textContent = (index + 1) + " of " + list.length;
     }
     Array.prototype.forEach.call(buttons, function (b) {
       b.addEventListener("click", function () { opener = b; showAt(visible().indexOf(b)); dialog.showModal(); });
@@ -107,6 +109,15 @@
       if (e.key === "ArrowRight") { e.preventDefault(); showAt(index + 1); }
     });
     dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
+    // Swipe on touch: a sideways drag of 40px or more moves one photo.
+    var startX = null;
+    big.addEventListener("pointerdown", function (e) { if (e.pointerType !== "mouse") startX = e.clientX; });
+    big.addEventListener("pointerup", function (e) {
+      if (startX === null) return;
+      var dx = e.clientX - startX; startX = null;
+      if (Math.abs(dx) >= 40) showAt(index + (dx < 0 ? 1 : -1));
+    });
+    big.addEventListener("pointercancel", function () { startX = null; });
     dialog.addEventListener("close", function () { if (opener) opener.focus(); });
   } else {
     // No <dialog>: buttons open the larger photo in the same tab.

@@ -3,7 +3,7 @@
    the page, so builders never edit this file.
    1. Phone menu sheet        2. Sticky phone bar
    3. Living photo            4. Dated notices
-   5. Live open/closed status 6. Gallery filters
+   5. Live open/closed status 6. Gallery filters and lightbox
    7. Ball row and staircase entrances (skipped under reduced motion) */
 (function () {
   'use strict';
@@ -139,6 +139,50 @@
       });
     });
   });
+
+  /* 6b. Gallery lightbox: each tile's link (to the biggest photo file)
+     opens a <dialog> instead. Previous / Next and the arrow keys move
+     through the photos the filter is showing, wrapping at the ends; a
+     sideways swipe does the same. Esc, Close or the backdrop shut it and
+     focus goes back to the photo. Without JS the links open the file. */
+  var lb = $('#lightbox');
+  if (lb && lb.showModal) {
+    var lbImg = $('[data-lb-img]', lb), lbCap = $('[data-lb-caption]', lb), lbCount = $('[data-lb-count]', lb);
+    var lbList = [], lbAt = 0, lbFrom = null;
+    var lbShow = function (i) {
+      lbAt = (i + lbList.length) % lbList.length;
+      var a = lbList[lbAt], t = $('img', a), c = $('figcaption', a.parentNode);
+      lbImg.src = a.getAttribute('href'); lbImg.alt = t ? t.alt : '';
+      lbCap.textContent = c ? c.textContent : '';
+      lbCount.textContent = (lbAt + 1) + ' of ' + lbList.length;
+      lb.style.setProperty('--frame', getComputedStyle(a).getPropertyValue('--frame'));
+    };
+    $$('.mosaic__open').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        lbList = $$('.mosaic__open').filter(function (x) { return !x.closest('[hidden]'); });
+        lbFrom = a; lbShow(lbList.indexOf(a)); lb.showModal();
+      });
+    });
+    $('[data-lb-prev]', lb).addEventListener('click', function () { lbShow(lbAt - 1); });
+    $('[data-lb-next]', lb).addEventListener('click', function () { lbShow(lbAt + 1); });
+    $('[data-lb-close]', lb).addEventListener('click', function () { lb.close(); });
+    lb.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); lbShow(lbAt - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); lbShow(lbAt + 1); }
+    });
+    lb.addEventListener('click', function (e) {
+      var r = lb.getBoundingClientRect();
+      if (e.target === lb && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) lb.close();
+    });
+    lb.addEventListener('close', function () { if (lbFrom) lbFrom.focus(); });
+    var sx = null; lbImg.draggable = false;
+    lbImg.addEventListener('pointerdown', function (e) { sx = e.clientX; });
+    lbImg.addEventListener('pointerup', function (e) {
+      if (sx === null) return; var dx = e.clientX - sx; sx = null;
+      if (Math.abs(dx) > 40) lbShow(lbAt + (dx < 0 ? 1 : -1));
+    });
+  }
 
   /* 7. Entrances: the stairs settle in once, when first seen. Nothing
      moves under reduced motion. */

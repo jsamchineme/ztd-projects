@@ -6,7 +6,8 @@
    4. Closure table marks ("past", "now", "next") and [data-next-closure].
    5. Living photo: autoplays only above phone width and without reduced
       motion; phones get the poster. A visible Pause / Play button.
-   6. Gallery: filter buttons and a <dialog> lightbox (Esc closes, focus returns).
+   6. Gallery: filter buttons and a <dialog> lightbox with Previous / Next
+      (arrow keys and swipe too; Esc closes, focus returns).
    Without JavaScript the menu is open, notices show, the status shows the
    hours written in the HTML, the living photo shows its poster and the
    gallery shows every photo. Nothing is lost.                            */
@@ -84,17 +85,44 @@
   var box = document.getElementById("lightbox");
   if (box && typeof box.showModal === "function") {
     var holder = box.querySelector(".lightbox__img"), big = document.createElement("img"), cap = box.querySelector("[data-caption]"), opener = null;
-    document.addEventListener("click", function (e) {
-      var o = e.target.closest && e.target.closest(".gallery__open");
-      if (!o) return;
-      var img = o.querySelector("img");
-      opener = o;
-      if (!big.parentNode) holder.appendChild(big);
+    var count = box.querySelector(".lightbox__count"), prev = box.querySelector(".lightbox__prev"), next = box.querySelector(".lightbox__next");
+    var list = [], at = 0;
+    // Show photo i of the photos the filters leave on the page; wraps at the ends.
+    var showPhoto = function (i) {
+      at = (i + list.length) % list.length;
+      var o = list[at], img = o.querySelector("img");
       big.src = o.getAttribute("data-full") || img.currentSrc || img.src;
       big.alt = img.alt;
       cap.textContent = o.getAttribute("data-caption") || img.alt;
+      if (count) count.textContent = list.length > 1 ? (at + 1) + " of " + list.length : "";
+    };
+    document.addEventListener("click", function (e) {
+      var o = e.target.closest && e.target.closest(".gallery__open");
+      if (!o) return;
+      opener = o;
+      list = Array.prototype.filter.call(document.querySelectorAll(".gallery__open"), function (b) { return b.querySelector("img") && !b.closest("[hidden]"); });
+      if (!big.parentNode) holder.insertBefore(big, holder.firstChild);
+      if (prev && next) prev.hidden = next.hidden = list.length < 2;
+      showPhoto(Math.max(0, list.indexOf(o)));
       box.showModal();
     });
+    if (prev && next) {
+      prev.addEventListener("click", function () { showPhoto(at - 1); });
+      next.addEventListener("click", function () { showPhoto(at + 1); });
+      box.addEventListener("keydown", function (e) {
+        if (list.length < 2) return;
+        if (e.key === "ArrowLeft") { e.preventDefault(); showPhoto(at - 1); }
+        if (e.key === "ArrowRight") { e.preventDefault(); showPhoto(at + 1); }
+      });
+      // Swipe on touch: 40px sideways moves one photo.
+      var x0 = null;
+      holder.addEventListener("pointerdown", function (e) { x0 = e.pointerType === "mouse" ? null : e.clientX; });
+      holder.addEventListener("pointerup", function (e) {
+        if (x0 === null || list.length < 2) return;
+        var dx = e.clientX - x0; x0 = null;
+        if (Math.abs(dx) > 40) showPhoto(dx < 0 ? at + 1 : at - 1);
+      });
+    }
     box.addEventListener("close", function () { if (opener) opener.focus(); });
     box.addEventListener("click", function (e) { if (e.target === box) box.close(); });
     var closer = box.querySelector(".lightbox__close");

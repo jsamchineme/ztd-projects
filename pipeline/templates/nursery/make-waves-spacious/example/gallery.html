@@ -298,7 +298,12 @@
 </section>
 </main>
 <dialog class="lightbox" id="lightbox" aria-label="Photo">
-  <img alt="">
+  <div class="lightbox__stage">
+    <img alt="">
+    <button class="lightbox__step lightbox__step--prev" type="button" data-lightbox-step="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg><span class="visually-hidden">Previous photo</span></button>
+    <p class="lightbox__count" data-lightbox-count aria-live="polite"></p>
+    <button class="lightbox__step lightbox__step--next" type="button" data-lightbox-step="1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg><span class="visually-hidden">Next photo</span></button>
+  </div>
   <div class="lightbox__bar"><p data-lightbox-caption></p><button class="lightbox__close" type="button">Close</button></div>
 </dialog>
 <footer class="site-footer">

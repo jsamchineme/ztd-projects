@@ -662,8 +662,11 @@
   </div>
 </section>
 <dialog class="lightbox" id="lightbox" aria-label="Photo">
-  <div class="lightbox__img"></div>
-  <div class="lightbox__bar"><p data-caption></p><button class="lightbox__close" type="button">Close</button></div>
+  <div class="lightbox__img">
+    <button class="lightbox__step lightbox__prev" type="button" aria-label="Previous photo" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="lightbox__step lightbox__next" type="button" aria-label="Next photo" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="lightbox__bar"><p data-caption></p><p class="lightbox__count" aria-live="polite"></p><button class="lightbox__close" type="button">Close</button></div>
 </dialog>
 </main>
 

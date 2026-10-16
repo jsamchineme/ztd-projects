@@ -109,14 +109,15 @@
 </section>
 <dialog class="lightbox" aria-label="Larger photo">
   <div class="lightbox__inner">
-    <img src="img/orchard-800.webp" alt="" width="800" height="600">
+    <div class="lightbox__stage">
+      <img src="img/orchard-800.webp" alt="" width="800" height="600">
+      <button type="button" class="lightbox__nav lightbox__nav--prev" data-prev aria-label="Previous photo"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="lightbox__count" data-count aria-live="polite"></p>
+      <button type="button" class="lightbox__nav lightbox__nav--next" data-next aria-label="Next photo"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
     <div class="lightbox__bar">
       <p data-caption></p>
-      <div class="lightbox__buttons">
-        <button type="button" data-prev>Previous</button>
-        <button type="button" data-next>Next</button>
-        <button type="button" class="lightbox__close" data-close>Close</button>
-      </div>
+      <button type="button" class="lightbox__close" data-close>Close</button>
     </div>
   </div>
 </dialog>

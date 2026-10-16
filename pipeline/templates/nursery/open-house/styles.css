@@ -473,6 +473,28 @@ ol.steps li + li { margin-top: 12px; }
 @media (min-width: 700px) { .mosaic { grid-template-columns: repeat(3, 1fr); } .mosaic .wide img { aspect-ratio: 21 / 9; } }
 .wall-group { padding-top: var(--space-group); }
 .wall-group:first-of-type { padding-top: 0; }
+/* Lightbox: each photo is a link to its big file; with JS it opens a <dialog> with Previous and Next.
+   Phones: the arrows sit in a row under the photo. 700px and wider: either side of it. */
+.mosaic__open { display: block; border-radius: 10px; cursor: zoom-in; }
+.lightbox { width: min(1040px, calc(100vw - 24px)); max-width: none; max-height: calc(100dvh - 24px); padding: 16px; border: 3px solid var(--ink); border-radius: 16px; background: var(--wall); color: var(--ink); }
+.lightbox::backdrop { background: rgba(35, 50, 74, .82); }
+.lightbox__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.lightbox__count { font: 600 1rem/1.3 var(--font-body); }
+.lightbox__close { min-height: 44px; padding: 8px 16px; border: 2px solid var(--ink); border-radius: 999px; background: var(--wall); color: var(--ink); font: 600 1rem/1 var(--font-body); cursor: pointer; }
+.lightbox__stage { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "fig fig" "prev next"; gap: 12px; align-items: center; }
+.lightbox__fig { grid-area: fig; display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 0; }
+.lightbox__fig img { max-width: 100%; width: auto; height: auto; max-height: calc(100dvh - 230px); object-fit: contain; border-radius: 10px; border: 2px solid var(--ink); background: var(--wall-2); touch-action: pan-y; }
+.lightbox__fig figcaption { font-size: 1rem; line-height: 1.4; text-align: center; }
+.lightbox__nav { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--ink); background: var(--lamp); color: var(--ink); cursor: pointer; }
+.lightbox__prev { grid-area: prev; justify-self: start; }
+.lightbox__next { grid-area: next; justify-self: end; }
+.lightbox__nav svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.lightbox__nav:hover { background: var(--butter); }
+@media (min-width: 700px) {
+  .lightbox { padding: 20px 24px 24px; }
+  .lightbox__stage { grid-template-columns: auto 1fr auto; grid-template-areas: "prev fig next"; gap: 20px; }
+  .lightbox__fig img { max-height: calc(100dvh - 190px); }
+}
 
 /* 12. FOOTER =============================================================== */
 .foot { position: relative; background: var(--wall-2); padding-block: 56px 32px; font-size: 1rem; }

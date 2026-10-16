@@ -526,7 +526,22 @@ video:focus-visible { outline: 4px solid var(--focus-ink); box-shadow: 0 0 0 8px
 
 .lightbox { padding: 0; border: 0; border-radius: var(--radius); background: var(--white); color: var(--ink); max-width: min(92vw, 640px); width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
 .lightbox::backdrop { background: rgba(11,42,74,.82); }
-.lightbox img { width: 100%; height: auto; max-height: 72vh; object-fit: contain; background: var(--navy); }
+.lightbox img { grid-area: img; width: 100%; height: auto; max-height: 64vh; object-fit: contain; background: var(--navy); }
+/* Previous and Next: in a navy strip under the photo on phones, either side
+   of it from 48em. Sun on navy 9.5:1; the navy arrow on sun 9.5:1. */
+.lightbox__stage { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "img img img" "prev count next"; align-items: center; gap: .5rem; padding-bottom: .5rem; background: var(--navy); touch-action: pan-y; }
+.lightbox__step { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 .5rem; padding: 0; border: 2px solid var(--sun); border-radius: var(--pill); background: var(--sun); color: var(--navy); cursor: pointer; }
+.lightbox__step[hidden] { display: none; }
+.lightbox__step:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; } /* the usual dark underline is lost on navy */
+.lightbox__step--prev { grid-area: prev; }
+.lightbox__step--next { grid-area: next; }
+.lightbox__step svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.lightbox__count { grid-area: count; margin: 0; text-align: center; color: var(--on-deep); font-weight: 700; }
+@media (min-width: 48em) {
+  .lightbox { max-width: min(92vw, 780px); }
+  .lightbox__stage { grid-template-areas: "prev img next" ". count ."; padding: .75rem .25rem; row-gap: .4rem; }
+  .lightbox img { max-height: 70vh; }
+}
 .lightbox__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1rem; }
 .lightbox__bar p { margin: 0; font-weight: 700; }
 .lightbox__close { min-width: var(--tap); min-height: var(--tap); border-radius: var(--pill); border: 2px solid var(--ink); background: var(--sun); color: var(--ink); font: 700 1rem var(--font); padding: .3rem 1rem; cursor: pointer; }

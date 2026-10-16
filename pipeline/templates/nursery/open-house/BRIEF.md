@@ -18,7 +18,7 @@ Read these once before your first build:
 | Path | What it is | Edit per nursery? |
 |---|---|---|
 | `styles.css` | The whole design system. Section 1 holds every token. | Tokens only (section 1) |
-| `openhouse.js` | About 130 lines of plain JavaScript, no dependencies: the phone menu sheet, the call bar that slides in after the hero, the live open or closed status, dated notices, the smoke pause button, the living photo, the click-to-play tour film and the gallery filters. It reads everything from the page. | Never |
+| `openhouse.js` | About 175 lines of plain JavaScript, no dependencies: the phone menu sheet, the call bar that slides in after the hero, the live open or closed status, dated notices, the smoke pause button, the living photo, the click-to-play tour film, the gallery filters and the gallery lightbox. It reads everything from the page. | Never |
 | `fonts/` | **Sniglet** 800 (display) and **Golos Text** 400 to 600 (variable, body), Latin and Latin Extended subsets as woff2, 67 KB in all. SIL Open Font Licence in `fonts/OFL.txt`. | Never |
 | `example/index.html` | Worked homepage for **My Second Home**, a real family-run nursery in a Victorian house in Cardonald, Glasgow, built only from its own website and its Care Inspectorate record. | Copy it for each nursery |
 | `example/join-us.html`, `fees-and-funding.html`, `our-nursery.html`, `our-team.html`, `parents.html`, `gallery.html` | The six inner pages, one per menu item. | Yes |
@@ -198,7 +198,7 @@ Every inner page uses one frame (`.band`, `.contents`, `.sec`, `.next`, then `.d
 | Live status | `.status[data-hours]` | `{"days":[1,2,3,4,5],"open":"08:00","close":"18:00","closed":["2026-12-25"]}`, UK time. Only the nursery's own closure dates. |
 | Tour film | `figure.film[data-film]`, `.film__play` | See section 10. |
 | Living photo | `figure.living`, `video[data-living]`, `.living__btn` | See section 10. |
-| Gallery | `.filters`, `.mosaic`, `.drawn`, `.drawn__box` | `data-filter` buttons over `data-group` items. 3 or 4 filters at most. |
+| Gallery | `.filters`, `.mosaic`, `.drawn`, `.drawn__box`, `.mosaic__open`, `#lightbox` | `data-filter` buttons over `data-group` items. 3 or 4 filters at most. Wrap each photo's `<picture>` in `<a class="mosaic__open" href="<biggest file>">` (not the `.drawn` drawing) and keep the one `<dialog id="lightbox">`: it shows the photo big with its caption, a "3 of 6" count, and Previous and Next icon buttons (under the photo on phones, either side from 700px). It steps through the photos the filter shows and wraps round; arrow keys and swipes move, Esc or the backdrop closes. Without JS the link opens the big file. |
 | Back link | `.back` | "← Back to [parent]" on sub-pages. |
 | Next door | `.next`, `.next__door` | The next room, drawn small. |
 | Call bar | `.callbar` | Phones and tablets under 900px. |

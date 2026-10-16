@@ -307,7 +307,8 @@ Plus a `.details` transcript ("Read what the film shows"). Click to play, poster
 
 - Filter buttons (`.filters button[data-filter][aria-pressed]`) take the petal tints: Rooms (peach), Garden (green), Building (butter), Food and Artwork when the nursery has them. Four groups at most. A polite live region announces "Showing n photos".
 - `ul.mosaic` > `li[data-group]` > `figure` > `button[data-lightbox="img/x.webp"]` > `picture` + `figcaption`. Two columns on phones (12px gaps), three from 56em. True alt text on every image and a short caption.
-- The lightbox is a `<dialog>`: Escape closes it, focus returns to the photo. Without JavaScript the button opens the image.
+- The lightbox is a `<dialog>`: Escape or the backdrop closes it, focus returns to the photo. Without JavaScript the button opens the image.
+- Keep its Previous / Next icon buttons (`[data-lightbox-prev]`, `[data-lightbox-next]`, 44px+, named "Previous photo" / "Next photo") and the `aria-live` "3 of 9" count: they step through the photos the filters leave visible and wrap; arrow keys and a sideways swipe do the same. On phones they sit in a bar under the photo, from 40em on its edges.
 - No homepage strip in this template (the Gallery petal is the door).
 
 ## 12. Pre-handover checklist

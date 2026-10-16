@@ -234,7 +234,7 @@ On every page, before `signpost.js`:
 
 - Filter buttons (`button.filter[data-filter][aria-pressed]`) are mini arrow boards; one group at a time, "All" shows every group. Kilbarchan groups: Rooms, Garden, Play, Food, Art. Keep the filter list in step with the groups you have.
 - Each group is a 2-column mosaic on phones (12px gaps) and 3 columns from 48em (16px), with one `li.is-big` per group. Each photo is a real `<img>` (WebP 400 and 800) in an `a[data-lightbox]` pointing at the larger file, with true alt text and a short caption.
-- The lightbox is one `<dialog id="lightbox">` at the end of the page: Esc, the Close button and a backdrop click close it; focus returns to the photo.
+- The lightbox is one `<dialog id="lightbox">` at the end of the page: Esc, the Close button and a backdrop click close it; focus returns to the photo. Under the photo (beside it from 48em) sit 48px round Previous / Next icon buttons (`button.lightbox__step[data-step="-1"|"1"]`, `aria-label` "Previous photo" / "Next photo") and a `[data-lightbox-count]` "3 of 15" (`aria-live="polite"`). They step through the photos the current filter shows and wrap at the ends; the Left / Right arrow keys and a 40px sideways swipe do the same. Keep this markup in every build.
 - A short "About these photos" section says why there are no faces. No slider, autoplay or share buttons.
 
 ## 11. Measured results (Kilbarchan example)

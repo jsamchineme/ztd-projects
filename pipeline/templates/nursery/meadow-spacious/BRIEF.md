@@ -271,6 +271,7 @@ Doodles in the sprite: `d-sun`, `d-moon`, `d-boots`, `d-apple`, `d-egg`, `d-spro
 - Each `li` holds `figure > button[data-full] > img` plus a `figcaption`. Mark a few `li.wide` (2 columns) and `li.tall` (2 rows). On phones there are 2 columns, so keep each group's cell count even (wide and tall each count 2) and put a tall photo early, or a hole appears.
 - `ul.filters` (hidden until the script runs) holds `button.filter[data-filter][aria-pressed]`. The count line has `aria-live="polite"`.
 - The `<dialog class="lightbox">` opens on click, moves with the arrow keys or Previous and Next, closes with Esc, Close or a click outside, and returns focus to the photo. Without `<dialog>` support the button opens the photo.
+- Lightbox controls: Previous and Next are 48px round icon buttons (inline SVG chevrons, `aria-label` "Previous photo" / "Next photo") either side of the photo from 48em and in a row under it on phones, with an "n of N" count (`[data-count]`, `aria-live="polite"`) between them. They wrap round the photos the current filter shows; a 40px sideways swipe on touch also moves.
 - Real alt text on every photo; no slider; `loading="lazy"`; 400 and 800px WebP.
 
 ## 11. The schedule (`#nursery-schedule`) and status

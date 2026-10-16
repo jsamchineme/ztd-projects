@@ -1,7 +1,7 @@
 /* Open House: small, dependency-free behaviour. Reads everything from the page; never edit per nursery.
    1. Phone menu sheet   2. Live open or closed status   3. Dated notices
    4. Smoke pause        5. Living photo                 6. Tour film (click to play)
-   7. Gallery filters */
+   7. Gallery filters        8. Gallery lightbox */
 (function () {
   'use strict';
   var doc = document.documentElement;
@@ -130,4 +130,46 @@
       if (live) live.textContent = 'Showing ' + (g === 'all' ? 'all photos' : f.textContent.trim().toLowerCase());
     });
   });
+
+  /* 8. Gallery lightbox: <a class="mosaic__open" href="big.jpg"> around each photo, one <dialog id="lightbox">.
+        Steps through the photos the filters show, wrapping round. Arrow keys and swipes move; Esc or the backdrop closes. */
+  var box = document.getElementById('lightbox');
+  var opens = document.querySelectorAll('.mosaic__open');
+  if (box && box.showModal && opens.length) {
+    var big = box.querySelector('img'), cap = box.querySelector('figcaption'), count = box.querySelector('.lightbox__count');
+    var list = [], at = 0, opener = null, downX = null;
+    var show = function (i) {
+      at = (i + list.length) % list.length;
+      var a = list[at], im = a.querySelector('img'), fc = a.parentNode.querySelector('figcaption');
+      big.src = a.getAttribute('href'); big.alt = im.alt;
+      big.width = im.getAttribute('width'); big.height = im.getAttribute('height');
+      cap.textContent = fc ? fc.textContent : '';
+      count.textContent = (at + 1) + ' of ' + list.length;
+    };
+    opens.forEach(function (a) {
+      a.setAttribute('aria-haspopup', 'dialog');
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        list = Array.prototype.filter.call(opens, function (x) { return !x.closest('[hidden]'); });
+        opener = a; show(list.indexOf(a)); box.showModal();
+      });
+    });
+    box.querySelector('.lightbox__prev').addEventListener('click', function () { show(at - 1); });
+    box.querySelector('.lightbox__next').addEventListener('click', function () { show(at + 1); });
+    box.querySelector('.lightbox__close').addEventListener('click', function () { box.close(); });
+    box.addEventListener('close', function () { if (opener) opener.focus(); });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(at - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(at + 1); }
+    });
+    box.addEventListener('click', function (e) { /* a click outside the dialog box is the backdrop */
+      var r = box.getBoundingClientRect();
+      if (e.clientX && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) box.close();
+    });
+    big.addEventListener('pointerdown', function (e) { downX = e.clientX; });
+    big.addEventListener('pointerup', function (e) {
+      if (downX !== null && Math.abs(e.clientX - downX) > 40) show(at + (e.clientX < downX ? 1 : -1));
+      downX = null;
+    });
+  }
 })();

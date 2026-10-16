@@ -241,8 +241,12 @@
       <li data-group="building"><figure><button type="button" data-lightbox="img/sign.webp" aria-label="Show a larger photo: Our sign by the road"><picture><source type="image/webp" srcset="img/sign-sm.webp 400w, img/sign.webp 640w" sizes="(min-width: 56em) 22rem, 50vw"><img src="img/sign.jpg" alt="Our sign on the grass beside the road, with the Sunshine Nursery logo and an arrow pointing the way." width="640" height="480" loading="lazy" decoding="async"></picture></button><figcaption>Our sign by the road.</figcaption></figure></li>
     </ul>
     <dialog class="lightbox" id="lightbox" aria-label="Larger photo">
-      <img data-lightbox-img hidden alt="">
-      <div class="lightbox__foot"><p data-lightbox-caption></p><button class="lightbox__close" type="button" data-lightbox-close><svg aria-hidden="true" focusable="false"><use href="#i-close"/></svg>Close</button></div>
+      <div class="lightbox__stage">
+        <img data-lightbox-img hidden alt="">
+        <button class="lightbox__step lightbox__step--prev" type="button" data-lightbox-prev aria-label="Previous photo"><svg aria-hidden="true" focusable="false"><use href="#i-back"/></svg></button>
+        <button class="lightbox__step lightbox__step--next" type="button" data-lightbox-next aria-label="Next photo"><svg aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button>
+      </div>
+      <div class="lightbox__foot"><p><span data-lightbox-caption></span> <span class="lightbox__count" aria-live="polite" data-lightbox-count></span></p><button class="lightbox__close" type="button" data-lightbox-close><svg aria-hidden="true" focusable="false"><use href="#i-close"/></svg>Close</button></div>
     </dialog>
   </div></div>
 </section>

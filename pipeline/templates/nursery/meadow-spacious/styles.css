@@ -546,7 +546,17 @@ a[href^="mailto:"] { overflow-wrap: anywhere; word-break: break-word; }
 .lightbox img { width: 100%; max-height: 72vh; object-fit: contain; border-radius: 18px; background: var(--paper-deep); }
 .lightbox__bar { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem .25rem .25rem; flex-wrap: wrap; }
 .lightbox__bar p { margin: 0; font-weight: 700; flex: 1 1 12rem; }
-.lightbox__buttons { display: flex; gap: .5rem; }
+/* Photo with Previous and Next: a row under the photo on phones, either side from 48em. */
+.lightbox__stage { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "img img img" "prev count next"; align-items: center; gap: .5rem; }
+.lightbox__stage img { grid-area: img; touch-action: pan-y; }
+.lightbox__count { grid-area: count; justify-self: center; margin: 0; text-align: center; font-weight: 700; }
+.lightbox .lightbox__nav { width: 48px; height: 48px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+.lightbox__nav--prev { grid-area: prev; }
+.lightbox__nav--next { grid-area: next; }
+.lightbox__nav svg { width: 1.5rem; height: 1.5rem; }
+@media (min-width: 48em) {
+  .lightbox__stage { grid-template-areas: "prev img next" ". count ."; }
+}
 .lightbox button { min-height: var(--tap); min-width: var(--tap); padding: .35rem .9rem; border-radius: 999px; border: 2px solid var(--line-strong); background: var(--surface); color: var(--ink); font: 700 1rem/1 var(--font); cursor: pointer; }
 .lightbox .lightbox__close { background: var(--action); border-color: var(--action); color: #fff; }
 

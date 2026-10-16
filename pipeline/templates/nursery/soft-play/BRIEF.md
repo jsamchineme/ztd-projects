@@ -15,7 +15,7 @@ It is the most playful of the four spacious directions, and still airy, because 
 | Path | What it is | Edit per nursery? |
 |---|---|---|
 | `styles.css` | The whole design system. Section 1 holds every token. | Tokens only (section 1) |
-| `softplay.js` | About 170 lines of plain JavaScript, no dependencies: phone menu sheet, sticky phone bar, living photo, dated notices, live open/closed status, gallery filters and the staircase entrance. Reads everything from the page. | Never |
+| `softplay.js` | About 210 lines of plain JavaScript, no dependencies: phone menu sheet, sticky phone bar, living photo, the tour film's play button, dated notices, live open/closed status, gallery filters and lightbox, and the staircase entrance. Reads everything from the page. | Never |
 | `foam-sprite.svg` | The source of every reusable drawing as `<symbol>`s: 6 foam shapes, the brand mark, staircase icons, room icons and "What's here" signs. **Paste its `<svg>` inline straight after `<body>` on every page** and draw with `<svg><use href="#id"/></svg>`. | Add symbols if needed |
 | `fonts/` | Bagel Fat One (display) and Albert Sans (variable, body), latin and latin-ext woff2 subsets, 82 KB in all. SIL OFL in `fonts/OFL.txt`. | Never |
 | `PHOTO-SHOTLIST.md` | What to ask the nursery to photograph. | Never |
@@ -217,7 +217,7 @@ ffmpeg -i a.jpg -i b.jpg … -filter_complex "[0:v]$seg[a];[1:v]$seg[b];…;[a][
 ```
 The living-photo recipe above uses the same method, as one 10 s cosine back-and-forth so it loops seamlessly.
 
-**Gallery:** `.filters[data-filters=mosaic]` (foam-block buttons with `aria-pressed`, groups Rooms, Play, Garden, and Food or Artwork when there are photos) over `ul.mosaic#mosaic > li[data-group] > figure > picture + figcaption`: 2 columns with 12px gaps on a phone, 3 on desktop, frame colour by group. Real `<img>` with true alt text and short captions, `loading="lazy"`, WebP 400/800 + JPEG. No slider, no lightbox. The homepage has **no** gallery strip; the Gallery door is the way in.
+**Gallery:** `.filters[data-filters=mosaic]` (foam-block buttons with `aria-pressed`, groups Rooms, Play, Garden, and Food or Artwork when there are photos) over `ul.mosaic#mosaic > li[data-group] > figure > a.mosaic__open[href=biggest file] > picture` + `figcaption`: 2 columns with 12px gaps on a phone, 3 on desktop, frame colour by group. Real `<img>` with true alt text and short captions, `loading="lazy"`, WebP 400/800 + JPEG. No slider on the page. Keep the `<dialog id="lightbox">` from the example: a tapped photo opens large with its caption, a "3 of 10" count and round sun Previous / Next arrow buttons (under the photo on a phone, either side from 760px); they, the arrow keys and a swipe step through the photos the filter is showing and wrap round. Esc, Close or the backdrop shut it. Without JS the link opens the file. The homepage shows 4 photo tiles in "Inside and out" (not a strip or slider); the full set is on the Gallery page.
 
 ## 10. Final figures for the example (14 October 2026)
 

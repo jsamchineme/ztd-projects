@@ -4,7 +4,7 @@
    3. Dated notices (data-show-from / data-show-until)
    4. Call bar: tucked away while the hero or the Book a visit band is in view
    5. Living photo: autoplays only on wider screens without reduced motion; visible pause button
-   6. Gallery filters and lightbox */
+   6. Gallery filters and lightbox (Previous / Next, arrow keys, swipe) */
 (function () {
   'use strict';
   var doc = document;
@@ -164,18 +164,43 @@
   });
   var box = doc.getElementById('lightbox');
   if (box && typeof box.showModal === 'function') {
-    var boxImg = box.querySelector('[data-lightbox-img]'), boxCap = box.querySelector('[data-lightbox-caption]'), opener = null;
+    var boxImg = box.querySelector('[data-lightbox-img]'), boxCap = box.querySelector('[data-lightbox-caption]'), boxCount = box.querySelector('[data-lightbox-count]');
+    var prev = box.querySelector('[data-lightbox-prev]'), next = box.querySelector('[data-lightbox-next]'), opener = null, list = [], at = 0;
+    /* Show photo i of the ones the filters leave visible; wraps at both ends */
+    function show(i) {
+      at = (i + list.length) % list.length;
+      var b = list[at], img = b.querySelector('img');
+      boxImg.src = b.getAttribute('data-lightbox');
+      boxImg.alt = img.alt;
+      boxImg.hidden = false;
+      boxCap.textContent = (b.closest('figure').querySelector('figcaption') || {}).textContent || '';
+      if (boxCount) boxCount.textContent = (at + 1) + ' of ' + list.length;
+    }
     doc.querySelectorAll('[data-lightbox]').forEach(function (b) {
       b.addEventListener('click', function () {
-        var img = b.querySelector('img');
+        list = Array.prototype.filter.call(doc.querySelectorAll('[data-lightbox]'), function (o) { return !o.closest('[hidden]'); });
         opener = b;
-        boxImg.src = b.getAttribute('data-lightbox');
-        boxImg.alt = img.alt;
-        boxImg.hidden = false;
-        boxCap.textContent = (b.closest('figure').querySelector('figcaption') || {}).textContent || '';
+        show(list.indexOf(b));
+        if (prev && next) prev.hidden = next.hidden = list.length < 2;
         box.showModal();
       });
     });
+    if (prev && next) {
+      prev.addEventListener('click', function () { show(at - 1); });
+      next.addEventListener('click', function () { show(at + 1); });
+      box.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); show(at - 1); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); show(at + 1); }
+      });
+      /* Swipe on touch: 40px sideways is enough */
+      var startX = null;
+      boxImg.addEventListener('pointerdown', function (e) { startX = e.pointerType === 'mouse' ? null : e.clientX; });
+      boxImg.addEventListener('pointerup', function (e) {
+        if (startX === null) return;
+        var dx = e.clientX - startX; startX = null;
+        if (Math.abs(dx) > 40) show(at + (dx < 0 ? 1 : -1));
+      });
+    }
     box.querySelector('[data-lightbox-close]').addEventListener('click', function () { box.close(); });
     box.addEventListener('click', function (e) { if (e.target === box) box.close(); });
     box.addEventListener('close', function () { if (opener) opener.focus(); });

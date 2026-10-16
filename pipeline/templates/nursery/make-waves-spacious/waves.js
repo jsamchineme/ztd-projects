@@ -141,24 +141,55 @@
     });
   });
 
-  /* Lightbox: a native dialog. Esc closes it; focus goes back to the photo. */
+  /* Lightbox: a native dialog. Previous and Next (and the arrow keys, and a
+     swipe) step through the photos the filters are showing, wrapping at the
+     ends. Esc closes it; focus goes back to the photo that opened it. */
   var box = doc.getElementById("lightbox");
   if (box && typeof box.showModal === "function") {
     var boxImg = box.querySelector("img");
     var boxCap = box.querySelector("[data-lightbox-caption]");
-    var opener = null;
-    doc.querySelectorAll("[data-lightbox]").forEach(function (a) {
+    var boxCount = box.querySelector("[data-lightbox-count]");
+    var steps = box.querySelectorAll("[data-lightbox-step]");
+    var opener = null, shown = [], at = 0;
+    var showAt = function (i) {
+      at = (i + shown.length) % shown.length;
+      var a = shown[at];
+      var img = a.querySelector("img");
+      boxImg.src = a.getAttribute("href");
+      boxImg.alt = img ? img.alt : "";
+      var cap = a.closest("figure") && a.closest("figure").querySelector("figcaption");
+      boxCap.textContent = cap ? cap.textContent : "";
+      if (boxCount) boxCount.textContent = shown.length > 1 ? (at + 1) + " of " + shown.length : "";
+    };
+    var links = doc.querySelectorAll("[data-lightbox]");
+    links.forEach(function (a) {
       a.addEventListener("click", function (e) {
         e.preventDefault();
         opener = a;
-        var img = a.querySelector("img");
-        boxImg.src = a.getAttribute("href");
-        boxImg.alt = img ? img.alt : "";
-        var cap = a.closest("figure") && a.closest("figure").querySelector("figcaption");
-        boxCap.textContent = cap ? cap.textContent : "";
+        shown = Array.prototype.filter.call(links, function (l) { return !l.closest("[hidden]"); });
+        steps.forEach(function (b) { b.hidden = shown.length < 2; });
+        showAt(Math.max(0, shown.indexOf(a)));
         box.showModal();
         box.querySelector(".lightbox__close").focus();
       });
+    });
+    steps.forEach(function (b) {
+      b.addEventListener("click", function () { showAt(at + parseInt(b.getAttribute("data-lightbox-step"), 10)); });
+    });
+    box.addEventListener("keydown", function (e) {
+      if (shown.length < 2) return;
+      if (e.key === "ArrowLeft") { e.preventDefault(); showAt(at - 1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); showAt(at + 1); }
+    });
+    /* Swipe: a sideways drag of 40px or more on the photo. */
+    var downX = null;
+    boxImg.addEventListener("dragstart", function (e) { e.preventDefault(); });
+    boxImg.addEventListener("pointerdown", function (e) { downX = e.clientX; });
+    boxImg.addEventListener("pointerup", function (e) {
+      if (downX === null || shown.length < 2) return;
+      var dx = e.clientX - downX;
+      downX = null;
+      if (Math.abs(dx) >= 40) showAt(at + (dx < 0 ? 1 : -1));
     });
     box.querySelector(".lightbox__close").addEventListener("click", function () { box.close(); });
     box.addEventListener("click", function (e) { if (e.target === box) box.close(); });

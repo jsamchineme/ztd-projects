@@ -251,6 +251,7 @@ On every page, before `waves.js`:
 - Filter buttons (`button.filter[data-filter][aria-pressed]`) show one group at a time; "All" shows every group. Groups: Rooms, Garden, Building, Food, Artwork (drop or add groups to match the photos you have, and keep the filter list in step).
 - Each group is a 2-column mosaic on phones, 4 from 48em, with one `li.is-big` photo per group. Each photo is a real `<img>` in an `a[data-lightbox]` pointing at the larger file, with true alt text and a short visible caption.
 - The lightbox is one `<dialog id="lightbox">` at the end of the page: Esc and the Close button close it, a backdrop click closes it, and focus returns to the photo.
+- Keep its Previous and Next icon buttons (`button.lightbox__step[data-lightbox-step]`, 48px sun circles in a navy strip under the photo on phones, either side of it from 48em) and the "3 of 11" count (`[data-lightbox-count]`, aria-live). Together with the arrow keys and a 40px swipe, they step through the photos the current filter shows and wrap at the ends. The big image is the link's `href` file, and its alt is the thumbnail's alt.
 - No slider, no autoplay, no share buttons.
 
 ## 11. Pre-handover checklist
