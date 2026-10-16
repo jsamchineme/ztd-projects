@@ -2,7 +2,7 @@
 // which starts that instance; by hand: node test/e2e.mjs http://studio.localhost:4310 localhost:4310 <screenshot dir>
 import { chromium } from 'playwright-core';
 import { createHmac, createECDH, createDecipheriv, randomBytes } from 'node:crypto';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import net from 'node:net';
 import http from 'node:http';
@@ -707,6 +707,67 @@ await check('a chat can be archived, unarchived and deleted', async () => {
   await page.waitForURL(/\/chat\/new$/);
   if (await row.count()) throw new Error('the deleted chat is still listed');
 }, page);
+// A fake Anthropic API for projects' AI workers (STUDIO_ANTHROPIC_URL in test/run.sh): every Messages call reports usage.
+const anthropic = http.createServer((req, res) => {
+  let body = '';
+  req.on('data', c => body += c);
+  req.on('end', () => {
+    const j = JSON.parse(body || '{}');
+    if (j.stream){
+      res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      res.write(`event: message_start\ndata: ${JSON.stringify({ type: 'message_start', message: { model: 'claude-opus-5-5', usage: { input_tokens: 1000, output_tokens: 1 } } })}\n\n`);
+      res.write(`event: content_block_delta\ndata: ${JSON.stringify({ type: 'content_block_delta', delta: { type: 'text_delta', text: 'hi' } })}\n\n`);
+      res.end(`event: message_delta\ndata: ${JSON.stringify({ type: 'message_delta', usage: { output_tokens: 2000 } })}\n\nevent: message_stop\ndata: {"type":"message_stop"}\n\n`);
+    } else {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ model: 'claude-opus-5-5', content: [{ type: 'text', text: 'hi' }], usage: { input_tokens: 10000, output_tokens: 1000 } }));
+    }
+  });
+}).listen(Number(new URL(BASE).port) + 2, '127.0.0.1');
+await check('daily budgets: a shared Claude’s limit stops a project’s AI workers; a project’s limit stops its chats', async () => {
+  const H = { headers: { Origin: BASE } };
+  const users = await (await page.request.get(`${BASE}/api/admin/users`)).json();
+  const mia = users.find(u => u.email === 'mia@example.com');
+  let teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const demo = teams.find(t => t.name === 'Pipeline Team').projects.find(p => p.name === 'Demo Site');
+  // Demo Site's workers run on Mia's share of Olu's Claude; its services are pointed at Studio's counting proxy
+  await page.request.patch(`${BASE}/api/projects/${demo.id}`, { ...H, data: { workerClaudeUserId: mia.id } });
+  const units = Object.values(JSON.parse(readFileSync(`${process.env.MOCK_ROOT}/state.json`, 'utf8')).units);
+  const base = units.map(u => u.env?.ANTHROPIC_BASE_URL).find(u => u?.includes('/claude-proxy/'));
+  if (!base) throw new Error('services weren’t given the proxy address');
+  const proxied = base.replace(/^http:\/\/127\.0\.0\.1:\d+/, BASE) + '/v1/messages';
+  // Olu sets Mia's limit from the team page
+  await page.goto(BASE + '/team');
+  await page.locator('tr', { hasText: 'mia@example.com' }).getByRole('button', { name: 'Set daily limit' }).click();
+  await page.fill('dialog input[type=number]', '0.05');
+  await page.locator('dialog').getByRole('button', { name: 'Save' }).click();
+  await page.getByText('Mia Member can spend $0.05 a day').waitFor();
+  await page.locator('tr', { hasText: 'mia@example.com' }).getByText('$0.00 of $0.05 today').waitFor();
+  // Streamed: 1000 in + 2000 out on Opus 5.5 = $0.044; then plain JSON: 10000 in + 1000 out = $0.06
+  const s1 = await page.request.post(proxied, { data: { model: 'claude-opus-5-5', stream: true, messages: [] } });
+  if (!s1.ok() || !(await s1.text()).includes('message_stop')) throw new Error('streamed call wasn’t passed through');
+  const s2 = await page.request.post(proxied, { data: { model: 'claude-opus-5-5', messages: [] } });
+  if (!s2.ok()) throw new Error('second call was refused under the limit');
+  const s3 = await page.request.post(proxied, { data: { model: 'claude-opus-5-5', messages: [] } });
+  if (s3.status() !== 400 || !(await s3.text()).includes('daily budget of $0.05')) throw new Error('call over the limit wasn’t refused: ' + s3.status());
+  const outside = await page.request.post(proxied, { headers: { 'X-Real-IP': '203.0.113.9' }, data: {} });
+  if (outside.status() !== 404) throw new Error('proxy answered a request from outside the machine');
+  teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const spent = teams.find(t => t.name === 'Pipeline Team').members.find(m => m.userId === mia.id).claudeFrom.spentToday;
+  if (Math.abs(spent - 0.104) > 1e-9) throw new Error('counted ' + spent + ', expected 0.104');
+  // A project budget, set in Settings, stops chats once the project's spend (workers included) reaches it
+  await page.goto(projectUrl + '/settings');
+  await page.fill('input[aria-label="Daily Claude budget"]', '0.01');
+  await page.click('#set-general button[type=submit]');
+  await page.locator('.toast', { hasText: 'Saved' }).waitFor();
+  const chat = await (await page.request.post(`${BASE}/api/projects/${demo.id}/chats`, { ...H, data: {} })).json();
+  const r = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt: 'hello' } });
+  if (r.status() !== 429 || !(await r.json()).error.includes('used its daily Claude budget of $0.01')) throw new Error('prompt over the project budget wasn’t refused: ' + r.status());
+  await page.request.patch(`${BASE}/api/projects/${demo.id}`, { ...H, data: { dailyBudgetUsd: null } });
+  const ok = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt: 'hello' } });
+  if (!ok.ok()) throw new Error('prompt refused after removing the budget: ' + ok.status());
+}, page);
+anthropic.close();
 await check('move a teammate to another team', async () => {
   const H = { headers: { Origin: BASE } };
   const users = await (await page.request.get(`${BASE}/api/admin/users`)).json();

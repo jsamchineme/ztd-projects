@@ -16,6 +16,7 @@ import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
 import * as U from './lib/uploads.mjs';
+import * as B from './lib/budget.mjs';
 import { requestEmailChange, confirmEmailChange } from './lib/account.mjs';
 import { ctl, ctlOk, ctlJson, spawnCtl } from './lib/ctl.mjs';
 import { subdomainOf, handleProjectRequest, handleProjectUpgrade, issueGateToken, canAccessOrg } from './lib/gate.mjs';
@@ -78,7 +79,8 @@ function projectView(project, user){
   const org = db.prepare('SELECT id, name FROM organization WHERE id = ?').get(project.organizationId);
   const services = P.listServices(project.id).map(s => ({ ...P.publicService(s), status: P.statusOf(project, s) }));
   const worker = project.workerClaudeUserId ? db.prepare('SELECT id, name FROM user WHERE id = ?').get(project.workerClaudeUserId) : null;
-  return { ...project, role, canManage: canManage(role), team: org, services, workerClaude: worker, running: A.runningChats().filter(id => A.getChat(id)?.projectId === project.id).length };
+  const { usageToken, ...rest } = project;
+  return { ...rest, role, spentToday: B.projectSpent(project.id), canManage: canManage(role), team: org, services, workerClaude: worker, running: A.runningChats().filter(id => A.getChat(id)?.projectId === project.id).length };
 }
 
 // ---------- routes ----------
@@ -91,7 +93,7 @@ const route = (method, pattern, handler, opts = {}) => {
 
 // Account
 route('GET', '/api/me', async ({ user, session }) => {
-  const claude = C.connectionInfo(user.id);
+  const claude = claudeInfo(user.id);
   return {
     user: { id: user.id, name: user.name, email: user.email, role: user.role, twoFactorEnabled: !!user.twoFactorEnabled, image: user.image || null },
     session: { id: session.id, expiresAt: session.expiresAt },
@@ -158,7 +160,9 @@ route('GET', '/api/gate', async ({ url, user, session }, res) => {
 async function reapplyWorkerProjects(userId){
   for (const p of db.prepare('SELECT * FROM project WHERE workerClaudeUserId = ?').all(userId)) await P.applyServices(p).catch(e => console.error(e.message));
 }
-route('GET', '/api/claude', async ({ user }) => C.connectionInfo(user.id));
+// On someone else's Claude, also their daily budget there and what they've spent today (lib/budget.mjs).
+const claudeInfo = userId => { const c = C.connectionInfo(userId); return c.sharedBy ? { ...c, ...B.personToday(userId) } : c; };
+route('GET', '/api/claude', async ({ user }) => claudeInfo(user.id));
 route('POST', '/api/claude/connect', async ({ user }) => C.startSignIn(user.id));
 route('POST', '/api/claude/code', async ({ user, body }) => { await C.submitCode(user.id, body.code); await reapplyWorkerProjects(user.id); return C.connectionInfo(user.id); });
 route('POST', '/api/claude/cancel', async ({ user }) => { C.cancelSignIn(user.id); return { ok: true }; });
@@ -179,6 +183,13 @@ route('DELETE', '/api/claude/share/:userId', async ({ user, params }) => {
   if (![s.ownerId, params.userId].includes(user.id) && user.role !== 'admin') throw err(403, 'Not your share to stop');
   C.stopShare(params.userId);
   return { ok: true };
+});
+route('POST', '/api/claude/share/:userId/budget', async ({ user, params, body }) => {
+  const s = C.shareOf(params.userId);
+  if (!s) throw err(404, 'They aren’t using someone else’s Claude.');
+  if (s.ownerId !== user.id && user.role !== 'admin') throw err(403, 'Only the person sharing their Claude, or a Studio admin, can set this.');
+  B.setShareBudget(user.id, params.userId, body.dailyBudgetUsd);
+  return B.personToday(params.userId);
 });
 
 // Projects
@@ -209,6 +220,7 @@ route('PATCH', '/api/projects/:id', async ({ user, params, body }) => {
     db.prepare('UPDATE project SET workerClaudeUserId = ? WHERE id = ?').run(uid, p.id);
     await P.applyServices(P.getProject(p.id));
   }
+  if (body.dailyBudgetUsd !== undefined && body.dailyBudgetUsd !== p.dailyBudgetUsd) B.setProjectBudget(user.id, p, body.dailyBudgetUsd);
   if (body.organizationId !== undefined && body.organizationId !== p.organizationId){
     if (user.role !== 'admin' && !['owner', 'admin'].includes(orgRole(user, body.organizationId))) throw err(403, 'You must be an admin of the team you move it to.');
     db.prepare('UPDATE project SET organizationId = ? WHERE id = ?').run(body.organizationId, p.id);
@@ -397,7 +409,7 @@ route('GET', '/api/teams', async ({ user }) => {
     : memberships(user.id);
   return teams.map(t => {
     const members = db.prepare(`SELECT m.id, m.role, m.createdAt, u.id AS userId, u.name, u.email, u.twoFactorEnabled FROM member m JOIN user u ON u.id = m.userId WHERE m.organizationId = ? ORDER BY u.name`).all(t.organizationId)
-      .map(m => { const s = C.shareOf(m.userId); return s ? { ...m, claudeFrom: { id: s.ownerId, name: s.ownerName } } : m; });
+      .map(m => { const s = C.shareOf(m.userId); return s ? { ...m, claudeFrom: { id: s.ownerId, name: s.ownerName, ...B.personToday(m.userId) } } : m; });
     const canAdmin = ['site-admin', 'owner', 'admin'].includes(t.role);
     const sharing = C.invitesSharing();
     const invites = canAdmin ? db.prepare(`SELECT id, email, role, status, expiresAt, inviterId FROM invitation WHERE organizationId = ? AND status = 'pending' ORDER BY createdAt DESC`).all(t.organizationId)
@@ -552,6 +564,7 @@ function serveStatic(req, res, pathname){
 }
 
 async function handleStudio(req, res){
+  if (req.url.startsWith('/claude-proxy/')) return B.proxyClaude(req, res);
   const url = new URL(req.url, STUDIO_URL);
   if (url.pathname.startsWith('/api/auth/')){
     for (const [k, v] of Object.entries(SECURITY)) res.setHeader(k, v);

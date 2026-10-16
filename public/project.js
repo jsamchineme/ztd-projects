@@ -793,6 +793,7 @@ function settingsTab(ctx){
     p.workerClaude && p.workerClaude.id !== state.me.user.id ? h('option', { value: p.workerClaude.id }, `${p.workerClaude.name}'s Claude`) : null,
     h('option', { value: state.me.user.id }, `My Claude (${state.me.claude?.connected ? state.me.claude.kind === 'subscription' ? 'subscription' : 'API key' : 'not connected yet'})`));
   worker.value = p.workerClaudeUserId || '';
+  const budget = h('input', { type: 'number', min: 0, step: '0.01', placeholder: 'No limit', value: p.dailyBudgetUsd ?? '', 'aria-label': 'Daily Claude budget' });
   const confirm = h('input', { type: 'text', placeholder: p.slug, 'aria-label': 'Type the short name to confirm' });
   // Studio admins: older projects share the ztd user; this moves one onto its own user, as new projects get.
   const userCard = h('div', { class: 'card-body' }, h('p', { class: 'muted', style: { margin: 0 } }, 'Checking…'));
@@ -817,7 +818,7 @@ function settingsTab(ctx){
         h('form', { class: 'card', id: 'set-general', onsubmit: async e => {
           e.preventDefault();
           await busy(e.submitter, async () => {
-            await api('PATCH', `/api/projects/${ctx.id}`, { name: name.value, description: desc.value, organizationId: team.value, workerClaudeUserId: worker.value || null });
+            await api('PATCH', `/api/projects/${ctx.id}`, { name: name.value, description: desc.value, organizationId: team.value, workerClaudeUserId: worker.value || null, dailyBudgetUsd: budget.value === '' ? null : Number(budget.value) });
             toast('Saved'); refreshProjects().catch(() => {});
           }, 'Saving…').catch(() => {});
         } },
@@ -825,6 +826,7 @@ function settingsTab(ctx){
           h('div', { class: 'card-body form-grid' },
             field('Name', name), field('Description', desc, 'Claude reads this at the start of every chat. If an admin turns on focus checks, prompts are compared with it'), field('Team', team, 'everyone in this team can open and work on it'),
             field('Claude for the project’s own AI workers', worker, 'some projects (like the pipeline) run Claude themselves; they use this connection'),
+            field('Daily Claude budget, in dollars', budget, `chats and AI workers together, by Claude’s cost estimate; empty for no limit. $${(p.spentToday || 0).toFixed(2)} used today, resets at midnight`),
             h('div', null, h('label', null, 'Folder on the server'), h('div', { class: 'secret' }, `/srv/projects/${p.slug}/repo`))),
           h('div', { class: 'card-foot' }, h('div', { class: 'spacer' }), h('button', { class: 'btn primary', type: 'submit' }, 'Save'))),
         admin ? card('set-user', 'Who it runs as', 'Studio admins only.', userCard) : null,

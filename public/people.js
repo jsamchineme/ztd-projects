@@ -246,6 +246,7 @@ async function paintClaude(card){
         h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, `Using ${info.sharedBy}’s Claude ${info.kind === 'subscription' ? 'subscription' : 'API key'}`),
           h('div', { class: 'small muted' }, `${info.sharedBy} shared it with you when they invited you.`)),
         h('span', { class: 'pill ok' }, ico('check'), 'Connected')),
+      info.dailyBudgetUsd != null ? h('p', { class: 'small' }, `Daily budget: $${info.spentToday.toFixed(2)} of $${info.dailyBudgetUsd.toFixed(2)} used today. It resets at midnight.`) : null,
       h('p', { class: 'small muted' }, `Prompts you send in Studio run on ${info.sharedBy}’s ${info.kind === 'subscription' ? 'Claude.ai plan and count towards its usage limits' : 'Anthropic Console account'}. Connect your own and Studio uses yours instead.`),
       h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => connectFlow(card) }, 'Connect my own Claude subscription'),
         h('button', { class: 'btn', onclick: () => apiKeyFlow(card) }, 'Use my own API key'),
@@ -388,11 +389,31 @@ function claudeFromLine(m, reload){
   const me = state.me.user;
   const mine = m.claudeFrom.id === me.id;
   const canStop = mine || m.userId === me.id || me.role === 'admin';
-  return h('div', { class: 'small muted' }, mine ? 'Uses your Claude' : `Uses ${m.claudeFrom.name}’s Claude`,
-    canStop ? [' · ', h('button', { class: 'btn small ghost', style: { minHeight: 0, padding: '0 4px' }, onclick: async e => {
+  const f = m.claudeFrom, link = { class: 'btn small ghost', style: { minHeight: 0, padding: '0 4px' } };
+  const canBudget = mine || me.role === 'admin';
+  return h('div', { class: 'small muted' }, mine ? 'Uses your Claude' : `Uses ${f.name}’s Claude`,
+    f.dailyBudgetUsd != null ? ` · $${f.spentToday.toFixed(2)} of $${f.dailyBudgetUsd.toFixed(2)} today` : f.spentToday ? ` · $${f.spentToday.toFixed(2)} today` : null,
+    canBudget ? [' · ', h('button', { ...link, onclick: () => shareBudget(m, reload) }, f.dailyBudgetUsd != null ? 'Change limit' : 'Set daily limit')] : null,
+    canStop ? [' · ', h('button', { ...link, onclick: async e => {
       if (await confirmDialog(`Stop ${m.name} using ${mine ? 'your' : m.claudeFrom.name + '’s'} Claude?`, 'They won’t be able to send prompts until they connect their own.', 'Stop sharing', true))
         busy(e.target, async () => { await api('DELETE', `/api/claude/share/${m.userId}`); toast('Stopped sharing'); reload(); });
     } }, 'Stop sharing')] : null);
+}
+
+// A daily limit on what someone may spend on the Claude shared with them (lib/budget.mjs).
+function shareBudget(m, reload){
+  const f = m.claudeFrom;
+  const amount = h('input', { type: 'number', min: 0, step: '0.01', placeholder: 'No limit', value: f.dailyBudgetUsd ?? '' });
+  dialog(close => h('form', { class: 'dialog-body', onsubmit: async e => {
+    e.preventDefault();
+    await busy(e.submitter, async () => {
+      await api('POST', `/api/claude/share/${m.userId}/budget`, { dailyBudgetUsd: amount.value === '' ? null : Number(amount.value) });
+      close(); toast(amount.value === '' ? `No daily limit for ${m.name}` : `${m.name} can spend $${Number(amount.value).toFixed(2)} a day`); reload();
+    }).catch(() => {});
+  } }, h('h2', null, `Daily limit for ${m.name}`),
+    h('p', { class: 'muted' }, `The most ${m.name} can spend each day on ${f.id === state.me.user.id ? 'your' : f.name + '’s'} Claude, including AI workers of projects that run on it. Costs are Claude’s own estimate; on a subscription that’s what the same work would cost on the API. A prompt that crosses the limit still finishes; after that they wait until midnight. $${f.spentToday.toFixed(2)} used today.`),
+    field('Dollars a day', amount, 'empty for no limit'),
+    h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Save'))));
 }
 
 function newTeam(reload){
