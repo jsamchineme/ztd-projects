@@ -493,7 +493,13 @@ async function handleStudio(req, res){
     try {
       if (req.method !== 'GET'){
         if (req.headers.origin !== STUDIO_URL) throw err(403, 'Bad origin');
-        if (Number(req.headers['content-length']) > (r.limit || 1_000_000)){ res.setHeader('Connection', 'close'); throw err(413, r.limit ? 'That file is too large (20 MB at most).' : 'Too large'); }
+        if (Number(req.headers['content-length']) > (r.limit || 1_000_000)){
+          // Read and drop the rest of the body, so the sender gets this 413 rather than a broken connection
+          // (closing at once raced with the upload still arriving). Bodies over 64 MB are cut off.
+          let dropped = 0;
+          req.on('data', c => { dropped += c.length; if (dropped > 64_000_000) req.destroy(); });
+          throw err(413, r.limit ? 'That file is too large (20 MB at most).' : 'Too large');
+        }
         if (!String(req.headers['content-type'] || '').includes('application/json') && req.headers['content-length'] !== '0' && req.headers['content-length']) throw err(415, 'Send JSON');
       }
       const s = await sessionFrom(req.headers);

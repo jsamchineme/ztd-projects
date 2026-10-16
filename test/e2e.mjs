@@ -85,7 +85,7 @@ await check('two-step setup with QR, key and backup codes', async () => {
 }, page);
 await check('admin creates a team', async () => {
   await page.click('text=Teams and people');
-  await page.click('text=+ New team');
+  await page.click('button:has-text("New team")');
   await page.fill('dialog input', 'Pipeline Team');
   await page.click('dialog button[type=submit]');
   await page.getByText('Team created').waitFor();
@@ -93,8 +93,8 @@ await check('admin creates a team', async () => {
 }, page);
 let projectUrl = '';
 await check('create a project from the blank starter', async () => {
-  await page.reload();
-  await page.click('text=+ New project');
+  await page.goto(BASE + '/');
+  await page.click('.page button:has-text("New project")');
   await page.fill('dialog input[placeholder="e.g. GP Pipeline"]', 'Demo Site');
   const slug = await page.inputValue('dialog input[placeholder="gp-pipeline"]');
   if (slug !== 'demo-site') throw new Error('slug was ' + slug);
@@ -243,7 +243,7 @@ await check('teammate accepts invite, creates account, sets up two-step, sees pr
 });
 await check('sign out, then sign in again needs the authenticator code', async () => {
   await page.goto(BASE + '/');
-  await page.click('text=Sign out');
+  await page.click('button[aria-label="Sign out"]');
   await page.waitForURL(/\/login/);
   await page.fill('input[type=email]', 'owner@example.com');
   await page.fill('input[type=password]', PW);

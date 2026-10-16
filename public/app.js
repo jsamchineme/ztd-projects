@@ -1,5 +1,5 @@
 // ZTD Devs Studio front end: routing, sign-in screens and the app shell.
-import { h, $, onTap, api, authApi, toast, fail, busy, dialog, field, initials, ApiError } from './ui.js';
+import { h, $, onTap, api, authApi, toast, fail, busy, dialog, field, initials, ApiError, ico } from './ui.js';
 import { renderProject, newProjectDialog } from './project.js';
 import { renderAccount, renderTeams, renderAdmin } from './people.js';
 
@@ -53,21 +53,78 @@ async function route(){
   const main = $('#main');
   main.replaceChildren();
   const pm = path.match(/^\/p\/([^/]+)(?:\/([a-z]+))?(?:\/([^/]+))?/);
-  markNav(path);
+  if (!pm || sideChats.dataset.project !== pm[1]) sideChats.replaceChildren();   // no stale chats while another project loads
+  sideChats.dataset.project = pm?.[1] || '';
+  renderSideProjects();   // moves the chat list under the open project, and marks where we are
   if (pm) return renderProject(main, pm[1], pm[2] || 'chat', pm[3]);
   if (path === '/account') return renderAccount(main);
   if (path === '/team') return renderTeams(main);
   if (path === '/admin') return renderAdmin(main);
-  // Home: open the most recent project, or welcome.
-  if (!state.projects.length) await refreshProjects();
-  const last = localStorageGet('lastProject');
-  const p = state.projects.find(x => x.id === last) || state.projects[0];
-  if (p) return go(`/p/${p.id}`, true);
-  main.append(h('div', { class: 'page' }, h('div', { class: 'page-inner' },
-    h('h1', null, `Welcome, ${state.me.user.name.split(' ')[0]}`),
-    h('p', { class: 'muted' }, 'There are no projects yet.'),
-    canCreateProjects() ? h('button', { class: 'btn primary', onclick: () => newProjectDialog() }, 'New project')
-      : h('p', null, 'Ask a team admin to add you to a team with projects.'))));
+  return renderHome(main);
+}
+
+// ---------- projects home ----------
+// What a project is doing, from its services and chats: [dot class, words].
+export function projectState(p){
+  const states = p.services.map(s => s.status.state);
+  if (p.status === 'creating') return ['starting', 'Setting up'];
+  if (p.status === 'error') return ['crashed', 'Setup failed'];
+  if (p.running) return ['busy', 'Claude working'];
+  if (states.includes('crashed')) return ['crashed', 'Needs a look'];
+  if (states.includes('running')) return ['running', 'Running'];
+  if (states.includes('starting')) return ['starting', 'Starting'];
+  return ['', 'Stopped'];
+}
+async function renderHome(main){
+  setTitle('');
+  const first = state.me.user.name.split(' ')[0];
+  const page = h('div', { class: 'page', style: { flex: 1 } });
+  main.append(page);
+  const projects = await refreshProjects();
+  if (!projects.length){
+    page.append(h('div', { class: 'page-inner narrow welcome' },
+      h('img', { src: '/icon.svg', alt: '', width: 56, height: 56 }),
+      h('h1', { class: 'hello' }, `Welcome, ${first}`),
+      h('p', { class: 'muted' }, 'There are no projects yet.', canCreateProjects() ? ' Start one from a blank website or a copy of a Git repo, and Claude can build it with you.' : ''),
+      canCreateProjects() ? h('div', { class: 'row center' }, h('button', { class: 'btn primary', onclick: () => newProjectDialog() }, ico('plus'), 'New project'),
+        h('a', { class: 'btn', href: '/team', 'data-link': '' }, ico('users'), 'Invite your team'))
+        : h('p', null, 'Ask a team admin to add you to a team with projects.')));
+    return;
+  }
+  const hour = new Date().getHours();
+  const services = projects.flatMap(p => p.services);
+  const up = services.filter(s => s.status.state === 'running').length;
+  const working = projects.reduce((n, p) => n + (p.running || 0), 0);
+  const crashed = projects.flatMap(p => p.services.filter(s => s.status.state === 'crashed').map(s => ({ p, s })));
+  const look = [
+    ...crashed.map(({ p, s }) => h('div', null, ico('alert'), h('span', { class: 'small' }, h('strong', null, s.label || s.name), ` in ${p.name} has stopped unexpectedly. `, h('a', { href: `/p/${p.id}/services`, 'data-link': '' }, 'See its logs')))),
+    !state.me.claude?.connected ? h('div', null, ico('sparkle'), h('span', { class: 'small' }, h('strong', null, 'Claude isn’t connected'), ', so you can’t send prompts yet. ', h('a', { href: '/account#claude', 'data-link': '' }, 'Connect Claude'))) : null,
+  ].filter(Boolean);
+  const card = p => {
+    const [dot, words] = projectState(p);
+    const live = p.services.find(s => s.url);
+    return h('a', { class: 'pcard', href: `/p/${p.id}`, 'data-link': '' },
+      h('div', { class: 'thumb' }, p.name.split(/\s+/).slice(0, 2).join(' '),
+        live ? h('span', { class: 'pill live' }, h('span', { class: 'dot ' + live.status.state }), `${live.subdomain}.${state.me.domain}`) : null),
+      h('h3', null, p.name),
+      h('p', null, p.description?.trim() || 'No description yet.'),
+      h('div', { class: 'pcard-foot' }, h('span', { class: 'dot ' + dot }), words, h('span', null, '·'), `${p.services.length} service${p.services.length === 1 ? '' : 's'}`,
+        h('span', { class: 'spacer' }), p.team ? h('span', { class: 'pill' }, p.team.name) : null));
+  };
+  page.append(h('div', { class: 'page-inner' },
+    h('div', { class: 'page-head' }, h('div', null,
+      h('h1', { class: 'hello' }, `Good ${hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening'}, ${first}`),
+      h('p', null, `${projects.length} project${projects.length === 1 ? '' : 's'}`, working ? `, ${working} chat${working === 1 ? '' : 's'} with Claude working now` : '', '.')),
+      h('div', { class: 'spacer' }), canCreateProjects() ? h('button', { class: 'btn primary', onclick: () => newProjectDialog() }, ico('plus'), 'New project') : null),
+    h('div', { class: 'stats' },
+      h('div', { class: 'stat' }, h('b', null, projects.length), h('span', null, ico('grid'), 'Projects')),
+      h('div', { class: 'stat' }, h('b', null, `${up}`, h('small', null, ` of ${services.length}`)), h('span', null, ico('server'), 'Services running')),
+      h('div', { class: 'stat' + (working ? ' gold' : '') }, h('b', null, working), h('span', null, working ? h('span', { class: 'dot busy' }) : ico('chat'), 'Chats working now')),
+      h('div', { class: 'stat' }, h('b', null, state.me.teams.length), h('span', null, ico('users'), state.me.teams.length === 1 ? 'Team' : 'Teams'))),
+    look.length ? h('section', { class: 'card look' }, h('div', { class: 'card-head' }, h('h3', null, 'Needs a look')), h('div', { class: 'list' }, look)) : null,
+    h('div', { class: 'pgrid' }, projects.map(card),
+      canCreateProjects() ? h('button', { class: 'pcard add', type: 'button', onclick: () => newProjectDialog() },
+        h('div', null, h('div', { class: 'plus' }, ico('plus')), h('strong', null, 'New project'), h('p', null, 'A blank website, or a copy of a public Git repo'))) : null)));
 }
 
 export function localStorageGet(k){ try { return localStorage.getItem('studio.' + k); } catch { return null; } }
@@ -78,22 +135,23 @@ export const canCreateProjects = () => state.me?.user.role === 'admin' || state.
 function shell(){
   if ($('.shell')) return;
   const me = state.me.user;
+  const mac = /Mac|iPhone|iPad/.test(navigator.platform);
   app.replaceChildren(h('div', { class: 'shell' },
     h('aside', { class: 'side', 'aria-label': 'Studio navigation' },
-      h('div', { class: 'side-top' },
-        h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), state.me.appName || 'Studio'),
-        canCreateProjects() ? h('button', { class: 'btn block', onclick: () => newProjectDialog() }, '+ New project') : null),
+      h('a', { class: 'brand', href: '/', 'data-link': '' }, h('img', { src: '/icon.svg', alt: '' }), state.me.appName || 'Studio'),
+      h('button', { type: 'button', class: 'search', onclick: () => openPalette() }, ico('search'), h('span', null, 'Search or jump to…'), h('span', { class: 'kbd' }, mac ? '⌘K' : 'Ctrl K')),
       h('nav', null,
-        h('h2', null, 'Projects'),
-        h('div', { id: 'side-projects' }),
-        h('h2', null, 'Studio'),
-        h('a', { class: 'nav-item', href: '/team', 'data-link': '' }, h('span', { class: 'name' }, 'Teams and people')),
-        me.role === 'admin' ? h('a', { class: 'nav-item', href: '/admin', 'data-link': '' }, h('span', { class: 'name' }, 'Admin')) : null),
-      h('div', { class: 'side-bottom' },
-        h('a', { class: 'nav-item', href: '/account', 'data-link': '' },
+        h('a', { class: 'nav-item', href: '/', 'data-link': '' }, ico('grid'), h('span', { class: 'name' }, 'Projects')),
+        h('a', { class: 'nav-item', href: '/team', 'data-link': '' }, ico('users'), h('span', { class: 'name' }, 'Teams and people')),
+        me.role === 'admin' ? h('a', { class: 'nav-item', href: '/admin', 'data-link': '' }, ico('shield'), h('span', { class: 'name' }, 'Admin')) : null,
+        h('h2', null, 'Projects', canCreateProjects() ? h('button', { type: 'button', class: 'side-add', title: 'New project', 'aria-label': 'New project', onclick: () => newProjectDialog() }, ico('plus')) : null),
+        h('div', { id: 'side-projects' })),
+      h('div', { class: 'side-foot' },
+        h('a', { class: 'me', href: '/account', 'data-link': '' },
           h('span', { class: 'avatar' }, initials(me.name)),
-          h('span', { class: 'name' }, me.name, h('br'), h('span', { class: 'small muted', id: 'side-claude' }, claudeLabel()))),
-        h('button', { class: 'nav-item', onclick: signOut }, h('span', { class: 'name muted' }, 'Sign out')))),
+          h('span', { class: 'me-text' }, h('strong', null, me.name), h('small', { id: 'side-claude' }, claudeLabel()))),
+        h('button', { type: 'button', class: 'btn ghost icon', title: 'Light or dark', 'aria-label': 'Switch between light and dark', onclick: toggleTheme }, ico('moon')),
+        h('button', { type: 'button', class: 'btn ghost icon', title: 'Sign out', 'aria-label': 'Sign out', onclick: signOut }, ico('logout')))),
     h('div', { class: 'main' },
       h('div', { class: 'topbar' },
         onTap(h('button', { class: 'btn ghost menu-btn', 'aria-label': 'Menu' }, h('span', { class: 'bars', 'aria-hidden': 'true' })), () => $('.shell').classList.toggle('menu-open')),
@@ -108,14 +166,17 @@ function shell(){
 }
 export const claudeLabel = () => state.me.claude?.connected ? (state.me.claude.kind === 'subscription' ? 'Claude subscription' : 'Claude API key') : 'Claude not connected';
 
+// The open project's chats, listed under it in the sidebar (filled in by project.js).
+export const sideChats = h('div', { class: 'proj-chats chat-list', id: 'chat-list' });
 export function renderSideProjects(){
   const el = $('#side-projects');
   if (!el) return;
-  el.replaceChildren(...state.projects.map(p => {
-    const states = p.services.map(s => s.status.state);
-    const dot = p.running ? 'busy' : states.includes('crashed') ? 'crashed' : states.includes('running') ? 'running' : states.includes('starting') ? 'starting' : '';
-    return h('a', { class: 'nav-item', href: `/p/${p.id}`, 'data-link': '', 'data-project': p.id, title: p.running ? 'Claude is working' : '' },
+  const open = location.pathname.match(/^\/p\/([^/]+)/)?.[1];
+  el.replaceChildren(...state.projects.flatMap(p => {
+    const [dot, words] = projectState(p);
+    const row = h('a', { class: 'nav-item', href: `/p/${p.id}`, 'data-link': '', 'data-project': p.id, title: words },
       h('span', { class: 'dot ' + dot }), h('span', { class: 'name' }, p.name));
+    return p.id === open ? [row, sideChats] : [row];
   }));
   if (!state.projects.length) el.append(h('p', { class: 'small muted', style: { margin: '4px 10px' } }, 'No projects yet.'));
   markNav(location.pathname);
@@ -143,6 +204,65 @@ export function hideTopbar(hidden){
 }
 export function setTitle(t){ document.title = t ? `${t} · ${state.me?.appName || 'Studio'}` : (state.me?.appName || 'Studio'); const tt = $('#topbar-title'); if (tt) tt.textContent = t || 'Studio'; }
 
+// ---------- light and dark ----------
+function toggleTheme(){
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = dark ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorageSet('theme', next);
+}
+
+// ---------- search and jump (⌘K) ----------
+export function openPalette(){
+  if (!state.me?.user.twoFactorEnabled || $('dialog.palette')) return;
+  const open = location.pathname.match(/^\/p\/([^/]+)/)?.[1];
+  const openProject = state.projects.find(p => p.id === open);
+  const items = [
+    ...state.projects.map(p => ({ group: 'Projects', icon: 'grid', label: p.name, hint: p.team?.name, go: `/p/${p.id}` })),
+    ...[...document.querySelectorAll('#chat-list .chat-row a.nav-item')].map(a => ({ group: `Chats in ${openProject?.name || 'this project'}`, icon: 'chat', label: a.querySelector('.name')?.firstChild?.textContent || a.title, go: a.getAttribute('href') })),
+    openProject ? { group: 'Actions', icon: 'plus', label: `New chat in ${openProject.name}`, go: `/p/${openProject.id}/chat/new` } : null,
+    canCreateProjects() ? { group: 'Actions', icon: 'plus', label: 'New project', run: () => newProjectDialog() } : null,
+    { group: 'Actions', icon: 'moon', label: 'Switch between light and dark', run: toggleTheme },
+    ...(openProject ? [['Services', 'server', 'services'], ['Changes', 'git', 'changes'], ['Files', 'folder', 'files'], ['Settings', 'sliders', 'settings']].map(([l, i, t]) => ({ group: `Go to in ${openProject.name}`, icon: i, label: l, go: `/p/${openProject.id}/${t}` })) : []),
+    { group: 'Go to', icon: 'grid', label: 'Projects home', go: '/' },
+    { group: 'Go to', icon: 'users', label: 'Teams and people', go: '/team' },
+    state.me.user.role === 'admin' ? { group: 'Go to', icon: 'shield', label: 'Admin', go: '/admin' } : null,
+    { group: 'Go to', icon: 'user', label: 'Account', go: '/account' },
+  ].filter(Boolean);
+  const input = h('input', { type: 'text', placeholder: 'Search projects, chats and pages…', 'aria-label': 'Search', autocomplete: 'off', spellcheck: false });
+  const list = h('div', { class: 'palette-list', role: 'listbox' });
+  let sel = 0, shown = [];
+  const d = dialog(close => {
+    const run = it => { close(); if (it.go) go(it.go); else it.run(); };
+    const paint = () => {
+      const q = input.value.trim().toLowerCase();
+      shown = items.filter(it => !q || it.label.toLowerCase().includes(q) || it.group.toLowerCase().includes(q));
+      sel = Math.max(0, Math.min(sel, shown.length - 1));
+      let last = '';
+      list.replaceChildren(...shown.flatMap((it, i) => [it.group !== last ? h('h4', null, last = it.group) : null,
+        h('button', { type: 'button', class: 'palette-item' + (i === sel ? ' on' : ''), role: 'option', 'aria-selected': String(i === sel), onclick: () => run(it), onmousemove: () => { if (sel !== i){ sel = i; paint(); } } },
+          ico(it.icon), h('span', null, it.label), it.hint ? h('span', { class: 'hint' }, it.hint) : null)]).filter(Boolean),
+        shown.length ? null : h('p', { class: 'muted small', style: { padding: '10px 12px', margin: 0 } }, 'Nothing matches.'));
+      list.querySelector('.on')?.scrollIntoView({ block: 'nearest' });
+    };
+    input.oninput = () => { sel = 0; paint(); };
+    input.onkeydown = e => {
+      if (e.key === 'ArrowDown'){ e.preventDefault(); sel = Math.min(sel + 1, shown.length - 1); paint(); }
+      else if (e.key === 'ArrowUp'){ e.preventDefault(); sel = Math.max(sel - 1, 0); paint(); }
+      else if (e.key === 'Enter' && shown[sel]){ e.preventDefault(); run(shown[sel]); }
+    };
+    paint();
+    return h('div', { class: 'palette-body' }, h('div', { class: 'palette-in' }, ico('search'), input, h('span', { class: 'kbd' }, 'esc')), list,
+      h('div', { class: 'palette-foot' }, h('span', null, h('span', { class: 'kbd' }, '↑'), ' ', h('span', { class: 'kbd' }, '↓'), ' to move'), h('span', null, h('span', { class: 'kbd' }, '↵'), ' to open')));
+  });
+  d.el.classList.add('palette');
+  d.el.addEventListener('click', e => { if (e.target === d.el) d.close(); });   // a click on the backdrop
+  input.focus();
+}
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === 'k'){ e.preventDefault(); openPalette(); }
+});
+
 async function signOut(){
   try { await authApi('/sign-out'); } catch {}
   state.me = null; state.projects = [];
@@ -150,9 +270,15 @@ async function signOut(){
 }
 
 // ---------- sign-in screens ----------
+// Sign-in screens: a navy brand panel beside the form (phones show only the form).
+function authFrame(card, quote = ['Build, run and ship your projects ', 'with Claude', '.'], line = 'Every project gets its own folder, web address and chats. Your team works on them together.'){
+  app.replaceChildren(h('main', { class: 'auth' },
+    h('aside', { class: 'auth-side' }, h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'),
+      h('blockquote', null, quote[0], h('em', null, quote[1]), quote[2]), h('p', null, line)),
+    h('div', { class: 'auth-main' }, card)));
+}
 function authPage(...children){
-  app.replaceChildren(h('main', { class: 'auth' }, h('div', { class: 'auth-card' },
-    h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'), ...children)));
+  authFrame(h('div', { class: 'auth-card' }, h('div', { class: 'brand only-phone' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'), ...children));
 }
 const errBox = () => h('div', { class: 'error-box', role: 'alert', hidden: true });
 function showErr(box, e){ box.hidden = false; box.textContent = e.message || String(e); }
@@ -302,9 +428,10 @@ export function mfaSetupScreen(){
   const pw = h('input', { type: 'password', autocomplete: 'current-password', required: true, autofocus: true });
   const box = errBox();
   const btn = h('button', { class: 'btn primary block', type: 'submit', style: { marginTop: '16px' } }, 'Continue');
-  app.replaceChildren(h('main', { class: 'auth' }, h('div', { class: 'auth-card wide', id: 'mfa-card' })));
+  authFrame(h('div', { class: 'auth-card wide', id: 'mfa-card' }), ['One more step and ', 'you’re in', '.'], 'Studio can change and run code on the server, so every account signs in with an authenticator app as well as a password.');
   const card = $('#mfa-card');
-  card.append(h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'),
+  card.append(h('div', { class: 'brand only-phone' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'),
+    h('div', { class: 'progress' }, h('i', { class: 'on' }), h('i'), h('i')),
     h('h1', null, 'Set up two-step sign-in'),
     h('p', { class: 'muted' }, 'Studio can change and run code on the server, so every account needs an authenticator app such as Google Authenticator, Microsoft Authenticator, 1Password or Authy.'),
     h('form', { onsubmit: async e => {
@@ -321,7 +448,8 @@ export function mfaSetupScreen(){
     const code = h('input', { type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', required: true, maxlength: 8 });
     const box2 = errBox();
     const btn2 = h('button', { class: 'btn primary block', type: 'submit', style: { marginTop: '16px' } }, 'Turn on two-step sign-in');
-    card.replaceChildren(h('div', { class: 'brand' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'),
+    card.replaceChildren(h('div', { class: 'brand only-phone' }, h('img', { src: '/icon.svg', alt: '' }), 'ZTD Devs Studio'),
+      h('div', { class: 'progress' }, h('i', { class: 'on' }), h('i', { class: 'on' }), h('i')),
       h('h1', null, 'Scan this code'),
       h('p', { class: 'muted' }, '1. In your authenticator app, add an account and scan the QR code.'),
       h('div', { class: 'qr' }, h('img', { src: '/api/qr?text=' + encodeURIComponent(totpURI), width: 200, height: 200, alt: 'QR code for your authenticator app' })),
@@ -345,8 +473,7 @@ export function mfaSetupScreen(){
 
 // ---------- start ----------
 route().catch(e => {
-  app.replaceChildren(h('main', { class: 'auth' }, h('div', { class: 'auth-card' }, h('h1', null, 'Studio isn’t responding'), h('p', null, e.message),
-    h('button', { class: 'btn', onclick: () => location.reload() }, 'Try again'))));
+  authPage(h('h1', null, 'Studio isn’t responding'), h('p', null, e.message), h('button', { class: 'btn', onclick: () => location.reload() }, 'Try again'));
 });
 // Keep the side list fresh (status dots, Claude activity).
 setInterval(() => { if (state.me?.user.twoFactorEnabled && document.visibilityState === 'visible') refreshProjects().catch(() => {}); }, 8000);

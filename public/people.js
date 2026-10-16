@@ -1,8 +1,14 @@
 // Account, teams and admin pages.
-import { h, $, fill, api, authApi, toast, fail, busy, dialog, confirmDialog, field, ago, copy, initials } from './ui.js';
+import { h, $, fill, api, authApi, toast, fail, busy, dialog, confirmDialog, field, ago, copy, initials, ico } from './ui.js';
 import { state, go, setTitle, claudeLabel } from './app.js';
 
-const page = main => { const inner = h('div', { class: 'page-inner', style: { maxWidth: '820px' } }); main.append(h('div', { class: 'page', style: { flex: 1 } }, inner)); return inner; };
+const page = main => { const inner = h('div', { class: 'page-inner' }); main.append(h('div', { class: 'page', style: { flex: 1 } }, inner)); return inner; };
+const pageHead = (title, sub, ...right) => h('div', { class: 'page-head' }, h('div', null, h('h1', null, title), sub ? h('p', null, sub) : null), right.length ? h('div', { class: 'spacer' }) : null, ...right);
+// A titled card; body is either nodes or an element that a loader fills in later.
+const section = (id, title, sub, body, ...extra) => h('section', { class: 'card', id }, h('div', { class: 'card-head' }, h('div', null, h('h3', null, title), sub ? h('p', null, sub) : null), ...extra), body);
+// The section menu beside a settings-style page; jumps to each card.
+const subnav = items => h('nav', { class: 'subnav', 'aria-label': 'Sections' }, items.filter(Boolean).map(([id, icon, label], i) =>
+  h('a', { class: i === 0 ? 'on' : '', href: '#' + id, onclick: e => { e.preventDefault(); e.currentTarget.parentNode.querySelectorAll('a').forEach(a => a.classList.toggle('on', a === e.currentTarget)); document.getElementById(id)?.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }, ico(icon), label)));
 const roleName = r => ({ owner: 'Owner', admin: 'Admin', member: 'Member', 'site-admin': 'Studio admin' })[r] || r;
 
 // =====================================================================
@@ -12,36 +18,46 @@ export async function renderAccount(main){
   setTitle('Account');
   const inner = page(main);
   const me = state.me.user;
-  const claudeCard = h('div', { class: 'card', id: 'claude' });
-  const sessionsCard = h('div', { class: 'card' });
+  const claudeCard = h('div', { class: 'card-body' });
+  const sessionsCard = h('div', { class: 'devices' });
 
   const name = h('input', { type: 'text', value: me.name, maxlength: 80 });
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
   const npw = h('input', { type: 'password', autocomplete: 'new-password', minlength: 12 });
   const otherOut = h('input', { type: 'checkbox', checked: true });
+  const roleName2 = r => ({ owner: 'Owner', admin: 'Admin', member: 'Member' })[r] || r;
 
   inner.append(
-    h('h1', null, 'Account'),
-    h('p', { class: 'muted' }, me.email, me.role === 'admin' ? ' · Studio admin' : ''),
-    h('h2', null, 'Claude'), claudeCard,
-    h('h2', null, 'Profile'),
-    h('form', { class: 'card', onsubmit: async e => { e.preventDefault(); await busy(e.submitter, async () => { await authApi('/update-user', { name: name.value.trim() }); state.me.user.name = name.value.trim(); toast('Saved'); }).catch(() => {}); } },
-      field('Name', name), h('button', { class: 'btn', type: 'submit', style: { marginTop: '10px' } }, 'Save name')),
-    h('h2', null, 'Password'),
-    h('form', { class: 'card', onsubmit: async e => {
-      e.preventDefault();
-      await busy(e.submitter, async () => {
-        if (npw.value.length < 12) throw new Error('Use at least 12 characters.');
-        await authApi('/change-password', { currentPassword: cur.value, newPassword: npw.value, revokeOtherSessions: otherOut.checked });
-        cur.value = npw.value = ''; toast('Password changed');
-      }).catch(() => {});
-    } }, field('Current password', cur), field('New password', npw, 'at least 12 characters'), h('label', { class: 'check' }, otherOut, 'Sign out my other devices'),
-      h('button', { class: 'btn', type: 'submit' }, 'Change password')),
-    h('h2', null, 'Two-step sign-in'),
-    h('div', { class: 'card' }, h('p', { style: { marginTop: 0 } }, '✓ On, with an authenticator app. Studio requires it for every account.'),
-      h('p', { class: 'small muted' }, 'Lost your backup codes? Make new ones; the old ones stop working.'),
-      h('button', { class: 'btn', onclick: () => newBackupCodes() }, 'New backup codes')),
-    h('h2', null, 'Where you’re signed in'), sessionsCard);
+    pageHead('Account', 'Your profile, your Claude connection and how you sign in.'),
+    h('div', { class: 'settings-layout' },
+      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-devices', 'laptop', 'Devices']]),
+      h('div', { class: 'stack' },
+        h('section', { class: 'card profile', id: 'acc-profile' }, h('span', { class: 'avatar lg' }, initials(me.name)),
+          h('div', null, h('h2', null, me.name), h('div', { class: 'muted' }, me.email),
+            h('div', { class: 'row tight', style: { marginTop: '8px' } }, me.role === 'admin' ? h('span', { class: 'pill navy' }, ico('shield'), 'Studio admin') : null,
+              ...state.me.teams.map(t => h('span', { class: 'pill' }, `${t.name} · ${roleName2(t.role)}`))))),
+        section('claude', 'Claude', 'Your prompts run on your own Claude account.', claudeCard),
+        h('form', { class: 'card', onsubmit: async e => { e.preventDefault(); await busy(e.submitter, async () => { await authApi('/update-user', { name: name.value.trim() }); state.me.user.name = name.value.trim(); toast('Saved'); }).catch(() => {}); } },
+          h('div', { class: 'card-head' }, h('div', null, h('h3', null, 'Profile'), h('p', null, 'Shown to your team.'))),
+          h('div', { class: 'card-body' }, field('Name', name)),
+          h('div', { class: 'card-foot' }, h('div', { class: 'spacer' }), h('button', { class: 'btn primary', type: 'submit' }, 'Save name'))),
+        h('form', { class: 'card', id: 'acc-password', onsubmit: async e => {
+          e.preventDefault();
+          await busy(e.submitter, async () => {
+            if (npw.value.length < 12) throw new Error('Use at least 12 characters.');
+            await authApi('/change-password', { currentPassword: cur.value, newPassword: npw.value, revokeOtherSessions: otherOut.checked });
+            cur.value = npw.value = ''; toast('Password changed');
+          }).catch(() => {});
+        } },
+          h('div', { class: 'card-head' }, h('div', null, h('h3', null, 'Password'), h('p', null, 'At least 12 characters. A short sentence works well.'))),
+          h('div', { class: 'card-body' }, h('div', { class: 'grid2' }, field('Current password', cur), field('New password', npw, 'at least 12 characters')), h('label', { class: 'check' }, otherOut, 'Sign out my other devices')),
+          h('div', { class: 'card-foot' }, h('div', { class: 'spacer' }), h('button', { class: 'btn primary', type: 'submit' }, 'Change password'))),
+        section('acc-mfa', 'Two-step sign-in', 'Studio requires it for every account.',
+          h('div', { class: 'card-body conn' }, h('span', { class: 'svc-icon' }, ico('shield')),
+            h('div', { style: { flex: 1 } }, h('strong', null, '✓ On, with an authenticator app.'), h('div', { class: 'small muted' }, 'Lost your backup codes? Make new ones; the old ones stop working.')),
+            h('button', { class: 'btn', onclick: () => newBackupCodes() }, ico('key'), 'New backup codes')),
+          h('span', { class: 'spacer' }), h('span', { class: 'pill ok' }, ico('check'), 'On')),
+        section('acc-devices', 'Devices', 'Where you’re signed in.', sessionsCard))));
 
   paintClaude(claudeCard);
   paintSessions(sessionsCard);
@@ -64,13 +80,13 @@ function newBackupCodes(){
 async function paintSessions(card){
   try {
     const list = await api('GET', '/api/auth/list-sessions');
-    card.replaceChildren(h('div', { class: 'table-wrap' }, h('table', { class: 'list' },
-      h('thead', null, h('tr', null, h('th', null, 'Device'), h('th', null, 'Last active'), h('th', null, ''))),
-      h('tbody', null, list.map(s => h('tr', null,
-        h('td', null, describeAgent(s.userAgent), s.id === state.me.session.id ? h('span', { class: 'pill', style: { marginLeft: '6px' } }, 'this device') : null, h('div', { class: 'small muted' }, s.ipAddress || '')),
-        h('td', { class: 'small' }, ago(s.updatedAt)),
-        h('td', null, s.id === state.me.session.id ? null : h('button', { class: 'btn small', onclick: e => busy(e.target, async () => { await authApi('/revoke-session', { token: s.token }); paintSessions(card); }) }, 'Sign out'))))))));
-  } catch (e){ card.textContent = e.message; }
+    const phone = ua => /iPhone|iPad|Android/.test(ua || '');
+    card.replaceChildren(...list.map(s => h('div', null,
+      h('span', { class: 'dev-ico' }, ico(phone(s.userAgent) ? 'phone' : 'laptop')),
+      h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, describeAgent(s.userAgent)), s.id === state.me.session.id ? h('span', { class: 'pill navy', style: { marginLeft: '8px' } }, 'This device') : null,
+        h('div', { class: 'small muted' }, [s.ipAddress, `active ${ago(s.updatedAt)}`].filter(Boolean).join(' · '))),
+      s.id === state.me.session.id ? null : h('button', { class: 'btn small', onclick: e => busy(e.target, async () => { await authApi('/revoke-session', { token: s.token }); paintSessions(card); }) }, 'Sign out'))));
+  } catch (e){ card.replaceChildren(h('div', null, e.message)); }
 }
 function describeAgent(ua = ''){
   const b = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
@@ -84,7 +100,10 @@ async function paintClaude(card){
   const side = $('#side-claude'); if (side) side.textContent = claudeLabel();
   if (info.connected){
     card.replaceChildren(
-      h('p', { style: { marginTop: 0 } }, h('strong', null, info.kind === 'subscription' ? '✓ Connected to your Claude subscription' : '✓ Using your Anthropic API key'), ` (${info.hint}), since ${new Date(info.createdAt).toLocaleDateString('en-GB')}.`),
+      h('div', { class: 'conn' }, h('span', { class: 'conn-logo' }, ico('sparkle')),
+        h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, info.kind === 'subscription' ? 'Connected to your Claude subscription' : 'Using your Anthropic API key'),
+          h('div', { class: 'small muted' }, `${info.hint} · since ${new Date(info.createdAt).toLocaleDateString('en-GB')}`)),
+        h('span', { class: 'pill ok' }, ico('check'), 'Connected')),
       h('p', { class: 'small muted' }, info.kind === 'subscription' ? 'Prompts you send in Studio run on your Claude.ai plan and count towards its usage limits.' : 'Prompts you send in Studio are billed to your Anthropic Console account.',
         ' Projects whose own AI workers use your connection (set in each project’s Settings) pick up a change the next time their services restart.'),
       h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => connectFlow(card) }, info.kind === 'subscription' ? 'Reconnect' : 'Switch to my subscription'),
@@ -92,7 +111,7 @@ async function paintClaude(card){
     return;
   }
   card.replaceChildren(
-    h('p', { style: { marginTop: 0 } }, h('strong', null, 'Not connected. '), 'Connect your own Claude account so your prompts run as you.'),
+    h('div', { class: 'conn' }, h('span', { class: 'conn-logo off' }, ico('sparkle')), h('div', null, h('strong', null, 'Not connected. '), 'Connect your own Claude account so your prompts run as you.')),
     h('div', { class: 'row' }, h('button', { class: 'btn primary', onclick: () => connectFlow(card) }, 'Connect my Claude subscription'),
       h('button', { class: 'btn', onclick: () => apiKeyFlow(card) }, 'Use an API key instead')),
     h('p', { class: 'small muted' }, 'This uses Claude Code’s own sign-in: you approve access on claude.ai and paste back a code. Studio stores the resulting token encrypted, and only uses it for prompts you send.'));
@@ -107,10 +126,11 @@ async function connectFlow(card){
   const box = h('div', { class: 'error-box', hidden: true });
   const btn = h('button', { class: 'btn primary', type: 'submit' }, 'Connect');
   card.replaceChildren(
-    h('ol', { style: { paddingLeft: '20px', marginTop: 0 } },
-      h('li', null, h('a', { class: 'btn primary small', href: url, target: '_blank', rel: 'noopener noreferrer' }, 'Open claude.ai to approve ↗'), ' Sign in with the Claude account you want Studio to use, and approve.'),
-      h('li', { style: { marginTop: '8px' } }, 'claude.ai shows a code. Copy it.'),
-      h('li', { style: { marginTop: '8px' } }, 'Paste it here:')),
+    h('ol', { class: 'steps-num' },
+      h('li', null, h('div', null, h('strong', null, 'Approve access on claude.ai'), h('div', { class: 'small muted', style: { margin: '2px 0 8px' } }, 'Sign in with the Claude account you want Studio to use, and approve.'),
+        h('a', { class: 'btn primary small', href: url, target: '_blank', rel: 'noopener noreferrer' }, 'Open claude.ai to approve', ico('external')))),
+      h('li', null, h('div', null, h('strong', null, 'Copy the code claude.ai shows'))),
+      h('li', null, h('div', null, h('strong', null, 'Paste it here')))),
     h('form', { onsubmit: async e => {
       e.preventDefault(); box.hidden = true;
       try { await busy(btn, () => api('POST', '/api/claude/code', { code: code.value.trim() }), 'Connecting…'); toast('Claude connected'); paintClaude(card); }
@@ -139,11 +159,11 @@ export async function renderTeams(main){
   async function load(){
     const teams = await api('GET', '/api/teams');
     fill(inner,
-      h('div', { class: 'row' }, h('div', null, h('h1', null, 'Teams and people'), h('p', { class: 'muted', style: { margin: 0 } }, 'Everyone in a team can open its projects, chat with Claude in them and restart them. Owners and admins can also invite people and change settings.')),
-        h('div', { class: 'spacer' }), state.me.user.role === 'admin' ? h('button', { class: 'btn', onclick: () => newTeam(load) }, '+ New team') : null),
-      !state.me.mailEnabled ? h('div', { class: 'note' }, 'Email isn’t set up on this server yet, so invitations aren’t emailed. Copy each invite link and send it yourself.') : null,
-      teams.length ? null : h('div', { class: 'card' }, 'You’re not in a team yet.'),
-      ...teams.map(t => teamCard(t, load)));
+      pageHead('Teams and people', 'Everyone in a team can open its projects, chat with Claude in them and restart them. Owners and admins can also invite people and change settings.',
+        state.me.user.role === 'admin' ? h('button', { class: 'btn', onclick: () => newTeam(load) }, ico('plus'), 'New team') : null),
+      !state.me.mailEnabled ? h('div', { class: 'note' }, ico('mail'), h('span', null, 'Email isn’t set up on this server yet, so invitations aren’t emailed. Copy each invite link and send it yourself.')) : null,
+      teams.length ? null : h('div', { class: 'card card-pad' }, 'You’re not in a team yet.'),
+      h('div', { class: 'stack' }, teams.map(t => teamCard(t, load))));
   }
   await load().catch(e => inner.replaceChildren(h('div', { class: 'error-box' }, e.message)));
 }
@@ -151,9 +171,10 @@ export async function renderTeams(main){
 function teamCard(t, reload){
   const email = h('input', { type: 'email', required: true, placeholder: 'name@example.com', 'aria-label': 'Email to invite' });
   const role = h('select', { 'aria-label': 'Role', style: { width: 'auto' } }, h('option', { value: 'member' }, 'Member'), h('option', { value: 'admin' }, 'Admin'), t.role === 'owner' || t.role === 'site-admin' ? h('option', { value: 'owner' }, 'Owner') : null);
-  return h('div', { class: 'card' },
-    h('div', { class: 'row' }, h('h3', { style: { fontSize: '1.15rem' } }, t.name), h('span', { class: 'pill' }, 'You: ' + roleName(t.role || 'none'))),
-    t.projects.length ? h('p', { class: 'small muted' }, 'Projects: ', t.projects.map((p, i) => [i ? ', ' : '', h('a', { href: `/p/${p.id}`, 'data-link': '' }, p.name)])) : h('p', { class: 'small muted' }, 'No projects yet.'),
+  return h('section', { class: 'card team-card' },
+    h('div', { class: 'card-head' }, h('div', null, h('h3', null, t.name),
+      t.projects.length ? h('p', null, 'Projects: ', t.projects.map((p, i) => [i ? ', ' : '', h('a', { href: `/p/${p.id}`, 'data-link': '' }, p.name)])) : h('p', null, 'No projects yet.')),
+      h('span', { class: 'spacer' }), h('span', { class: 'pill navy' }, 'You: ' + roleName(t.role || 'none'))),
     h('div', { class: 'table-wrap' }, h('table', { class: 'list' },
       h('thead', null, h('tr', null, h('th', null, 'Person'), h('th', null, 'Role'), h('th', null, 'Two-step'), h('th', null, ''))),
       h('tbody', null, t.members.map(m => {
@@ -164,18 +185,19 @@ function teamCard(t, reload){
         return h('tr', null,
           h('td', null, h('div', { class: 'row', style: { gap: '8px', flexWrap: 'nowrap' } }, h('span', { class: 'avatar' }, initials(m.name)), h('div', null, m.name, m.userId === state.me.user.id ? ' (you)' : '', h('div', { class: 'small muted' }, m.email)))),
           h('td', null, sel),
-          h('td', { class: 'small' }, m.twoFactorEnabled ? '✓ On' : h('span', { style: { color: 'var(--warn)' } }, 'Not set up')),
-          h('td', null, t.canAdmin && m.userId !== state.me.user.id ? h('button', { class: 'btn small danger', onclick: async e => {
+          h('td', { class: 'small' }, m.twoFactorEnabled ? h('span', { class: 'pill ok' }, ico('check'), 'On') : h('span', { class: 'pill warn' }, ico('alert'), 'Not set up')),
+          h('td', { class: 'right' }, t.canAdmin && m.userId !== state.me.user.id ? h('button', { class: 'btn small ghost danger', onclick: async e => {
             if (await confirmDialog(`Remove ${m.name}?`, `They lose access to ${t.name}'s projects straight away.`, 'Remove', true))
               busy(e.target, async () => { await authApi('/organization/remove-member', { memberIdOrEmail: m.id, organizationId: t.organizationId }); reload(); });
           } }, 'Remove') : null));
       })))),
     t.canAdmin ? h('div', null,
-      t.invites.length ? h('div', null, h('h3', { style: { marginTop: '18px' } }, 'Waiting to join'),
-        h('ul', { class: 'files', style: { fontFamily: 'inherit' } }, t.invites.map(i => h('li', null, h('span', { class: 'path' }, i.email, h('span', { class: 'small muted' }, ` · ${roleName(i.role)} · expires ${new Date(i.expiresAt).toLocaleDateString('en-GB')}`)),
-          h('button', { class: 'btn small', onclick: () => copy(i.link) }, 'Copy invite link'),
-          h('button', { class: 'btn small ghost', onclick: e => busy(e.target, async () => { await authApi('/organization/cancel-invitation', { invitationId: i.id }); reload(); }) }, 'Cancel'))))) : null,
-      h('form', { class: 'row', style: { marginTop: '16px' }, onsubmit: async e => {
+      t.invites.length ? h('div', { class: 'card-body invites' }, h('div', { class: 'small muted label' }, 'Waiting to join'),
+        t.invites.map(i => h('div', { class: 'row' }, h('span', { class: 'avatar small blank' }, ico('mail')), h('span', null, h('strong', null, i.email), h('span', { class: 'small muted' }, ` · ${roleName(i.role)} · expires ${new Date(i.expiresAt).toLocaleDateString('en-GB')}`)),
+          h('span', { class: 'spacer' }),
+          h('button', { class: 'btn small', onclick: () => copy(i.link) }, ico('link'), 'Copy invite link'),
+          h('button', { class: 'btn small ghost', onclick: e => busy(e.target, async () => { await authApi('/organization/cancel-invitation', { invitationId: i.id }); reload(); }) }, 'Cancel')))) : null,
+      h('form', { class: 'card-foot', onsubmit: async e => {
         e.preventDefault();
         await busy(e.submitter, async () => {
           await authApi('/organization/invite-member', { email: email.value.trim(), role: role.value, organizationId: t.organizationId, resend: true });
@@ -204,22 +226,22 @@ function newTeam(reload){
 export async function renderAdmin(main){
   setTitle('Admin');
   const inner = page(main);
-  inner.style.maxWidth = '1100px';
   if (state.me.user.role !== 'admin'){ inner.append(h('p', null, 'Admins only.')); return; }
-  const usersCard = h('div', { class: 'card table-wrap' });
-  const auditCard = h('div', { class: 'card table-wrap' });
-  const studioCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Checking…'));
-  const mailCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
-  const focusCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
-  const backupCard = h('div', { class: 'card' }, h('p', { class: 'muted' }, 'Loading…'));
+  const usersCard = h('div', { class: 'table-wrap' });
+  const auditCard = h('div', { class: 'table-wrap' });
+  const loading = t => h('div', { class: 'card-body' }, h('p', { class: 'muted', style: { margin: 0 } }, t));
+  const studioCard = loading('Checking…'), mailCard = loading('Loading…'), focusCard = loading('Loading…'), backupCard = loading('Loading…');
   inner.append(
-    h('h1', null, 'Admin'),
-    h('h2', null, 'Studio version'), studioCard,
-    h('h2', null, 'Email'), mailCard,
-    h('h2', null, 'Project focus'), focusCard,
-    h('h2', null, 'GitHub backup'), backupCard,
-    h('h2', null, 'People'), h('p', { class: 'muted small' }, 'To add someone, invite them to a team from Teams and people.'), usersCard,
-    h('h2', null, 'Activity log'), auditCard);
+    pageHead('Admin', 'Studio-wide settings. Only Studio admins see this page.'),
+    h('div', { class: 'settings-layout' },
+      subnav([['adm-version', 'download', 'Studio version'], ['adm-email', 'mail', 'Email'], ['adm-focus', 'eye', 'Project focus'], ['adm-backup', 'github', 'GitHub backup'], ['adm-people', 'users', 'People'], ['adm-activity', 'activity', 'Activity log']]),
+      h('div', { class: 'stack' },
+        section('adm-version', 'Studio version', 'Installs the latest commit of the Studio source project, then restarts.', studioCard),
+        section('adm-email', 'Email', 'How Studio sends invitations and sign-in help.', mailCard),
+        section('adm-focus', 'Project focus', 'Spot prompts that don’t belong in their project.', focusCard),
+        section('adm-backup', 'GitHub backup', 'Every project’s committed code, pushed every hour, a branch per project.', backupCard),
+        section('adm-people', 'People', 'To add someone, invite them to a team from Teams and people.', usersCard),
+        section('adm-activity', 'Activity log', 'Sign-ins, prompts, restarts and admin changes.', auditCard))));
 
   async function loadUsers(){
     const users = await api('GET', '/api/admin/users');
@@ -227,11 +249,11 @@ export async function renderAdmin(main){
     usersCard.replaceChildren(h('table', { class: 'list' },
       h('thead', null, h('tr', null, h('th', null, 'Person'), h('th', null, 'Teams'), h('th', null, 'Security'), h('th', null, 'Last seen'), h('th', null, ''))),
       h('tbody', null, users.map(u => h('tr', null,
-        h('td', null, u.name, u.role === 'admin' ? h('span', { class: 'pill', style: { marginLeft: '6px' } }, 'admin') : null, u.banned ? h('span', { class: 'pill', style: { marginLeft: '6px', color: 'var(--bad)' } }, 'suspended') : null, h('div', { class: 'small muted' }, u.email)),
+        h('td', null, h('div', { class: 'person' }, h('span', { class: 'avatar' }, initials(u.name)), h('div', null, h('strong', null, u.name), u.role === 'admin' ? h('span', { class: 'pill navy', style: { marginLeft: '6px' } }, 'admin') : null, u.banned ? h('span', { class: 'pill bad', style: { marginLeft: '6px' } }, 'suspended') : null, h('div', { class: 'small muted' }, u.email)))),
         h('td', { class: 'small' }, u.teams.map(t => `${t.name} (${roleName(t.role)})`).join(', ') || '—'),
-        h('td', { class: 'small' }, u.twoFactorEnabled ? 'Two-step on' : h('span', { style: { color: 'var(--warn)' } }, 'Two-step not set up'), h('br'), u.claude ? 'Claude connected' : 'No Claude'),
+        h('td', { class: 'small' }, u.twoFactorEnabled ? [h('span', { class: 'dot running' }), ' Two-step on'] : [h('span', { class: 'dot starting' }), h('span', { style: { color: 'var(--warn)' } }, ' Two-step not set up')], h('br'), h('span', { class: 'muted' }, u.claude ? 'Claude connected' : 'No Claude')),
         h('td', { class: 'small' }, ago(u.lastSeen)),
-        h('td', null, u.id === state.me.user.id ? h('span', { class: 'small muted' }, 'you') : h('div', { class: 'row', style: { gap: '6px' } },
+        h('td', null, u.id === state.me.user.id ? h('span', { class: 'small muted' }, 'you') : h('div', { class: 'row tight' },
           act('Reset link', async () => {
             const r = await api('POST', `/api/admin/users/${u.id}/reset-link`);
             if (r.link) dialog(close => h('div', { class: 'dialog-body' }, h('h2', null, 'Password reset link'), h('p', { class: 'muted' }, `Send this to ${u.email}. It works once, for one hour.`), h('div', { class: 'secret' }, r.link),
@@ -251,8 +273,8 @@ export async function renderAdmin(main){
     const table = more ? auditCard.querySelector('tbody') : null;
     const trs = rows.map(r => h('tr', null, h('td', { class: 'small muted', style: { whiteSpace: 'nowrap' } }, new Date(r.at).toLocaleString('en-GB')), h('td', { class: 'small' }, r.userName || '—'), h('td', { class: 'small mono' }, r.action), h('td', { class: 'small' }, [r.target, r.detail].filter(Boolean).join(' · ').slice(0, 200)), h('td', { class: 'small muted' }, r.ip)));
     if (table) table.append(...trs);
-    else auditCard.replaceChildren(h('table', { class: 'list' }, h('thead', null, h('tr', null, h('th', null, 'When'), h('th', null, 'Who'), h('th', null, 'What'), h('th', null, 'Detail'), h('th', null, 'IP'))), h('tbody', null, trs)),
-      h('button', { class: 'btn small', style: { marginTop: '10px' }, onclick: () => loadAudit(true).catch(fail) }, 'Older'));
+    else auditCard.replaceChildren(h('table', { class: 'list audit' }, h('thead', null, h('tr', null, h('th', null, 'When'), h('th', null, 'Who'), h('th', null, 'What'), h('th', null, 'Detail'), h('th', null, 'IP'))), h('tbody', null, trs)),
+      h('div', { class: 'card-foot' }, h('div', { class: 'spacer' }), h('button', { class: 'btn small', onclick: () => loadAudit(true).catch(fail) }, 'Older')));
   }
   loadBackup(backupCard).catch(e => backupCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
   loadFocus(focusCard).catch(e => focusCard.replaceChildren(h('div', { class: 'error-box' }, e.message)));
@@ -367,7 +389,7 @@ async function loadFocus(card){
     finally { box.disabled = false; }
   };
   card.replaceChildren(
-    h('label', { class: 'check', style: { marginTop: 0 } }, box, ' Flag prompts that don’t fit their project'),
+    h('label', { class: 'check switch-check', style: { marginTop: 0 } }, box, ' Flag prompts that don’t fit their project'),
     h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'Each prompt is compared with its project’s Description (in the project’s Settings) by a quick check with Haiku, on the sender’s Claude connection, while Claude works. Prompts that don’t fit still run, and are marked in the chat and listed here in the Activity log as chat.off-topic. Projects without a description aren’t checked.'));
 }
 
