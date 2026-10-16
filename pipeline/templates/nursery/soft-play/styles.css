@@ -267,15 +267,17 @@ body.menu-open { overflow: hidden; }
 
 /* ---------- 7. HOMEPAGE --------------------------------------------- */
 /* Hero (S2): at least 70% of the first phone screen; name, H1, one
-   sentence, two actions. The foam scene sits above the words on phones. */
-.hero { padding-block: 0 72px; min-height: calc(76svh - 76px); display: flex; align-items: center; }
-.hero .wrap { display: grid; gap: 28px; align-items: center; }
-.hero__scene {
-  margin-inline: calc(-1 * var(--gutter)); padding: 28px 16px 12px;
-  background: radial-gradient(circle at 50% 120%, var(--tint-sun) 0 62%, transparent 62.2%), var(--tint-pool);
-}
-.hero__scene svg { max-width: 560px; margin-inline: auto; }
-.hero__scene svg { width: 100%; height: auto; overflow: visible; }
+   sentence, two actions, and the nursery's best room photo in a chunky
+   foam frame with a little tumble of foam on its corner. The words come
+   first on phones; the photo sits right on desktop. */
+.hero { padding-block: 8px 72px; min-height: calc(76svh - 76px); display: flex; align-items: center; }
+.hero .wrap { display: grid; gap: 40px; align-items: center; }
+.hero__media { position: relative; order: 2; margin-bottom: 36px; }
+.hero__photo img { aspect-ratio: 4 / 3; }
+.hero__foam { position: absolute; left: -6px; bottom: -40px; display: flex; align-items: flex-end; pointer-events: none; }
+.hero__foam svg { width: 84px; height: 70px; overflow: visible; }
+.hero__foam svg:nth-child(2) { width: 56px; height: 48px; margin-left: -18px; transform: rotate(-10deg); }
+.hero__foam svg:nth-child(3) { width: 64px; height: 54px; margin-left: -10px; }
 .hero__name { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.1; margin-bottom: 14px; }
 .hero__name b { font-weight: 400; }
 .hero__name b:nth-child(1) { color: var(--action); }
@@ -285,9 +287,14 @@ body.menu-open { overflow: hidden; }
 .hero h1 { max-width: 12ch; }
 .hero__sentence { margin-top: 20px; font-size: calc(var(--text) * 1.06); max-width: 34ch; }
 @media (min-width: 900px) {
-  .hero { min-height: min(84svh, 760px); padding-block: 24px 96px; }
-  .hero .wrap { grid-template-columns: 1fr 1.25fr; gap: 48px; }
-  .hero__scene { order: 2; margin: 0; padding: 40px 32px 20px; border-radius: 48px; box-shadow: 0 10px 0 var(--tint-sun); }
+  .hero { min-height: min(84svh, 760px); padding-block: 24px 112px; }
+  .hero .wrap { grid-template-columns: 1fr 1.25fr; gap: 56px; }
+  .hero__media { margin-bottom: 0; }
+  .hero__photo img { aspect-ratio: 5 / 4; box-shadow: 0 12px 0 var(--pool-lo); }
+  .hero__foam { left: -44px; bottom: -56px; }
+  .hero__foam svg { width: 120px; height: 100px; }
+  .hero__foam svg:nth-child(2) { width: 78px; height: 66px; }
+  .hero__foam svg:nth-child(3) { width: 92px; height: 78px; }
 }
 
 /* The foam staircase (the essentials, S9): one list, five facts.
@@ -325,13 +332,67 @@ body.menu-open { overflow: hidden; }
   .stairs li::before { left: 0; }
 }
 
-/* The play room: one full-width photo (a living photo on wide screens). */
-.playroom .frame { margin-bottom: 64px; }
-@media (max-width: 599px) { .playroom .frame video { aspect-ratio: 4 / 5; } }
-@media (min-width: 900px) {
-  .playroom .wrap { display: grid; grid-template-columns: 1.35fr 1fr; gap: 64px; align-items: center; }
-  .playroom .frame { margin-bottom: 0; }
+/* Take the tour: the photo-tour film, big, with a foam "Play the tour"
+   button over the poster (softplay.js shows it; without JS the native
+   controls do the job). A real walk-round video from the nursery goes
+   here in place of the photo film. */
+.tour { background: var(--tint-grass); }
+.tour .film { margin-top: 40px; }
+.film__play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -60%); z-index: 2;
+  display: inline-flex; align-items: center; gap: .6rem; min-height: 64px; padding: 0 1.6rem 0 1.2rem;
+  font: 700 1.125rem/1 var(--font); color: #FFFFFF; background: var(--action);
+  border: 0; border-radius: 999px; cursor: pointer; box-shadow: 0 var(--edge) 0 var(--action-edge);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
+.film__play { white-space: nowrap; }
+.film__play svg { width: 1.6em; height: 1.6em; }
+@media (max-width: 479px) { .film__play { min-height: 52px; padding: 0 1.1rem 0 .9rem; font-size: 1rem; } }
+.film__play:hover { background: color-mix(in srgb, var(--action) 88%, #000); }
+.film__play:active { transform: translate(-50%, calc(-60% + 3px)); box-shadow: 0 3px 0 var(--action-edge); }
+.film__play:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; background: var(--focus); color: var(--ink); box-shadow: 0 var(--edge) 0 var(--ink); }
+.film__play[hidden] { display: none; }
+.tour .transcript { margin-top: 20px; }
+@media (min-width: 900px) {
+  .tour .wrap { display: grid; grid-template-columns: 1fr 2fr; column-gap: 64px; align-items: center; }
+  .tour__words { grid-row: 1 / span 3; align-self: center; }
+  .tour .film { margin-top: 0; }
+  .tour .more { grid-column: 2; margin-top: 16px; }
+}
+
+/* Walk round with us: four room stops, one photo per row on a phone,
+   two per row from 760px with the second column stepped down like foam
+   steps. Each stop carries a numbered foam badge in its door colour.
+   Then "Inside and out": four photo-only tiles (S6: 2 per row on a
+   phone, 4 on desktop), one parent quote and one door link. */
+.stops { list-style: none; margin: 48px 0 0; padding: 0; display: grid; gap: 56px; counter-reset: stop; }
+.stop { position: relative; max-width: none; counter-increment: stop; }
+.stop::before {
+  content: counter(stop); position: absolute; z-index: 2; top: -18px; left: -6px;
+  display: grid; place-items: center; width: 56px; height: 56px;
+  font: 400 1.6rem/1 var(--font-display); color: var(--ink);
+  background: var(--foam-hi); border-radius: 50%; box-shadow: 0 5px 0 var(--foam-lo);
+}
+.stop h3 { margin: 20px 0 0; font: 400 1.6rem/1.1 var(--font-display); }
+.stop p { margin-top: 8px; }
+.stop .frame { --frame: var(--foam); }
+@media (min-width: 760px) {
+  .stops { grid-template-columns: 1fr 1fr; column-gap: 48px; row-gap: 64px; }
+  .stops { margin-bottom: 160px; }
+  .stop:nth-child(even) { transform: translateY(80px); }
+}
+.finds__title { margin-top: 80px; font: 400 var(--h3)/1.1 var(--font-display); font-size: 1.75rem; }
+.finds__line { margin-top: 12px; }
+.finds { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.finds li { max-width: none; }
+.finds img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 18px; border: 5px solid var(--c, var(--sun)); background: var(--c, var(--sun)); }
+.finds li:nth-child(1) { --c: var(--grass); }
+.finds li:nth-child(2) { --c: var(--sun); }
+.finds li:nth-child(3) { --c: var(--tomato); }
+.finds li:nth-child(4) { --c: var(--grape); }
+.finds figcaption { margin-top: 6px; font-size: .9375rem; line-height: 1.4; font-weight: 600; }
+@media (min-width: 900px) { .finds { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+.walk__quote { margin-top: 64px; }
 
 /* A little tumble of foam shapes above the doors heading. */
 .tumble { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 20px; }

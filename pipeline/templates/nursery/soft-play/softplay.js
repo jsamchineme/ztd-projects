@@ -85,6 +85,21 @@
     if (wide.addEventListener) wide.addEventListener('change', start);
   });
 
+  /* 3b. Tour film: a big "Play the tour" button over the poster. It
+     starts the film and then gets out of the way; the native controls
+     (hidden until then so they don't sit under it) and captions do the rest. Without JS the button stays hidden. */
+  $$('[data-film]').forEach(function (fig) {
+    var v = $('video', fig), btn = $('.film__play', fig);
+    if (!v || !btn) return;
+    btn.hidden = false; v.controls = false;
+    btn.addEventListener('click', function () {
+      btn.hidden = true; v.controls = true;
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+      v.focus();
+    });
+    v.addEventListener('play', function () { btn.hidden = true; v.controls = true; });
+  });
+
   /* 4. Dated notices: hide [data-show-from] / [data-show-until] (YYYY-MM-DD,
      inclusive, UK date) outside their window. Never a pop-up. */
   var ukToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());

@@ -6,7 +6,7 @@
 
 It is the most playful of the four spacious directions, and still airy, because each shape sits alone on its own row. There is **no character or mascot** (that's Sidekick): the fun comes from shape, colour and touch.
 
-**Best for:** town and city nurseries with indoor play spaces (a soft-play room, sensory room, big hall), newer purpose-built nurseries, toddler-heavy settings and younger families, and nurseries with few outdoor photos. It works with zero photos.
+**Best for:** town and city nurseries with indoor play spaces (a soft-play room, sensory room, big hall), newer purpose-built nurseries, toddler-heavy settings and younger families, and nurseries with good indoor photos. It is at its best with 8 or more photos of empty rooms and a short tour video; with none, see section 4a.
 
 ---
 
@@ -34,10 +34,11 @@ Pages link `../styles.css` and `../softplay.js`; fonts load from `../fonts/` thr
 
 The owner's complaint about our first 11 nursery templates: *"a bit cramped, especially in mobile view. I need more space and sometimes less detail on the home page, with a clear way to go into separate pages."* Soft Play is built around that:
 
-- **Few things per screen.** Each 844px phone screen holds at most one H2, six text blocks and three boxed elements (S5). The homepage is 172 words.
-- **One thing per row on a phone.** The staircase bars, the doors and the play-room photo each take a whole row.
+- **Few things per screen.** Each 844px phone screen holds at most one H2, six text blocks and three boxed elements (S5). The homepage is about 270 words, most of them short photo captions.
+- **One thing per row on a phone.** The staircase bars, the doors, the tour film and each room photo take a whole row.
 - **Real doors to detail.** Six foam-shape doors lead to inner pages; every inner page opens with the same band, an "On this page" list, short sections and a "Next" door.
-- **Fun through shape, colour and touch,** not through characters, slogans or clip art: a drawn foam scene, chunky photo frames like foam mat edges, a beach ball that bounces gently on the visit card, and buttons that squish.
+- **The real nursery, shown generously.** The homepage leads with the nursery's own photos: the best room in the hero, a photo tour, a numbered walk round four rooms, and tiles of the garden and play spaces (section 4a).
+- **Fun through shape, colour and touch,** not through characters, slogans or clip art: foam shapes tumbling off the photo frames, chunky photo frames like foam mat edges, a beach ball that bounces gently on the visit card, and buttons that squish.
 
 It deliberately avoids every signature device of our earlier templates (luggage tags, cork boards, full-stop headlines, storybook chapters, weather tiles, recipe cards, leaf corners, torn paper, boxed key-fact rows, a posing mascot, highlighted-word headings, clock boxes, dashed day paths, wave seams, ringed circle photos, big-number cards, watercolour, one-word photo tiles, pastel room blocks, arch frames, hi-vis stripes).
 
@@ -45,10 +46,10 @@ It deliberately avoids every signature device of our earlier templates (luggage 
 
 | # | Decision | Finding that drives it |
 |---|---|---|
-| 1 | Hero = drawn foam scene, the nursery name in four foam colours, an H1 of up to 6 words, one sentence, Book a visit and Phone. Nothing else. | S2: the hero may hold only the name, an H1, one sentence and 2 actions. Playhouse's best image is its empty soft-play room: "fun" with no child in view. |
+| 1 | Hero = the nursery name in four foam colours, an H1 of up to 6 words, one sentence, Book a visit and Phone, and the nursery's **best room photo** in a chunky foam frame with three foam shapes tumbling off its corner. | S2: the hero may hold only the name, an H1, one sentence and 2 actions. Samuel's feedback (16 October 2026): sell the nursery with its own photos. First brief §3 "show the place"; parents study real photos and ignore generic art [NNG-P]. |
 | 2 | **Foam staircase** for the essentials: one `<ol>`, five lines (ages, hours, funded hours, places, grades), each up to 8 words with a small icon. On a phone five full-width bars stepping in 12px; on desktop five steps rising left to right. | S9: the essentials are a single list, not boxes, within the first 2 phone screens. The bars are drawn with `::before`, so each row stays a list line, not a box (S5 counts boxes). |
 | 3 | Grades line links to the Care Inspectorate record; every quality theme, with its date, is on Visit and join. | S9; §3.2; §4.1 (every grade, the date and a link; never only the best). |
-| 4 | **One play-room photo**, full row, 4:5 on a phone, with a chunky foam-mat frame; a living photo on wide screens. | S12: 35% of the phone homepage is picture or colour field; one full-width picture every 2 screens. Playhouse feels open because photos fill rows. |
+| 4 | **Take the tour** (the tour film, big, with a foam "Play the tour" button) and **Walk round with us** (4 numbered room stops, then 4 photo-only tiles of the garden and play spaces, one parent quote). | Samuel's feedback (16 October 2026): parents should learn a lot about the nursery from the site and want to visit. Engaging patterns §1.1 (feeling first, then proof), §1.2 (proof, then the visit). S6 (photo-only tiles may go 2 per row), S12 (photos fill rows). |
 | 5 | **Six foam-shape doors** (step, wedge, cylinder, half-moon, cube, ball), one per row on a phone with hairlines drawn as backgrounds, 3 by 2 on desktop. Label ≤3 words in Bagel, one line ≤8 words with intent wording. | S6, S7, S9; Sunflower's intent wording ("What it costs, and help with fees", "Come and see us"). |
 | 6 | **Book a visit band**: deep pool blue with generous padding, one centred white card with a gently bouncing beach ball on its edge, one button and Phone, and a pile of foam at its foot. | S13 one primary action; Sunflower's single-card visit band; Ball-pit edging removed on the owner's feedback (too busy). |
 | 7 | **"Book a visit"** in tomato-deep everywhere; Phone is always a plain text link with a handset icon. | S13. Playhouse's repeated "Enquire now" is the model. |
@@ -75,7 +76,7 @@ It deliberately avoids every signature device of our earlier templates (luggage 
 ### Space (S1 to S13): the gates
 - Phone gutters 24px, tablet 40px, desktop ≥64px with a 1,120px container (`--gutter`, `--container`).
 - Section padding `--space-section` (80px phone, 128px desktop) on every homepage section and every inner section.
-- Homepage: hero + 4 sections max (essentials, play room, doors, visit band), ≤6 phone screens, **120 to 180 words in `<main>`** (hard max 200), at most 1 H2, 6 text blocks (7 on the first screen) and 3 boxes per 844px screen.
+- Homepage: hero + 5 sections (essentials, tour, walk round, doors, visit band), at most 1 H2, 6 text blocks (7 on the first screen) and 3 boxes per 844px screen. **Deliberately longer than S3 and S4** (about 9 phone screens, about 270 words) because it is photo-led: the extra length is photos and short captions, not paragraphs. Keep every caption to one short line.
 - **Never on the homepage:** menus, the full grade table, the day, settling-in steps, FAQs, policies, team lists, review walls, newsletter forms, logo walls, curriculum essays.
 - Every homepage content section ends with exactly one door link.
 - Inner pages: ≤900 visible words, sections ≤120 words.
@@ -84,33 +85,45 @@ It deliberately avoids every signature device of our earlier templates (luggage 
 - `audit.mjs` must report 0 blockers, 0 major, 0 minor on every page; `viewports.mjs` must show no layout flags at all 9 widths.
 - Targets ≥44px (links in lists and `<details>` are `inline-flex` at 44px for this reason).
 - Focus: 3px ink outline; links get the GOV.UK yellow; foam buttons turn yellow with an ink edge.
-- Every animation is off under `prefers-reduced-motion`; the living photo never plays then.
+- Every animation is off under `prefers-reduced-motion`. The tour film never autoplays.
 
 ### Performance
-- Homepage on a phone: **187 KB** transferred in the example (fonts, CSS, JS, one poster). The living photo loads only on wide screens; the tour film is `preload="none"`.
+- Homepage on a phone: about **250 KB** after scrolling to the end (fonts, CSS, JS, the hero photo, 8 lazy-loaded photos and the film poster). Photos are `loading="lazy"` except the hero (`fetchpriority="high"`); the tour film is `preload="none"`.
 - Self-hosted fonts only. No third-party requests.
 
 ## 4. Homepage structure (keep this order)
 
-> Hero → The essentials → The play room → Doors → Book a visit band → Footer
+> Hero → The essentials → Take the tour → Walk round with us → Doors → Book a visit band → Footer
 
 | Section | Content | Budget |
 |---|---|---|
-| Hero (`.hero`, `data-bar-after`) | `.hero__scene` (inline foam scene SVG on a sky-and-sun field), `.hero__name` (4 coloured words), H1, `.hero__sentence`, `.actions` (Book a visit + Phone) | H1 ≤6 words, sentence ≤25 words |
+| Hero (`.hero`, `data-bar-after`) | `.hero__media` (`figure.frame.hero__photo` with the best room photo + `.hero__foam`, 3 foam shapes), `.hero__name` (4 coloured words), H1, `.hero__sentence`, `.actions` (Book a visit + Phone) | H1 ≤6 words, sentence ≤25 words |
 | The essentials | H2, `ol.stairs` with 5 `<li>` (icon + text), one `.more` "All the details →" | each line ≤8 words, no sub-notes |
-| The play room (`.playroom`) | `figure.frame.living` (video with poster), H2, one `.lede`, one door link | body ≤30 words |
+| Take the tour (`.tour`, grass tint) | `.tour__words` (H2, one `.lede`), `figure.frame.film[data-film]` (video + `.film__play` button), `details.transcript`, one door link | lede ≤20 words |
+| Walk round with us (`.walk`) | H2, `.lede`, `ol.stops` with 4 `li.stop.door--{shape}` (photo, H3, one line), `.finds__title` H3 + `.finds__line`, `ul.finds` with 4 photo tiles, `blockquote.quote`, one door link | each stop line ≤8 words, tile captions ≤3 words |
 | Doors (`.doors-section`) | `.tumble` (3 small foam shapes), H2, `ul.doors` with 6 `a.door.door--{shape}` | label ≤3 words, line ≤8 words |
 | Visit band (`.visit`, `data-bar-hide`) | `.visit__card` with a bouncing beach ball (`foam-ball-body` over a still shadow), H2, one line, Book a visit + Phone, `.visit__pile` | ≤20 words |
 
-The H2s are placed so each falls on its own 844px phone screen. If you change copy length, re-run the density check and adjust (the `.tumble` drawing above the doors heading and the 4:5 photo exist partly to keep the doors H2 on its own screen).
+The H2s are placed so each falls on its own 844px phone screen. If you change copy length, re-run the density check and adjust.
+
+## 4a. Photo-led homepage (added 16 October 2026)
+
+Samuel noticed that the other nursery templates are photo-rich and Soft Play was not: one photo on the homepage, the rest drawings. Parents should learn a lot about the nursery from the site and want to come in. So the homepage now leads with the nursery's own photos, while keeping the space rules per screen (one H2, few words, one link per section):
+
+- **Hero photo:** the brightest, widest empty room. 4:3 on a phone (below the words), 5:4 on desktop (right).
+- **Take the tour:** the best moving picture the nursery has. A real walk-round phone video of the empty rooms is best (silent, under 3 MB, re-encoded, captions describing each room). Without one, use the photo film made from stills (section 9) and say so on the page. The "Play the tour" button hides the native controls until it is pressed.
+- **Walk round with us:** 4 rooms, each a landscape photo at least 800px wide, a short name and one line from what the photo shows. Numbered foam badges in the door colours. Two per row from 760px, the second column stepped down.
+- **Inside and out:** 4 square-cropped tiles. Lead with the garden or outdoor space (first brief: parents look for outdoor space). Small photos (300 to 400px) are fine here.
+- **One parent quote** from the nursery's own site, attributed as it does. Never a quote that names a child.
+- With fewer than 6 usable photos, drop the tiles first, then stops 3 and 4. With no photos at all, put the drawn foam scene back in the hero (see git history before 16 October 2026) and drop both photo sections.
 
 ## 5. Responsive layout
 
 | Width | What changes |
 |---|---|
-| < 600px | 24px gutters. Scene full bleed above the words. Staircase bars stepping in 12px. Play photo 4:5. Doors one per row (shape 104px left, label right). Sticky phone bar after the hero. Tables stack to label/value rows. |
-| 600 to 899px | 40px gutters. Play photo 3:2. Doors 2 per row from 760px (labels only change size). |
-| ≥ 900px | Hero in two columns (words left, the scene on a rounded sky panel right). Staircase becomes 5 rising steps. Play room photo and words side by side. Page bands in two columns with the foam shape right. Gallery 3 columns. |
+| < 600px | 24px gutters. Hero photo 4:3 below the words. Staircase bars stepping in 12px. Tour film full row. Room stops one per row; tiles 2 per row. Doors one per row (shape 104px left, label right). Sticky phone bar after the hero. Tables stack to label/value rows. |
+| 600 to 899px | 40px gutters. Room stops 2 per row from 760px, the second column stepped down 80px. Doors 2 per row from 760px (labels only change size). |
+| ≥ 900px | Hero in two columns (words left, the photo right). Staircase becomes 5 rising steps. Tour: words left, film right. Tiles 4 in a row. Page bands in two columns with the foam shape right. Gallery 3 columns. |
 | ≥ 1024px | Desktop nav replaces the Menu button; phone bar off. Doors 3 by 2 with a tinted hover. |
 | ≥ 1248px | 64px gutters; container 1,120px. |
 
@@ -160,7 +173,7 @@ Text only ever sits on the floor, white, the tints, the `-hi` faces or `--sun` (
 2. Keep `--action` a single deep colour that carries white at ≥4.5:1. It is the one action colour.
 3. Change the `.wordmark` and `.hero__name` words to the nursery's name (each word is a `<b>`; the colours cycle).
 4. Swap the photo frame colours (`frame--*`) to suit the photos.
-5. The hero scene is inline SVG coloured by the same tokens, so it follows automatically. Move or drop props (the zebra rocker is optional) but keep: a wedge, a roll, two cubes, balls. No people.
+5. Choose the hero photo and the four room stops from the nursery's own photos (section 4a). The foam shapes on the hero photo follow the tokens.
 
 ## 8. Inner pages
 
@@ -177,7 +190,7 @@ Add a **Food** page (cube, with the meal list) only if the nursery publishes men
 
 ## 9. Video and gallery
 
-**Living photo** (homepage play room):
+**Living photo** (optional; no longer on the example homepage):
 ```html
 <figure class="frame frame--pool living" data-living>
   <video muted loop playsinline preload="none" width="768" height="432"
@@ -207,6 +220,8 @@ The living-photo recipe above uses the same method, as one 10 s cosine back-and-
 **Gallery:** `.filters[data-filters=mosaic]` (foam-block buttons with `aria-pressed`, groups Rooms, Play, Garden, and Food or Artwork when there are photos) over `ul.mosaic#mosaic > li[data-group] > figure > picture + figcaption`: 2 columns with 12px gaps on a phone, 3 on desktop, frame colour by group. Real `<img>` with true alt text and short captions, `loading="lazy"`, WebP 400/800 + JPEG. No slider, no lightbox. The homepage has **no** gallery strip; the Gallery door is the way in.
 
 ## 10. Final figures for the example (14 October 2026)
+
+> **Updated 16 October 2026** for the photo-led homepage (section 4a): phone length 7,316px (about 8.7 screens), hero + 5 sections, about 270 words in `<main>`, about 250 KB on a phone after a full scroll. Audit 0/0/0 on all 7 pages; no layout flags at the 9 widths. The homepage rows in the table below are from the earlier, drawing-led version.
 
 Measured at 390 by 844 with `scratchpad/tools/density.mjs` rules (text blocks = headings, paragraphs, list items, captions; boxes = filled or bordered elements narrower than the screen).
 
@@ -267,7 +282,6 @@ Audit: **0 blockers, 0 major, 0 minor** on all 7 pages. `viewports.mjs`: **no la
 ## 13. Changes from the direction brief, and why
 
 - **The Food door became Parents (cube).** Leaps and Bounds publishes nothing about food, so a Food page would be empty. Food sits as a short "Ask us" section on Our nursery. Add a Food page when a nursery publishes menus.
-- **The play-room photo is the block play room, not a soft-play room.** The nursery has no soft-play room; its block play room (tyres, blocks, a plank) is its most playful empty space. The foam scene carries the soft-play idea.
+- **The homepage became photo-led (16 October 2026),** on Samuel's feedback that it showed too little of the nursery. The hero photo is the big room (`dining-room`), the room stops are the baby, cosy, calm and block-play rooms, and the tiles are the garden, sand, book nook and dressing up. The nursery has no soft-play room; the foam shapes carry the soft-play idea. The living photo (`media/play-room-loop.mp4`) is no longer on the homepage; `softplay.js` still supports `data-living` if a nursery has a good short loop.
 - **The visit band gained a foam pile at its foot, and the doors a small "tumble" of shapes above their heading,** to reach the picture share (S12) and to keep each H2 on its own phone screen.
 - **The hero scene has a zebra rocker** (an optional prop in the brief) and no steps; the steps shape is the Visit and join door.
-- **The living photo plays from 768px**, not only on desktop, because tablets can afford 138 KB.
