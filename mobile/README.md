@@ -4,7 +4,7 @@ Rings your phone when something happens in Studio: Claude finishes (or fails) in
 someone accepts your invitation, and, if you turn it on, when Claude finishes in a teammate's chat. You choose which
 on Studio's **Account → Phone notifications**.
 
-It's an Expo (React Native, SDK 58) app. It keeps a WebSocket open to Studio (`wss://<studio>/api/phone/socket`,
+It's an Expo (React Native) app on SDK 57, the newest one Expo Go in the App Store runs. It keeps a WebSocket open to Studio (`wss://<studio>/api/phone/socket`,
 served by `lib/phone.mjs`), and for each message it shows a notification with sound and vibration. While the app is
 open it keeps vibrating until you tap **Stop** (you can turn that off in the app).
 
@@ -35,12 +35,12 @@ allow installs from the browser.
 **iPhone (Expo Go):** install **Expo Go** from the App Store and sign in with the same Expo account. Then, on the
 iPhone, open https://studio.ztddevs.com/api/phone/app (also linked on Studio's Account → Phone notifications). It
 forwards to the app in Expo Go,
-`exp://u.expo.dev/13ca0973-4369-458f-b5da-dbaeb85ef01c?channel-name=expo-go&runtime-version=exposdk:58.0.0`, and Expo Go
+`exp://u.expo.dev/13ca0973-4369-458f-b5da-dbaeb85ef01c?channel-name=expo-go&runtime-version=exposdk:57.0.0`, and Expo Go
 keeps it in its recent projects. An app of its own on iPhone would need an Apple developer account.
 
 To publish a change for Expo Go (`app.config.js` then marks it with the Expo SDK version, which is what Expo Go loads):
 `EXPO_GO=1 npx eas-cli@latest update --channel expo-go --platform ios --environment preview --message "what changed"`.
-After an Expo SDK upgrade, change `exposdk:58.0.0` in the link here and in `PHONE_APP_URL` in `lib/phone.mjs`.
+After an Expo SDK upgrade, change `exposdk:57.0.0` in the link here and in `PHONE_APP_URL` in `lib/phone.mjs`.
 
 **For development** you can still run it from a computer with Expo Go: `npm install`, then `npx expo start --tunnel`.
 
