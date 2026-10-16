@@ -103,7 +103,7 @@ async function chatTab(ctx, chatId){
   let chats = [], showArchived = false;
   const openId = () => location.pathname.split('/').pop();   // a new chat gets its id in the address after the first message
   const chatLink = (c, open) => h('div', { class: 'chat-row' },
-    h('a', { class: 'nav-item' + (c.id === open ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, 'data-link': '' },
+    h('a', { class: 'nav-item' + (c.id === open ? ' active' : ''), href: `/p/${id}/chat/${c.id}`, title: c.prompt || c.title, 'data-link': '' },
       c.running ? h('span', { class: 'dot busy' }) : null,
       h('span', { class: 'name' }, c.title, h('br'), h('span', { class: 'sub' }, `${c.mine ? 'You' : 'Teammate'} · ${ago(c.updatedAt)}`))),
     c.mine || ctx.project.canManage ? h('button', { type: 'button', class: 'btn ghost small chat-more', 'aria-label': `Options for ${c.title}`, title: 'Archive or delete', onclick: () => chatOptions(c) }, '⋯') : null);
