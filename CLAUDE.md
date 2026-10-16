@@ -99,7 +99,7 @@ Audit fixes that work:
 
 ## Git
 
-- **Remote:** the private repo `jsamchineme/product-mapboard`, via the SSH host `github-personal` (the user's personal key). The `gh` CLI is signed in as a different account (samuelviv), so use git over SSH.
+- **Pushing:** Studio pushes all its projects to one repo. Don't push from a chat.
 - **Commit identity** (set locally in this repo): `jsamchineme <jsamchineme@gmail.com>`.
 - Commit only when asked.
 
