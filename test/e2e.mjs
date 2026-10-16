@@ -213,8 +213,10 @@ await check('invite a teammate (link shown when email is off)', async () => {
   await page.goto(BASE + '/team');
   await page.getByText('Email isn’t set up').waitFor();
   await page.fill('input[aria-label="Email to invite"]', 'mia@example.com');
+  await page.check('input[aria-label="Share my Claude"]');
   await page.click('button:has-text("Invite")');
   await page.getByText('mia@example.com').waitFor();
+  await page.getByText('shares your Claude').waitFor();
   const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
   inviteLink = teams[0].invites[0].link;
   await page.screenshot({ path: `${SHOTS}/08-team.png`, fullPage: true });
@@ -236,6 +238,10 @@ await check('teammate accepts invite, creates account, sets up two-step, sees pr
   await p2.fill('input[inputmode=numeric]', totp(s2));
   await p2.click('button[type=submit]');
   await p2.locator('.side .nav-item', { hasText: 'Demo Site' }).waitFor();
+  // The invitation shared the owner's Claude
+  await p2.locator('#side-claude', { hasText: 'Olu Owner’s Claude' }).waitFor();
+  const me = await (await p2.request.get(`${BASE}/api/me`)).json();
+  if (!me.claude.connected || me.claude.sharedBy !== 'Olu Owner' || me.claude.hint) throw new Error('share not applied: ' + JSON.stringify(me.claude));
   // A member can't change settings
   await p2.click('.side .nav-item:has-text("Demo Site")');
   await p2.click('.tab:has-text("Settings")');

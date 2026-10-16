@@ -240,6 +240,18 @@ async function paintClaude(card){
   const info = await api('GET', '/api/claude').catch(() => ({ connected: false }));
   state.me.claude = info;
   const side = $('#side-claude'); if (side) side.textContent = claudeLabel();
+  if (info.connected && info.sharedBy){
+    card.replaceChildren(
+      h('div', { class: 'conn' }, h('span', { class: 'conn-logo' }, ico('sparkle')),
+        h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, `Using ${info.sharedBy}’s Claude ${info.kind === 'subscription' ? 'subscription' : 'API key'}`),
+          h('div', { class: 'small muted' }, `${info.sharedBy} shared it with you when they invited you.`)),
+        h('span', { class: 'pill ok' }, ico('check'), 'Connected')),
+      h('p', { class: 'small muted' }, `Prompts you send in Studio run on ${info.sharedBy}’s ${info.kind === 'subscription' ? 'Claude.ai plan and count towards its usage limits' : 'Anthropic Console account'}. Connect your own and Studio uses yours instead.`),
+      h('div', { class: 'row' }, h('button', { class: 'btn', onclick: () => connectFlow(card) }, 'Connect my own Claude subscription'),
+        h('button', { class: 'btn', onclick: () => apiKeyFlow(card) }, 'Use my own API key'),
+        h('button', { class: 'btn danger', onclick: async () => { if (await confirmDialog(`Stop using ${info.sharedBy}’s Claude?`, 'You won’t be able to send prompts until you connect your own.', 'Stop using it', true)){ await api('DELETE', '/api/claude'); paintClaude(card); } } }, 'Stop using it')));
+    return;
+  }
   if (info.connected){
     card.replaceChildren(
       h('div', { class: 'conn' }, h('span', { class: 'conn-logo' }, ico('sparkle')),
@@ -312,6 +324,9 @@ export async function renderTeams(main){
 
 function teamCard(t, reload){
   const email = h('input', { type: 'email', required: true, placeholder: 'name@example.com', 'aria-label': 'Email to invite' });
+  // Only your own connection can be shared, not one shared with you.
+  const canShare = state.me.claude?.connected && !state.me.claude.sharedBy;
+  const share = h('input', { type: 'checkbox', 'aria-label': 'Share my Claude' });
   const role = h('select', { 'aria-label': 'Role', style: { width: 'auto' } }, h('option', { value: 'member' }, 'Member'), h('option', { value: 'admin' }, 'Admin'), t.role === 'owner' || t.role === 'site-admin' ? h('option', { value: 'owner' }, 'Owner') : null);
   return h('section', { class: 'card team-card' },
     h('div', { class: 'card-head' }, h('div', null, h('h3', null, t.name),
@@ -325,7 +340,7 @@ function teamCard(t, reload){
         sel.value = m.role;
         sel.onchange = async () => { try { await authApi('/organization/update-member-role', { memberId: m.id, role: sel.value, organizationId: t.organizationId }); toast(`${m.name} is now ${roleName(sel.value)}`); } catch (e){ fail(e); sel.value = m.role; } };
         return h('tr', null,
-          h('td', null, h('div', { class: 'row', style: { gap: '8px', flexWrap: 'nowrap' } }, h('span', { class: 'avatar' }, initials(m.name)), h('div', null, m.name, m.userId === state.me.user.id ? ' (you)' : '', h('div', { class: 'small muted' }, m.email)))),
+          h('td', null, h('div', { class: 'row', style: { gap: '8px', flexWrap: 'nowrap' } }, h('span', { class: 'avatar' }, initials(m.name)), h('div', null, m.name, m.userId === state.me.user.id ? ' (you)' : '', h('div', { class: 'small muted' }, m.email), m.claudeFrom ? claudeFromLine(m, reload) : null))),
           h('td', null, sel),
           h('td', { class: 'small' }, m.twoFactorEnabled ? h('span', { class: 'pill ok' }, ico('check'), 'On') : h('span', { class: 'pill warn' }, ico('alert'), 'Not set up')),
           h('td', { class: 'right' }, t.canAdmin && m.userId !== state.me.user.id ? h('button', { class: 'btn small ghost danger', onclick: async e => {
@@ -335,18 +350,33 @@ function teamCard(t, reload){
       })))),
     t.canAdmin ? h('div', null,
       t.invites.length ? h('div', { class: 'card-body invites' }, h('div', { class: 'small muted label' }, 'Waiting to join'),
-        t.invites.map(i => h('div', { class: 'row' }, h('span', { class: 'avatar small blank' }, ico('mail')), h('span', null, h('strong', null, i.email), h('span', { class: 'small muted' }, ` · ${roleName(i.role)} · expires ${new Date(i.expiresAt).toLocaleDateString('en-GB')}`)),
+        t.invites.map(i => h('div', { class: 'row' }, h('span', { class: 'avatar small blank' }, ico('mail')), h('span', null, h('strong', null, i.email), h('span', { class: 'small muted' }, ` · ${roleName(i.role)} · expires ${new Date(i.expiresAt).toLocaleDateString('en-GB')}`), i.sharesClaude ? h('span', { class: 'small muted' }, i.inviterId === state.me.user.id ? ' · shares your Claude' : ' · shares the inviter’s Claude') : null),
           h('span', { class: 'spacer' }),
           h('button', { class: 'btn small', onclick: () => copy(i.link) }, ico('link'), 'Copy invite link'),
           h('button', { class: 'btn small ghost', onclick: e => busy(e.target, async () => { await authApi('/organization/cancel-invitation', { invitationId: i.id }); reload(); }) }, 'Cancel')))) : null,
       h('form', { class: 'card-foot', onsubmit: async e => {
         e.preventDefault();
         await busy(e.submitter, async () => {
-          await authApi('/organization/invite-member', { email: email.value.trim(), role: role.value, organizationId: t.organizationId, resend: true });
+          const inv = await authApi('/organization/invite-member', { email: email.value.trim(), role: role.value, organizationId: t.organizationId, resend: true });
+          if (canShare && inv?.id) await api('POST', `/api/invitations/${inv.id}/share-claude`, { on: share.checked });
           toast(state.me.mailEnabled ? `Invitation emailed to ${email.value.trim()}` : 'Invitation created. Copy the link below and send it.');
           email.value = ''; reload();
         }, 'Inviting…').catch(() => {});
-      } }, h('div', { style: { flex: '1 1 220px' } }, email), role, h('button', { class: 'btn primary', type: 'submit' }, 'Invite'))) : null);
+      } }, h('div', { style: { flex: '1 1 220px' } }, email), role, h('button', { class: 'btn primary', type: 'submit' }, 'Invite'),
+        canShare ? h('label', { class: 'check', style: { flexBasis: '100%', margin: '4px 0 0' } }, share,
+          h('span', null, `Let them use my Claude ${state.me.claude.kind === 'subscription' ? 'subscription' : 'API key'} `, h('span', { class: 'small muted' }, '(until they connect their own)'))) : null)) : null);
+}
+
+// "Uses Samuel's Claude", with a way to stop it for the person sharing, the person using it, or a site admin.
+function claudeFromLine(m, reload){
+  const me = state.me.user;
+  const mine = m.claudeFrom.id === me.id;
+  const canStop = mine || m.userId === me.id || me.role === 'admin';
+  return h('div', { class: 'small muted' }, mine ? 'Uses your Claude' : `Uses ${m.claudeFrom.name}’s Claude`,
+    canStop ? [' · ', h('button', { class: 'btn small ghost', style: { minHeight: 0, padding: '0 4px' }, onclick: async e => {
+      if (await confirmDialog(`Stop ${m.name} using ${mine ? 'your' : m.claudeFrom.name + '’s'} Claude?`, 'They won’t be able to send prompts until they connect their own.', 'Stop sharing', true))
+        busy(e.target, async () => { await api('DELETE', `/api/claude/share/${m.userId}`); toast('Stopped sharing'); reload(); });
+    } }, 'Stop sharing')] : null);
 }
 
 function newTeam(reload){

@@ -163,7 +163,23 @@ route('POST', '/api/claude/connect', async ({ user }) => C.startSignIn(user.id))
 route('POST', '/api/claude/code', async ({ user, body }) => { await C.submitCode(user.id, body.code); await reapplyWorkerProjects(user.id); return C.connectionInfo(user.id); });
 route('POST', '/api/claude/cancel', async ({ user }) => { C.cancelSignIn(user.id); return { ok: true }; });
 route('POST', '/api/claude/apikey', async ({ user, body }) => { C.saveApiKey(user.id, body.key); await reapplyWorkerProjects(user.id); return C.connectionInfo(user.id); });
-route('DELETE', '/api/claude', async ({ user }) => { C.disconnect(user.id); await reapplyWorkerProjects(user.id); return { ok: true }; });
+route('DELETE', '/api/claude', async ({ user }) => { C.disconnect(user.id); C.stopShare(user.id); await reapplyWorkerProjects(user.id); return { ok: true }; });
+// Sharing your connection with someone you invite (lib/claude.mjs). Set on a pending invitation you sent.
+route('POST', '/api/invitations/:id/share-claude', async ({ user, params, body }) => {
+  const inv = db.prepare(`SELECT id, inviterId FROM invitation WHERE id = ? AND status = 'pending'`).get(params.id);
+  if (!inv) throw err(404, 'Invitation not found');
+  if (inv.inviterId !== user.id) throw err(403, 'Only the person who sent the invitation can share their Claude with it.');
+  C.shareOnInvite(inv.id, user.id, !!body.on);
+  return { ok: true };
+});
+// Stopped by the person sharing, the person using it, or a site admin.
+route('DELETE', '/api/claude/share/:userId', async ({ user, params }) => {
+  const s = C.shareOf(params.userId);
+  if (!s) return { ok: true };
+  if (![s.ownerId, params.userId].includes(user.id) && user.role !== 'admin') throw err(403, 'Not your share to stop');
+  C.stopShare(params.userId);
+  return { ok: true };
+});
 
 // Projects
 route('GET', '/api/projects', async ({ user }) => {
@@ -380,10 +396,12 @@ route('GET', '/api/teams', async ({ user }) => {
     ? db.prepare('SELECT id AS organizationId, name, slug FROM organization ORDER BY name').all().map(t => ({ ...t, role: orgRole(user, t.organizationId) }))
     : memberships(user.id);
   return teams.map(t => {
-    const members = db.prepare(`SELECT m.id, m.role, m.createdAt, u.id AS userId, u.name, u.email, u.twoFactorEnabled FROM member m JOIN user u ON u.id = m.userId WHERE m.organizationId = ? ORDER BY u.name`).all(t.organizationId);
+    const members = db.prepare(`SELECT m.id, m.role, m.createdAt, u.id AS userId, u.name, u.email, u.twoFactorEnabled FROM member m JOIN user u ON u.id = m.userId WHERE m.organizationId = ? ORDER BY u.name`).all(t.organizationId)
+      .map(m => { const s = C.shareOf(m.userId); return s ? { ...m, claudeFrom: { id: s.ownerId, name: s.ownerName } } : m; });
     const canAdmin = ['site-admin', 'owner', 'admin'].includes(t.role);
-    const invites = canAdmin ? db.prepare(`SELECT id, email, role, status, expiresAt FROM invitation WHERE organizationId = ? AND status = 'pending' ORDER BY createdAt DESC`).all(t.organizationId)
-      .map(i => ({ ...i, link: `${STUDIO_URL}/invite/${i.id}` })) : [];
+    const sharing = C.invitesSharing();
+    const invites = canAdmin ? db.prepare(`SELECT id, email, role, status, expiresAt, inviterId FROM invitation WHERE organizationId = ? AND status = 'pending' ORDER BY createdAt DESC`).all(t.organizationId)
+      .map(i => ({ ...i, link: `${STUDIO_URL}/invite/${i.id}`, sharesClaude: sharing.has(i.id) })) : [];
     const projects = db.prepare('SELECT id, name, slug FROM project WHERE organizationId = ? ORDER BY name').all(t.organizationId);
     return { ...t, canAdmin, members, invites, projects };
   });

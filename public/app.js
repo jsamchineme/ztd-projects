@@ -169,7 +169,7 @@ function shell(){
   });
   refreshProjects().catch(fail);
 }
-export const claudeLabel = () => state.me.claude?.connected ? (state.me.claude.kind === 'subscription' ? 'Claude subscription' : 'Claude API key') : 'Claude not connected';
+export const claudeLabel = () => state.me.claude?.connected ? (state.me.claude.sharedBy ? `${state.me.claude.sharedBy}’s Claude` : state.me.claude.kind === 'subscription' ? 'Claude subscription' : 'Claude API key') : 'Claude not connected';
 
 // The open project's chats, listed under it in the sidebar (filled in by project.js).
 export const sideChats = h('div', { class: 'proj-chats chat-list', id: 'chat-list' });
