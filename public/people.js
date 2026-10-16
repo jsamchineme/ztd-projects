@@ -312,7 +312,7 @@ export async function runStudioUpdate(btn, logBox){
 }
 
 // Email for password resets and invites. Saving checks the settings with the mail server first.
-// GitHub backup: every project's committed code, pushed to one repo with a folder per project (ops/github-backup.sh).
+// GitHub backup: every project's committed code, pushed to one repo with a branch per project (ops/github-backup.sh).
 async function loadBackup(card){
   let poll = null;
   const paint = s => {
@@ -323,7 +323,7 @@ async function loadBackup(card){
     const save = act(repo ? 'Change repo' : 'Set up', async () => paint(await api('PUT', '/api/admin/github-backup', { url: urlInput.value })), repo ? '' : 'primary');
     if (!repo){
       fill(card,
-        h('p', { style: { marginTop: 0 } }, 'Push every project’s committed code to one GitHub repo, a folder per project, every hour. Good for browsing everything in one place, and as an off-server backup.'),
+        h('p', { style: { marginTop: 0 } }, 'Push every project’s committed code to one GitHub repo every hour, each project on its own branch with its full history. An off-server backup, and an easy start if a project later needs a repo of its own.'),
         h('ol', { class: 'small' },
           h('li', null, 'On GitHub, create an empty ', h('strong', null, 'private'), ' repo, for example ztd-projects.'),
           h('li', null, 'Paste its address here. Studio then shows a key to add to that repo.')),
@@ -332,7 +332,7 @@ async function loadBackup(card){
     }
     const last = s.last;
     fill(card,
-      h('p', { style: { marginTop: 0 } }, 'Backing up to ', h('a', { href: `https://github.com/${repo}`, target: '_blank', rel: 'noopener' }, repo), ' every hour, a folder per project. Only committed changes are included.'),
+      h('p', { style: { marginTop: 0 } }, 'Backing up to ', h('a', { href: `https://github.com/${repo}`, target: '_blank', rel: 'noopener' }, repo), ' every hour, a branch per project (projects/<name>). Only committed changes are included.'),
       s.running ? h('div', { class: 'note' }, 'Backing up now…')
         : last ? h('div', { class: last.ok ? 'ok-box' : 'error-box' }, `${last.message} (${ago(Date.parse(last.at))})`)
         : h('div', { class: 'note' }, 'No backup yet. Add the key below on GitHub, then press Back up now.'),

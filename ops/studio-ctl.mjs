@@ -316,7 +316,7 @@ WantedBy=multi-user.target
     process.stdout.write(r.stdout);
   },
 
-  // ----- backing up every project to one GitHub repo, a folder per project (ops/github-backup.sh) -----
+  // ----- backing up every project to one GitHub repo, a branch per project (ops/github-backup.sh) -----
   'github-backup'(action = 'status', flag){
     const STATE = '/var/lib/studio/github-backup', CFG = '/etc/studio/github-backup.json', KEY = '/etc/studio/github-backup-key';
     const conf = () => existsSync(CFG) ? JSON.parse(readFileSync(CFG, 'utf8')) : {};

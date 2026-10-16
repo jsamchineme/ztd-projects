@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Backs up every project's committed code to one GitHub repo, a folder per project (Admin → GitHub backup).
-# Run by studio-ctl github-backup run (hourly from cron, or "Back up now"), as root. Each run adds one commit to main
-# whose tree holds <project>/ for every project, with each project's own history merged in, so the backup has it too.
+# Backs up every project's committed code to one GitHub repo, a branch per project (Admin → GitHub backup).
+# Run by studio-ctl github-backup run (hourly from cron, or "Back up now"), as root. Branch projects/<slug> is the
+# project's own history as it stands (force-pushed, so it follows the project even if its history is rewritten), which
+# makes it easy to move a project to a repo of its own later. main only holds a README listing the projects.
+# A project that's deleted keeps its branch on GitHub.
 # Only root can read the deploy key and the copy below. Each project's repo is read as the user who owns it (git
 # upload-pack runs as that user), so no git command runs as root inside a folder an agent can change.
 set -euo pipefail
@@ -26,15 +28,16 @@ exec 3>&2 2> >(tee -a "$ERRLOG" >&3)
 failed(){ local step=$1; sleep 0.2; report 0 "The backup failed at: $step. $(grep -v -e '^\s*$' -e '^To ' "$ERRLOG" | sed 's/^remote: *//' | tail -n 4 | tr '\n' ' ' | tr -s ' ' | cut -c1-500)"; }
 trap 'failed "$BASH_COMMAND"' ERR
 
-# What GitHub has now, so history carries on from there (also checks that the key works).
-if ! remote=$(git ls-remote "$URL" refs/heads/main 2>&1); then
+# What GitHub has now, so main carries on from there and only branches that moved are pushed (also checks the key works).
+if ! remote=$(git ls-remote "$URL" 'refs/heads/*' 2>&1); then
   trap - ERR; report 0 "GitHub refused the connection. Check the repo address, and that the deploy key is added with write access. ($(echo "$remote" | tail -1))"; exit 1
 fi
-if [ -n "$remote" ]; then git fetch -q --no-tags "$URL" +refs/heads/main:refs/heads/main; fi
+declare -A there=()
+while read -r sha ref; do [ -n "$ref" ] && there[$ref]=$sha; done <<< "$remote"
+if [ -n "${there[refs/heads/main]:-}" ]; then git fetch -q --no-tags "$URL" +refs/heads/main:refs/heads/main; fi
 prev=$(git rev-parse -q --verify refs/heads/main || true)
 
-rm -f "$GIT_INDEX_FILE"
-parents=() changed=() list=()
+push=() changed=() list=()
 for dir in "$PROJECTS"/*/repo; do
   slug=$(basename "$(dirname "$dir")")
   [[ "$slug" =~ ^[a-z][a-z0-9-]*[a-z0-9]$ ]] && [ -d "$dir/.git" ] || continue
@@ -43,21 +46,23 @@ for dir in "$PROJECTS"/*/repo; do
   if [ "$(id -u)" = 0 ]; then up="/usr/sbin/runuser -u $owner -- git upload-pack"; else up="git upload-pack"; fi
   git fetch -q --no-tags --upload-pack="$up" "$dir" "+HEAD:refs/projects/$slug" 2>/dev/null || continue   # no commits yet
   head=$(git rev-parse "refs/projects/$slug")
-  git read-tree --prefix="$slug/" "$head"
-  list+=("- [$slug]($slug/): $(git log -1 --format='%s (%h, %cs)' "$head")")
-  if [ -z "$prev" ] || ! git merge-base --is-ancestor "$head" "$prev"; then parents+=(-p "$head"); changed+=("$slug"); fi
+  list+=("- **$slug**, branch \`projects/$slug\`: $(git log -1 --format='%s (%h, %cs)' "$head")")
+  if [ "${there[refs/heads/projects/$slug]:-}" != "$head" ]; then push+=("+refs/projects/$slug:refs/heads/projects/$slug"); changed+=("$slug"); fi
 done
-readme=$(printf '# ZTD Devs Studio projects\n\nA backup of every project'"'"'s committed code, one folder per project, pushed by ZTD Devs Studio.\nUncommitted changes aren'"'"'t included. Each project'"'"'s own commits are part of this history too.\n\n%s\n' "$(printf '%s\n' "${list[@]}")" | git hash-object -w --stdin)
+
+# main: just a README listing every project and its branch.
+rm -f "$GIT_INDEX_FILE"
+readme=$(printf '# ZTD Devs Studio projects\n\nA backup of every project'"'"'s committed code, pushed by ZTD Devs Studio. Each project is on its own\nbranch, `projects/<name>`, with its full history. Uncommitted changes aren'"'"'t included.\n\nTo give a project a repo of its own: `git push <new-repo> origin/projects/<name>:refs/heads/main`\n\n%s\n' "$(printf '%s\n' "${list[@]}")" | git hash-object -w --stdin)
 git update-index --add --cacheinfo "100644,$readme,README.md"
 tree=$(git write-tree)
+if [ -z "$prev" ] || [ "$tree" != "$(git rev-parse "$prev^{tree}")" ]; then
+  git update-ref refs/heads/main "$(git commit-tree "$tree" ${prev:+-p "$prev"} -m "List of $(count ${#list[@]})${changed:+: ${changed[*]} changed}")"
+  push+=(main:main)
+fi
 
-if [ -n "$prev" ] && [ "$tree" = "$(git rev-parse "$prev^{tree}")" ] && [ ${#changed[@]} = 0 ]; then
+if [ ${#push[@]} = 0 ]; then
   trap - ERR; report 1 "Up to date: $(count ${#list[@]}), nothing new since the last backup."; exit 0
 fi
-msg="Backup of $(count ${#list[@]})"
-[ ${#changed[@]} = 0 ] || msg="$msg: ${changed[*]} changed"
-commit=$(git commit-tree "$tree" ${prev:+-p "$prev"} "${parents[@]}" -m "$msg")
-git update-ref refs/heads/main "$commit"
-git push -q "$URL" main:main
+git push -q "$URL" "${push[@]}"
 trap - ERR
 report 1 "Backed up $(count ${#list[@]})${changed:+ (changed: ${changed[*]})}."

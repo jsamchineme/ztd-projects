@@ -3,6 +3,7 @@
 import { chromium } from 'playwright-core';
 import { createHmac } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import net from 'node:net';
 
 const [BASE, DOMAIN_PORT, SHOTS] = process.argv.slice(2);
@@ -351,7 +352,7 @@ await check('focus checks: an admin turns them on; off-topic prompts are flagged
   await page.locator('label:has-text("Flag prompts that don’t fit their project") input').uncheck();
   await page.getByText('Focus checks are off').waitFor();
 }, page);
-await check('GitHub backup: set a repo, see the deploy key, back up now, turn off', async () => {
+await check('GitHub backup: set a repo, see the deploy key, back up now (a branch per project), turn off', async () => {
   await page.goto(BASE + '/admin');
   await page.fill('input[aria-label="GitHub repo"]', 'https://gitlab.com/someone/projects');
   await page.click('button:has-text("Set up")');
@@ -362,6 +363,11 @@ await check('GitHub backup: set a repo, see the deploy key, back up now, turn of
   await page.locator('pre', { hasText: 'ssh-ed25519' }).waitFor();
   await page.click('button:has-text("Back up now")');
   await page.locator('.ok-box', { hasText: 'Backed up 1 project (changed: demo-site)' }).waitFor({ timeout: 15000 });
+  if (process.env.MOCK_ROOT){
+    const gh = (...a) => execFileSync('git', ['--git-dir', `${process.env.MOCK_ROOT}/github.git`, ...a], { encoding: 'utf8' });
+    if (gh('rev-parse', 'projects/demo-site').trim() !== execFileSync('git', ['-C', `${process.env.MOCK_ROOT}/projects/demo-site/repo`, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()) throw new Error('projects/demo-site is not the project’s HEAD');
+    if (gh('ls-tree', '--name-only', 'main').trim() !== 'README.md' || !gh('show', 'main:README.md').includes('projects/demo-site')) throw new Error('main should only hold a README listing the projects');
+  }
   await page.click('button:has-text("Back up now")');
   await page.locator('.ok-box', { hasText: 'Up to date: 1 project' }).waitFor({ timeout: 15000 });
   await page.screenshot({ path: `${SHOTS}/10c-github-backup.png`, fullPage: true });

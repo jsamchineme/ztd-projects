@@ -43,6 +43,6 @@ for _ in $(seq 40); do curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT
 curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/" || { echo "Studio didn't start:"; cat "$WORK/server.log"; exit 1; }
 
 code=0
-node "$WORK/app/test/e2e.mjs" "http://studio.localhost:$PORT" "localhost:$PORT" "$SHOTS" || code=$?
+MOCK_ROOT="$WORK/mock" node "$WORK/app/test/e2e.mjs" "http://studio.localhost:$PORT" "localhost:$PORT" "$SHOTS" || code=$?
 [ "$code" = 0 ] || { echo; echo "Studio's log (last 30 lines):"; tail -30 "$WORK/server.log"; echo "Screenshots: $SHOTS"; }
 exit "$code"

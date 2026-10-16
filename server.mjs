@@ -410,7 +410,7 @@ route('POST', '/api/projects/:id/own-user', async ({ user, params, req }) => {
   for (const name of r.running) await ctlOk(['svc', p.slug, name, 'start'], { timeout: 60000 }).catch(() => failed.push(name));
   return { ...r, failed };
 });
-// Backing up every project to one GitHub repo, a folder per project (see ops/github-backup.sh).
+// Backing up every project to one GitHub repo, a branch per project (see ops/github-backup.sh).
 route('GET', '/api/admin/github-backup', async ({ user }) => { needAdmin(user); return ctlJson(['github-backup', 'status']); });
 route('PUT', '/api/admin/github-backup', async ({ user, body, req }) => {
   needAdmin(user);
