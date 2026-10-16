@@ -60,6 +60,34 @@
   --shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 
+/* ---------- 6. Paper · ZTD blue: Paper with the ztddevs.com navy and gold ---------- */
+[data-style="ztd"] {
+  --font: "DM Sans", "Inter", system-ui, sans-serif; --head: "Fraunces", Georgia, serif; --mono: "JetBrains Mono", monospace;
+  --radius: 10px; --radius-lg: 16px; --head-weight: 600; --head-track: -0.015em;
+}
+[data-style="ztd"][data-mode="light"] {
+  --bg: #f9f8f5; --panel: #ffffff; --side: #f1f0eb; --hover: #e7e7e1; --active: #ffffff;
+  --line: #e4e3dc; --line-strong: #cfcec5; --text: #111111; --muted: #5f6368; --faint: #9a9c9f;
+  --accent: #00427c; --accent-strong: #003463; --accent-soft: #e4edf6; --on-accent: #fff;
+  --ok: #2f7d4f; --warn: #a66e00; --bad: #b3261e; --code: #f3f4f2; --user: #eef2f6;
+  --shadow: 0 1px 0 rgba(0,40,80,.04), 0 10px 30px rgba(0,40,80,.07);
+  --gold: #ffc349; --on-gold: #111111;
+}
+[data-style="ztd"][data-mode="dark"] {
+  --bg: #0a0f16; --panel: #111823; --side: #080c12; --hover: #18212e; --active: #1b2533;
+  --line: #1f2a38; --line-strong: #2f3d50; --text: #eef1f5; --muted: #9aa5b4; --faint: #687486; --on-accent: #fff;
+  --accent: #5b9be0; --accent-strong: #7cb1ea; --accent-soft: rgba(91,155,224,.13);
+  --ok: #6cc591; --warn: #ffc349; --bad: #f08a80; --code: #0d131c; --user: #142033;
+  --shadow: 0 10px 30px rgba(0,0,0,.4);
+  --gold: #ffc349; --on-gold: #111111;
+}
+[data-style="ztd"][data-mode="dark"] .btn.primary, [data-style="ztd"][data-mode="dark"] .send, [data-style="ztd"][data-mode="dark"] .logo { background: #1d5fa3; }
+/* gold is the second brand colour: used sparingly, for counts and "working" */
+[data-style="ztd"] .badge { background: var(--gold); color: var(--on-gold); }
+[data-style="ztd"] .dot.busy { background: var(--gold); box-shadow: 0 0 0 3px rgba(255,195,73,.25); }
+[data-style="ztd"] .tab.on { border-color: var(--gold); }
+[data-style="ztd"] .logo { border-radius: 8px; }
+
 /* ---------- 3. Aurora: soft gradients and frosted panels ---------- */
 [data-style="aurora"] {
   --font: "Plus Jakarta Sans", system-ui, sans-serif; --head: var(--font); --mono: "JetBrains Mono", monospace;
@@ -356,6 +384,7 @@ h1.big { font-size: 2rem; margin-bottom: 4px; }
 const STYLES = {
   graphite: ['Graphite', 'Linear/Vercel look: dark-first, cool slate, indigo accent, Geist type, hairline borders, compact.'],
   paper:    ['Paper', 'The safe step: today\'s warm Studio, cleaned up. Fraunces headings, Inter body, terracotta.'],
+  ztd:      ['Paper · ZTD blue', 'Paper in the ztddevs.com colours: navy #00427c, gold #ffc349 highlights, DM Sans body.'],
   aurora:   ['Aurora', 'Soft gradient glow, frosted floating panels, violet → cyan accent. Friendly and fresh.'],
   terminal: ['Terminal', 'Bold and builder-ish: black and white, monospace labels, lime accent, hard edges.'],
   calm:     ['Calm', 'AI-native and roomy: floating cards, sage green, serif headings, big round composer.'],
