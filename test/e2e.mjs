@@ -524,8 +524,15 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   await page.fill('textarea', 'ring my phone when done');
   await page.keyboard.press('Enter');
   const done = await ws.next(m => m.type === 'message' && m.event === 'runFinished', 'finished-chat message');
-  if (!/ring my phone when done: done/.test(done.title) || !done.body.startsWith('Demo Site · ') || !done.url.includes('/chat/')) throw new Error(`finished-chat message says ${JSON.stringify(done)}`);
+  if (!/ring my phone when done: done/.test(done.title) || !done.body.startsWith('Demo Site · ') || !done.url.startsWith(projectUrl + '/chat/')) throw new Error(`finished-chat message says ${JSON.stringify(done)}`);
   ws.close();
+  // Tapping it opens that chat.
+  await page.goto(done.url);
+  await page.locator('.bubble', { hasText: 'ring my phone when done' }).waitFor({ timeout: 8000 });
+  // Older links named the project by its short name: they still open it, at its usual address.
+  await page.goto(done.url.replace(projectUrl, `${BASE}/p/demo-site`));
+  await page.waitForURL(done.url);
+  await page.locator('.bubble', { hasText: 'ring my phone when done' }).waitFor({ timeout: 8000 });
 
   // Offline for that one: on reconnecting it comes again, marked as missed.
   const again = await open({ token, after: done.id - 1 });

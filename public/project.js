@@ -15,7 +15,12 @@ const TABS = [['chat', 'Chat', 'chat'], ['services', 'Services', 'server'], ['ch
 export async function renderProject(main, id, tab, sub){
   let project;
   try { project = await api('GET', `/api/projects/${id}`); }
-  catch (e){ main.append(h('div', { class: 'page' }, h('div', { class: 'error-box' }, e.message))); return; }
+  catch (e){
+    // An older notification link with the project's short name in place of its id.
+    const found = e.status === 404 && /^[a-z0-9-]+$/.test(id) && await api('GET', `/api/projects/by-slug/${id}`).catch(() => null);
+    if (found && main.isConnected) return go(location.pathname.replace(`/p/${id}`, `/p/${found.id}`) + location.search, true);
+    main.append(h('div', { class: 'page' }, h('div', { class: 'error-box' }, e.message))); return;
+  }
   if (!main.isConnected) return;   // another page opened while this one loaded
   localStorageSet('lastProject', id);
   setTitle(project.name);

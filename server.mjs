@@ -169,6 +169,12 @@ route('POST', '/api/projects', async ({ user, body }) => {
   if (user.role !== 'admin' && !['owner', 'admin'].includes(role)) throw err(403, 'Only team owners and admins can create projects in that team.');
   return projectView(await P.createProject(body, user), user);
 });
+// Older notification links named the project by its short name; the page swaps that for its id.
+route('GET', '/api/projects/by-slug/:slug', async ({ user, params }) => {
+  const p = db.prepare('SELECT * FROM project WHERE slug = ?').get(params.slug);
+  projectRole(user, p);
+  return { id: p.id };
+});
 route('GET', '/api/projects/:id', async ({ user, params }) => { await P.allStatus(); return projectView(P.getProject(params.id), user); });
 route('PATCH', '/api/projects/:id', async ({ user, params, body }) => {
   const p = P.getProject(params.id); needManage(user, p);
