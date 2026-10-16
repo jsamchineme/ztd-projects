@@ -1,6 +1,7 @@
 // Account, teams and admin pages.
 import { h, $, fill, api, authApi, toast, fail, busy, dialog, confirmDialog, field, ago, copy, initials, ico } from './ui.js';
 import { state, go, setTitle, claudeLabel } from './app.js';
+import { pushState, currentSubscription, enablePush, disablePush } from './push.js';
 
 const page = main => { const inner = h('div', { class: 'page-inner' }); main.append(h('div', { class: 'page', style: { flex: 1 } }, inner)); return inner; };
 const pageHead = (title, sub, ...right) => h('div', { class: 'page-head' }, h('div', null, h('h1', null, title), sub ? h('p', null, sub) : null), right.length ? h('div', { class: 'spacer' }) : null, ...right);
@@ -35,7 +36,7 @@ export async function renderAccount(main){
   inner.append(
     pageHead('Account', 'Your profile, your Claude connection and how you sign in.'),
     h('div', { class: 'settings-layout' },
-      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-email', 'mail', 'Email notifications'], ['acc-phone', 'phone', 'Phone notifications'], ['acc-devices', 'laptop', 'Devices']]),
+      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-email', 'mail', 'Email notifications'], ['acc-phone', 'phone', 'Push notifications'], ['acc-devices', 'laptop', 'Devices']]),
       h('div', { class: 'stack' },
         h('section', { class: 'card profile', id: 'acc-profile' }, h('span', { class: 'avatar lg' }, initials(me.name)),
           h('div', null, h('h2', null, me.name), h('div', { class: 'muted' }, me.email),
@@ -77,7 +78,7 @@ export async function renderAccount(main){
             h('button', { class: 'btn', onclick: () => newBackupCodes() }, ico('key'), 'New backup codes')),
           h('span', { class: 'spacer' }), h('span', { class: 'pill ok' }, ico('check'), 'On')),
         section('acc-email', 'Email notifications', `Sent to ${me.email}.`, emailCard),
-        section('acc-phone', 'Phone notifications', 'The Studio phone app rings when these happen.', phoneCard),
+        section('acc-phone', 'Push notifications', 'On your phone or computer, even with Studio closed.', phoneCard),
         section('acc-devices', 'Devices', 'Where you’re signed in.', sessionsCard))));
 
   paintClaude(claudeCard);
@@ -119,27 +120,64 @@ async function paintEmailPrefs(card){
 async function paintPhones(card){
   let r;
   try { r = await api('GET', '/api/me/phones'); } catch (e){ card.replaceChildren(h('p', null, e.message)); return; }
-  const row = p => h('div', { class: 'phone-row' },
+  const repaint = () => paintPhones(card);
+  const here = await currentSubscription().catch(() => null);
+  const isHere = w => here && w.endpoint === here.endpoint;
+
+  // This browser: turn web push on or off, or what's in the way.
+  const state = pushState();
+  const turnOn = e => busy(e.currentTarget, async () => { await enablePush(r.vapidKey); toast('Notifications are on for this device'); repaint(); }).catch(() => {});
+  const turnOff = e => busy(e.currentTarget, async () => { await disablePush(); toast('Notifications are off for this device'); repaint(); }).catch(() => {});
+  const thisDevice = h('div', { class: 'push-here' },
+    state === 'home-screen' ? h('p', { class: 'note', style: { margin: 0 } }, 'To get notifications on this iPhone, add Studio to your Home Screen: tap Share (the square with an arrow), then ', h('strong', null, 'Add to Home Screen'), '. Open Studio from the Home Screen, sign in, and come back to this page.')
+    : state === 'unsupported' ? h('p', { class: 'muted', style: { margin: 0 } }, 'This browser can’t get push notifications.')
+    : state === 'denied' ? h('p', { class: 'note', style: { margin: 0 } }, 'Notifications are blocked for Studio in this browser. Allow them in its settings, then reload this page.')
+    : r.web.some(isHere) ? h('div', { class: 'row' }, h('span', { style: { flex: 1 } }, '✓ This device gets notifications, even with Studio closed.'), h('button', { class: 'btn small', onclick: turnOff }, 'Turn off here'))
+    : h('button', { class: 'btn primary', onclick: turnOn }, ico('phone'), 'Turn on notifications on this device'));
+
+  const webRow = w => h('div', { class: 'phone-row' },
+    h('span', { class: 'dev-ico' }, ico(/iPhone|iPad|Android/.test(w.device) ? 'phone' : 'laptop')),
+    h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, w.device),
+      isHere(w) ? h('span', { class: 'pill navy', style: { marginLeft: '8px' } }, 'This device') : null,
+      h('div', { class: 'small muted' }, [`Added ${ago(w.createdAt)}`, w.lastOkAt ? `last notified ${ago(w.lastOkAt)}` : ''].filter(Boolean).join(' · '))),
+    h('button', { class: 'btn small', onclick: e => busy(e.target, async () => {
+      if (isHere(w)) await disablePush(); else await api('DELETE', '/api/me/push', { id: w.id });
+      toast('Notifications turned off for that device'); repaint();
+    }).catch(() => {}) }, 'Remove'));
+  const appRow = p => h('div', { class: 'phone-row' },
     h('span', { class: 'dev-ico' }, ico('phone')),
-    h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, p.name),
+    h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, p.name), h('span', { class: 'small muted' }, ' · phone app'),
       p.connected ? h('span', { class: 'pill ok', style: { marginLeft: '8px' } }, 'Connected') : null,
       h('div', { class: 'small muted' }, [p.connected ? `Paired ${ago(p.createdAt)}` : p.lastSeenAt ? `Last connected ${ago(p.lastSeenAt)}` : 'Not connected yet',
         p.push ? 'rings with the app closed' : p.lastSeenAt ? 'only while the app is open: open it to turn on push' : ''].filter(Boolean).join(' · '))),
-    h('button', { class: 'btn small', onclick: e => remove(e.target, p) }, 'Remove'));
-  const remove = (btn, p) => busy(btn, async () => { await api('DELETE', `/api/me/phones/${p.id}`); toast(`${p.name} removed`); paintPhones(card); }).catch(() => {});
+    h('button', { class: 'btn small', onclick: e => busy(e.target, async () => { await api('DELETE', `/api/me/phones/${p.id}`); toast(`${p.name} removed`); repaint(); }).catch(() => {}) }, 'Remove'));
+  const count = r.web.length + r.phones.length;
   const test = e => busy(e.target, async () => {
     const t = await api('POST', '/api/me/phones/test');
-    toast(t.delivered ? `Sent to ${t.delivered} phone${t.delivered > 1 ? 's' : ''}` : 'No phone is connected right now. It’ll get the test when the app connects.', !t.delivered);
+    toast(t.delivered ? `Sent to ${t.delivered} device${t.delivered > 1 ? 's' : ''}` : 'Nothing got it right now. A phone app gets it when it connects.', !t.delivered);
   }).catch(() => {});
+
+  const repeat = h('input', { type: 'checkbox', checked: r.webRepeat });
+  repeat.onchange = async () => {
+    repeat.disabled = true;
+    try { await api('PUT', '/api/me/push/repeat', { on: repeat.checked }); toast(repeat.checked ? 'Studio will remind you until you open it' : 'One notification each time'); }
+    catch (e){ repeat.checked = !repeat.checked; fail(e); }
+    finally { repeat.disabled = false; }
+  };
+
   card.replaceChildren(
-    r.phones.length ? h('div', { class: 'phones' }, r.phones.map(row)) : h('p', { class: 'muted', style: { marginTop: 0 } }, 'No phone paired yet. Install the Studio phone app, then pair it here.'),
-    h('p', { class: 'small muted' }, 'On iPhone the app runs in Expo Go (free in the App Store). On your phone, ',
-      h('a', { href: r.appUrl, class: 'phone-app-link' }, 'open the app in Expo Go'), ', or go to ', h('span', { class: 'mono' }, `${location.origin}/api/phone/app`), '.'),
-    h('div', { class: 'row', style: { margin: '12px 0 16px' } },
-      h('button', { class: 'btn primary', onclick: () => pairDialog(() => paintPhones(card)) }, ico('phone'), 'Pair a phone'),
-      r.phones.length ? h('button', { class: 'btn', onclick: test }, 'Send a test') : null),
-    ...r.prefs.map(prefBox('/api/me/phone-prefs', 'Your phone will ring for these', 'Your phone won’t ring for these')),
-    h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'Phones get these as push notifications, even with the app closed, once the app has been opened and allowed to send notifications.'));
+    thisDevice,
+    count ? h('div', { class: 'phones', style: { marginTop: '14px' } }, r.web.map(webRow), r.phones.map(appRow))
+      : h('p', { class: 'muted' }, 'No devices get notifications yet.'),
+    count ? h('div', { class: 'row', style: { margin: '12px 0 4px' } }, h('button', { class: 'btn', onclick: test }, 'Send a test')) : null,
+    r.web.length ? h('label', { class: 'check switch-check email-pref', style: { marginTop: '12px' } }, repeat,
+      h('span', null, h('strong', null, 'Remind me until I open Studio'), h('span', { class: 'small muted' }, 'Each notification comes again every 30 seconds, up to 4 more times, until you open Studio or tap it.'))) : null,
+    h('h4', { class: 'push-sub' }, 'Notify me when'),
+    ...r.prefs.map(prefBox('/api/me/phone-prefs', 'Your devices will ring for these', 'Your devices won’t ring for these')),
+    h('details', { class: 'push-app' }, h('summary', null, 'Or use the Studio phone app (Expo Go)'),
+      h('p', { class: 'small muted' }, 'It can ring until you tap Stop while it’s open. On iPhone it runs in Expo Go (free in the App Store). On your phone, ',
+        h('a', { href: r.appUrl, class: 'phone-app-link' }, 'open the app in Expo Go'), ', or go to ', h('span', { class: 'mono' }, `${location.origin}/api/phone/app`), '. Then pair it:'),
+      h('button', { class: 'btn', onclick: () => pairDialog(repaint) }, ico('phone'), 'Pair a phone')));
 }
 
 function pairDialog(done){

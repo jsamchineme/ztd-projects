@@ -2,7 +2,7 @@
 
 Rings your phone when something happens in Studio: Claude finishes (or fails) in your chat, a project is ready,
 someone accepts your invitation, and, if you turn it on, when Claude finishes in a teammate's chat. You choose which
-on Studio's **Account → Phone notifications**.
+on Studio's **Account → Push notifications**.
 
 It's an Expo (React Native) app on SDK 57, the newest one Expo Go in the App Store runs. It keeps a WebSocket open to Studio (`wss://<studio>/api/phone/socket`,
 served by `lib/phone.mjs`), and for each message it shows a notification with sound and vibration. Studio also sends
@@ -34,7 +34,7 @@ allow installs from the browser.
   `npx eas-cli@latest build --platform android --profile preview`
 
 **iPhone (Expo Go):** install **Expo Go** from the App Store and sign in with the same Expo account. Then, on the
-iPhone, open https://studio.ztddevs.com/api/phone/app (also linked on Studio's Account → Phone notifications). It
+iPhone, open https://studio.ztddevs.com/api/phone/app (also linked on Studio's Account → Push notifications). It
 forwards to the app in Expo Go,
 `exp://u.expo.dev/13ca0973-4369-458f-b5da-dbaeb85ef01c?channel-name=expo-go&runtime-version=exposdk:57.0.0`, and Expo Go
 keeps it in its recent projects. An app of its own on iPhone would need an Apple developer account.
@@ -47,7 +47,7 @@ After an Expo SDK upgrade, change `exposdk:57.0.0` in the link here and in `PHON
 
 ## Pairing
 
-1. On Studio, open **Account → Phone notifications** and press **Pair a phone**.
+1. On Studio, open **Account → Push notifications** and press **Pair a phone**.
 2. In the app, tap **Scan the code** and point the phone at the QR code (or copy the code and paste it).
 3. Studio shows **✓ Connected**. Press **Send a test**: the phone should ring.
 

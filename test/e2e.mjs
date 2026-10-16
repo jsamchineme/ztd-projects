@@ -1,7 +1,7 @@
 // End-to-end test of Studio in a real browser, against a throwaway local instance. Run it with npm test (test/run.sh),
 // which starts that instance; by hand: node test/e2e.mjs http://studio.localhost:4310 localhost:4310 <screenshot dir>
 import { chromium } from 'playwright-core';
-import { createHmac } from 'node:crypto';
+import { createHmac, createECDH, createDecipheriv, randomBytes } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import net from 'node:net';
@@ -481,7 +481,8 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   const card = page.locator('#acc-phone');
   for (const label of ['Claude finishes in your chat', 'Claude finishes in a teammate’s chat', 'A project you created is ready'])
     await card.getByText(label).waitFor();
-  await card.getByText('No phone paired yet').waitFor();
+  await card.getByText('No devices get notifications yet').waitFor();
+  await card.locator('summary', { hasText: 'Studio phone app' }).click();
   if (!(await card.locator('a.phone-app-link').getAttribute('href')).startsWith('exp://')) throw new Error('no Expo Go link');
   const app = await page.request.get(`${BASE}/api/phone/app`, { maxRedirects: 0 });
   if (app.status() !== 302 || !app.headers().location.startsWith('exp://u.expo.dev/')) throw new Error(`/api/phone/app answered ${app.status()} ${app.headers().location}`);
@@ -533,7 +534,7 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   await page.reload();
   await card.getByText('rings with the app closed').waitFor();
   await card.locator('button:has-text("Send a test")').click();
-  await page.locator('.toast', { hasText: 'Sent to 1 phone' }).waitFor();
+  await page.locator('.toast', { hasText: 'Sent to 1 device' }).waitFor();
   const tested = await ws.next(m => m.type === 'message' && m.title === 'Test from Studio', 'test message');
   for (let i = 0; i < 50 && !pushes.length; i++) await new Promise(r => setTimeout(r, 100));
   const p = pushes.find(x => x.title === 'Test from Studio');
@@ -585,6 +586,80 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   if (await closed !== 4001) throw new Error('removing the phone didn’t close its connection');
   const gone = await open({ token, after: null });
   await gone.next(m => m.type === 'unpaired', 'refusal after removing');
+}, page);
+await check('web push: Studio installs as a web app; a browser subscribes, gets encrypted pushes and reminders until Studio is opened', async () => {
+  const sw = await page.request.get(`${BASE}/sw.js`);
+  if (!sw.ok() || !sw.headers()['content-type'].includes('javascript') || !(await sw.text()).includes("addEventListener('push'")) throw new Error('no service worker');
+  const man = await page.request.get(`${BASE}/manifest.webmanifest`);
+  if (!man.headers()['content-type'].includes('manifest+json') || (await man.json()).display !== 'standalone') throw new Error('no web app manifest');
+  await page.goto(BASE + '/account');
+  if (!await page.locator('link[rel=manifest]').count()) throw new Error('the page doesn’t link the manifest');
+  const card = page.locator('#acc-phone');
+  await card.locator('button:has-text("Turn on notifications on this device")').waitFor();
+  await page.waitForFunction(() => navigator.serviceWorker.getRegistration('/').then(r => !!r));   // registered by Studio's pages
+
+  // A browser's subscription: its own keys, and an address at a push service (a stand-in on the port after Studio's).
+  const ecdh = createECDH('prime256v1'); ecdh.generateKeys();
+  const authSecret = randomBytes(16);
+  const port = Number(new URL(BASE).port) + 1;
+  const got = [];
+  let answer = 201;
+  const service = http.createServer((req, res) => {
+    const chunks = []; req.on('data', d => chunks.push(d));
+    req.on('end', () => { got.push({ path: req.url, headers: req.headers, body: Buffer.concat(chunks) }); res.statusCode = answer; res.end(); });
+  });
+  await new Promise(r => service.listen(port, '127.0.0.1', r));
+  // RFC 8291: what a browser does to read a push.
+  const open = ({ body }) => {
+    const salt = body.subarray(0, 16), idlen = body[20], serverKey = body.subarray(21, 21 + idlen), data = body.subarray(21 + idlen);
+    const hmac = (k, d) => createHmac('sha256', k).update(d).digest();
+    const shared = ecdh.computeSecret(serverKey);
+    const ikm = hmac(hmac(authSecret, shared), Buffer.concat([Buffer.from('WebPush: info\0'), ecdh.getPublicKey(), serverKey, Buffer.from([1])]));
+    const prk = hmac(salt, ikm);
+    const key = hmac(prk, Buffer.from('Content-Encoding: aes128gcm\0\x01')).subarray(0, 16), nonce = hmac(prk, Buffer.from('Content-Encoding: nonce\0\x01')).subarray(0, 12);
+    const d = createDecipheriv('aes-128-gcm', key, nonce); d.setAuthTag(data.subarray(-16));
+    const plain = Buffer.concat([d.update(data.subarray(0, -16)), d.final()]);
+    return JSON.parse(plain.subarray(0, plain.lastIndexOf(2)).toString());
+  };
+  const subscription = { endpoint: `http://127.0.0.1:${port}/wp/olu`, keys: { p256dh: ecdh.getPublicKey().toString('base64url'), auth: authSecret.toString('base64url') } };
+  const post = s => page.request.post(`${BASE}/api/me/push`, { headers: { Origin: BASE, 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)' }, data: { subscription: s } });
+  if ((await post({ ...subscription, endpoint: 'https://example.com/steal' })).ok()) throw new Error('a push address that isn’t a push service was accepted');
+  if (!(await post(subscription)).ok()) throw new Error('subscribing failed');
+  await page.reload();
+  await card.locator('.phone-row', { hasText: 'iPhone · Home Screen' }).waitFor();
+  await card.getByText('Remind me until I open Studio').waitFor();
+  await card.screenshot({ path: `${SHOTS}/09e-push-card.png` });
+
+  await card.locator('button:has-text("Send a test")').click();
+  await page.locator('.toast', { hasText: 'Sent to 1 device' }).waitFor();
+  for (let i = 0; i < 50 && !got.length; i++) await new Promise(r => setTimeout(r, 100));
+  const first = got[0];
+  if (!first || first.path !== '/wp/olu' || first.headers['content-encoding'] !== 'aes128gcm' || !/^vapid t=.+, k=.+/.test(first.headers.authorization) || first.headers.urgency !== 'high')
+    throw new Error(`the push request was ${JSON.stringify(first?.headers)}`);
+  const m = open(first);
+  if (m.title !== 'Test from Studio' || !m.url.endsWith('/account') || !m.id) throw new Error(`the push said ${JSON.stringify(m)}`);
+  // Reminders until Studio is opened (this page says so, as Studio's pages do while on screen).
+  for (let i = 0; i < 50 && got.length < 3; i++) await new Promise(r => setTimeout(r, 100));
+  if (!/^Reminder 1 of 4/.test(open(got[1]).body)) throw new Error(`the reminder said ${JSON.stringify(open(got[1]))}`);
+  await page.request.post(`${BASE}/api/me/push/seen`, { headers: { Origin: BASE }, data: {} });
+  await new Promise(r => setTimeout(r, 400));
+  const n = got.length;
+  await new Promise(r => setTimeout(r, 1000));
+  if (got.length !== n) throw new Error('reminders went on after Studio was opened');
+
+  // Reminders off: one push each time.
+  await card.locator('label:has-text("Remind me until I open Studio") input').uncheck();
+  await page.locator('.toast', { hasText: 'One notification each time' }).waitFor();
+  got.length = 0;
+  await page.request.post(`${BASE}/api/me/phones/test`, { headers: { Origin: BASE }, data: {} });
+  await new Promise(r => setTimeout(r, 1200));
+  if (got.length !== 1) throw new Error(`with reminders off, ${got.length} pushes were sent`);
+  // The push service says the subscription is gone (the web app was deleted): Studio forgets it.
+  answer = 410;
+  await page.request.post(`${BASE}/api/me/phones/test`, { headers: { Origin: BASE }, data: {} });
+  for (let i = 0; i < 50 && (await (await page.request.get(`${BASE}/api/me/phones`)).json()).web.length; i++) await new Promise(r => setTimeout(r, 100));
+  if ((await (await page.request.get(`${BASE}/api/me/phones`)).json()).web.length) throw new Error('a gone subscription was kept');
+  service.close();
 }, page);
 await check('phone layout: chat usable at 390px', async () => {
   await page.setViewportSize({ width: 390, height: 844 });

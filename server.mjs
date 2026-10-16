@@ -10,7 +10,8 @@ import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
 import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail, sendTemplate } from './lib/mail.mjs';
 import { emailPrefs, setEmailPrefs, phonePrefs, setPhonePrefs } from './lib/notify.mjs';
-import { listPhones, pairPhone, removePhone, testPhones, handlePhoneUpgrade, PHONE_APP_URL } from './lib/phone.mjs';
+import { listPhones, pairPhone, removePhone, testPhones, handlePhoneUpgrade, PHONE_APP_URL, markSeen } from './lib/phone.mjs';
+import { vapidPublicKey, listWebPush, subscribe, unsubscribe, webRepeat, setWebRepeat } from './lib/webpush.mjs';
 import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
@@ -22,7 +23,7 @@ import { subdomainOf, handleProjectRequest, handleProjectUpgrade, issueGateToken
 await migrate();
 const authHandler = toNodeHandler(auth);
 const PUBLIC = join(APP_DIR, 'public');
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json' };
 const SECURITY = {
   'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
   'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'X-Frame-Options': 'DENY',
@@ -102,7 +103,13 @@ route('GET', '/api/me', async ({ user, session }) => {
 route('GET', '/api/me/email', async ({ user }) => emailPrefs(user));
 route('PUT', '/api/me/email', async ({ user, body }) => setEmailPrefs(user, body));
 // Phones paired for notifications, and what they ring for (lib/phone.mjs). The phone itself connects to /api/phone/socket.
-route('GET', '/api/me/phones', async ({ user }) => ({ phones: listPhones(user.id), prefs: phonePrefs(user), appUrl: PHONE_APP_URL }));
+route('GET', '/api/me/phones', async ({ user }) => ({ phones: listPhones(user.id), prefs: phonePrefs(user), appUrl: PHONE_APP_URL,
+  web: listWebPush(user.id), webRepeat: webRepeat(user.id), vapidKey: vapidPublicKey }));
+// Web push (lib/webpush.mjs, public/sw.js): this browser's subscription, reminders, and "I've seen them" from an open Studio.
+route('POST', '/api/me/push', async ({ user, body, req }) => subscribe(user, body.subscription, req.headers['user-agent']));
+route('DELETE', '/api/me/push', async ({ user, body }) => { unsubscribe(user, body); return { ok: true }; });
+route('PUT', '/api/me/push/repeat', async ({ user, body }) => { setWebRepeat(user.id, !!body.on); return { on: webRepeat(user.id) }; });
+route('POST', '/api/me/push/seen', async ({ user }) => { markSeen(user.id); return { ok: true }; });
 route('POST', '/api/me/phones', async ({ user, body, req }) => pairPhone(user, body.name, ipOf(req)));
 route('DELETE', '/api/me/phones/:id', async ({ user, params, req }) => { removePhone(user, params.id, ipOf(req)); return { ok: true }; });
 route('POST', '/api/me/phones/test', async ({ user }) => testPhones(user));

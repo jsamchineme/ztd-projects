@@ -2,6 +2,7 @@
 import { h, $, onTap, api, authApi, toast, fail, busy, dialog, field, initials, ApiError, ico } from './ui.js';
 import { renderProject, newProjectDialog } from './project.js';
 import { renderAccount, renderTeams, renderAdmin } from './people.js';
+import { startPush, disablePush } from './push.js';
 
 export const state = { me: null, projects: [], menuOpen: false };
 const app = document.getElementById('app');
@@ -137,6 +138,7 @@ export const canCreateProjects = () => state.me?.user.role === 'admin' || state.
 // ---------- shell ----------
 function shell(){
   if ($('.shell')) return;
+  startPush();
   const me = state.me.user;
   const mac = /Mac|iPhone|iPad/.test(navigator.platform);
   app.replaceChildren(h('div', { class: 'shell' },
@@ -267,6 +269,7 @@ document.addEventListener('keydown', e => {
 });
 
 async function signOut(){
+  await disablePush().catch(() => {});   // a signed-out browser shouldn't keep getting someone's notifications
   try { await authApi('/sign-out'); } catch {}
   state.me = null; state.projects = [];
   location.href = '/login';

@@ -1,4 +1,4 @@
-// ZTD Studio phone app: pairs with Studio (Account → Phone notifications), keeps a connection open, and rings when
+// ZTD Studio phone app: pairs with Studio (Account → Push notifications), keeps a connection open, and rings when
 // Studio sends a notification. See README.md.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, FlatList, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
@@ -41,7 +41,7 @@ function Pair({ notice, onPaired }){
 
   const use = text => {
     const p = parseCode(text);
-    if (!p){ setError('That isn’t a Studio pairing code. On Studio, open Account → Phone notifications → Pair a phone.'); return false; }
+    if (!p){ setError('That isn’t a Studio pairing code. On Studio, open Account → Push notifications → Pair a phone.'); return false; }
     done.current = true;
     onPaired(p);
     return true;
@@ -75,7 +75,7 @@ function Pair({ notice, onPaired }){
       {notice ? <Text style={[s.box, s.badBox]}>{notice}</Text> : null}
       <View style={s.card}>
         <Text style={s.h2}>Pair this phone</Text>
-        <Text style={s.p}>On Studio, open <Text style={s.b}>Account → Phone notifications</Text> and press <Text style={s.b}>Pair a phone</Text>. Then scan the code it shows.</Text>
+        <Text style={s.p}>On Studio, open <Text style={s.b}>Account → Push notifications</Text> and press <Text style={s.b}>Pair a phone</Text>. Then scan the code it shows.</Text>
         <Btn label="Scan the code" primary onPress={scan} />
         <Text style={[s.p, { marginTop: 18 }]}>Or copy the code on Studio and paste it here:</Text>
         <TextInput style={s.input} value={code} onChangeText={t => { setCode(t); setError(''); }} placeholder="https://studio…#…"
@@ -211,7 +211,7 @@ function Home({ pairing, onUnpair }){
           </View>
           <Text style={s.small}>{pushOn
             ? 'Push is on: your phone gets these with the app closed too. While the app is open, it keeps ringing until you tap Stop.'
-            : 'Push is off, so messages only arrive while the app is open. Allow notifications for this app to get them with it closed.'} Choose what rings in Studio: Account → Phone notifications.</Text>
+            : 'Push is off, so messages only arrive while the app is open. Allow notifications for this app to get them with it closed.'} Choose what rings in Studio: Account → Push notifications.</Text>
           <Text style={[s.small, { marginTop: 8 }]}>To keep banners on screen until you swipe them away: iPhone Settings → Notifications → Expo Go → Banner Style → Persistent.</Text>
           <Text style={[s.h3, { marginTop: 22 }]}>Recent</Text>
           {!messages.length ? <Text style={s.small}>Nothing yet. Press Send a test to try it.</Text> : null}
