@@ -9,6 +9,7 @@ import { PORT, STUDIO_HOST, STUDIO_URL, DOMAIN, APP_DIR, SECURE, APP_NAME } from
 import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
 import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail, sendTemplate } from './lib/mail.mjs';
+import { emailPrefs, setEmailPrefs } from './lib/notify.mjs';
 import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
@@ -96,6 +97,9 @@ route('GET', '/api/me', async ({ user, session }) => {
   };
 }, { mfa: false });
 
+// Which notification emails this person gets (lib/notify.mjs).
+route('GET', '/api/me/email', async ({ user }) => emailPrefs(user));
+route('PUT', '/api/me/email', async ({ user, body }) => setEmailPrefs(user, body));
 // Changing your email (lib/account.mjs). The confirm link is opened from the email, maybe signed out or in another browser.
 route('POST', '/api/account/email', async ({ user, body, req }) => requestEmailChange(user, body, ipOf(req)));
 route('GET', '/api/account/email/confirm', async ({ url, req }, res) => {

@@ -20,6 +20,7 @@ export async function renderAccount(main){
   const me = state.me.user;
   const claudeCard = h('div', { class: 'card-body' });
   const sessionsCard = h('div', { class: 'devices' });
+  const emailCard = h('div', { class: 'card-body' });
 
   const name = h('input', { type: 'text', value: me.name, maxlength: 80 });
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
@@ -33,7 +34,7 @@ export async function renderAccount(main){
   inner.append(
     pageHead('Account', 'Your profile, your Claude connection and how you sign in.'),
     h('div', { class: 'settings-layout' },
-      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-devices', 'laptop', 'Devices']]),
+      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-email', 'mail', 'Email notifications'], ['acc-devices', 'laptop', 'Devices']]),
       h('div', { class: 'stack' },
         h('section', { class: 'card profile', id: 'acc-profile' }, h('span', { class: 'avatar lg' }, initials(me.name)),
           h('div', null, h('h2', null, me.name), h('div', { class: 'muted' }, me.email),
@@ -74,10 +75,12 @@ export async function renderAccount(main){
             h('div', { style: { flex: 1 } }, h('strong', null, '✓ On, with an authenticator app.'), h('div', { class: 'small muted' }, 'Lost your backup codes? Make new ones; the old ones stop working.')),
             h('button', { class: 'btn', onclick: () => newBackupCodes() }, ico('key'), 'New backup codes')),
           h('span', { class: 'spacer' }), h('span', { class: 'pill ok' }, ico('check'), 'On')),
+        section('acc-email', 'Email notifications', `Sent to ${me.email}.`, emailCard),
         section('acc-devices', 'Devices', 'Where you’re signed in.', sessionsCard))));
 
   paintClaude(claudeCard);
   paintSessions(sessionsCard);
+  paintEmailPrefs(emailCard);
   if (location.hash === '#claude') claudeCard.scrollIntoView({ block: 'center' });
   // Back from the link in a confirm-your-new-email message (see lib/account.mjs).
   const emailResult = new URLSearchParams(location.search).get('email');
@@ -87,6 +90,26 @@ export async function renderAccount(main){
     else toast(emailResult === 'taken' ? 'Another account already uses that email, so it wasn’t changed.' : 'That link has expired or was already used. Ask for a new one below.', true);
     if (emailResult !== 'changed') $('#acc-address')?.scrollIntoView({ block: 'center' });
   }
+}
+
+// Each box saves as soon as it's changed. Security emails can't be turned off, so they're only mentioned.
+async function paintEmailPrefs(card){
+  let prefs;
+  try { prefs = await api('GET', '/api/me/email'); } catch (e){ card.replaceChildren(h('p', null, e.message)); return; }
+  const box = p => {
+    const input = h('input', { type: 'checkbox', checked: p.on });
+    input.onchange = async () => {
+      input.disabled = true;
+      try { await api('PUT', '/api/me/email', { [p.key]: input.checked }); toast(input.checked ? 'You’ll get these emails' : 'You won’t get these emails'); }
+      catch (e){ input.checked = !input.checked; fail(e); }
+      finally { input.disabled = false; }
+    };
+    return h('label', { class: 'check switch-check email-pref' }, input, h('span', null, h('strong', null, p.label), h('span', { class: 'small muted' }, p.hint)));
+  };
+  card.replaceChildren(
+    state.me.mailEnabled ? null : h('p', { class: 'note small', style: { marginTop: 0 } }, 'Email isn’t set up on this Studio yet, so nothing is sent. A Studio admin can set it up on the Admin page.'),
+    ...prefs.map(box),
+    h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'Password resets, invitations and security notices (a changed password, a reset two-step sign-in) are always sent.'));
 }
 
 function newBackupCodes(){

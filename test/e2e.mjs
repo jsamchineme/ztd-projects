@@ -350,6 +350,34 @@ await check('every email template renders, escapes what people typed and never s
   const m = templates.invite({ ...samples.invite, inviterName: '<script>x</script>', orgName: 'A & B' });
   if (m.html.includes('<script>') || !m.html.includes('A &amp; B')) throw new Error('names are not escaped');
 }, page);
+await check('email notifications: each person chooses; a turned-off one isn’t sent, a turned-on one is', async () => {
+  await page.goto(BASE + '/account');
+  const card = page.locator('#acc-email');
+  for (const label of ['Claude finishes a long run', 'A project you created is ready', 'Someone accepts your invitation', 'A prompt is flagged as off-topic'])
+    await card.getByText(label).waitFor();
+  const ready = card.locator('label:has-text("A project you created is ready") input');
+  if (!await ready.isChecked()) throw new Error('project-ready emails should start on');
+  await ready.uncheck();
+  await page.locator('.toast', { hasText: 'You won’t get these emails' }).waitFor();
+  await page.reload();
+  if (await page.locator('#acc-email label:has-text("A project you created is ready") input').isChecked()) throw new Error('the choice wasn’t saved');
+  await page.locator('#acc-email').screenshot({ path: `${SHOTS}/09b-email-prefs.png` });
+  const me = await (await page.request.get(`${BASE}/api/me`)).json();
+  const make = async (name, slug) => {
+    const r = await page.request.post(`${BASE}/api/projects`, { headers: { Origin: BASE }, data: { name, slug, organizationId: me.teams[0].organizationId, starter: 'blank' } });
+    if (!r.ok()) throw new Error(`creating ${name} failed: ${await r.text()}`);
+    const p = await r.json();
+    for (let i = 0; i < 100 && (await (await page.request.get(`${BASE}/api/projects/${p.id}`)).json()).status === 'creating'; i++) await new Promise(r => setTimeout(r, 100));
+    return p;
+  };
+  const quiet = await make('Quiet Site', 'quiet-site');
+  const r = await page.request.put(`${BASE}/api/me/email`, { headers: { Origin: BASE }, data: { projectReady: true } });
+  if (!(await r.json()).find(p => p.key === 'projectReady').on) throw new Error('turning it back on failed');
+  const loud = await make('Loud Site', 'loud-site');
+  await waitMail(m => /Loud Site is ready/.test(m), 'project-ready');
+  if (mails.map(decoded).some(m => /Quiet Site is ready/.test(m))) throw new Error('an email that was turned off was sent');
+  for (const p of [quiet, loud]) await page.request.delete(`${BASE}/api/projects/${p.id}`, { headers: { Origin: BASE }, data: { confirm: p.slug } });
+}, page);
 await check('changing your email: needs your password, and the new address must confirm it; the old one gets a notice', async () => {
   const post = data => page.request.post(`${BASE}/api/account/email`, { headers: { Origin: BASE }, data });
   if ((await post({ email: 'olu@example.com', password: 'wrong password here' })).ok()) throw new Error('a wrong password was accepted');
