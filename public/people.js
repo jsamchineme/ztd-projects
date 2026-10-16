@@ -25,12 +25,15 @@ export async function renderAccount(main){
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
   const npw = h('input', { type: 'password', autocomplete: 'new-password', minlength: 12 });
   const otherOut = h('input', { type: 'checkbox', checked: true });
+  const newEmail = h('input', { type: 'email', autocomplete: 'email', maxlength: 254, required: true });
+  const emailPw = h('input', { type: 'password', autocomplete: 'current-password', required: true });
+  const emailNote = h('div', { class: 'ok-box', hidden: true });
   const roleName2 = r => ({ owner: 'Owner', admin: 'Admin', member: 'Member' })[r] || r;
 
   inner.append(
     pageHead('Account', 'Your profile, your Claude connection and how you sign in.'),
     h('div', { class: 'settings-layout' },
-      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-devices', 'laptop', 'Devices']]),
+      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-devices', 'laptop', 'Devices']]),
       h('div', { class: 'stack' },
         h('section', { class: 'card profile', id: 'acc-profile' }, h('span', { class: 'avatar lg' }, initials(me.name)),
           h('div', null, h('h2', null, me.name), h('div', { class: 'muted' }, me.email),
@@ -41,6 +44,20 @@ export async function renderAccount(main){
           h('div', { class: 'card-head' }, h('div', null, h('h3', null, 'Profile'), h('p', null, 'Shown to your team.'))),
           h('div', { class: 'card-body' }, field('Name', name)),
           h('div', { class: 'card-foot' }, h('div', { class: 'spacer' }), h('button', { class: 'btn primary', type: 'submit' }, 'Save name'))),
+        h('form', { class: 'card', id: 'acc-address', onsubmit: async e => {
+          e.preventDefault();
+          await busy(e.submitter, async () => {
+            const r = await api('POST', '/api/account/email', { email: newEmail.value.trim(), password: emailPw.value });
+            emailPw.value = '';
+            if (r.changed){ state.me.user.email = r.email; toast('Email changed'); return go('/account', true); }
+            newEmail.value = '';
+            emailNote.hidden = false;
+            emailNote.textContent = `Check ${r.sentTo} for a link to confirm it. It works for one hour. Until then you still sign in with ${me.email}.`;
+          }).catch(() => {});
+        } },
+          h('div', { class: 'card-head' }, h('div', null, h('h3', null, 'Email address'), h('p', null, `You sign in with ${me.email}. Studio’s emails go there too.`))),
+          h('div', { class: 'card-body' }, h('div', { class: 'grid2' }, field('New email', newEmail), field('Your password', emailPw)), emailNote),
+          h('div', { class: 'card-foot' }, h('div', { class: 'spacer' }), h('button', { class: 'btn primary', type: 'submit' }, 'Change email'))),
         h('form', { class: 'card', id: 'acc-password', onsubmit: async e => {
           e.preventDefault();
           await busy(e.submitter, async () => {
@@ -62,6 +79,14 @@ export async function renderAccount(main){
   paintClaude(claudeCard);
   paintSessions(sessionsCard);
   if (location.hash === '#claude') claudeCard.scrollIntoView({ block: 'center' });
+  // Back from the link in a confirm-your-new-email message (see lib/account.mjs).
+  const emailResult = new URLSearchParams(location.search).get('email');
+  if (emailResult){
+    history.replaceState(null, '', '/account');
+    if (emailResult === 'changed') toast(`Email changed. You now sign in with ${me.email}.`);
+    else toast(emailResult === 'taken' ? 'Another account already uses that email, so it wasn’t changed.' : 'That link has expired or was already used. Ask for a new one below.', true);
+    if (emailResult !== 'changed') $('#acc-address')?.scrollIntoView({ block: 'center' });
+  }
 }
 
 function newBackupCodes(){

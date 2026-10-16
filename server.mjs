@@ -13,6 +13,7 @@ import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
 import * as U from './lib/uploads.mjs';
+import { requestEmailChange, confirmEmailChange } from './lib/account.mjs';
 import { ctl, ctlOk, ctlJson, spawnCtl } from './lib/ctl.mjs';
 import { subdomainOf, handleProjectRequest, handleProjectUpgrade, issueGateToken, canAccessOrg } from './lib/gate.mjs';
 
@@ -94,6 +95,13 @@ route('GET', '/api/me', async ({ user, session }) => {
     teams: memberships(user.id), claude, mailEnabled: mailEnabled(), domain: DOMAIN, appName: APP_NAME
   };
 }, { mfa: false });
+
+// Changing your email (lib/account.mjs). The confirm link is opened from the email, maybe signed out or in another browser.
+route('POST', '/api/account/email', async ({ user, body, req }) => requestEmailChange(user, body, ipOf(req)));
+route('GET', '/api/account/email/confirm', async ({ url, req }, res) => {
+  const result = await confirmEmailChange(url.searchParams.get('token') || '', ipOf(req));
+  res.writeHead(302, { Location: `/account?email=${result}`, 'Cache-Control': 'no-store' }); res.end();
+}, { public: true });
 
 route('GET', '/api/qr', async ({ url }, res) => {
   const text = url.searchParams.get('text') || '';

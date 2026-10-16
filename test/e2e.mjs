@@ -350,6 +350,31 @@ await check('every email template renders, escapes what people typed and never s
   const m = templates.invite({ ...samples.invite, inviterName: '<script>x</script>', orgName: 'A & B' });
   if (m.html.includes('<script>') || !m.html.includes('A &amp; B')) throw new Error('names are not escaped');
 }, page);
+await check('changing your email: needs your password, and the new address must confirm it; the old one gets a notice', async () => {
+  const post = data => page.request.post(`${BASE}/api/account/email`, { headers: { Origin: BASE }, data });
+  if ((await post({ email: 'olu@example.com', password: 'wrong password here' })).ok()) throw new Error('a wrong password was accepted');
+  if ((await post({ email: 'mia@example.com', password: PW })).ok()) throw new Error('another account’s email was accepted');
+  await page.goto(BASE + '/account');
+  const card = page.locator('#acc-address');
+  await card.locator('input[type=email]').fill('olu@example.com');
+  await card.locator('input[type=password]').fill(PW);
+  await card.locator('button:has-text("Change email")').click();
+  await card.getByText('Check olu@example.com for a link').waitFor();
+  if ((await (await page.request.get(`${BASE}/api/me`)).json()).user.email !== 'owner@example.com') throw new Error('the email changed before it was confirmed');
+  const confirm = await waitMail(m => /To: olu@example.com/i.test(m) && /Confirm your new email/.test(m), 'confirm-email');
+  const link = confirm.match(/(http\S+\/api\/account\/email\/confirm\?token=[\w-]+)/)?.[1];
+  if (!link) throw new Error('confirm email has no link');
+  await page.goto(link);
+  await page.locator('.toast', { hasText: 'You now sign in with olu@example.com' }).waitFor();
+  await waitMail(m => /To: owner@example.com/i.test(m) && /Your email was changed/.test(m), 'email-changed');
+  await page.goto(link);
+  await page.locator('.toast', { hasText: 'expired or was already used' }).waitFor();
+  // and back, so the rest of the test can sign in as before
+  await post({ email: 'owner@example.com', password: PW });
+  const back = await waitMail(m => /To: owner@example.com/i.test(m) && /Confirm your new email/.test(m), 'second confirm-email');
+  await page.request.get(back.match(/(http\S+\/api\/account\/email\/confirm\?token=[\w-]+)/)[1]);
+  if ((await (await page.request.get(`${BASE}/api/me`)).json()).user.email !== 'owner@example.com') throw new Error('changing it back failed');
+}, page);
 await check('admin removes the email settings', async () => {
   await page.goto(BASE + '/admin');
   await page.click('button:has-text("Remove")');
