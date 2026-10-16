@@ -123,7 +123,8 @@ async function paintPhones(card){
     h('span', { class: 'dev-ico' }, ico('phone')),
     h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, p.name),
       p.connected ? h('span', { class: 'pill ok', style: { marginLeft: '8px' } }, 'Connected') : null,
-      h('div', { class: 'small muted' }, p.connected ? `Paired ${ago(p.createdAt)}` : p.lastSeenAt ? `Last connected ${ago(p.lastSeenAt)}` : 'Not connected yet')),
+      h('div', { class: 'small muted' }, [p.connected ? `Paired ${ago(p.createdAt)}` : p.lastSeenAt ? `Last connected ${ago(p.lastSeenAt)}` : 'Not connected yet',
+        p.push ? 'rings with the app closed' : p.lastSeenAt ? 'only while the app is open: open it to turn on push' : ''].filter(Boolean).join(' · '))),
     h('button', { class: 'btn small', onclick: e => remove(e.target, p) }, 'Remove'));
   const remove = (btn, p) => busy(btn, async () => { await api('DELETE', `/api/me/phones/${p.id}`); toast(`${p.name} removed`); paintPhones(card); }).catch(() => {});
   const test = e => busy(e.target, async () => {
@@ -138,7 +139,7 @@ async function paintPhones(card){
       h('button', { class: 'btn primary', onclick: () => pairDialog(() => paintPhones(card)) }, ico('phone'), 'Pair a phone'),
       r.phones.length ? h('button', { class: 'btn', onclick: test }, 'Send a test') : null),
     ...r.prefs.map(prefBox('/api/me/phone-prefs', 'Your phone will ring for these', 'Your phone won’t ring for these')),
-    h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'The app gets these while it’s open or recently used. If it was closed, it catches up on the last day’s when you open it.'));
+    h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'Phones get these as push notifications, even with the app closed, once the app has been opened and allowed to send notifications.'));
 }
 
 function pairDialog(done){

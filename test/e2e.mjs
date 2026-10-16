@@ -5,6 +5,7 @@ import { createHmac } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import net from 'node:net';
+import http from 'node:http';
 
 const [BASE, DOMAIN_PORT, SHOTS] = process.argv.slice(2);
 mkdirSync(SHOTS, { recursive: true });
@@ -260,7 +261,7 @@ await check('admin page: people and activity log; reset link for teammate', asyn
   await page.goto(BASE + '/admin');
   await page.getByText('mia@example.com').waitFor();
   await page.locator('tr', { hasText: 'mia@example.com' }).locator('button:has-text("Reset link")').click();
-  await page.getByText('Password reset link').waitFor();
+  await page.getByRole('heading', { name: 'Password reset link' }).waitFor();
   const link = (await page.locator('dialog .secret').textContent()).trim();
   if (!link.includes('/reset-password?token=')) throw new Error('bad link ' + link);
   await page.click('dialog button:has-text("Done")');
@@ -515,15 +516,43 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   await page.locator('dialog', { hasText: '✓ Connected' }).waitFor({ timeout: 8000 });
   await page.click('dialog button:has-text("Done")');
   await card.locator('.pill', { hasText: 'Connected' }).waitFor();
+
+  // Push: the app gives its Expo push token; messages then also go to Expo's push service (a stand-in here, on the
+  // port after Studio's: see test/run.sh), so the phone shows them with the app closed.
+  const pushes = [];
+  let pushAnswer = () => ({ status: 'ok', id: 'x' });
+  const expo = http.createServer((req, res) => {
+    let body = ''; req.on('data', d => body += d);
+    req.on('end', () => { const list = JSON.parse(body); pushes.push(...list); res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ data: list.map(() => pushAnswer()) })); });
+  });
+  await new Promise(r => expo.listen(Number(new URL(BASE).port) + 1, '127.0.0.1', r));
+  ws.send(JSON.stringify({ type: 'push-token', token: 'not a token' }));
+  if ((await ws.next(m => m.type === 'push-token', 'push-token answer')).saved) throw new Error('a bad push token was saved');
+  ws.send(JSON.stringify({ type: 'push-token', token: 'ExponentPushToken[abcdefghij1234567890]' }));
+  if (!(await ws.next(m => m.type === 'push-token', 'push-token answer')).saved) throw new Error('the push token wasn’t saved');
+  await page.reload();
+  await card.getByText('rings with the app closed').waitFor();
   await card.locator('button:has-text("Send a test")').click();
   await page.locator('.toast', { hasText: 'Sent to 1 phone' }).waitFor();
-  await ws.next(m => m.type === 'message' && m.title === 'Test from Studio', 'test message');
+  const tested = await ws.next(m => m.type === 'message' && m.title === 'Test from Studio', 'test message');
+  for (let i = 0; i < 50 && !pushes.length; i++) await new Promise(r => setTimeout(r, 100));
+  const p = pushes.find(x => x.title === 'Test from Studio');
+  if (!p || p.to !== 'ExponentPushToken[abcdefghij1234567890]' || p.sound !== 'default' || p.data.id !== tested.id || p.data.url !== tested.url || !p.data.studio)
+    throw new Error(`the push was ${JSON.stringify(pushes)}`);
   await card.screenshot({ path: `${SHOTS}/09d-phone-card.png` });
 
   await page.goto(projectUrl + '/chat/new');
   await page.fill('textarea', 'ring my phone when done');
   await page.keyboard.press('Enter');
   const done = await ws.next(m => m.type === 'message' && m.event === 'runFinished', 'finished-chat message');
+  for (let i = 0; i < 50 && !pushes.some(x => x.data.id === done.id); i++) await new Promise(r => setTimeout(r, 100));
+  if (!pushes.some(x => x.data.id === done.id && x.data.url === done.url)) throw new Error('the finished chat wasn’t pushed');
+  // Expo says the app is gone from the phone: Studio stops pushing to it.
+  pushAnswer = () => ({ status: 'error', message: 'gone', details: { error: 'DeviceNotRegistered' } });
+  await page.request.post(`${BASE}/api/me/phones/test`, { headers: { Origin: BASE }, data: {} });
+  for (let i = 0; i < 50 && (await (await page.request.get(`${BASE}/api/me/phones`)).json()).phones[0].push; i++) await new Promise(r => setTimeout(r, 100));
+  if ((await (await page.request.get(`${BASE}/api/me/phones`)).json()).phones[0].push) throw new Error('a token Expo rejected was kept');
+  expo.close();
   if (!/ring my phone when done: done/.test(done.title) || !done.body.startsWith('Demo Site · ') || !done.url.startsWith(projectUrl + '/chat/')) throw new Error(`finished-chat message says ${JSON.stringify(done)}`);
   ws.close();
   // Tapping it opens that chat.

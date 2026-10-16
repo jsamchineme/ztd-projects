@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { connect, parseCode } from './src/socket';
-import { setUpNotifications, showNotification, startRinging, stopRinging, onNotificationTap } from './src/alerts';
+import { setUpNotifications, showNotification, startRinging, stopRinging, onNotificationTap, pushToken, handlePushes } from './src/alerts';
 import * as store from './src/store';
 
 const C = { navy: '#00427c', gold: '#ffc349', bg: '#f9f8f5', panel: '#ffffff', line: '#e4e3dc', text: '#111111', muted: '#5f6368', ok: '#2f7d4f', bad: '#b3261e', warn: '#8a5b00' };
@@ -94,48 +94,67 @@ function Home({ pairing, onUnpair }){
   const [messages, setMessages] = useState([]);
   const [settings, setSettings] = useState(store.DEFAULT_SETTINGS);
   const [allowed, setAllowed] = useState(true);
+  const [pushOn, setPushOn] = useState(false);
   const [ringing, setRinging] = useState(null);
   const lastId = useRef(null);
+  const push = useRef(null);   // this phone's Expo push token, once known
   const settingsRef = useRef(settings);
   const conn = useRef(null);
   const appState = useRef(AppState.currentState);
 
   const ring = useCallback(m => {
-    showNotification(m).catch(() => {});
-    if (settingsRef.current.ring && appState.current === 'active'){ setRinging(m); startRinging(); }
+    const open = appState.current === 'active';
+    // In the background with push on, the push is the notification; another from here would show it twice.
+    if (open || !push.current) showNotification(m).catch(() => {});
+    if (settingsRef.current.ring && open){ setRinging(m); startRinging(); }
   }, []);
 
   useEffect(() => {
     let alive = true;
-    setUpNotifications().then(ok => alive && setAllowed(ok)).catch(() => {});
+    // With notifications allowed, Studio also pushes each message, so the phone shows it while the app is closed.
+    setUpNotifications().then(async ok => {
+      if (!alive) return;
+      setAllowed(ok);
+      const t = ok ? await pushToken() : null;
+      if (!alive || !t) return;
+      push.current = t; setPushOn(true);
+      conn.current?.pushToken(t);
+    }).catch(() => {});
     const untap = onNotificationTap();
+    // The same message can come over the socket and as a push: whichever is first counts.
+    let receive = () => {};
+    const unpush = handlePushes(m => receive(m));
     (async () => {
       const [saved, last, set] = await Promise.all([store.loadMessages(), store.loadLastId(), store.loadSettings()]);
       if (!alive) return;
       setMessages(saved); lastId.current = last; setSettings(set); settingsRef.current = set;
       const missed = [];
       let missedTimer = null;
+      receive = m => {
+        if (lastId.current != null && m.id <= lastId.current) return;
+        lastId.current = m.id; store.saveLastId(m.id);
+        setMessages(list => { const next = [m, ...list.filter(x => x.id !== m.id)]; store.saveMessages(next); return next; });
+        if (!m.missed) return ring(m);
+        // Missed while offline: with push on, the phone already showed them, so they're only listed. Otherwise they
+        // arrive together and get one notification.
+        if (push.current) return;
+        missed.push(m);
+        clearTimeout(missedTimer);
+        missedTimer = setTimeout(() => {
+          const n = missed.length, newest = missed[n - 1];
+          missed.length = 0;
+          ring(n === 1 ? newest : { ...newest, title: `${n} notifications while you were away`, body: newest.title });
+        }, 300);
+      };
       conn.current = connect(pairing, {
         getLastId: () => lastId.current,
+        getPushToken: () => push.current,
         onStatus: st => alive && setStatus(st),
         onReady: r => {
           setInfo(r);
           if (lastId.current == null || r.last < lastId.current){ lastId.current = r.last; store.saveLastId(r.last); }
         },
-        onMessage: m => {
-          if (lastId.current != null && m.id <= lastId.current) return;
-          lastId.current = m.id; store.saveLastId(m.id);
-          setMessages(list => { const next = [m, ...list]; store.saveMessages(next); return next; });
-          // Messages missed while offline arrive together: one notification for all of them.
-          if (!m.missed) return ring(m);
-          missed.push(m);
-          clearTimeout(missedTimer);
-          missedTimer = setTimeout(() => {
-            const n = missed.length, newest = missed[n - 1];
-            missed.length = 0;
-            ring(n === 1 ? newest : { ...newest, title: `${n} notifications while you were away`, body: newest.title });
-          }, 300);
-        },
+        onMessage: m => receive(m),
         onUnpaired: error => onUnpair(error),
       });
     })();
@@ -143,7 +162,7 @@ function Home({ pairing, onUnpair }){
       appState.current = next;
       if (next === 'active') conn.current?.wake();
     });
-    return () => { alive = false; untap(); sub.remove(); conn.current?.close(); stopRinging(); };
+    return () => { alive = false; untap(); unpush(); sub.remove(); conn.current?.close(); stopRinging(); };
   }, [pairing]);
 
   useEffect(() => {
@@ -182,7 +201,9 @@ function Home({ pairing, onUnpair }){
             <Toggle label="Keep ringing until I tap Stop" hint="While the app is open. Up to a minute." value={settings.ring} onChange={v => change('ring', v)} />
             <Toggle label="Keep the screen on" hint="Leave the phone on your desk with the app open, and it never misses a message." value={settings.keepAwake} onChange={v => change('keepAwake', v)} />
           </View>
-          <Text style={s.small}>The app gets messages while it’s open or recently used. When you open it again, it catches up on the last day’s. Choose what rings in Studio: Account → Phone notifications.</Text>
+          <Text style={s.small}>{pushOn
+            ? 'Push is on: your phone gets these with the app closed too. While the app is open, it keeps ringing until you tap Stop.'
+            : 'Push is off, so messages only arrive while the app is open. Allow notifications for this app to get them with it closed.'} Choose what rings in Studio: Account → Phone notifications.</Text>
           <Text style={[s.h3, { marginTop: 22 }]}>Recent</Text>
           {!messages.length ? <Text style={s.small}>Nothing yet. Press Send a test to try it.</Text> : null}
         </>}

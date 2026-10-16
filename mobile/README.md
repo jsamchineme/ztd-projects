@@ -5,7 +5,8 @@ someone accepts your invitation, and, if you turn it on, when Claude finishes in
 on Studio's **Account → Phone notifications**.
 
 It's an Expo (React Native) app on SDK 57, the newest one Expo Go in the App Store runs. It keeps a WebSocket open to Studio (`wss://<studio>/api/phone/socket`,
-served by `lib/phone.mjs`), and for each message it shows a notification with sound and vibration. While the app is
+served by `lib/phone.mjs`), and for each message it shows a notification with sound and vibration. Studio also sends
+each message as a push, so it arrives with the app closed. While the app is
 open it keeps vibrating until you tap **Stop** (you can turn that off in the app).
 
 | File | What it does |
@@ -54,13 +55,14 @@ The code is shown once and only lets a phone receive your notifications. Remove 
 
 ## What to expect
 
-- Messages arrive instantly while the app is open, and for a while after you switch away from it. Phones pause apps
-  in the background (iPhones within seconds, Android after some minutes), and then the connection stops.
-- When you open the app again it reconnects and catches up on the last day's messages, with one notification for them.
-- To never miss one, turn on **Keep the screen on** and leave the app open, for example on a charger on your desk.
-- Ringing with the app fully closed would need push notifications through Apple and Google (Expo's push service and
-  a build of the app of its own rather than Expo Go). The Studio side would then send a push as well as the
-  WebSocket message.
+- Once the app has been opened and allowed to send notifications, it gives Studio its Expo push token, and every
+  message also goes through Expo's push service (`lib/phone.mjs`). The phone then shows it with sound even when the
+  app is closed. Studio's Account page shows "rings with the app closed" for that phone.
+- While the app is open, messages come over the WebSocket and the phone keeps vibrating until you tap **Stop**. The
+  push copy of the same message is dropped, so nothing shows twice.
+- On iPhone this works in Expo Go. On Android, Expo Go can't get pushes (since SDK 53); the APK build can, once a
+  Firebase (FCM) key is added to the Expo project.
+- A push makes a single notification sound; the repeated ringing only happens with the app open.
 
 ## Checking it
 

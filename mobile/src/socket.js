@@ -10,8 +10,9 @@ export function socketUrl(studio){
 }
 
 // handlers: onStatus({ state: 'connecting' | 'connected' | 'offline', retryIn?, error? }), onReady(info),
-// onMessage(message), onUnpaired(error). getLastId() returns the newest message id the app has (or null).
-export function connect({ studio, token }, { getLastId, onStatus, onReady, onMessage, onUnpaired }){
+// onMessage(message), onUnpaired(error). getLastId() returns the newest message id the app has (or null);
+// getPushToken() where Studio should send pushes (or null), sent after each hello.
+export function connect({ studio, token }, { getLastId, getPushToken, onStatus, onReady, onMessage, onUnpaired }){
   let ws = null, stopped = false, attempt = 0, retryTimer = null, pingTimer = null, pongTimer = null;
 
   const clearTimers = () => { clearTimeout(retryTimer); clearInterval(pingTimer); clearTimeout(pongTimer); };
@@ -33,7 +34,11 @@ export function connect({ studio, token }, { getLastId, onStatus, onReady, onMes
     sock.onmessage = e => {
       clearTimeout(pongTimer);
       let m; try { m = JSON.parse(e.data); } catch { return; }
-      if (m.type === 'ready'){ attempt = 0; onStatus({ state: 'connected' }); onReady(m); }
+      if (m.type === 'ready'){
+        attempt = 0; onStatus({ state: 'connected' }); onReady(m);
+        const push = getPushToken();
+        if (push) sock.send(JSON.stringify({ type: 'push-token', token: push }));
+      }
       else if (m.type === 'message') onMessage(m);
       else if (m.type === 'unpaired'){ stopped = true; onUnpaired(m.error); }
     };
@@ -51,6 +56,8 @@ export function connect({ studio, token }, { getLastId, onStatus, onReady, onMes
   return {
     // Reconnect now, e.g. when the app comes back to the front, unless the connection is fine.
     wake(){ if (!stopped && (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING)) { attempt = 0; open(); } },
+    // Send a push token got after connecting.
+    pushToken(push){ if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'push-token', token: push })); },
     test(){ if (ws?.readyState === WebSocket.OPEN){ ws.send(JSON.stringify({ type: 'test' })); return true; } return false; },
     close(){ stopped = true; clearTimers(); ws?.close(); },
   };
