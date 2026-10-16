@@ -317,12 +317,13 @@ export async function renderTeams(main){
         state.me.user.role === 'admin' ? h('button', { class: 'btn', onclick: () => newTeam(load) }, ico('plus'), 'New team') : null),
       !state.me.mailEnabled ? h('div', { class: 'note' }, ico('mail'), h('span', null, 'Email isn’t set up on this server yet, so invitations aren’t emailed. Copy each invite link and send it yourself.')) : null,
       teams.length ? null : h('div', { class: 'card card-pad' }, 'You’re not in a team yet.'),
-      h('div', { class: 'stack' }, teams.map(t => teamCard(t, load))));
+      h('div', { class: 'stack' }, teams.map(t => teamCard(t, load, teams))));
   }
   await load().catch(e => inner.replaceChildren(h('div', { class: 'error-box' }, e.message)));
 }
 
-function teamCard(t, reload){
+function teamCard(t, reload, teams){
+  const others = teams.filter(o => o.canAdmin && o.organizationId !== t.organizationId);
   const email = h('input', { type: 'email', required: true, placeholder: 'name@example.com', 'aria-label': 'Email to invite' });
   // Only your own connection can be shared, not one shared with you.
   const canShare = state.me.claude?.connected && !state.me.claude.sharedBy;
@@ -343,10 +344,10 @@ function teamCard(t, reload){
           h('td', null, h('div', { class: 'row', style: { gap: '8px', flexWrap: 'nowrap' } }, h('span', { class: 'avatar' }, initials(m.name)), h('div', null, m.name, m.userId === state.me.user.id ? ' (you)' : '', h('div', { class: 'small muted' }, m.email), m.claudeFrom ? claudeFromLine(m, reload) : null))),
           h('td', null, sel),
           h('td', { class: 'small' }, m.twoFactorEnabled ? h('span', { class: 'pill ok' }, ico('check'), 'On') : h('span', { class: 'pill warn' }, ico('alert'), 'Not set up')),
-          h('td', { class: 'right' }, t.canAdmin && m.userId !== state.me.user.id ? h('button', { class: 'btn small ghost danger', onclick: async e => {
+          h('td', { class: 'right' }, t.canAdmin && m.userId !== state.me.user.id ? h('div', { class: 'row tight end' }, others.length ? h('button', { class: 'btn small ghost', onclick: () => moveMember(t, m, others, reload) }, 'Move') : null, h('button', { class: 'btn small ghost danger', onclick: async e => {
             if (await confirmDialog(`Remove ${m.name}?`, `They lose access to ${t.name}'s projects straight away.`, 'Remove', true))
               busy(e.target, async () => { await authApi('/organization/remove-member', { memberIdOrEmail: m.id, organizationId: t.organizationId }); reload(); });
-          } }, 'Remove') : null));
+          } }, 'Remove')) : null));
       })))),
     t.canAdmin ? h('div', null,
       t.invites.length ? h('div', { class: 'card-body invites' }, h('div', { class: 'small muted label' }, 'Waiting to join'),
@@ -365,6 +366,21 @@ function teamCard(t, reload){
       } }, h('div', { style: { flex: '1 1 220px' } }, email), role, h('button', { class: 'btn primary', type: 'submit' }, 'Invite'),
         canShare ? h('label', { class: 'check', style: { flexBasis: '100%', margin: '4px 0 0' } }, share,
           h('span', null, `Let them use my Claude ${state.me.claude.kind === 'subscription' ? 'subscription' : 'API key'} `, h('span', { class: 'small muted' }, '(until they connect their own)'))) : null)) : null);
+}
+
+// Moves someone straight into another team you administer; they keep their role.
+function moveMember(t, m, others, reload){
+  const to = h('select', { 'aria-label': 'Move to team' }, others.map(o => h('option', { value: o.organizationId }, o.name)));
+  dialog(close => h('form', { class: 'dialog-body', onsubmit: async e => {
+    e.preventDefault();
+    await busy(e.submitter, async () => {
+      await api('POST', `/api/teams/${t.organizationId}/members/${m.id}/move`, { organizationId: to.value });
+      close(); toast(`${m.name} moved to ${to.selectedOptions[0].textContent}`); reload();
+    }).catch(() => {});
+  } }, h('h2', null, `Move ${m.name} to another team`),
+    h('p', { class: 'muted' }, `They lose access to ${t.name}’s projects and get access to the new team’s, with the same role. Projects here that use their Claude switch to the team owner’s.`),
+    field('Team', to),
+    h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Move'))));
 }
 
 // "Uses Samuel's Claude", with a way to stop it for the person sharing, the person using it, or a site admin.

@@ -707,6 +707,34 @@ await check('a chat can be archived, unarchived and deleted', async () => {
   await page.waitForURL(/\/chat\/new$/);
   if (await row.count()) throw new Error('the deleted chat is still listed');
 }, page);
+await check('move a teammate to another team', async () => {
+  const H = { headers: { Origin: BASE } };
+  const users = await (await page.request.get(`${BASE}/api/admin/users`)).json();
+  const mia = users.find(u => u.email === 'mia@example.com');
+  let teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const from = teams.find(t => t.name === 'Pipeline Team');
+  const demo = from.projects.find(p => p.name === 'Demo Site');
+  // Demo Site's workers run on Mia's Claude, so the move hands them back to the owner's
+  await page.request.patch(`${BASE}/api/projects/${demo.id}`, { ...H, data: { workerClaudeUserId: mia.id } });
+  await page.goto(BASE + '/team');
+  await page.click('button:has-text("New team")');
+  await page.fill('dialog input', 'Nurseries');
+  await page.click('dialog button[type=submit]');
+  await page.getByRole('heading', { name: 'Nurseries' }).waitFor();
+  await page.locator('.team-card', { hasText: 'Pipeline Team' }).locator('tr', { hasText: 'mia@example.com' }).getByRole('button', { name: 'Move', exact: true }).click();
+  await page.selectOption('dialog select', { label: 'Nurseries' });
+  await page.locator('dialog').getByRole('button', { name: 'Move', exact: true }).click();
+  await page.getByText('Mia Member moved to Nurseries').waitFor();
+  await page.locator('.team-card', { hasText: 'Nurseries' }).getByText('mia@example.com').waitFor();
+  teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const to = teams.find(t => t.name === 'Nurseries'), old = teams.find(t => t.name === 'Pipeline Team');
+  if (!to.members.some(m => m.userId === mia.id) || old.members.some(m => m.userId === mia.id)) throw new Error('membership not moved');
+  const p = await (await page.request.get(`${BASE}/api/projects/${demo.id}`)).json();
+  if (p.workerClaude?.name !== 'Olu Owner') throw new Error('workers did not fall back to the owner: ' + JSON.stringify(p.workerClaude));
+  const m = to.members.find(m => m.userId === mia.id);
+  const same = await page.request.post(`${BASE}/api/teams/${to.organizationId}/members/${m.id}/move`, { ...H, data: { organizationId: to.organizationId } });
+  if (same.status() !== 400) throw new Error('moving to the same team was allowed');
+}, page);
 await check('delete project needs the short name', async () => {
   await page.goto(projectUrl + '/settings');
   await page.click('button:has-text("Delete project")');

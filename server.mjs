@@ -406,6 +406,34 @@ route('GET', '/api/teams', async ({ user }) => {
     return { ...t, canAdmin, members, invites, projects };
   });
 });
+// Moves someone to another team in one step, keeping their role. The mover must administer both teams.
+// The old team's projects that ran on their Claude fall back to the old team's owner's.
+route('POST', '/api/teams/:orgId/members/:memberId/move', async ({ user, params, body, req }) => {
+  const m = db.prepare('SELECT * FROM member WHERE id = ? AND organizationId = ?').get(params.memberId, params.orgId);
+  if (!m) throw err(404, 'Person not found in this team');
+  const dest = db.prepare('SELECT id, name FROM organization WHERE id = ?').get(body.organizationId);
+  if (!dest) throw err(404, 'Team not found');
+  if (dest.id === m.organizationId) throw err(400, 'They’re already in that team.');
+  if (m.userId === user.id) throw err(400, 'You can’t move yourself.');
+  const isAdmin = r => ['site-admin', 'owner', 'admin'].includes(r);
+  if (!isAdmin(orgRole(user, m.organizationId)) || !isAdmin(orgRole(user, dest.id))) throw err(403, 'You must be an admin of both teams.');
+  const owners = () => db.prepare(`SELECT userId FROM member WHERE organizationId = ? AND role = 'owner' ORDER BY createdAt`).all(m.organizationId).map(r => r.userId);
+  if (m.role === 'owner' && owners().length === 1) throw err(400, 'They’re the team’s only owner. Make someone else an owner first.');
+  const role = m.role === 'owner' && !['site-admin', 'owner'].includes(orgRole(user, dest.id)) ? 'admin' : m.role;
+  const from = db.prepare('SELECT name FROM organization WHERE id = ?').get(m.organizationId).name;
+  db.transaction(() => {
+    if (db.prepare('SELECT 1 FROM member WHERE userId = ? AND organizationId = ?').get(m.userId, dest.id)) db.prepare('DELETE FROM member WHERE id = ?').run(m.id);
+    else db.prepare('UPDATE member SET organizationId = ?, role = ? WHERE id = ?').run(dest.id, role, m.id);
+  })();
+  const owner = owners()[0] || null;
+  for (const p of db.prepare('SELECT * FROM project WHERE organizationId = ? AND workerClaudeUserId = ?').all(m.organizationId, m.userId)){
+    db.prepare('UPDATE project SET workerClaudeUserId = ? WHERE id = ?').run(owner, p.id);
+    await P.applyServices(P.getProject(p.id)).catch(e => console.error(e.message));
+  }
+  const who = db.prepare('SELECT email FROM user WHERE id = ?').get(m.userId)?.email;
+  audit(user.id, 'team.move-member', who, `${from} → ${dest.name}`, ipOf(req));
+  return { ok: true };
+});
 
 // Site admin
 const needAdmin = user => { if (user.role !== 'admin') throw err(403, 'Admins only'); };
