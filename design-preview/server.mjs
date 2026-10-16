@@ -1,22 +1,53 @@
-// Design preview for Studio: serves public/ on $PORT. Not part of Studio itself.
+// Design preview for Studio. Runs Studio's real front end (../public) against a fake API (mock.mjs), with the new
+// stylesheet from ztd/ in place of public/app.css. /options is the earlier page comparing six styles.
+// Studio sets PORT. Nothing here talks to the real Studio or its data.
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { join, extname, normalize } from 'node:path';
+import { handleApi, reset } from './mock.mjs';
 
 const PORT = Number(process.env.PORT || 4400);
-const ROOT = join(import.meta.dirname, 'public');
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.json': 'application/json' };
+const HERE = import.meta.dirname;
+const STUDIO = join(HERE, '..', 'public');   // the real front end, read fresh on every request
+const ZTD = join(HERE, 'ztd');                // the new look: app.css, icon.svg, fonts/, preview.js
+const OPTIONS = join(HERE, 'public');
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.json': 'application/json' };
+
+const inside = (root, path) => { const f = join(root, normalize(path).replace(/^(\.\.[/\\])+/, '')); return f.startsWith(root) ? f : null; };
+async function file(res, path, type){
+  try {
+    const body = await readFile(path);
+    res.writeHead(200, { 'Content-Type': type || TYPES[extname(path)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
+    res.end(body);
+    return true;
+  } catch { return false; }
+}
+// Studio's index.html, plus the preview menu and the saved light/dark choice (applied before the page paints).
+async function appPage(res){
+  const html = (await readFile(join(STUDIO, 'index.html'), 'utf8')).replace('</head>',
+    `<script>try{var t=localStorage.getItem('pv.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>\n` +
+    `<link rel="preload" href="/fonts/dm-sans.woff2" as="font" type="font/woff2" crossorigin>\n<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>\n` +
+    `<script type="module" src="/__preview/preview.js"></script>\n</head>`);
+  res.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' });
+  res.end(html);
+}
+const cookiesOf = req => Object.fromEntries(String(req.headers.cookie || '').split(';').map(c => c.trim().split('=')).filter(([k, v]) => k && v));
 
 http.createServer(async (req, res) => {
-  const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^(\.\.[\/\\])+/, '');
-  let file = join(ROOT, path.endsWith('/') ? path + 'index.html' : path);
-  if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end(); }
+  const url = new URL(req.url, 'http://x');
+  const path = decodeURIComponent(url.pathname);
   try {
-    const body = await readFile(file);
-    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream' });
-    res.end(body);
-  } catch {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not found');
+    if (path.startsWith('/api/')) return handleApi(req, res, url, cookiesOf(req));
+    if (path === '/__preview/reset' && req.method === 'POST'){ reset(); res.writeHead(200, { 'Set-Cookie': ['pv_out=; Max-Age=0; Path=/', 'pv_mfa=; Max-Age=0; Path=/'] }); return res.end('{}'); }
+    if (path === '/options' || path === '/options/') return file(res, join(OPTIONS, 'index.html'));
+    if (path.startsWith('/__preview/')){ const f = inside(ZTD, path.slice('/__preview/'.length)); if (f && await file(res, f)) return; }
+    if (path === '/app.css') return file(res, join(ZTD, 'app.css'));
+    if (path === '/icon.svg') return file(res, join(ZTD, 'icon.svg'));
+    if (path.startsWith('/fonts/')){ const f = inside(join(ZTD, 'fonts'), path.slice('/fonts/'.length)); if (f && await file(res, f)) return; }
+    if (extname(path) && path !== '/index.html'){ const f = inside(STUDIO, path); if (f && await file(res, f)) return; res.writeHead(404); return res.end('Not found'); }
+    return appPage(res);   // every app route (/, /p/…, /login, /account…) is Studio's single page
+  } catch (e){
+    console.error(e);
+    if (!res.headersSent){ res.writeHead(500); res.end('Preview error'); }
   }
-}).listen(PORT, '127.0.0.1', () => console.log(`Listening on ${PORT}`));
+}).listen(PORT, '127.0.0.1', () => console.log(`Studio design preview on ${PORT}`));
