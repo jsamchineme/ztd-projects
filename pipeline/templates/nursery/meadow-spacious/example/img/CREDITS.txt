@@ -131,10 +131,10 @@ person's consent for the new site before go-live. Not used: Sandy Wilkie MBE (no
 staff), and the farm, events and work-experience people further down that page.
 
 Video (media/)
-- lambs-loop.mp4 (8 s, 640x640, no sound, 240 KB) and lambs-loop-poster.webp: a slow
+- lambs-loop.mp4 (8 s, 640x640, 30fps, no sound, 477 KB) and lambs-loop-poster.webp: a slow
   back-and-forth pan across ONE still photo (the lambs photo above), made with ffmpeg.
   It is labelled on the page as "A slow pan across one photo". It is not footage.
-- farm-tour.mp4 (41 s, 1280x720, no sound, 3.4 MB), farm-tour-poster.webp and
+- farm-tour.mp4 (41 s, 1280x720, 30fps, no sound, 3.9 MB), farm-tour-poster.webp and
   farm-tour.vtt: a slideshow of 12 of the photos above (secret-garden, fire-pit,
   mud-kitchen, sunflowers, orchard, beehive, hens, ducks, highland-cow, horses-field,
   river, back-field), each slowly panned, with cross-fades. Labelled "A walk round the

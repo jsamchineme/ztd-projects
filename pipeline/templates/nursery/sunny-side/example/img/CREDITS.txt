@@ -16,8 +16,8 @@ room-tunnel      <- /wp-content/uploads/2024/03/IMG_1494.jpg (empty room).
 room-tables      <- /wp-content/uploads/2024/03/IMG_1497.jpg (empty room; the wall art is unnamed handprints).
 
 VIDEO (made by us, labelled honestly on the page)
-garden-loop.mp4  8-second muted loop: a slow pan right and back across garden.jpg (ffmpeg zoompan). No real footage. 135 KB.
-tour.mp4         33-second silent "look round": eight of the photos above (all but the sign) in a row with slow zooms and cross-fades (ffmpeg). 1.2 MB.
+garden-loop.mp4  8-second muted loop: a slow pan right and back across garden.jpg (ffmpeg zoompan, 30fps). No real footage. 323 KB.
+tour.mp4         33-second silent "look round": eight of the photos above (all but the sign) in a row with slow zooms and cross-fades (ffmpeg, 30fps). 2.1 MB.
                  Not real footage. Captions in tour.vtt; the text transcript is on Our nursery.
 
 EXCLUDED, and why

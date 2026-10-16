@@ -106,7 +106,7 @@ It must not use any of the existing signature devices (luggage tags, cork boards
 27. Don't link Facebook from the footer (the audit gets a 400 minor).
 
 ### Performance
-28. Homepage under about 1 MB on a phone. The example weighs **160 KB on a phone** (the living photo stays a poster) and **295 KB at 1280px** (the 135 KB loop plays).
+28. Homepage under about 1 MB on a phone. The example weighs **160 KB on a phone** (the living photo stays a poster) and **about 485 KB at 1280px** (the 323 KB loop plays).
 29. Photos: WebP at 400px and full size (quality about 62), JPEG fallback (about 74), `width` and `height` set, `loading="lazy"` below the fold.
 
 ## 4. Homepage structure (keep this order)
@@ -288,7 +288,7 @@ Sub-pages (a single policy, one nursery of a group) open with `<a class="back" h
 </figure>
 ```
 - 6 to 10 seconds, muted, under 1.5 MB, self-hosted MP4 (H.264). Phones and reduced-motion visitors get the poster and a Play button; from 40em it autoplays with a visible Pause button.
-- Honest label in the caption. The example's loop is a slow pan across one real photo (ffmpeg `zoompan`, played forward then reversed so the loop is seamless), 135 KB.
+- Honest label in the caption. The example's loop is a slow pan across one real photo (ffmpeg `zoompan`, played forward then reversed so the loop is seamless), 323 KB.
 - Recipe: `ffmpeg -loop 1 -i garden.jpg -vf "scale=1280:960,zoompan=z='1.18':x='(iw-iw/zoom)*on/99':y='(ih-ih/zoom)/2':d=100:s=640x480:fps=25" -frames:v 100 pan.mp4`, then `-filter_complex "[0:v]split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1"` with `-c:v libx264 -crf 30 -an -movflags +faststart`.
 
 **Tour film** (`figure.tour`):

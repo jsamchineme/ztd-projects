@@ -25,9 +25,9 @@ Used (name: source on kilbarchancn.com, what was cut out)
 - pumpkin: /wp-content/uploads/2021/03/20201028_140705825_iOS. Face and the logo on the sweatshirt cut out; hands, pumpkin and bowl kept.
 
 Video (both made by us from the photos above, and labelled as such on the pages)
-- living-garden.mp4 (9 s, 175 KB, no audio) and living-garden-poster.webp: a slow pan across
+- living-garden.mp4 (9 s, 215 KB, 30fps, no audio) and living-garden-poster.webp: a slow pan across
   the snow-garden crop, forward then reversed. Labelled "A slow pan across one photo, not a film."
-- tour.mp4 (35 s, 870 KB, no audio), tour-poster.webp, tour.en.vtt: the 12 crops above
+- tour.mp4 (35 s, 1.3 MB, 30fps, no audio), tour-poster.webp, tour.en.vtt: the 12 crops above
   with slow zooms and fades. Portrait photos are letterboxed on a blurred copy of themselves.
   Labelled "Made from 12 still photos, not film." Captions describe each photo.
 - The nursery has its own tour film, "Nursery Tour 8 6 21", embedded from YouTube on

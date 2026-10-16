@@ -20,8 +20,8 @@ playroom-blue-*.webp           /img/facilities/5.jpg              Playroom with 
 playroom-lilac-*.webp          /img/facilities/6.jpg              Playroom with home corner, dolls' house, tree painting
 
 Videos (made by us with ffmpeg from the photos above; no footage was filmed, no sound track)
-living-garden.mp4 / living-garden-poster.webp   5 s pan across the garden photo (about/6.jpg) and 5 s back, a 10 s seamless loop, 480x480, 194 KB. Labelled "A slow pan across one photo".
-tour.mp4 / tour-poster.webp / tour.en.vtt       39 s photo tour of the 11 photos above with slow zooms and fades, 640x480, 1.5 MB, captions in tour.en.vtt. Labelled "made from still photos, not film".
+living-garden.mp4 / living-garden-poster.webp   5 s pan across the garden photo (about/6.jpg) and 5 s back, a 10 s seamless loop, 480x480, 30fps, 367 KB. Labelled "A slow pan across one photo".
+tour.mp4 / tour-poster.webp / tour.en.vtt       39 s photo tour of the 11 photos above with slow zooms and fades, 640x480, 30fps, 2 MB, captions in tour.en.vtt. Labelled "made from still photos, not film".
 
 Excluded, and why
 /img/facilities/3.jpg        A child (seen side-on, in a dressing-up costume) stands in the playroom. Identifiable child: excluded.

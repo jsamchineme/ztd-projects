@@ -78,7 +78,7 @@ Sources behind the decisions:
 | `PHOTO-SHOTLIST.md` | What to photograph (and film) at a nursery, and the no-faces rule. | Give it to the nursery |
 | `example/` | Seven finished pages for Jaybees: `index.html`, `join-us.html`, `fees-and-funding.html`, `our-nursery.html`, `our-team.html`, `parents.html`, `gallery.html`. | Copy for each nursery |
 | `example/img/` | 14 child-free crops of the nursery's own photos (WebP 400 and up to 800px), two posters, `favicon.svg` and `CREDITS.txt` (every source, and every photo **not** used and why). | Each nursery gets its own |
-| `example/media/` | `forest-loop.mp4` (living photo, 10 s, 165 KB), `tour.mp4` (film, 32 s, 745 KB), `tour.vtt` (captions). | Each nursery gets its own |
+| `example/media/` | `forest-loop.mp4` (living photo, 10 s, 340 KB), `tour.mp4` (film, 32 s, 1.3 MB), `tour.vtt` (captions). | Each nursery gets its own |
 | `thumb.jpg` | Picker thumbnail: `node pipeline/template-thumbs.mjs nursery/sidekick-spacious`. | After changes |
 
 Pages link `../styles.css` and `../sidekick.js`. **The mascot and icon sprites are inlined into every page, never referenced as files:** board previews are sandboxed (an opaque origin), and `<use href="../mascot.svg#…">` silently draws nothing there. After editing `mascot.svg` or `icons.svg`, paste their contents (without the outer `<svg>`) into each page's hidden sprite block again. Keep that folder shape. Nothing loads from another server: no Google Fonts, CDNs, analytics, maps, social embeds, YouTube or Vimeo (§6.6).
@@ -165,7 +165,7 @@ What makes it premium rather than twee:
 24b. `density.mjs` counts the off-screen skip link (in screen 1), highlighted-word spans taller than 30px and the fixed booking bar as "boxes". Report real boxes separately (section "Final space figures").
 
 ### Performance
-25. Homepage under about 1 MB on a phone. The example loads about **210 KB on a phone** (files before compression: page, CSS, JS, two fonts and the poster; the 4-photo strip is gone) and about 370 KB on desktop, where the 161 KB loop plays.
+25. Homepage under about 1 MB on a phone. The example loads about **210 KB on a phone** (files before compression: page, CSS, JS, two fonts and the poster; the 4-photo strip is gone) and about 550 KB on desktop, where the 340 KB loop plays.
 26. Photos: WebP at 400 and 800px (or the source's width, with the true `w` descriptor), `width` and `height` set. Lazy-load the gallery; the few in-page `.snap` photos load eagerly.
 27. Video: living photo under 1.5 MB, `preload="none"`, `src` set by the script only when it will play. Film: `preload="none"`, poster, captions.
 

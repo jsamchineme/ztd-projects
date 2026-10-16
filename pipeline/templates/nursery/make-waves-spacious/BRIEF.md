@@ -138,7 +138,7 @@ What they do badly, and we fix:
 17. **Motion:** riders bob and clouds drift only inside `prefers-reduced-motion: no-preference`. The living photo never autoplays on phones or under reduced motion, and always has a pause button.
 
 ### Performance
-18. Homepage under about 1 MB on a phone (Oban: 285 KB on a phone, 479 KB on desktop including the 194 KB living-photo loop). Below-the-fold images are `loading="lazy"` with `width` and `height`.
+18. Homepage under about 1 MB on a phone (Oban: 285 KB on a phone, 650 KB on desktop including the 367 KB living-photo loop). Below-the-fold images are `loading="lazy"` with `width` and `height`.
 19. Living photo under 1.5 MB, 6 to 10 seconds. Tour under 4 MB, `preload="none"`.
 
 ## 4. Homepage structure (keep this order)
@@ -290,7 +290,7 @@ On every page, before `waves.js`:
 </video>
 ```
 - Click to play, nothing downloads until then, captions on by default, a "Read the tour as text" transcript in a `details`, and a meta line (length, sound, captions, size).
-- Oban has no film, so its tour is made from the 11 photos with slow zooms and 0.7 s fades (39 s, 1.5 MB) and says so: "made from still photos, not film". A real walk-through of empty rooms replaces it when the nursery films one (`PHOTO-SHOTLIST.md`). Keep it under 4 MB at 720p or less.
+- Oban has no film, so its tour is made from the 11 photos with slow zooms and 0.7 s fades (39 s, 2 MB) and says so: "made from still photos, not film". A real walk-through of empty rooms replaces it when the nursery films one (`PHOTO-SHOTLIST.md`). Keep it under 4 MB at 720p or less.
 
 ## 10. Gallery page
 

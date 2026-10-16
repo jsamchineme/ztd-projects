@@ -217,7 +217,7 @@ On every page, before `signpost.js`:
 <p class="small">Our garden after snow. A slow pan across one photo, not a film.</p>
 ```
 - 6 to 10 seconds, under 1.5 MB, no audio, 16:9. `signpost.js` autoplays it only at 48em and wider without reduced motion; phones get the poster and the button.
-- From the nursery's own footage (no identifiable children), or, as for Kilbarchan, an **honestly labelled** pan across one real photo. Recipe (4.5 s across, reversed, 9 s loop, 175 KB):
+- From the nursery's own footage (no identifiable children), or, as for Kilbarchan, an **honestly labelled** pan across one real photo. Recipe (4.5 s across, reversed, 9 s loop, 215 KB):
   `ffmpeg -loop 1 -t 4.5 -framerate 25 -i garden.png -filter_complex "[0:v]crop=w=iw*0.686:h=ih:x='(iw-ow)*t/4.5':y=0,scale=640:360,format=yuv420p,split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1[v]" -map "[v]" -an -c:v libx264 -crf 27 -preset slow -movflags +faststart -map_metadata -1 living-garden.mp4`
 
 **Tour, "The way in"** (Gallery):
@@ -228,7 +228,7 @@ On every page, before `signpost.js`:
 </video>
 ```
 - Click to play, nothing downloads until then, captions on by default, "Read the tour as text" in a `details`, and a meta line (length, sound, captions, size).
-- Kilbarchan's tour is made from 12 still crops with slow zooms and 0.6 s fades (35 s, 870 KB) and says "Made from 12 still photos, not film". Kilbarchan has a real 2021 tour film on YouTube; it was not used (third-party embed, unchecked for children, rights unknown). Ask for the file and replace `tour.mp4`, keeping it under 4 MB at 720p or less. Ideal: a walk from the gate to the empty rooms (`PHOTO-SHOTLIST.md`).
+- Kilbarchan's tour is made from 12 still crops with slow zooms and 0.6 s fades (35 s, 1.3 MB) and says "Made from 12 still photos, not film". Kilbarchan has a real 2021 tour film on YouTube; it was not used (third-party embed, unchecked for children, rights unknown). Ask for the file and replace `tour.mp4`, keeping it under 4 MB at 720p or less. Ideal: a walk from the gate to the empty rooms (`PHOTO-SHOTLIST.md`).
 
 ## 10. Gallery page
 

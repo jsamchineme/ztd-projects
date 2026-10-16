@@ -235,11 +235,11 @@ Section 1 of `styles.css`. Contrast is WCAG, computed:
 - `<video controls preload="none" playsinline crossorigin="anonymous" poster>`, an MP4 source, a WebVTT `<track kind="captions" default>`, and a transcript in a fold. **Every `<video>` with a `<track>` must carry `crossorigin="anonymous"`**, or the captions load nothing in the sandboxed board preview.
 - JavaScript hides the native controls behind a big lamp-yellow play disc until clicked. No autoplay, no sound unless the film has it and the viewer asks.
 - Best: the nursery's own walk-through, starting outside the front door, then the hall, the empty rooms, the kitchen and the garden. No children. Re-encode small (`ffmpeg -crf 30`, 960px wide).
-- **The example's film** is honest about what it is: the nursery has no footage without children, so it is a 31-second, 0.9 MB film made with ffmpeg from five of its real photos (slow pans and fades), labelled "Made from our own photos, with no sound. No children are shown."
+- **The example's film** is honest about what it is: the nursery has no footage without children, so it is a 31-second, 1.8 MB film made with ffmpeg from five of its real photos (slow pans and fades), labelled "Made from our own photos, with no sound. No children are shown."
 
 **Living photo** (`figure.living` in the Digital Den section).
 - `<video data-living data-src="…" poster muted loop playsinline preload="none">`. It plays only on screens 700px and wider with no reduced-motion request; everyone else sees the poster and downloads nothing. A Pause button appears when it plays.
-- Under 1.5 MB, 6 to 10 seconds. The example's is an 8-second, 118 KB slow pan across one real photo of the sensory corner, labelled as such.
+- Under 1.5 MB, 6 to 10 seconds. The example's is an 8-second, 506 KB slow pan across one real photo of the sensory corner, labelled as such.
 
 ## 11. Illustration rules
 

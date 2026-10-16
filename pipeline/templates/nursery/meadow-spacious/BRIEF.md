@@ -136,7 +136,7 @@ It must not reuse the signature devices of our earlier nursery templates: no lug
 17. Decorative SVG is `aria-hidden="true"`. Photos in tiles whose word is the link text have `alt=""`; every other photo has short, true alt text.
 
 ### Performance
-18. Homepage under about 1 MB on a phone. The example: **about 520 KB on a phone after scrolling the whole page** (no video downloads on phones), about 1.07 MB on desktop including the 240 KB loop.
+18. Homepage under about 1 MB on a phone. The example: **about 520 KB on a phone after scrolling the whole page** (no video downloads on phones), about 1.3 MB on desktop including the 477 KB loop.
 19. Below-the-fold images use `loading="lazy"`, `width`, `height` and `srcset`. The collage's first blob is eager.
 
 ## 4. Homepage structure (keep this order)
