@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Which domain to focus on: GP, dental or nurseries in Scotland, compared on website need and ease of selling.">
+<title>Which domain to focus on: GP, dental or nurseries</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #6b6a65;
+    --grid: #e1e0d9;
+    --border: rgba(11,11,11,0.10);
+    --accent: #1c5cab;
+    --s1: #86b6ef; /* Good      */
+    --s2: #3987e5; /* Average   */
+    --s3: #1c5cab; /* Bad       */
+    --s4: #0d366b; /* No site   */
+    --win-bg: #e8f1fc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #f0efec;
+      --ink-2: #c3c2b7;
+      --muted: #a3a29b;
+      --grid: #2c2c2a;
+      --border: rgba(255,255,255,0.10);
+      --accent: #86b6ef;
+      --s1: #184f95;
+      --s2: #2a78d6;
+      --s3: #6da7ec;
+      --s4: #b7d3f6;
+      --win-bg: #14243a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 1.3rem; margin: 48px 0 6px; }
+  h3 { font-size: 1.05rem; margin: 0 0 4px; }
+  p { margin: 0 0 12px; }
+  .lede { color: var(--ink-2); max-width: 68ch; }
+  .small { font-size: .875rem; color: var(--ink-2); }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+
+  /* Verdict */
+  .verdict { margin-top: 24px; background: var(--win-bg); border-color: transparent; }
+  .verdict .kicker { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0; }
+  .verdict .big { font-size: 1.6rem; font-weight: 700; margin: 2px 0 12px; }
+  .verdict ol { margin: 0; padding-left: 1.2em; }
+  .verdict li { margin-bottom: 4px; }
+
+  /* Stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+  .tile .v { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+  .tile .l { color: var(--ink-2); font-size: .9rem; }
+
+  /* Scorecard */
+  .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
+  .score-card.top { border: 2px solid var(--accent); }
+  .score-card .rank { font-size: .8rem; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+  .score-card .total { font-size: 1.6rem; font-weight: 700; }
+  .score-card .total span { font-size: .9rem; color: var(--ink-2); font-weight: 400; }
+  .meter-row { display: grid; grid-template-columns: 9.5em 1fr 1.6em; align-items: center; gap: 8px; margin: 6px 0; font-size: .9rem; }
+  .meter { display: flex; gap: 2px; }
+  .meter i { flex: 1; height: 10px; border-radius: 3px; background: var(--grid); }
+  .meter i.on { background: var(--s3); }
+  .meter-row b { text-align: right; font-variant-numeric: tabular-nums; }
+  .score-card ul { margin: 12px 0 0; padding-left: 1.1em; font-size: .9rem; color: var(--ink-2); }
+
+  /* Stacked bar chart */
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 12px 0 8px; font-size: .875rem; color: var(--ink-2); padding: 0; list-style: none; }
+  .legend li { display: flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .bars { margin-top: 8px; }
+  .bar-row { display: grid; grid-template-columns: 7.5em 1fr; gap: 12px; align-items: center; margin: 14px 0; }
+  .bar-row .name { font-weight: 600; }
+  .bar-row .name small { display: block; font-weight: 400; color: var(--ink-2); font-size: .8rem; }
+  .stack { display: flex; gap: 2px; height: 34px; }
+  .seg { position: relative; height: 100%; min-width: 3px; border-radius: 4px; cursor: default; }
+  .seg:hover, .seg:focus-visible { filter: brightness(1.12); outline: none; box-shadow: 0 0 0 2px var(--ink); }
+  .need-label { font-size: .85rem; color: var(--ink-2); margin-top: 4px; }
+  .need-label strong { color: var(--ink); }
+  .tip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: var(--ink); color: var(--page); font-size: .85rem; padding: 6px 10px; border-radius: 6px; max-width: 240px;
+  }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin-top: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { color: var(--ink-2); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .yes { font-weight: 600; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--accent); min-height: 44px; display: flex; align-items: center; }
+
+  /* Sequence */
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 12px; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; gap: 12px; }
+  .steps li::before {
+    content: counter(s); width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--surface);
+    display: grid; place-items: center; font-weight: 700;
+  }
+  .sources a { display: inline-flex; align-items: center; min-height: 44px; }
+  nav ul { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  nav a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
+  .sources li { margin-bottom: 6px; overflow-wrap: anywhere; }
+  footer { margin-top: 48px; color: var(--ink-2); font-size: .85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Which domain should we focus on?</h1>
+  <p class="lede">GP practices, NHS dental practices and independent nurseries in Scotland, compared on two things: how much their websites need help, and how easy they are to reach and sell to. Built from our own graded prospect lists plus public sources. October 2026.</p>
+
+  <nav aria-label="Sections"><ul><li><a href="#scores">Scorecard</a></li><li><a href="#need">Need</a></li><li><a href="#reach">Reach</a></li><li><a href="#competition">Competition</a></li><li><a href="#sequence">Order</a></li><li><a href="#sources">Sources</a></li></ul></nav>
+
+  <section class="card verdict" aria-labelledby="verdict-h">
+    <p class="kicker" id="verdict-h">Recommendation</p>
+    <p class="big">Focus on small independent nurseries first.</p>
+    <ol>
+      <li><strong>Most need:</strong> 97% of the nurseries we graded have a poor, average or missing website. For dental it's 50% and for GP 42%.</li>
+      <li><strong>Easiest to reach:</strong> we have an email for all 802 nurseries and the manager's name for 795. For GP and dental we only have phone numbers.</li>
+      <li><strong>Weakest competition:</strong> nurseries mostly build their own sites on Wix or WordPress. GPs have a free NHS website (GP.scot) and vendors on yearly contracts.</li>
+    </ol>
+  </section>
+
+  <div class="tiles">
+    <div class="card tile"><div class="v">729</div><div class="l">nurseries with a poor, average or missing website</div></div>
+    <div class="card tile"><div class="v">795</div><div class="l">nurseries where we have the manager's name and email</div></div>
+    <div class="card tile"><div class="v">448</div><div class="l">dental practices with a poor or average site (2nd best)</div></div>
+    <div class="card tile"><div class="v">£0</div><div class="l">what a GP pays for the NHS GP.scot website, our strongest competitor</div></div>
+  </div>
+
+  <h2 id="scores">Scorecard</h2>
+  <p class="lede">Each domain is scored 1–5 on five things (higher is better for us). The scores are our judgement, based on the numbers further down the page.</p>
+  <div class="score-grid" id="scorecards"></div>
+
+  <h2 id="need">Need: how good are their websites now?</h2>
+  <p class="lede">The grade we gave each prospect when we reviewed its website. Nurseries leave out 51 that were out of scope (council or chain-run).</p>
+  <ul class="legend" aria-label="Legend">
+    <li><i style="background:var(--s1)"></i>Good</li>
+    <li><i style="background:var(--s2)"></i>Average</li>
+    <li><i style="background:var(--s3)"></i>Bad</li>
+    <li><i style="background:var(--s4)"></i>No website found</li>
+  </ul>
+  <div class="bars" id="bars" aria-describedby="need-note"></div>
+  <details>
+    <summary>Show as a table</summary>
+    <div class="table-wrap" tabindex="0"><table id="need-table"></table></div>
+  </details>
+  <p class="small" id="need-note">Nursery caveat: 196 nurseries marked "no website" were never searched, because the search budget ran out. Some of them may have a site. Leaving them out entirely, need is still 96% (533 of 555).</p>
+
+  <h2 id="reach">Reach: can we contact the person who decides?</h2>
+  <div class="table-wrap" tabindex="0">
+    <table>
+      <thead><tr><th scope="col"></th><th scope="col" class="num">Nursery</th><th scope="col" class="num">Dental</th><th scope="col" class="num">GP</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Prospects</th><td class="num">802</td><td class="num">1,031</td><td class="num">1,052</td></tr>
+        <tr><th scope="row">Email address</th><td class="num yes">802</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><th scope="row">Named decision-maker</th><td class="num yes">795</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><th scope="row">Phone number</th><td class="num">781</td><td class="num">751</td><td class="num">524</td></tr>
+        <tr><th scope="row">Who decides</th><td>Owner-manager</td><td>Principal dentist, or a group's head office</td><td>GP partners, often sticking with a vendor on contract</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">Nursery emails come from the Care Inspectorate register. About 310 of them are Gmail, Hotmail, Outlook, Yahoo or BT addresses, which suggests nobody in-house handles their web presence.</p>
+
+  <h2 id="competition">Who we'd be up against</h2>
+  <div class="table-wrap" tabindex="0">
+    <table>
+      <thead><tr><th scope="col">Domain</th><th scope="col">Current provider</th><th scope="col">What it means for us</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Nursery</th><td>Self-built: WordPress 159, Wix 30, Squarespace 23, GoDaddy 20, plus Weebly, Duda, Jimdo and others</td><td>No incumbent to displace. Owners built it themselves and know it looks dated.</td></tr>
+        <tr><th scope="row">Dental</th><td>Agency templates. Group-owned practices (Clyde Munro, Portman, mydentist) have central web teams.</td><td>Open for independents. The 182 group-owned practices are mostly graded Good already (171 of them), so they're not where the need is.</td></tr>
+        <tr><th scope="row">GP</th><td>Genpra (234 sites, £635 a year plus £125 set-up), My Surgery Website (208), NHS-domain sites (214), and the free NHS 24 GP.scot platform</td><td>Locked in. Every practice has had to have a website since 2022, and a free NHS option exists.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="market">Market context</h2>
+  <div class="table-wrap" tabindex="0">
+    <table>
+      <thead><tr><th scope="col">Domain</th><th scope="col">Scotland-wide</th><th scope="col">Why websites matter to them</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Nursery</th><td>About 2,550 funded nursery centres, 949 of them private or voluntary partners. 668 graded private services.</td><td>Parents start online (84% begin on Google, per one agency survey), but they decide after a visit. The website's job is to get families to book a visit, and empty places cost money.</td></tr>
+        <tr><th scope="row">Dental</th><td>96% of people are registered with an NHS dentist, but only 62% have attended in the last 2 years.</td><td>53% of NHS dentists surveyed by BDA Scotland (April 2025) expect a faster move to private work. Practices going private have to win patients.</td></tr>
+        <tr><th scope="row">GP</th><td>880 practices (April 2026), and falling as practices merge.</td><td>Patients are registered by catchment area, so a better website doesn't bring in new patients. Value is in fewer phone calls, not growth.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="sequence">Recommended order</h2>
+  <ol class="steps">
+    <li><div><h3>Nurseries, now</h3><p>Start with the 269 Bad or Average nurseries that already have a site (226 private, 43 voluntary). Email the named manager with a before-and-after. The 460 with no website come next. Templates, research and a board with 220 cards are already in place.</p></div></li>
+    <li><div><h3>Independent dental, next</h3><p>Target the 448 Bad or Average practices, plus 64 with no site, and leave out group-owned ones. Pitch practices moving towards private work. We have phone numbers only, so finding emails comes first. 501 cards are already on the main board.</p></div></li>
+    <li><div><h3>GP, only through partners</h3><p>Don't sell rebuilds to GPs. If we do anything, offer a restyle that works with their existing vendor, or partner with Genpra or a health board. Our GP list isn't on a board yet.</p></div></li>
+  </ol>
+
+  <h2 id="caveats">Caveats</h2>
+  <ul>
+    <li>The grades are our own reviews, not an independent audit.</li>
+    <li>The "84% start on Google" figure comes from a marketing agency's survey. A YouGov survey found only 12% of parents rely mainly on a nursery's website, with visits and word of mouth counting for more.</li>
+    <li>The nursery list deliberately includes only private and voluntary providers running 3 or fewer services, so it is pre-filtered towards buyers.</li>
+    <li>We have no data on budgets for any domain. One thing to test in the first pitches is what nurseries will pay.</li>
+  </ul>
+
+  <h2 id="sources">Sources</h2>
+  <ul class="sources small">
+    <li>Our data: <code>prospects/nursery/</code>, <code>prospects/data</code> and <code>prospects/grades</code> (dental), <code>prospects/gp/</code>, <code>ideas/competitors/gp-website-competitors.xlsx</code>, <code>prospects/research/</code></li>
+    <li><a href="https://publichealthscotland.scot/publications/general-practice-list-sizes-and-demographics/general-practice-list-sizes-and-demographics-28-april-2026/">Public Health Scotland: GP list sizes, April 2026</a></li>
+    <li><a href="https://www.nhsinform.scot/gpscot">NHS Inform: GP.scot websites</a></li>
+    <li><a href="https://legislation.gov.uk/ssi/2022/130/pdfs/ssipn_20220130_en.pdf">SSI 2022/130 policy note (GP practices must have a website)</a></li>
+    <li><a href="https://www.publichealthscotland.scot/publications/nhs-dental-data-monitoring-report">Public Health Scotland: NHS dental data monitoring report</a></li>
+    <li><a href="https://www.sdmag.co.uk/2025/04/25/nhs-dentistry-reform-risk/">Scottish Dental: BDA Scotland survey, April 2025</a></li>
+    <li><a href="https://www.gov.scot/publications/funded-early-learning-and-childcare-statistics-2025/pages/centres-providing-funded-elc/">Scottish Government: Funded ELC statistics 2025</a></li>
+    <li><a href="https://www.parliament.scot/chamber-and-committees/research-prepared-for-parliament/research-briefings/2026/7/28/sb-2647">SPICe briefing SB 26-47 (Care Inspectorate grades by sector)</a></li>
+    <li><a href="https://nmt-magazine.co.uk/feature/what-parents-look-for">Nursery Management Today: what parents look for</a></li>
+    <li><a href="https://www.nurseryworld.co.uk/content/news/one-in-five-parents-do-not-research-nursery-choices">Nursery World: how parents research nurseries (YouGov)</a></li>
+  </ul>
+
+  <footer>Counts from the prospect files as of 16 October 2026.</footer>
+</main>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+const NEED = [
+  { name: "Nursery", total: 751, parts: [22, 160, 109, 460] },
+  { name: "Dental",  total: 1031, parts: [519, 239, 209, 64] },
+  { name: "GP",      total: 1052, parts: [614, 231, 120, 87] },
+];
+const LABELS = ["Good", "Average", "Bad", "No website found"];
+const pct = (n, t) => Math.round(n / t * 100);
+
+const bars = document.getElementById("bars");
+const tip = document.getElementById("tip");
+for (const d of NEED) {
+  const need = d.parts[1] + d.parts[2] + d.parts[3];
+  const row = document.createElement("div");
+  row.className = "bar-row";
+  row.innerHTML = `<div class="name">${d.name}<small>${d.total.toLocaleString()} graded</small></div>
+    <div><div class="stack">${d.parts.map((n, i) =>
+      `<div class="seg" role="img" tabindex="0" style="flex:${n};background:var(--s${i + 1})"
+        data-tip="${d.name}: ${LABELS[i]}: ${n.toLocaleString()} (${pct(n, d.total)}%)"
+        aria-label="${LABELS[i]}: ${n} (${pct(n, d.total)}%)"></div>`).join("")}</div>
+    <div class="need-label"><strong>${pct(need, d.total)}% need a new site</strong> (${need.toLocaleString()} of ${d.total.toLocaleString()})</div></div>`;
+  bars.appendChild(row);
+}
+const showTip = (el, x, y) => { tip.textContent = el.dataset.tip; tip.style.display = "block";
+  tip.style.left = Math.min(x + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (y + 14) + "px"; };
+bars.addEventListener("mousemove", e => { const s = e.target.closest(".seg"); s ? showTip(s, e.clientX, e.clientY) : (tip.style.display = "none"); });
+bars.addEventListener("mouseleave", () => tip.style.display = "none");
+bars.addEventListener("focusin", e => { const s = e.target.closest(".seg"); if (s) { const r = s.getBoundingClientRect(); showTip(s, r.left, r.bottom); } });
+bars.addEventListener("focusout", () => tip.style.display = "none");
+
+document.getElementById("need-table").innerHTML =
+  `<thead><tr><th scope="col">Domain</th>${LABELS.map(l => `<th scope="col" class="num">${l}</th>`).join("")}<th scope="col" class="num">Need</th></tr></thead><tbody>` +
+  NEED.map(d => `<tr><th scope="row">${d.name}</th>${d.parts.map(n => `<td class="num">${n}</td>`).join("")}<td class="num">${pct(d.parts[1] + d.parts[2] + d.parts[3], d.total)}%</td></tr>`).join("") + "</tbody>";
+
+const CRITERIA = ["Website need", "Reachability", "Decision speed", "Low competition", "Volume"];
+const SCORES = [
+  { name: "Nurseries", rank: "1st: focus here", s: [5, 5, 4, 5, 3],
+    why: ["97% poor, average or no site", "Email and named manager for almost all", "The owner decides, with no NHS process", "Self-built sites, no vendor lock-in", "About 750 in scope"] },
+  { name: "Dental (independent)", rank: "2nd", s: [3, 2, 3, 3, 4],
+    why: ["50% poor, average or no site", "Phone only, no emails or names", "Principal dentist decides, unless group-owned", "Agency templates and group web teams", "About 1,000 practices"] },
+  { name: "GP", rank: "3rd", s: [2, 2, 1, 1, 4],
+    why: ["42% poor, average or no site", "Phone only, practice managers are busy", "Partners and contracts, slow", "Free GP.scot site plus Genpra and My Surgery Website", "880 practices, and falling"] },
+];
+document.getElementById("scorecards").innerHTML = SCORES.map((c, ci) => {
+  const total = c.s.reduce((a, b) => a + b, 0);
+  return `<section class="card score-card${ci === 0 ? " top" : ""}" aria-label="${c.name}, ${total} out of 25">
+    <div class="rank">${c.rank}</div><h3>${c.name}</h3>
+    <div class="total">${total}<span> / 25</span></div>
+    ${c.s.map((v, i) => `<div class="meter-row"><span>${CRITERIA[i]}</span>
+      <span class="meter" aria-hidden="true">${[1,2,3,4,5].map(k => `<i class="${k <= v ? "on" : ""}"></i>`).join("")}</span><b>${v}</b></div>`).join("")}
+    <ul>${c.why.map(w => `<li>${w}</li>`).join("")}</ul></section>`;
+}).join("");
+</script>
+</body>
+</html>
