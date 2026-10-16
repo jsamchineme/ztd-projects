@@ -539,6 +539,15 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   const p = pushes.find(x => x.title === 'Test from Studio');
   if (!p || p.to !== 'ExponentPushToken[abcdefghij1234567890]' || p.sound !== 'default' || p.data.id !== tested.id || p.data.url !== tested.url || !p.data.studio)
     throw new Error(`the push was ${JSON.stringify(pushes)}`);
+  // Not seen yet: it's pushed again, like an alarm (every 0.3 s here, see test/run.sh), until the app says it's seen.
+  const reminders = () => pushes.filter(x => x.data.id === tested.id && /^Reminder \d of 4/.test(x.body || '')).length;
+  for (let i = 0; i < 50 && reminders() < 2; i++) await new Promise(r => setTimeout(r, 100));
+  if (reminders() < 2) throw new Error('an unseen message wasn’t pushed again');
+  ws.send(JSON.stringify({ type: 'seen', upTo: tested.id }));
+  await new Promise(r => setTimeout(r, 400));
+  const after = reminders();
+  await new Promise(r => setTimeout(r, 1000));
+  if (reminders() !== after) throw new Error('reminders went on after the message was seen');
   await card.screenshot({ path: `${SHOTS}/09d-phone-card.png` });
 
   await page.goto(projectUrl + '/chat/new');

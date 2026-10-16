@@ -11,8 +11,9 @@ export function socketUrl(studio){
 
 // handlers: onStatus({ state: 'connecting' | 'connected' | 'offline', retryIn?, error? }), onReady(info),
 // onMessage(message), onUnpaired(error). getLastId() returns the newest message id the app has (or null);
-// getPushToken() where Studio should send pushes (or null), sent after each hello.
-export function connect({ studio, token }, { getLastId, getPushToken, onStatus, onReady, onMessage, onUnpaired }){
+// getPushToken() where Studio should send pushes (or null), and getRepeat() whether pushes repeat until seen, both sent
+// after each hello.
+export function connect({ studio, token }, { getLastId, getPushToken, getRepeat, onStatus, onReady, onMessage, onUnpaired }){
   let ws = null, stopped = false, attempt = 0, retryTimer = null, pingTimer = null, pongTimer = null;
 
   const clearTimers = () => { clearTimeout(retryTimer); clearInterval(pingTimer); clearTimeout(pongTimer); };
@@ -35,9 +36,11 @@ export function connect({ studio, token }, { getLastId, getPushToken, onStatus, 
       clearTimeout(pongTimer);
       let m; try { m = JSON.parse(e.data); } catch { return; }
       if (m.type === 'ready'){
-        attempt = 0; onStatus({ state: 'connected' }); onReady(m);
+        attempt = 0; onStatus({ state: 'connected' });
         const push = getPushToken();
         if (push) sock.send(JSON.stringify({ type: 'push-token', token: push }));
+        sock.send(JSON.stringify({ type: 'repeat', on: !!getRepeat() }));
+        onReady(m);
       }
       else if (m.type === 'message') onMessage(m);
       else if (m.type === 'unpaired'){ stopped = true; onUnpaired(m.error); }
@@ -51,13 +54,17 @@ export function connect({ studio, token }, { getLastId, getPushToken, onStatus, 
       retryTimer = setTimeout(open, wait);
     };
   }
+  const send = m => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(m)); };
   open();
 
   return {
     // Reconnect now, e.g. when the app comes back to the front, unless the connection is fine.
     wake(){ if (!stopped && (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING)) { attempt = 0; open(); } },
     // Send a push token got after connecting.
-    pushToken(push){ if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'push-token', token: push })); },
+    pushToken(push){ send({ type: 'push-token', token: push }); },
+    repeat(on){ send({ type: 'repeat', on }); },
+    // The person has the app open and has seen messages up to this id: Studio stops repeating their pushes.
+    seen(upTo){ if (upTo != null) send({ type: 'seen', upTo }); },
     test(){ if (ws?.readyState === WebSocket.OPEN){ ws.send(JSON.stringify({ type: 'test' })); return true; } return false; },
     close(){ stopped = true; clearTimers(); ws?.close(); },
   };

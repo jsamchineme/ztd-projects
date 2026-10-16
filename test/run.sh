@@ -38,7 +38,7 @@ if curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/"; then echo "Port 
 ( cd "$WORK/app" && exec env STUDIO_ALLOW_FIRST_SIGNUP=1 STUDIO_SECRET=local-test-secret-0123456789abcdefghijklmnop \
     STUDIO_DATA="$WORK/data" PORT="$PORT" STUDIO_DOMAIN=localhost STUDIO_HOST=studio.localhost STUDIO_URL="http://studio.localhost:$PORT" \
     STUDIO_CTL="$WORK/app/test/mock-ctl.mjs" STUDIO_CTL_SUDO=0 MOCK_ROOT="$WORK/mock" \
-    STUDIO_EXPO_PUSH_URL="http://127.0.0.1:$((PORT + 1))/push" node server.mjs ) > "$WORK/server.log" 2>&1 &
+    STUDIO_EXPO_PUSH_URL="http://127.0.0.1:$((PORT + 1))/push" STUDIO_PUSH_REPEAT_MS=300 node server.mjs ) > "$WORK/server.log" 2>&1 &
 SERVER=$!
 for _ in $(seq 40); do curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/" && break; sleep 0.25; done
 curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/" || { echo "Studio didn't start:"; cat "$WORK/server.log"; exit 1; }

@@ -121,6 +121,8 @@ function Home({ pairing, onUnpair }){
       conn.current?.pushToken(t);
     }).catch(() => {});
     const untap = onNotificationTap();
+    // Opening the app counts as seeing what's arrived, which stops Studio repeating those pushes.
+    const seen = () => { if (appState.current === 'active') conn.current?.seen(lastId.current); };
     // The same message can come over the socket and as a push: whichever is first counts.
     let receive = () => {};
     const unpush = handlePushes(m => receive(m));
@@ -133,6 +135,7 @@ function Home({ pairing, onUnpair }){
       receive = m => {
         if (lastId.current != null && m.id <= lastId.current) return;
         lastId.current = m.id; store.saveLastId(m.id);
+        seen();
         setMessages(list => { const next = [m, ...list.filter(x => x.id !== m.id)]; store.saveMessages(next); return next; });
         if (!m.missed) return ring(m);
         // Missed while offline: with push on, the phone already showed them, so they're only listed. Otherwise they
@@ -149,10 +152,12 @@ function Home({ pairing, onUnpair }){
       conn.current = connect(pairing, {
         getLastId: () => lastId.current,
         getPushToken: () => push.current,
+        getRepeat: () => settingsRef.current.ring,
         onStatus: st => alive && setStatus(st),
         onReady: r => {
           setInfo(r);
           if (lastId.current == null || r.last < lastId.current){ lastId.current = r.last; store.saveLastId(r.last); }
+          seen();
         },
         onMessage: m => receive(m),
         onUnpaired: error => onUnpair(error),
@@ -160,7 +165,7 @@ function Home({ pairing, onUnpair }){
     })();
     const sub = AppState.addEventListener('change', next => {
       appState.current = next;
-      if (next === 'active') conn.current?.wake();
+      if (next === 'active'){ conn.current?.wake(); seen(); }
     });
     return () => { alive = false; untap(); unpush(); sub.remove(); conn.current?.close(); stopRinging(); };
   }, [pairing]);
@@ -170,7 +175,10 @@ function Home({ pairing, onUnpair }){
     else deactivateKeepAwake('studio').catch(() => {});
   }, [settings.keepAwake]);
 
-  const change = (key, value) => { const next = { ...settings, [key]: value }; setSettings(next); settingsRef.current = next; store.saveSettings(next); };
+  const change = (key, value) => {
+    const next = { ...settings, [key]: value }; setSettings(next); settingsRef.current = next; store.saveSettings(next);
+    if (key === 'ring') conn.current?.repeat(value);
+  };
   const stop = () => { stopRinging(); setRinging(null); };
 
   const dot = { connected: C.ok, connecting: C.warn, offline: C.bad }[status.state];
@@ -198,12 +206,13 @@ function Home({ pairing, onUnpair }){
             </Pressable>
           ) : null}
           <View style={s.card}>
-            <Toggle label="Keep ringing until I tap Stop" hint="While the app is open. Up to a minute." value={settings.ring} onChange={v => change('ring', v)} />
+            <Toggle label="Keep ringing until I respond" hint="With the app closed, the notification comes again every 30 seconds, up to 5 times, until you open the app or tap it. With the app open, it vibrates until you tap Stop (up to a minute)." value={settings.ring} onChange={v => change('ring', v)} />
             <Toggle label="Keep the screen on" hint="Leave the phone on your desk with the app open, and it never misses a message." value={settings.keepAwake} onChange={v => change('keepAwake', v)} />
           </View>
           <Text style={s.small}>{pushOn
             ? 'Push is on: your phone gets these with the app closed too. While the app is open, it keeps ringing until you tap Stop.'
             : 'Push is off, so messages only arrive while the app is open. Allow notifications for this app to get them with it closed.'} Choose what rings in Studio: Account → Phone notifications.</Text>
+          <Text style={[s.small, { marginTop: 8 }]}>To keep banners on screen until you swipe them away: iPhone Settings → Notifications → Expo Go → Banner Style → Persistent.</Text>
           <Text style={[s.h3, { marginTop: 22 }]}>Recent</Text>
           {!messages.length ? <Text style={s.small}>Nothing yet. Press Send a test to try it.</Text> : null}
         </>}

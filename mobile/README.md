@@ -62,7 +62,13 @@ The code is shown once and only lets a phone receive your notifications. Remove 
   push copy of the same message is dropped, so nothing shows twice.
 - On iPhone this works in Expo Go. On Android, Expo Go can't get pushes (since SDK 53); the APK build can, once a
   Firebase (FCM) key is added to the Expo project.
-- A push makes a single notification sound; the repeated ringing only happens with the app open.
+- Like an alarm: until you open the app (or tap the notification), Studio pushes it again every 30 seconds, up to 4
+  more times, marked "Reminder 1 of 4" and so on. The app's **Keep ringing until I respond** switch turns this off
+  for that phone. With the app open, it vibrates until you tap **Stop** instead.
+- For banners that stay until you swipe them away: iPhone Settings → Notifications → Expo Go → Banner Style →
+  Persistent.
+- Louder, alarm-style ringing (Apple's AlarmKit, a custom sound, notifications that break through Focus) needs an
+  app of its own rather than Expo Go, so an Apple developer account.
 
 ## Checking it
 
