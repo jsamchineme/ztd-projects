@@ -98,7 +98,7 @@ It must not use any of the existing signature devices (luggage tags, cork boards
 21. One `h1` per page; `h2` per section; `h3` inside. Landmarks: `header`, `nav[aria-label]`, `main#main`, `footer`. The skip link is the first element in `body`.
 22. Focus is a 3px soil ring with a white halo (gold on the footer). Never remove it.
 23. Tap targets 44px. Drawings are `aria-hidden="true"`; every link and button has a text name.
-24. Motion only inside `prefers-reduced-motion: no-preference`; the companion bobs 3 times and stops, so nothing moves for more than 5 seconds without a control.
+24. Motion only inside `prefers-reduced-motion: no-preference`; the hero sun rises, turns and glows twice while the clouds drift in and the bee flies in and bobs once; the little sun climbs the sun arc to the current time when it is first seen; the companion in the visit band bobs 3 times. The sun in Explore (`data-sun-play`) turns and glows each time it scrolls into view, then rests. Every animation stops within 5 seconds, so nothing needs a pause control (WCAG 2.2.2); don't add a continuous loop.
 
 ### Known quirks
 25. **The board preview blocks the fonts** (the sandbox gives the page a null origin and `/templates/` sends no CORS header), so the preview at `localhost:4391/templates/…` shows Georgia and system sans. That affects every template; the real site and `http-server` are fine. Drawings render there because the sprite is inline.
@@ -115,7 +115,7 @@ Measured on a 390 by 844 phone (the example):
 
 | # | Section | Classes | Holds | Screen |
 |---|---|---|---|---|
-| 0 | Header | `.site-header`, `.brand`, `.site-nav` (from 64em), `a.menu-toggle[data-menu-open]`, `dialog#menu-sheet` | Emblem mark, name, town; Menu | 1 |
+| 0 | Header | `.site-header`, `.brand`, `.site-nav` (from 70em), `a.menu-toggle[data-menu-open]`, `dialog#menu-sheet` | Emblem mark, name, town; Menu | 1 |
 | 1 | **Hero** | `section.hero` > `.hero__art` (emblem, 2 clouds, dashed trail, `.hero__bee`) + `.hero__text` | `p.hero__name` "[Name], [Town]"; `h1` (up to 8 words; the nursery's own line if it has one); `p.hero__lead` (one sentence, ages and weeks); `.actions` with `a.btn` Book a visit and `a.call-link` Phone | 1 |
 | 2 | **The essentials** | `section.essentials` > `h2` + `ul.essentials__list` + `p.more` | 5 lines, up to 8 words each: ages; hours as `li.essentials__hours` holding the **sun arc**; funded hours with the council; places; grades (a link to the report). Then "All the details →" | 1 to 2 |
 | 3 | **Intent pair** | `section.section--sky.intent` > optional `figure.living.intent__photo` + `h2` + `ul.intent__list` of 2 `li.intent-card` | Each card: `p.intent-card__q` (up to 8 words) and one `a.go` door | 3 |
@@ -139,7 +139,8 @@ Checked with `viewports.mjs` at 360, 390, 430, 600, 768, 834, 1024, 1280 and 144
 | 37.5em (600px) | Gutters 40px. Doors become petal cards, 2 per row. |
 | 48em (768px) | Body 19px. Intent cards 2 per row. The page band puts its drawing beside the text. "On this page" in 2 columns. The call bar goes. |
 | 56em (896px) | Hero in two columns (text left, big sun right). Essentials sit beside their heading. The intent photo sits beside the heading and cards. Footer in 2 columns. Gallery 3 columns. |
-| 64em (1024px) | Gutters 64px. Full menu row with the Book a visit button; Menu goes. **The flower of doors:** six petals in two arcs either side of a 25rem sun whose centre is the "Book a visit" link. Rooms 3 per row. |
+| 64em (1024px) | Gutters 64px. **The flower of doors:** six petals in two arcs either side of a 25rem sun whose centre is the "Book a visit" link. Rooms 3 per row. |
+| 70em (1120px) | Full menu row with the Book a visit button; Menu goes. Links stay on one line; the current page has a gold underline. |
 | 80em (1280px) | Body 20px. |
 
 The DOM order of the petals runs left, right, left, right, left, right on desktop, so reading and tab order match what people see. On phones and for screen readers the petals are a plain list.
@@ -267,7 +268,7 @@ Every page reuses the head, sprite, header, menu sheet, footer, call bar and sch
 
 | Page | Band (H1, action) | Sections in the example |
 |---|---|---|
-| `join-us.html` (Visit and join, butter) | "Come and see us", Phone button | Book a visit (how, plus questions parents ask) · How enrolment works (`.steps`) · Sessions and places (`.summary`, registered places) · What's here (`.whats-here`) · Find us (address, directions, sign photo). Next: Fees and funding |
+| `join-us.html` (Visit and join, butter) | "Come and see us", Phone button | Book a visit (how, plus questions parents ask) · How enrolment works (`.steps`) · Sessions and places (`.summary`, registered places) · What's here (`.whats-here`: one card per thing, the nursery's own photo when it shows that exact thing, otherwise its drawing in `.whats-here__art`) · Find us (address, directions, sign photo). Next: Fees and funding |
 | `fees-and-funding.html` (green) | "Fees and funding", Book a visit | Funded hours (council partner, 1,140 hours, how to apply) · When funding starts (birthday table, mygov.scot source) · 2 year olds · Our fees (phone for fees; sessions; registration fee) · Help with costs (`.details`: Tax-Free Childcare, Universal Credit, Parent Club). Next: Our nursery |
 | `our-nursery.html` (peach) | "Our rooms and garden" | Rooms by age (`.rooms`, with the nursery's own ratios) · A look round (tour film, transcript) · Outdoors (photo) · How children learn · Food · Our inspection grades (`.grades`, every indicator in `.details`, report and register links). Next: Our team |
 | `our-team.html` (lilac) | "Meet our team" | Our managers (`.people--2`) · Your child's key worker · The whole team (`.details` per group) · Staff in each room · What the letters mean. Next: Parents |

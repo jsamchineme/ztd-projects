@@ -314,6 +314,10 @@ All of these must come from the nursery or the Care Inspectorate record.
    - Reuse rooms, garden, building, food, artwork and staff images where the staff member's identity is already public on that site, and record the source in `img/CREDITS.txt`.
    - After handover, the nursery may add child photos under its own consent process. The templates should still look complete without them.
 5. **Never use** stock or AI-generated children or staff, clip-art children, or illustrations of "happy toddlers". Parents are judging the real place [NNG-P].
+6. **Use the nursery's own photo when it has one; otherwise the template's drawing.** (Owner's decision, October 2026.)
+   - Each thing a page lists (a playroom, the garden, wetsuits, a library bus) gets a photo only if the nursery has one that shows that exact thing.
+   - If it doesn't, keep the template's drawing in the same frame, so the layout doesn't depend on photos. Sunny Side's "What's here" is the worked example.
+   - AI pictures of objects with no people are not banned, but never pass them off as the nursery's own: label them "Illustration", or prefer the drawing.
 
 ---
 

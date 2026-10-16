@@ -6,11 +6,11 @@ Reuse needs the nursery's consent at handover. No child is identifiable in any f
 
 USED
 building-gable   <- /wp-content/uploads/2025/04/IMG_9148.jpg (front gable, sign and cloud boards). Gallery; first frame of tour.mp4.
-building-front   <- /wp-content/uploads/2025/04/IMG_9147.jpg (front of the building under a blue sky). Gallery; tour poster.
+building-front   <- /wp-content/uploads/2025/04/IMG_9147.jpg (front of the building under a blue sky). Gallery; tour poster; Visit and join (What's here).
 sign             <- /wp-content/uploads/2025/04/IMG_9146.jpg (roadside sign). Visit and join; gallery.
-garden           <- /wp-content/uploads/2024/03/IMG_1504.jpg (empty garden and learning shed). Home living photo poster; Our nursery; gallery.
+garden           <- /wp-content/uploads/2024/03/IMG_1504.jpg (empty garden and learning shed). Home living photo poster; Our nursery; gallery; Visit and join (What's here).
 room-blocks      <- /wp-content/uploads/2024/03/IMG_1437.jpg, CROPPED to the left 520 x 390px to remove an adult standing at the right edge (body only, but removed anyway).
-room-construction<- /wp-content/uploads/2024/03/IMG_1432.jpg (empty room).
+room-construction<- /wp-content/uploads/2024/03/IMG_1432.jpg (empty room). Gallery; Visit and join (What's here).
 room-baby        <- /wp-content/uploads/2024/03/IMG_1438.jpg (empty under-2s room; room identity per the site's Services page, phone to confirm).
 room-tunnel      <- /wp-content/uploads/2024/03/IMG_1494.jpg (empty room).
 room-tables      <- /wp-content/uploads/2024/03/IMG_1497.jpg (empty room; the wall art is unnamed handprints).

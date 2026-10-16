@@ -4,7 +4,8 @@
    3. Dated notices (data-show-from / data-show-until)
    4. Call bar: tucked away while the hero or the Book a visit band is in view
    5. Living photo: autoplays only on wider screens without reduced motion; visible pause button
-   6. Gallery filters and lightbox (Previous / Next, arrow keys, swipe) */
+   6. Gallery filters and lightbox (Previous / Next, arrow keys, swipe)
+   7. The sun in Explore: turns and glows each time it comes into view (not with reduced motion) */
 (function () {
   'use strict';
   var doc = document;
@@ -18,9 +19,12 @@
     toggle.setAttribute('aria-haspopup', 'dialog');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-controls', 'menu-sheet');
+    sheet.setAttribute('tabindex', '-1');
     toggle.addEventListener('click', function (e) {
       e.preventDefault();
       sheet.showModal();
+      /* Focus the sheet itself, not its first link: otherwise phones draw a focus ring round the logo on every open. Tab still starts at the logo. */
+      sheet.focus();
       toggle.setAttribute('aria-expanded', 'true');
     });
     toggle.addEventListener('keydown', function (e) { if (e.key === ' ') { e.preventDefault(); toggle.click(); } });
@@ -91,8 +95,27 @@
       var sun = arc.querySelector('.sun-arc__sun'); if (!sun) return;
       var cx = +arc.getAttribute('data-cx') || 160, cy = +arc.getAttribute('data-cy') || 100, rx = +arc.getAttribute('data-rx') || 148, ry = +arc.getAttribute('data-ry') || 84;
       if (typeof st.frac === 'number') {
-        var ang = Math.PI * (1 - st.frac);
-        sun.setAttribute('transform', 'translate(' + (cx + rx * Math.cos(ang)).toFixed(1) + ' ' + (cy - ry * Math.sin(ang)).toFixed(1) + ')');
+        var place = function (f, turn) {
+          var ang = Math.PI * (1 - f);
+          sun.setAttribute('transform', 'translate(' + (cx + rx * Math.cos(ang)).toFixed(1) + ' ' + (cy - ry * Math.sin(ang)).toFixed(1) + ') rotate(' + (turn || 0).toFixed(1) + ')');
+        };
+        place(st.frac);
+        /* With motion allowed, the sun climbs from opening time to now (and turns as it goes) the first time the arc is seen */
+        if (!reduceMotion && 'IntersectionObserver' in window && window.requestAnimationFrame) {
+          place(0);
+          var seen = new IntersectionObserver(function (entries) {
+            if (!entries[0].isIntersecting) return;
+            seen.disconnect();
+            var start = null, dur = 1600;
+            requestAnimationFrame(function step(t) {
+              if (start === null) start = t;
+              var k = Math.min(1, (t - start) / dur), e = 1 - Math.pow(1 - k, 3);
+              place(st.frac * e, 120 * e);
+              if (k < 1) requestAnimationFrame(step);
+            });
+          }, { threshold: 0.5 });
+          seen.observe(arc);
+        }
       } else {
         sun.setAttribute('transform', 'translate(' + cx + ' ' + (cy + 40) + ')');
         sun.style.opacity = '0';
@@ -124,6 +147,7 @@
       bar.classList.toggle('is-tucked', showing.size > 0);
     }, { threshold: 0 });
     watched.forEach(function (w) { io.observe(w); });
+    doc.body.classList.add('callbar-tucks');
   }
 
   /* 5. Living photo ---------------------------------------------------- */
@@ -206,5 +230,18 @@
     box.addEventListener('close', function () { if (opener) opener.focus(); });
   } else {
     doc.querySelectorAll('[data-lightbox]').forEach(function (b) { b.addEventListener('click', function () { location.href = b.getAttribute('data-lightbox'); }); });
+  }
+
+  /* 7. Sun in Explore ------------------------------------------------- */
+  /* Plays each time it scrolls into view: the class comes off when it leaves, so the animation starts afresh. */
+  var suns = doc.querySelectorAll('[data-sun-play]');
+  if (suns.length && !reduceMotion && 'IntersectionObserver' in window) {
+    var sunIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.intersectionRatio >= 0.6) en.target.classList.add('is-playing');
+        else if (!en.isIntersecting) en.target.classList.remove('is-playing');
+      });
+    }, { threshold: [0, 0.6] });
+    suns.forEach(function (s) { sunIo.observe(s); });
   }
 })();
