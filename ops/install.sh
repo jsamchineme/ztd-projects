@@ -33,6 +33,12 @@ mkdir -p /srv/studio-uploads
 # 2751: project users can't list the folder, but can reach their own project's folder in it (studio:<project user>).
 chown studio:ztd /srv/studio-uploads; chmod 2751 /srv/studio-uploads
 
+# Tools project tasks use (ffmpeg for audio and video). Installed once; a failed apt doesn't stop the update.
+if ! command -v ffmpeg >/dev/null; then
+  { apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; } \
+    || echo "Warning: couldn't install ffmpeg; carrying on."
+fi
+
 # Code (owned by root, so neither Studio nor agents can change it)
 if [ -f "$APP/server.mjs" ]; then
   mkdir -p "$(dirname "$PREV")"; chmod 700 "$(dirname "$PREV")"

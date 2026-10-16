@@ -33,7 +33,7 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `lib/claude.mjs` | Each user's Claude connection: a subscription token via `claude setup-token`, or an API key. Stored encrypted (AES-256-GCM). |
 | `lib/ctl.mjs` | Runs `studio-ctl` through sudo |
 | `ops/studio-ctl.mjs` | The root helper. It's the only privileged code. AI agents (user `ztd` or a project's own user) may run only `status`, and `svc` and `logs` for projects that run as their own user. |
-| `ops/install.sh` | Installs or updates everything on the server. Safe to re-run. Project services get `OOMPolicy=continue` from a drop-in, so a process going over a service's memory limit doesn't stop the whole service. |
+| `ops/install.sh` | Installs or updates everything on the server. Safe to re-run. Also installs ffmpeg for project tasks, if it's missing. Project services get `OOMPolicy=continue` from a drop-in, so a process going over a service's memory limit doesn't stop the whole service. |
 | `ops/backup.sh` | Nightly backup (03:30) to `/var/backups/ztd`, kept for 14 days |
 | `ops/isolate-studio.sh` | One-off: moves the Studio source into its own project, `studio-src`, run as the user `studiodev` (see Security model) |
 | `ops/migrate-pipeline.sh` | Copies this repo and its board data from a Mac to the server, then registers it as the Pipeline project |
