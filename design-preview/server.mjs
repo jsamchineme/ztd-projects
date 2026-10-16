@@ -1,5 +1,5 @@
-// Design preview for Studio. Runs Studio's real front end (../public) against a fake API (mock.mjs), with the new
-// stylesheet from ztd/ in place of public/app.css. /options is the earlier page comparing six styles.
+// Design preview for Studio. / is the redesign mock-up (mockup/). The app's own addresses (/p/…, /login…) run Studio's
+// real front end (../public) against a fake API (mock.mjs), recoloured by ztd/app.css. /options compares six styles.
 // Studio sets PORT. Nothing here talks to the real Studio or its data.
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -11,6 +11,7 @@ const HERE = import.meta.dirname;
 const STUDIO = join(HERE, '..', 'public');   // the real front end, read fresh on every request
 const ZTD = join(HERE, 'ztd');                // the new look: app.css, icon.svg, fonts/, preview.js
 const OPTIONS = join(HERE, 'public');
+const MOCKUP = join(HERE, 'mockup');          // the full redesign, hand-built screens; served at /
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.json': 'application/json' };
 
 const inside = (root, path) => { const f = join(root, normalize(path).replace(/^(\.\.[/\\])+/, '')); return f.startsWith(root) ? f : null; };
@@ -39,6 +40,8 @@ http.createServer(async (req, res) => {
   try {
     if (path.startsWith('/api/')) return handleApi(req, res, url, cookiesOf(req));
     if (path === '/__preview/reset' && req.method === 'POST'){ reset(); res.writeHead(200, { 'Set-Cookie': ['pv_out=; Max-Age=0; Path=/', 'pv_mfa=; Max-Age=0; Path=/'] }); return res.end('{}'); }
+    if (path === '/' || path === '/mockup' || path === '/mockup/') return file(res, join(MOCKUP, 'index.html'));
+    if (path.startsWith('/mockup/')){ const f = inside(MOCKUP, path.slice('/mockup/'.length)); if (f && await file(res, f)) return; }
     if (path === '/options' || path === '/options/') return file(res, join(OPTIONS, 'index.html'));
     if (path.startsWith('/__preview/')){ const f = inside(ZTD, path.slice('/__preview/'.length)); if (f && await file(res, f)) return; }
     if (path === '/app.css') return file(res, join(ZTD, 'app.css'));
