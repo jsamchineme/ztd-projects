@@ -481,6 +481,9 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   for (const label of ['Claude finishes in your chat', 'Claude finishes in a teammate’s chat', 'A project you created is ready'])
     await card.getByText(label).waitFor();
   await card.getByText('No phone paired yet').waitFor();
+  if (!(await card.locator('a.phone-app-link').getAttribute('href')).startsWith('exp://')) throw new Error('no Expo Go link');
+  const app = await page.request.get(`${BASE}/api/phone/app`, { maxRedirects: 0 });
+  if (app.status() !== 302 || !app.headers().location.startsWith('exp://u.expo.dev/')) throw new Error(`/api/phone/app answered ${app.status()} ${app.headers().location}`);
   await card.locator('button:has-text("Pair a phone")').click();
   await page.fill('dialog input[type=text]', 'Test phone');
   await page.click('dialog button:has-text("Show pairing code")');

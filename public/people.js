@@ -132,6 +132,8 @@ async function paintPhones(card){
   }).catch(() => {});
   card.replaceChildren(
     r.phones.length ? h('div', { class: 'phones' }, r.phones.map(row)) : h('p', { class: 'muted', style: { marginTop: 0 } }, 'No phone paired yet. Install the Studio phone app, then pair it here.'),
+    h('p', { class: 'small muted' }, 'On iPhone the app runs in Expo Go (free in the App Store). On your phone, ',
+      h('a', { href: r.appUrl, class: 'phone-app-link' }, 'open the app in Expo Go'), ', or go to ', h('span', { class: 'mono' }, `${location.origin}/api/phone/app`), '.'),
     h('div', { class: 'row', style: { margin: '12px 0 16px' } },
       h('button', { class: 'btn primary', onclick: () => pairDialog(() => paintPhones(card)) }, ico('phone'), 'Pair a phone'),
       r.phones.length ? h('button', { class: 'btn', onclick: test }, 'Send a test') : null),

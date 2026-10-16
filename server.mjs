@@ -10,7 +10,7 @@ import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
 import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail, sendTemplate } from './lib/mail.mjs';
 import { emailPrefs, setEmailPrefs, phonePrefs, setPhonePrefs } from './lib/notify.mjs';
-import { listPhones, pairPhone, removePhone, testPhones, handlePhoneUpgrade } from './lib/phone.mjs';
+import { listPhones, pairPhone, removePhone, testPhones, handlePhoneUpgrade, PHONE_APP_URL } from './lib/phone.mjs';
 import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
@@ -102,11 +102,13 @@ route('GET', '/api/me', async ({ user, session }) => {
 route('GET', '/api/me/email', async ({ user }) => emailPrefs(user));
 route('PUT', '/api/me/email', async ({ user, body }) => setEmailPrefs(user, body));
 // Phones paired for notifications, and what they ring for (lib/phone.mjs). The phone itself connects to /api/phone/socket.
-route('GET', '/api/me/phones', async ({ user }) => ({ phones: listPhones(user.id), prefs: phonePrefs(user) }));
+route('GET', '/api/me/phones', async ({ user }) => ({ phones: listPhones(user.id), prefs: phonePrefs(user), appUrl: PHONE_APP_URL }));
 route('POST', '/api/me/phones', async ({ user, body, req }) => pairPhone(user, body.name, ipOf(req)));
 route('DELETE', '/api/me/phones/:id', async ({ user, params, req }) => { removePhone(user, params.id, ipOf(req)); return { ok: true }; });
 route('POST', '/api/me/phones/test', async ({ user }) => testPhones(user));
 route('PUT', '/api/me/phone-prefs', async ({ user, body }) => setPhonePrefs(user, body));
+// Opens the phone app in Expo Go: a link that works anywhere an exp:// link isn't clickable.
+route('GET', '/api/phone/app', async (_, res) => { res.writeHead(302, { Location: PHONE_APP_URL, 'Cache-Control': 'no-store' }); res.end(); }, { public: true });
 // Changing your email (lib/account.mjs). The confirm link is opened from the email, maybe signed out or in another browser.
 route('POST', '/api/account/email', async ({ user, body, req }) => requestEmailChange(user, body, ipOf(req)));
 route('GET', '/api/account/email/confirm', async ({ url, req }, res) => {
