@@ -98,6 +98,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .switch-check { font-weight: 600; }
 .email-pref { align-items: flex-start; }
 .email-pref > span { display: flex; flex-direction: column; gap: 2px; }
+.email-pref .small { font-weight: 400; }
 .input-wrap { display: flex; align-items: center; border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--panel); }
 .input-wrap > .ico { margin-left: 11px; color: var(--faint); }
 .input-wrap input:not([type=checkbox]) { border: 0; box-shadow: none; background: none; min-height: 36px; padding-left: 8px; }
