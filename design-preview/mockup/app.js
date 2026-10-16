@@ -202,7 +202,7 @@ function paintPanel(){
   const here = location.hash.replace(/^#\/?/, '') || 'home', mode = document.documentElement.dataset.mode;
   pv.innerHTML = `<h4>Look</h4><div class="pv-seg"><button type="button" data-m="light" class="${mode !== 'dark' ? 'on' : ''}">Light</button><button type="button" data-m="dark" class="${mode === 'dark' ? 'on' : ''}">Dark</button></div>` +
     SCREENS.map(([g, xs]) => `<h4>${g}</h4>` + xs.map(([p, l]) => `<a href="#/${p}" class="${p === here ? 'on' : ''}">${l}</a>`).join('')).join('') +
-    `<h4>Dialogs and messages</h4>${DIALOGS.map(([k, l]) => `<a href="#" data-d="${k}">${l}</a>`).join('')}<p>Press ⌘K or Ctrl+K anywhere to search. D switches light and dark. Narrow the window below 860 px for phones.</p>`;
+    `<h4>Dialogs and messages</h4>${DIALOGS.map(([k, l]) => `<a href="#" data-d="${k}">${l}</a>`).join('')}<h4>Emails</h4><a href="/emails/">Every email Studio sends</a><p>Press ⌘K or Ctrl+K anywhere to search. D switches light and dark. Narrow the window below 860 px for phones.</p>`;
 }
 pv.addEventListener('click', e => {
   const m = e.target.closest('[data-m]'); if (m) return setMode(m.dataset.m);

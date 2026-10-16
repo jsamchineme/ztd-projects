@@ -92,6 +92,6 @@ function paint(){
     el('p', { className: 'pv-note' }, 'Phone layout: make the window narrower than 860 px. Everything here is made-up data.'),
     el('div', { className: 'pv-foot' },
       el('button', { type: 'button', onclick: async () => { await fetch('/__preview/reset', { method: 'POST' }); location.href = '/p/p1/chat/c1'; } }, 'Reset data'),
-      el('a', { href: '/options' }, 'Style options')));
+      el('a', { href: '/options' }, 'Style options'), el('a', { href: '/emails/' }, 'Emails')));
 }
 document.body.append(panel, btn);

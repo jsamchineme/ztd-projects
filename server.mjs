@@ -8,7 +8,7 @@ import QRCode from 'qrcode';
 import { PORT, STUDIO_HOST, STUDIO_URL, DOMAIN, APP_DIR, SECURE, APP_NAME } from './lib/config.mjs';
 import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
-import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail } from './lib/mail.mjs';
+import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail, sendTemplate } from './lib/mail.mjs';
 import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
@@ -379,6 +379,8 @@ route('POST', '/api/admin/users/:id/reset-mfa', async ({ user, params, req }) =>
   db.prepare('UPDATE user SET twoFactorEnabled = 0 WHERE id = ?').run(params.id);
   db.prepare('DELETE FROM session WHERE userId = ?').run(params.id);
   audit(user.id, 'admin.reset-mfa', params.id, '', ipOf(req));
+  const target = db.prepare('SELECT name, email FROM user WHERE id = ?').get(params.id);
+  if (target) sendTemplate(target.email, 'mfaReset', { name: target.name, email: target.email, adminName: user.name, url: `${STUDIO_URL}/login` });
   return { ok: true };
 });
 route('GET', '/api/admin/audit', async ({ user, url }) => {

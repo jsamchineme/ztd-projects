@@ -5,7 +5,7 @@
 //   studio-admin make-admin <email>
 import { readFileSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
-import { auth, migrate } from '../lib/auth.mjs';
+import { auth, migrate, cliLink } from '../lib/auth.mjs';
 import { db, now, audit } from '../lib/db.mjs';
 import { randomId } from '../lib/crypto.mjs';
 import { STUDIO_URL } from '../lib/config.mjs';
@@ -17,7 +17,9 @@ const [cmd, ...a] = process.argv.slice(2);
 async function resetLink(email, hours = 48){
   const user = db.prepare('SELECT id FROM user WHERE lower(email) = lower(?)').get(email);
   if (!user) throw new Error(`No account for ${email}`);
-  await auth.api.requestPasswordReset({ body: { email, redirectTo: '/reset-password' } });
+  cliLink.hours = hours;   // the email says "set your password" and gives this expiry
+  try { await auth.api.requestPasswordReset({ body: { email, redirectTo: '/reset-password' } }); }
+  finally { cliLink.hours = 0; }
   const row = db.prepare("SELECT id, identifier FROM verification WHERE value = ? AND identifier LIKE 'reset-password:%' ORDER BY createdAt DESC LIMIT 1").get(user.id);
   if (!row) throw new Error('No reset token was created');
   const exp = new Date(Date.now() + hours * 3600 * 1000);

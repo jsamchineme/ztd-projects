@@ -320,6 +320,38 @@ await check('admin sets up email: wrong password refused, test email sent, passw
   const r = await (await page.request.get(`${BASE}/api/admin/mail`)).text();
   if (r.includes('right')) throw new Error('password was returned');
   await page.screenshot({ path: `${SHOTS}/09-email.png`, fullPage: true });
+}, page);
+// Mail as the SMTP server saw it, with quoted-printable undone.
+const decoded = m => m.replace(/=\n/g, '').replace(/=([0-9A-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+const waitMail = async (test, what) => { for (let i = 0; i < 40; i++){ const m = mails.map(decoded).find(test); if (m) return m; await new Promise(r => setTimeout(r, 100)); } throw new Error(`no ${what} email arrived`); };
+await check('emails have HTML and plain text with the logo; reset, password-changed and 2FA-reset notices are sent', async () => {
+  const test = await waitMail(m => /Test email from/.test(m), 'test');
+  for (const part of ['multipart/alternative', 'text/plain', 'text/html', 'Content-ID: <logo>', 'Email is working'])
+    if (!test.includes(part)) throw new Error(`test email is missing ${part}`);
+  const users = await (await page.request.get(`${BASE}/api/admin/users`)).json();
+  const mia = users.find(u => u.email === 'mia@example.com');
+  await page.request.post(`${BASE}/api/admin/users/${mia.id}/reset-link`, { headers: { Origin: BASE }, data: {} });
+  const reset = await waitMail(m => /To: mia@example.com/i.test(m) && /Choose a new password/.test(m), 'reset');
+  const token = reset.match(/reset-password\?token=([\w%-]+)/)?.[1];
+  if (!token) throw new Error('reset email has no link');
+  const done = await page.request.post(`${BASE}/api/auth/reset-password`, { headers: { Origin: BASE }, data: { newPassword: 'a third new password 3', token: decodeURIComponent(token) } });
+  if (!done.ok()) throw new Error(`reset failed: ${done.status()}`);
+  await waitMail(m => /To: mia@example.com/i.test(m) && /Your password was changed/.test(m) && /reset with an emailed link/.test(m), 'password-changed');
+  await page.request.post(`${BASE}/api/admin/users/${mia.id}/reset-mfa`, { headers: { Origin: BASE }, data: {} });
+  await waitMail(m => /To: mia@example.com/i.test(m) && /Two-step sign-in was reset/.test(m), '2FA-reset');
+}, page);
+await check('every email template renders, escapes what people typed and never says undefined', async () => {
+  const { templates, samples } = await import('../lib/emails.mjs');
+  for (const [name, fn] of Object.entries(templates)){
+    const m = fn(samples[name]);
+    if (!m.subject || !m.html.includes('cid:logo') || !m.text) throw new Error(`${name} is incomplete`);
+    if (/undefined|NaN|\[object/.test(m.subject + m.html + m.text)) throw new Error(`${name} shows a missing value`);
+  }
+  const m = templates.invite({ ...samples.invite, inviterName: '<script>x</script>', orgName: 'A & B' });
+  if (m.html.includes('<script>') || !m.html.includes('A &amp; B')) throw new Error('names are not escaped');
+}, page);
+await check('admin removes the email settings', async () => {
+  await page.goto(BASE + '/admin');
   await page.click('button:has-text("Remove")');
   await page.click('dialog button:has-text("Remove")');
   await page.getByText('Email isn’t set up').waitFor();
