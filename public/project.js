@@ -311,15 +311,26 @@ function renderChat(ctx, el, chatId, loadList){
   const atBottom = () => transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 120;
   let autoUntil = 0;   // scrolls made by the code (following new output) don't count as the reader scrolling
   let replaying = false;   // while a saved chat is drawn, scroll once at the end instead of after every event
-  const scroll = (force) => { if (replaying && !force) return; if (force || atBottom()){ autoUntil = Date.now() + 200; transcript.scrollTop = transcript.scrollHeight; } };
+  const scroll = (force) => { if (replaying && !force) return; if (force || atBottom()){ autoUntil = Date.now() + 200; transcript.scrollTop = transcript.scrollHeight; pinned = true; } };
   // Phones: the top bar slides away while reading on through a long conversation, and comes back when scrolling back.
   let lastTop = 0, moved = 0, touchedAt = 0;
   for (const type of ['touchstart', 'touchmove', 'wheel']) transcript.addEventListener(type, () => { touchedAt = Date.now(); }, { passive: true });
+  // While the reader is at the bottom, keep the newest messages in view when anything changes size: the update bar
+  // appearing, the message box growing as they type, pictures loading. Otherwise they slide behind the box.
+  let pinned = true;
+  const pin = () => { if (pinned && !replaying){ autoUntil = Date.now() + 200; transcript.scrollTop = transcript.scrollHeight; } };
+  const resized = new ResizeObserver(pin);
+  resized.observe(transcript); resized.observe(inner);
+  onLeave(() => resized.disconnect());
   transcript.addEventListener('scroll', () => {
     const t = transcript.scrollTop, d = t - lastTop;
     lastTop = t;
+    if (Date.now() >= autoUntil) pinned = atBottom();
     // Only the reader's own scrolling (including the glide after a swipe) counts.
     if (!d || !phone.matches || Date.now() < autoUntil || Date.now() - touchedAt > 3000) return;
+    // A page that's barely longer than the screen: hiding the bar would make it fit, pulling the scroll back and
+    // bringing the bar back again, over and over.
+    if (transcript.scrollHeight - transcript.clientHeight < transcript.clientHeight) return;
     moved = Math.sign(d) === Math.sign(moved) ? moved + d : d;
     if (t < 20 || moved < -40) hideTopbar(false);
     else if (moved > 40) hideTopbar(true);
