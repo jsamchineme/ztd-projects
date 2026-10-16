@@ -1269,3 +1269,87 @@ html:not(.js) .nav__toggle { display: none; }
 .care--non-urgent .care__head { background: var(--colour-brand-tint); color: var(--colour-text); box-shadow: inset 0 4px 0 var(--colour-brand); border-top-color: var(--colour-brand-tint); }
 .care--urgent .care__kicker, .care--non-urgent .care__kicker { color: var(--colour-text-secondary); }
 .care--urgent .care__head, .care--non-urgent .care__head { padding-top: calc(var(--space-3) + 4px); }
+
+
+/* 18. QUICK-ANSWER PANELS (dialog.modal, opened by frontdesk.js) ==========
+   Short answers that a patient asks for by tapping a link (test results, fit
+   notes). They open only when asked, never on their own, and close back to
+   the same place on the page: Close, Escape, tapping outside, or Back.
+   Anything longer than one screen on a phone gets its own page instead.
+   Without JavaScript the dialog shows in place as a normal section. */
+.modal {
+  width: min(40rem, calc(100% - 2 * var(--space-3)));
+  max-width: none;
+  max-height: calc(100dvh - 2 * var(--space-3));
+  padding: 0;
+  border: 0;
+  border-top: 4px solid var(--colour-brand);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  box-shadow: 0 1rem 3rem rgba(33, 43, 50, 0.35);
+}
+.modal[open] { display: flex; flex-direction: column; }
+/* Taller than the screen, so it still covers everything if a phone or iPad
+   toolbar slides away while the panel is open */
+.modal::backdrop { inset: -10vh 0 -50vh; background: rgba(33, 43, 50, 0.6); }
+html:has(.modal[open]) { overflow: hidden; }   /* the page behind stays put */
+
+.modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--colour-border);
+}
+.modal__head h2 { margin: 0; padding-top: 0.35rem; }
+.modal__close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap);
+  padding: 0 var(--space-3) 0 var(--space-2);
+  border: 2px solid var(--colour-border-strong);
+  border-radius: var(--radius);
+  background: var(--colour-surface);
+  color: var(--colour-link);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+.modal__close svg { width: 1.25rem; height: 1.25rem; fill: currentColor; }
+.modal__close:hover { color: var(--colour-link-hover); border-color: var(--colour-link-hover); text-decoration: underline; }
+.modal__close:focus-visible { border-color: var(--colour-focus-text); }
+.modal__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4);
+}
+.modal__body > :last-child { margin-bottom: 0; }
+.modal__body .block > h3 { font-size: var(--fs-h4); margin-bottom: var(--space-2); }
+.modal__body .button { margin: 0; }
+@media (min-width: 40em) {
+  .modal__head { padding: var(--space-4) var(--space-4) var(--space-3) var(--space-5); }
+  .modal__body { padding: var(--space-4) var(--space-5) var(--space-5); }
+}
+
+/* No JavaScript: the panel is an ordinary white section in the page flow */
+html:not(.js) .modal {
+  display: block;
+  position: static;
+  width: auto;
+  max-height: none;
+  margin: 0;
+  border-top: 1px solid var(--colour-border);
+  box-shadow: none;
+  padding-block: var(--space-6);
+}
+html:not(.js) .modal > * {
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  border: 0;
+}
+html:not(.js) .modal__close { display: none; }
+@media print { .modal:not([open]) { display: none; } }

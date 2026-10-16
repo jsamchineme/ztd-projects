@@ -10,6 +10,9 @@
    5. Site search that answers inline, in the page (never an overlay). Inner pages
       leave out #search-results and #practice-schedule, so their search form
       submits to the homepage (./?q=...), which holds the index for every page.
+   6. Quick-answer panels: links to a dialog.modal on the same page open it over
+      the page; Close, Escape, the backdrop and Back all close it. Runs straight
+      after the menu, so it works on pages without a schedule too.
 */
 (function () {
   'use strict';
@@ -30,6 +33,61 @@
       if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') { setOpen(false); toggle.focus(); }
     });
     list.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+  }
+
+  /* ---------- 6. Quick-answer panels ---------- */
+  // A link to #id, where id is a dialog.modal on this page, opens it over the page
+  // instead of jumping down to it. Opening adds #id to the address, so Back closes
+  // it and a link from another page (./#test-results) opens it on arrival.
+  var modals = {};
+  // Pin the page while a panel is open. iPad and iPhone browsers ignore overflow: hidden,
+  // so the page behind scrolls, the toolbar slides away and the dimmed backdrop no longer
+  // reaches the bottom of the screen. Fixing the body in place stops that.
+  var lockedY = null;
+  var openModal = function (d) {
+    if (lockedY === null) {
+      lockedY = window.scrollY;
+      doc.body.style.cssText += ';position:fixed;top:' + (-lockedY) + 'px;left:0;right:0';
+    }
+    d.showModal();
+  };
+  var unlock = function () {
+    if (lockedY === null || doc.querySelector('dialog.modal[open]')) return;
+    ['position', 'top', 'left', 'right'].forEach(function (k) { doc.body.style.removeProperty(k); });
+    window.scrollTo({ top: lockedY, behavior: 'instant' });
+    lockedY = null;
+  };
+  Array.prototype.forEach.call(doc.querySelectorAll('dialog.modal'), function (d) {
+    if (typeof d.showModal !== 'function') return;   // old browser: stays a normal section
+    modals[d.id] = d;
+    d.addEventListener('click', function (e) {
+      if (e.target === d || e.target.closest('[data-modal-close]')) d.close();   // backdrop or Close
+    });
+    d.addEventListener('close', function () {
+      unlock();
+      if (history.state && history.state.modal === d.id) history.back();
+      else if (location.hash === '#' + d.id) history.replaceState(null, '', location.pathname + location.search);
+    });
+  });
+  var hashModal = function () { return modals[decodeURIComponent(location.hash.slice(1))]; };
+  if (Object.keys(modals).length) {
+    doc.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href*="#"]');
+      if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var url = new URL(a.href, location.href);
+      var d = modals[decodeURIComponent(url.hash.slice(1))];
+      if (!d || url.pathname !== location.pathname || url.search !== location.search) return;
+      e.preventDefault();
+      if (d.open) return;
+      history.pushState({ modal: d.id }, '', '#' + d.id);
+      openModal(d);
+    });
+    window.addEventListener('popstate', function () {
+      var target = hashModal();
+      Object.keys(modals).forEach(function (id) { if (modals[id].open && modals[id] !== target) modals[id].close(); });
+      if (target && !target.open) openModal(target);
+    });
+    if (hashModal()) openModal(hashModal());
   }
 
   /* ---------- Schedule ---------- */
