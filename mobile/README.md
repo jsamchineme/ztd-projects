@@ -28,11 +28,18 @@ allow installs from the browser.
 
 - JavaScript changes (`App.js`, `src/`): publish them, and the installed app picks them up the next time it's opened
   twice (once to download, once to use):
-  `npx eas-cli@latest update --channel preview --message "what changed"`
+  `npx eas-cli@latest update --channel preview --environment preview --message "what changed"`
 - New native packages, permissions or icons in `app.json`, or a new Expo SDK: build a new APK and install it:
   `npx eas-cli@latest build --platform android --profile preview`
 
-**iPhone:** an installable build needs an Apple developer account (`--platform ios`, the same commands otherwise).
+**iPhone (Expo Go):** install **Expo Go** from the App Store and sign in with the same Expo account. Then open
+`exp://u.expo.dev/13ca0973-4369-458f-b5da-dbaeb85ef01c?channel-name=expo-go&runtime-version=exposdk:58.0.0`: scan it as
+a QR code with the iPhone camera, or open the update on the project's expo.dev page (Updates → Preview). Expo Go keeps
+it in its recent projects. To publish a change for Expo Go:
+`EXPO_GO=1 npx eas-cli@latest update --channel expo-go --platform ios --environment preview --message "what changed"`
+(`app.config.js` then marks it with the Expo SDK version, which is what Expo Go loads). After an Expo SDK upgrade,
+change `exposdk:58.0.0` in the link to the new version. An app of its own on iPhone would need an Apple developer
+account.
 
 **For development** you can still run it from a computer with Expo Go: `npm install`, then `npx expo start --tunnel`.
 

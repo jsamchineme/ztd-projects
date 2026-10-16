@@ -20,9 +20,6 @@
       "permissions": [
         "android.permission.VIBRATE",
         "android.permission.POST_NOTIFICATIONS",
-        "android.permission.CAMERA",
-        "android.permission.VIBRATE",
-        "android.permission.POST_NOTIFICATIONS",
         "android.permission.CAMERA"
       ]
     },
