@@ -475,6 +475,69 @@ await check('an older project moves to its own user; services start again and ch
   await page.locator('.bubble', { hasText: 'still here after the move?' }).waitFor({ timeout: 8000 });
   await page.waitForFunction(() => !document.querySelector('.send.stop'), null, { timeout: 15000 });
 }, page);
+await check('phone notifications: pair a phone, it connects, rings for a test and a finished chat, catches up, and is removed', async () => {
+  await page.goto(BASE + '/account');
+  const card = page.locator('#acc-phone');
+  for (const label of ['Claude finishes in your chat', 'Claude finishes in a teammate’s chat', 'A project you created is ready'])
+    await card.getByText(label).waitFor();
+  await card.getByText('No phone paired yet').waitFor();
+  await card.locator('button:has-text("Pair a phone")').click();
+  await page.fill('dialog input[type=text]', 'Test phone');
+  await page.click('dialog button:has-text("Show pairing code")');
+  const code = await page.locator('dialog input[aria-label="Pairing code"]').inputValue();
+  const [studio, token] = code.split('#');
+  if (studio !== BASE || !token || token.length < 40) throw new Error(`odd pairing code: ${code}`);
+  await page.locator('dialog .qr img').waitFor();
+  await page.screenshot({ path: `${SHOTS}/09c-pair-phone.png` });
+
+  // The phone app's side (mobile/src/socket.js), as a plain WebSocket.
+  const url = `ws://127.0.0.1:${new URL(BASE).port}/api/phone/socket`;
+  const open = (hello) => new Promise((resolve, reject) => {
+    const ws = new WebSocket(url), got = [];
+    ws.got = got;
+    ws.next = (match, what) => new Promise((res, rej) => {
+      const t = setTimeout(() => rej(new Error(`no ${what} on the socket (got: ${got.map(m => m.type + ' ' + (m.title || '')).join(', ')})`)), 15000);
+      const look = () => { const m = got.find(match); if (m){ clearTimeout(t); got.splice(got.indexOf(m), 1); res(m); } else setTimeout(look, 50); };
+      look();
+    });
+    ws.onmessage = e => got.push(JSON.parse(e.data));
+    ws.onopen = () => { ws.send(JSON.stringify({ type: 'hello', ...hello })); resolve(ws); };
+    ws.onerror = () => reject(new Error('the socket didn’t open'));
+  });
+  const stranger = await open({ token: 'x'.repeat(43), after: null });
+  await stranger.next(m => m.type === 'unpaired', 'refusal for a wrong token');
+  const ws = await open({ token, after: null });
+  const ready = await ws.next(m => m.type === 'ready', 'ready');
+  if (ready.phone !== 'Test phone' || ready.user !== 'Olu Owner') throw new Error(`ready says ${JSON.stringify(ready)}`);
+  await page.locator('dialog', { hasText: '✓ Connected' }).waitFor({ timeout: 8000 });
+  await page.click('dialog button:has-text("Done")');
+  await card.locator('.pill', { hasText: 'Connected' }).waitFor();
+  await card.locator('button:has-text("Send a test")').click();
+  await page.locator('.toast', { hasText: 'Sent to 1 phone' }).waitFor();
+  await ws.next(m => m.type === 'message' && m.title === 'Test from Studio', 'test message');
+  await card.screenshot({ path: `${SHOTS}/09d-phone-card.png` });
+
+  await page.goto(projectUrl + '/chat/new');
+  await page.fill('textarea', 'ring my phone when done');
+  await page.keyboard.press('Enter');
+  const done = await ws.next(m => m.type === 'message' && m.event === 'runFinished', 'finished-chat message');
+  if (!/ring my phone when done: done/.test(done.title) || !done.body.startsWith('Demo Site · ') || !done.url.includes('/chat/')) throw new Error(`finished-chat message says ${JSON.stringify(done)}`);
+  ws.close();
+
+  // Offline for that one: on reconnecting it comes again, marked as missed.
+  const again = await open({ token, after: done.id - 1 });
+  await again.next(m => m.type === 'ready', 'ready after reconnecting');
+  const missed = await again.next(m => m.type === 'message', 'missed message');
+  if (missed.id !== done.id || !missed.missed) throw new Error(`catching up sent ${JSON.stringify(missed)}`);
+
+  await page.goto(BASE + '/account');
+  const closed = new Promise(r => { again.onclose = e => r(e.code); });
+  await card.locator('.phone-row button:has-text("Remove")').click();
+  await page.locator('.toast', { hasText: 'Test phone removed' }).waitFor();
+  if (await closed !== 4001) throw new Error('removing the phone didn’t close its connection');
+  const gone = await open({ token, after: null });
+  await gone.next(m => m.type === 'unpaired', 'refusal after removing');
+}, page);
 await check('phone layout: chat usable at 390px', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(projectUrl + '/chat');

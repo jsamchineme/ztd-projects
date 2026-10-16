@@ -21,6 +21,7 @@ export async function renderAccount(main){
   const claudeCard = h('div', { class: 'card-body' });
   const sessionsCard = h('div', { class: 'devices' });
   const emailCard = h('div', { class: 'card-body' });
+  const phoneCard = h('div', { class: 'card-body' });
 
   const name = h('input', { type: 'text', value: me.name, maxlength: 80 });
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
@@ -34,7 +35,7 @@ export async function renderAccount(main){
   inner.append(
     pageHead('Account', 'Your profile, your Claude connection and how you sign in.'),
     h('div', { class: 'settings-layout' },
-      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-email', 'mail', 'Email notifications'], ['acc-devices', 'laptop', 'Devices']]),
+      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-email', 'mail', 'Email notifications'], ['acc-phone', 'phone', 'Phone notifications'], ['acc-devices', 'laptop', 'Devices']]),
       h('div', { class: 'stack' },
         h('section', { class: 'card profile', id: 'acc-profile' }, h('span', { class: 'avatar lg' }, initials(me.name)),
           h('div', null, h('h2', null, me.name), h('div', { class: 'muted' }, me.email),
@@ -76,11 +77,13 @@ export async function renderAccount(main){
             h('button', { class: 'btn', onclick: () => newBackupCodes() }, ico('key'), 'New backup codes')),
           h('span', { class: 'spacer' }), h('span', { class: 'pill ok' }, ico('check'), 'On')),
         section('acc-email', 'Email notifications', `Sent to ${me.email}.`, emailCard),
+        section('acc-phone', 'Phone notifications', 'The Studio phone app rings when these happen.', phoneCard),
         section('acc-devices', 'Devices', 'Where you’re signed in.', sessionsCard))));
 
   paintClaude(claudeCard);
   paintSessions(sessionsCard);
   paintEmailPrefs(emailCard);
+  paintPhones(phoneCard);
   if (location.hash === '#claude') claudeCard.scrollIntoView({ block: 'center' });
   // Back from the link in a confirm-your-new-email message (see lib/account.mjs).
   const emailResult = new URLSearchParams(location.search).get('email');
@@ -93,23 +96,73 @@ export async function renderAccount(main){
 }
 
 // Each box saves as soon as it's changed. Security emails can't be turned off, so they're only mentioned.
+const prefBox = (path, on, off) => p => {
+  const input = h('input', { type: 'checkbox', checked: p.on });
+  input.onchange = async () => {
+    input.disabled = true;
+    try { await api('PUT', path, { [p.key]: input.checked }); toast(input.checked ? on : off); }
+    catch (e){ input.checked = !input.checked; fail(e); }
+    finally { input.disabled = false; }
+  };
+  return h('label', { class: 'check switch-check email-pref' }, input, h('span', null, h('strong', null, p.label), h('span', { class: 'small muted' }, p.hint)));
+};
 async function paintEmailPrefs(card){
   let prefs;
   try { prefs = await api('GET', '/api/me/email'); } catch (e){ card.replaceChildren(h('p', null, e.message)); return; }
-  const box = p => {
-    const input = h('input', { type: 'checkbox', checked: p.on });
-    input.onchange = async () => {
-      input.disabled = true;
-      try { await api('PUT', '/api/me/email', { [p.key]: input.checked }); toast(input.checked ? 'You’ll get these emails' : 'You won’t get these emails'); }
-      catch (e){ input.checked = !input.checked; fail(e); }
-      finally { input.disabled = false; }
-    };
-    return h('label', { class: 'check switch-check email-pref' }, input, h('span', null, h('strong', null, p.label), h('span', { class: 'small muted' }, p.hint)));
-  };
   card.replaceChildren(
     state.me.mailEnabled ? null : h('p', { class: 'note small', style: { marginTop: 0 } }, 'Email isn’t set up on this Studio yet, so nothing is sent. A Studio admin can set it up on the Admin page.'),
-    ...prefs.map(box),
+    ...prefs.map(prefBox('/api/me/email', 'You’ll get these emails', 'You won’t get these emails')),
     h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'Password resets, invitations and security notices (a changed password, a reset two-step sign-in) are always sent.'));
+}
+
+// Paired phones (lib/phone.mjs), a test button, and what they ring for.
+async function paintPhones(card){
+  let r;
+  try { r = await api('GET', '/api/me/phones'); } catch (e){ card.replaceChildren(h('p', null, e.message)); return; }
+  const row = p => h('div', { class: 'phone-row' },
+    h('span', { class: 'dev-ico' }, ico('phone')),
+    h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, p.name),
+      p.connected ? h('span', { class: 'pill ok', style: { marginLeft: '8px' } }, 'Connected') : null,
+      h('div', { class: 'small muted' }, p.connected ? `Paired ${ago(p.createdAt)}` : p.lastSeenAt ? `Last connected ${ago(p.lastSeenAt)}` : 'Not connected yet')),
+    h('button', { class: 'btn small', onclick: e => remove(e.target, p) }, 'Remove'));
+  const remove = (btn, p) => busy(btn, async () => { await api('DELETE', `/api/me/phones/${p.id}`); toast(`${p.name} removed`); paintPhones(card); }).catch(() => {});
+  const test = e => busy(e.target, async () => {
+    const t = await api('POST', '/api/me/phones/test');
+    toast(t.delivered ? `Sent to ${t.delivered} phone${t.delivered > 1 ? 's' : ''}` : 'No phone is connected right now. It’ll get the test when the app connects.', !t.delivered);
+  }).catch(() => {});
+  card.replaceChildren(
+    r.phones.length ? h('div', { class: 'phones' }, r.phones.map(row)) : h('p', { class: 'muted', style: { marginTop: 0 } }, 'No phone paired yet. Install the Studio phone app, then pair it here.'),
+    h('div', { class: 'row', style: { margin: '12px 0 16px' } },
+      h('button', { class: 'btn primary', onclick: () => pairDialog(() => paintPhones(card)) }, ico('phone'), 'Pair a phone'),
+      r.phones.length ? h('button', { class: 'btn', onclick: test }, 'Send a test') : null),
+    ...r.prefs.map(prefBox('/api/me/phone-prefs', 'Your phone will ring for these', 'Your phone won’t ring for these')),
+    h('p', { class: 'muted small', style: { marginBottom: 0 } }, 'The app gets these while it’s open or recently used. If it was closed, it catches up on the last day’s when you open it.'));
+}
+
+function pairDialog(done){
+  const name = h('input', { type: 'text', maxlength: 60, value: /iPhone|Android/.test(navigator.userAgent) ? '' : 'My phone', placeholder: 'My phone', required: true });
+  let poll;
+  const d = dialog(close => h('form', { onsubmit: async e => {
+    e.preventDefault();
+    await busy(e.submitter, async () => {
+      const p = await api('POST', '/api/me/phones', { name: name.value.trim() });
+      const status = h('p', { class: 'muted small phone-pair-status' }, 'Waiting for the app to connect…');
+      e.target.replaceChildren(h('h2', null, `Pair ${p.name}`),
+        h('p', { class: 'muted' }, 'In the Studio phone app, tap Scan and point it at this code. Or copy the code and paste it into the app.'),
+        h('div', { class: 'qr' }, h('img', { src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(p.qr), width: 220, height: 220, alt: 'Pairing code for the Studio phone app' })),
+        h('div', { class: 'row tight' }, h('input', { type: 'text', readonly: true, value: p.code, class: 'mono', style: { flex: 1 }, 'aria-label': 'Pairing code', onfocus: ev => ev.target.select() }),
+          h('button', { class: 'btn', type: 'button', onclick: () => copy(p.code) }, 'Copy')),
+        h('p', { class: 'muted small' }, 'This code is shown only once. Anyone with it gets your Studio notifications, so don’t share it. You can remove the phone later.'),
+        status,
+        h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn primary', type: 'button', onclick: close }, 'Done')));
+      poll = setInterval(async () => {
+        const phone = (await api('GET', '/api/me/phones').catch(() => null))?.phones.find(x => x.id === p.id);
+        if (phone?.connected){ clearInterval(poll); status.textContent = '✓ Connected. Your phone will ring for the notifications you choose.'; status.classList.remove('muted'); done(); }
+      }, 2000);
+    }).catch(() => {});
+  } }, h('h2', null, 'Pair a phone'), field('Name for this phone', name, 'so you can tell your phones apart'),
+    h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Show pairing code'))));
+  d.el.addEventListener('close', () => { clearInterval(poll); done(); });
 }
 
 function newBackupCodes(){

@@ -9,7 +9,8 @@ import { PORT, STUDIO_HOST, STUDIO_URL, DOMAIN, APP_DIR, SECURE, APP_NAME } from
 import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
 import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail, sendTemplate } from './lib/mail.mjs';
-import { emailPrefs, setEmailPrefs } from './lib/notify.mjs';
+import { emailPrefs, setEmailPrefs, phonePrefs, setPhonePrefs } from './lib/notify.mjs';
+import { listPhones, pairPhone, removePhone, testPhones, handlePhoneUpgrade } from './lib/phone.mjs';
 import * as P from './lib/projects.mjs';
 import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
@@ -100,6 +101,12 @@ route('GET', '/api/me', async ({ user, session }) => {
 // Which notification emails this person gets (lib/notify.mjs).
 route('GET', '/api/me/email', async ({ user }) => emailPrefs(user));
 route('PUT', '/api/me/email', async ({ user, body }) => setEmailPrefs(user, body));
+// Phones paired for notifications, and what they ring for (lib/phone.mjs). The phone itself connects to /api/phone/socket.
+route('GET', '/api/me/phones', async ({ user }) => ({ phones: listPhones(user.id), prefs: phonePrefs(user) }));
+route('POST', '/api/me/phones', async ({ user, body, req }) => pairPhone(user, body.name, ipOf(req)));
+route('DELETE', '/api/me/phones/:id', async ({ user, params, req }) => { removePhone(user, params.id, ipOf(req)); return { ok: true }; });
+route('POST', '/api/me/phones/test', async ({ user }) => testPhones(user));
+route('PUT', '/api/me/phone-prefs', async ({ user, body }) => setPhonePrefs(user, body));
 // Changing your email (lib/account.mjs). The confirm link is opened from the email, maybe signed out or in another browser.
 route('POST', '/api/account/email', async ({ user, body, req }) => requestEmailChange(user, body, ipOf(req)));
 route('GET', '/api/account/email/confirm', async ({ url, req }, res) => {
@@ -544,6 +551,7 @@ server.on('upgrade', (req, socket, head) => {
   const host = String(req.headers.host || '').toLowerCase().replace(/:\d+$/, '');
   const sub = subdomainOf(host);
   if (sub && host !== STUDIO_HOST) return handleProjectUpgrade(req, socket, head, sub);
+  if ((host === STUDIO_HOST || host === 'localhost' || host === '127.0.0.1') && req.url.split('?')[0] === '/api/phone/socket') return handlePhoneUpgrade(req, socket, head);
   socket.destroy();
 });
 server.requestTimeout = 0;

@@ -30,6 +30,8 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `lib/projects.mjs` | Projects and services: validation, systemd specs, status, certificates |
 | `lib/agent.mjs` | Chats: runs `claude -p --output-format stream-json`, saves events and streams them over SSE. Chats resume their Claude session. Each chat runs in its own systemd scope in `studio-chats.slice`, outside `studio.service`: 1.5 GB per chat (`chatMemoryMB` in ctl.json), 1.5 GB for all chats together. A chat that goes over its limit only loses the process that did, never Studio or other chats. |
 | `lib/uploads.mjs` | Files attached in chat (paste, drop or the paperclip): up to 20 MB each and 10 per message, saved to `/srv/studio-uploads/<slug>/<id>/`. That folder is owned by `studio` with group `ztd`, so Claude can read the files but not change them, and they stay out of git. The prompt lists the paths and Claude opens them with Read, which handles images, PDFs, notebooks and text. |
+| `lib/notify.mjs` | Notifications each person chooses on the Account page, by email and on their phone |
+| `lib/phone.mjs` | Phone notifications: pairing phones (a code shown once as a QR code; only its hash is kept), the WebSocket at `/api/phone/socket` the phone app keeps open, and a day of messages for phones that were offline |
 | `lib/claude.mjs` | Each user's Claude connection: a subscription token via `claude setup-token`, or an API key. Stored encrypted (AES-256-GCM). |
 | `lib/ctl.mjs` | Runs `studio-ctl` through sudo |
 | `ops/studio-ctl.mjs` | The root helper. It's the only privileged code. AI agents (user `ztd` or a project's own user) may run only `status`, and `svc` and `logs` for projects that run as their own user. |
@@ -39,6 +41,7 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `ops/migrate-pipeline.sh` | Copies this repo and its board data from a Mac to the server, then registers it as the Pipeline project |
 | `ops/fake-claude.mjs` | Stand-in for the `claude` CLI for tests. Turn it on with `"fakeClaude"` in `/etc/studio/ctl.json`. |
 | `bin/admin.mjs` | `studio-admin` on the server: `bootstrap`, `reset-link`, `import-project`, `make-admin`, `add-user`, `delete-user` |
+| `mobile/` | The phone app (Expo, React Native) that rings for phone notifications. See `mobile/README.md`. Not installed on the server. |
 | `public/` | The front end. Plain ES modules, no build step and no CDNs. |
 | `test/` | `mock-ctl.mjs` and `e2e.mjs`: a 26-step browser test against a throwaway local instance |
 

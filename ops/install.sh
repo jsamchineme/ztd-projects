@@ -44,7 +44,7 @@ if [ -f "$APP/server.mjs" ]; then
   mkdir -p "$(dirname "$PREV")"; chmod 700 "$(dirname "$PREV")"
   rm -rf "$PREV"; cp -al "$APP" "$PREV" 2>/dev/null || cp -a "$APP" "$PREV"   # hard links: the copy below replaces files rather than writing into them
 fi
-rsync -a --delete --exclude node_modules --exclude data --exclude '.env' "$SRC/" "$APP/"
+rsync -a --delete --exclude node_modules --exclude data --exclude '.env' --exclude /mobile "$SRC/" "$APP/"
 ( cd "$APP" && npm ci --omit=dev --no-audit --no-fund >/dev/null 2>&1 || npm install --omit=dev --no-audit --no-fund >/dev/null )
 chown -R root:root "$APP"; chmod -R go-w "$APP"
 # The update unpacks into a root-only temp folder, and rsync -a copies that mode onto $APP; Studio must be able to enter it.
