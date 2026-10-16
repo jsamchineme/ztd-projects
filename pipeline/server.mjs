@@ -432,7 +432,20 @@ const TYPES = { '.md': 'text/plain; charset=utf-8', '.pdf': 'application/pdf', '
 // A sandboxed page has an opaque origin, so its own fonts and caption files count as cross-origin requests and are
 // refused without this header. These are static, read-only files, so allowing any origin is safe.
 const OPEN = { 'Access-Control-Allow-Origin': '*' };
-async function preview(res, pathname){
+// Sends a static file, honouring a single byte Range. Safari (and so every iPad and iPhone browser) won't play
+// a video unless the server answers range requests with 206.
+function sendFile(req, res, body, headers){
+  headers = { ...OPEN, ...headers, 'Accept-Ranges': 'bytes' };
+  const m = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+  if (!m || (!m[1] && !m[2])) { res.writeHead(200, headers); return res.end(body); }
+  const size = body.length;
+  let start = m[1] ? Number(m[1]) : Math.max(0, size - Number(m[2]));
+  let end = m[1] && m[2] ? Math.min(Number(m[2]), size - 1) : size - 1;
+  if (start >= size || start > end) { res.writeHead(416, { ...headers, 'Content-Range': `bytes */${size}` }); return res.end(); }
+  res.writeHead(206, { ...headers, 'Content-Range': `bytes ${start}-${end}/${size}`, 'Content-Length': end - start + 1 });
+  res.end(body.subarray(start, end + 1));
+}
+async function preview(req, res, pathname){
   const [, kind, id, ...rest] = pathname.split('/');
   if (!/^\d+$/.test(id || '')) return send(res, 404, 'Not found', 'text/plain');
   if (!rest.length) { res.writeHead(301, { Location: `/${kind}/${id}/` }); return res.end(); }
@@ -443,14 +456,13 @@ async function preview(res, pathname){
   if (file.endsWith(sep) || file === root) file = join(file, 'index.html');
   try {
     const body = await readFile(file);
-    res.writeHead(200, { ...OPEN, 'Content-Type': TYPES[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store',
+    sendFile(req, res, body, { 'Content-Type': TYPES[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store',
       'Content-Security-Policy': 'sandbox allow-scripts allow-forms allow-popups', 'X-Content-Type-Options': 'nosniff' });
-    res.end(body);
   } catch { send(res, 404, 'Not found', 'text/plain'); }
 }
 
 // Design templates and their worked examples (/templates/<name>/example/), for people to look at.
-async function template(res, pathname){
+async function template(req, res, pathname){
   const root = join(ROOT, 'templates');
   let file;
   try { file = resolve(root, decodeURIComponent(pathname.slice('/templates/'.length))); } catch { return send(res, 400, 'Bad path', 'text/plain'); }
@@ -458,9 +470,8 @@ async function template(res, pathname){
   if (pathname.endsWith('/')) file = join(file, 'index.html');
   try {
     const body = await readFile(file);
-    res.writeHead(200, { ...OPEN, 'Content-Type': extname(file) === '.md' ? 'text/plain; charset=utf-8' : TYPES[extname(file).toLowerCase()] || 'application/octet-stream',
+    sendFile(req, res, body, { 'Content-Type': extname(file) === '.md' ? 'text/plain; charset=utf-8' : TYPES[extname(file).toLowerCase()] || 'application/octet-stream',
       'Cache-Control': 'no-store', 'Content-Security-Policy': 'sandbox allow-scripts allow-forms allow-popups', 'X-Content-Type-Options': 'nosniff' });
-    res.end(body);
   } catch { send(res, 404, 'Not found', 'text/plain'); }
 }
 
@@ -475,8 +486,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed', 'text/plain');
-  if (url.pathname.startsWith('/preview/') || url.pathname.startsWith('/audit/') || url.pathname.startsWith('/source/')) return preview(res, url.pathname);
-  if (url.pathname.startsWith('/templates/')) return template(res, url.pathname);
+  if (url.pathname.startsWith('/preview/') || url.pathname.startsWith('/audit/') || url.pathname.startsWith('/source/')) return preview(req, res, url.pathname);
+  if (url.pathname.startsWith('/templates/')) return template(req, res, url.pathname);
   if (url.pathname !== '/' && url.pathname !== '/index.html') return send(res, 404, 'Not found', 'text/plain');
   try { send(res, 200, await readFile(join(ROOT, 'index.html')), 'text/html; charset=utf-8'); }
   catch { send(res, 500, 'index.html is missing', 'text/plain'); }
