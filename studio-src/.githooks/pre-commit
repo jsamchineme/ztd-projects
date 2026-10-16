@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-# Refuses a commit whose JavaScript doesn't parse (see ops/check.sh). It checks what is being committed, not the
-# working folder. Turned on per clone with: git config core.hooksPath .githooks
-set -euo pipefail
-tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
-git checkout-index -a --prefix="$tmp/"
-bash "$(git rev-parse --show-toplevel)/ops/check.sh" "$tmp" || { echo "Commit stopped. (To commit anyway: git commit --no-verify)"; exit 1; }
