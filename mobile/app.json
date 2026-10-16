@@ -19,7 +19,11 @@
       },
       "permissions": [
         "android.permission.VIBRATE",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.CAMERA",
+        "android.permission.VIBRATE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.CAMERA"
       ]
     },
     "web": {
@@ -42,6 +46,18 @@
           "color": "#00427c"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "13ca0973-4369-458f-b5da-dbaeb85ef01c"
+      }
+    },
+    "owner": "jsamchineme",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/13ca0973-4369-458f-b5da-dbaeb85ef01c"
+    }
   }
 }

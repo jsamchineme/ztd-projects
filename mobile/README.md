@@ -17,38 +17,24 @@ open it keeps vibrating until you tap **Stop** (you can turn that off in the app
 
 ## Getting it on your phone
 
-You need [Node](https://nodejs.org) on a computer, and the **Expo Go** app on your phone (App Store or Play Store).
+The app is built and hosted by Expo, in the Expo account `jsamchineme` (project
+https://expo.dev/accounts/jsamchineme/projects/ztd-studio-phone). Nothing runs on a computer.
 
-**Quickest: run it from your computer.**
+**Android:** open the latest build on that page (Builds) on the phone and install the APK. Android asks once to
+allow installs from the browser.
 
-```sh
-cd mobile
-npm install
-npx expo start --tunnel
-```
+**Changing the app** (run in `mobile/`, with an Expo access token from https://expo.dev/settings/access-tokens in
+`EXPO_TOKEN`):
 
-Scan the QR code it prints with your phone's camera (iPhone) or with Expo Go (Android). The app opens in Expo Go.
-It keeps working while the computer is on and `expo start` is running.
+- JavaScript changes (`App.js`, `src/`): publish them, and the installed app picks them up the next time it's opened
+  twice (once to download, once to use):
+  `npx eas-cli@latest update --channel preview --message "what changed"`
+- New native packages, permissions or icons in `app.json`, or a new Expo SDK: build a new APK and install it:
+  `npx eas-cli@latest build --platform android --profile preview`
 
-**Hosted on Expo, so the computer can be off.** Make a free account at expo.dev, then once:
+**iPhone:** an installable build needs an Apple developer account (`--platform ios`, the same commands otherwise).
 
-```sh
-cd mobile
-npx eas-cli@latest login
-npx eas-cli@latest init            # links the app to your Expo account
-npx eas-cli@latest update:configure
-```
-
-and each time the app changes:
-
-```sh
-npx eas-cli@latest update --branch main --message "what changed"
-```
-
-Open the project on expo.dev → Updates, and scan the update's QR code with Expo Go.
-
-**Its own app (Android), without Expo Go:** `npx eas-cli@latest build -p android --profile preview` builds an APK
-on Expo's servers and gives you a link to install it. On iPhone, an installable build needs an Apple developer account.
+**For development** you can still run it from a computer with Expo Go: `npm install`, then `npx expo start --tunnel`.
 
 ## Pairing
 
