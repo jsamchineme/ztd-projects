@@ -326,7 +326,7 @@ const boardLink = u => String(u || '').replace(/^http:\/\/(localhost|127\.0\.0\.
 const domain = u => String(u || '').replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
 const LS = { get(k, d){ try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
 
-let cfg, stages = {}, cards = [], workflows = [], auditing = new Set(), crawling = new Set(), wfOpen = false, wfEdit = null, tab = LS.get('pipeline.tab', 'production'), openId = null, me = LS.get('pipeline.me', '');
+let cfg, stages = {}, cards = [], workflows = [], maxWorkers = 0, maxWorkersCap = 10, auditing = new Set(), crawling = new Set(), wfOpen = false, wfEdit = null, tab = LS.get('pipeline.tab', 'production'), openId = null, me = LS.get('pipeline.me', '');
 
 // ---------- api ----------
 async function api(method, path, body){
@@ -644,7 +644,7 @@ async function load(){
     try {
       const [r, w, n] = await Promise.all([api('GET', '/cards'), api('GET', '/workflows'), api('GET', `/notifications?after=${lastNote ?? 0}`).catch(() => null)]);
       if (n) gotNotes(n);
-      cards = r.cards; workflows = w.workflows; auditing = new Set(r.auditing || []); crawling = new Set(r.crawling || []);
+      cards = r.cards; workflows = w.workflows; maxWorkers = w.maxWorkers; maxWorkersCap = w.maxWorkersCap; auditing = new Set(r.auditing || []); crawling = new Set(r.crawling || []);
       render();
       renderWfButton();
       if (wfOpen && !wfEdit) renderWf();
@@ -908,6 +908,9 @@ function wfListHtml(){
   return `<div class="ph"><div class="t"><h2>Workflows</h2><div class="sub">AI workers move cards through the queues you choose.</div></div><button class="x" data-wf-close aria-label="Close">×</button></div>
     <div class="pb">
       <button class="btn primary" data-wf-new style="align-self:flex-start">New workflow</button>
+      <label class="f" style="margin:0"><span>Cards worked at once, across all workflows</span>
+        <select class="in" id="wfMax" style="width:auto">${maxWorkers > 0 ? '' : '<option value="" selected>No limit</option>'}${Array.from({ length: maxWorkersCap }, (_, i) => i + 1).map(n => `<option value="${n}" ${n === maxWorkers ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+      <p class="hint" style="margin:-6px 0 0">Other workers wait their turn. Each card uses Chrome on the server, so raise this with care.</p>
       ${items || `<p class="hint" style="margin:0">No workflows yet. A workflow is a list of steps: each step runs Claude workers on one queue, and when a worker finishes a card it moves to the next bucket, where the next step picks it up.</p>`}
     </div>`;
 }
@@ -982,6 +985,7 @@ $('#wf').addEventListener('input', e => {
 });
 $('#wf').addEventListener('change', e => {
   const t = e.target;
+  if (t.id === 'wfMax') return act(() => api('PATCH', '/settings', { maxWorkers: Number(t.value) }), `Up to ${t.value} card${t.value === '1' ? '' : 's'} at once`);
   if (t.dataset.s && t.tagName === 'SELECT'){
     const i = Number(t.dataset.i);
     if (t.dataset.s === 'stage') wfEdit.steps[i] = { ...newStep(t.value), workers: wfEdit.steps[i].workers, limit: wfEdit.steps[i].limit };

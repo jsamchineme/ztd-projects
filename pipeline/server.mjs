@@ -51,6 +51,9 @@ let db = { nextId: 1, cards: [] };
 if (existsSync(DATA)) db = JSON.parse(await readFile(DATA, 'utf8'));
 db.workflows ||= [];
 db.nextWorkflowId ||= 1;
+db.settings ||= {}; // set from the board; each falls back to config
+const MAX_WORKERS = 10;
+const maxWorkers = () => db.settings.maxWorkers ?? config.maxWorkers ?? 0;
 // Workers die with the server, so give back any cards they were holding.
 for (const c of db.cards) if (c.claim?.run){ c.claim = null; c.history.push({ at: new Date().toISOString(), by: 'server', action: 'release', note: 'Server restarted while an AI worker had it' }); }
 let version = 0, saving = Promise.resolve();
@@ -266,7 +269,7 @@ async function crawlCard(c, by, { force = false } = {}){
 }
 
 const runner = createRunner({
-  stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter, previewUrl,
+  stages, config, claim, complete, setFields, log, save, broadcast, nextFor, enter, previewUrl, maxWorkers,
   workDir: id => join(WORK, String(id)),
   auditCard: auditMod && auditCard, hasPreview, crawlCard: crawlMod && crawlCard,
   auditScript: join(ROOT, 'audit.mjs'), root: ROOT, notify: notifier.notify
@@ -315,10 +318,19 @@ async function api(req, res, url){
     if (parts[1] === 'test' && m === 'POST'){ notifier.test(); broadcast(); return send(res, 200, { ok: true, email: notifier.emailReady() }); }
     throw new ApiError(404, 'Not found');
   }
+  if (parts[0] === 'settings' && m === 'PATCH'){
+    if ('maxWorkers' in body){
+      const n = Number(body.maxWorkers);
+      if (!Number.isInteger(n) || n < 1 || n > MAX_WORKERS) throw new ApiError(400, `Cards at once must be a whole number from 1 to ${MAX_WORKERS}`);
+      db.settings.maxWorkers = n;
+    }
+    save(); broadcast();
+    return send(res, 200, { maxWorkers: maxWorkers() });
+  }
   if (parts[0] === 'workflows'){
     const withRun = w => ({ ...w, run: runner.status(w.id) });
     if (parts.length === 1){
-      if (m === 'GET') return send(res, 200, { workflows: db.workflows.map(withRun) });
+      if (m === 'GET') return send(res, 200, { workflows: db.workflows.map(withRun), maxWorkers: maxWorkers(), maxWorkersCap: MAX_WORKERS });
       if (m === 'POST'){
         const w = { id: db.nextWorkflowId++, ...cleanWorkflow(body), createdAt: now(), updatedAt: now() };
         db.workflows.push(w); save();
