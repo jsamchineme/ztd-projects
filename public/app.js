@@ -50,8 +50,10 @@ async function route(){
   if (!state.me.user.twoFactorEnabled) return mfaSetupScreen();
 
   shell();
-  const main = $('#main');
-  main.replaceChildren();
+  // Each visit draws into its own view. If another visit starts while this one still waits for the server, it
+  // replaces the view, so the slower one can't add a second copy of the page (see isCurrent in project.js).
+  const main = h('div', { class: 'view' });
+  $('#main').replaceChildren(main);
   const pm = path.match(/^\/p\/([^/]+)(?:\/([a-z]+))?(?:\/([^/]+))?/);
   if (!pm || sideChats.dataset.project !== pm[1]) sideChats.replaceChildren();   // no stale chats while another project loads
   sideChats.dataset.project = pm?.[1] || '';
@@ -81,6 +83,7 @@ async function renderHome(main){
   const page = h('div', { class: 'page', style: { flex: 1 } });
   main.append(page);
   const projects = await refreshProjects();
+  if (!page.isConnected) return;   // left before the projects arrived
   if (!projects.length){
     page.append(h('div', { class: 'page-inner narrow welcome' },
       h('img', { src: '/icon.svg', alt: '', width: 56, height: 56 }),

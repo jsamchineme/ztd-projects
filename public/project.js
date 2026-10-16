@@ -16,6 +16,7 @@ export async function renderProject(main, id, tab, sub){
   let project;
   try { project = await api('GET', `/api/projects/${id}`); }
   catch (e){ main.append(h('div', { class: 'page' }, h('div', { class: 'error-box' }, e.message))); return; }
+  if (!main.isConnected) return;   // another page opened while this one loaded
   localStorageSet('lastProject', id);
   setTitle(project.name);
   if (!TABS.some(t => t[0] === tab)) tab = 'chat';
@@ -87,6 +88,8 @@ function sideChatList(ctx){
   const { id } = ctx;
   const el = sideChats;
   el.replaceChildren();
+  const owner = el._owner = {};   // a newer project page takes the list over; this one then stops touching it
+  const mine = () => el._owner === owner;
   let showArchived = false;
   const openId = () => location.pathname.match(/\/chat\/([^/]+)$/)?.[1];   // a new chat gets its id in the address after the first message
   const chatLink = (c, open) => h('div', { class: 'chat-row', 'data-chat': c.id },
@@ -96,6 +99,7 @@ function sideChatList(ctx){
     c.mine || ctx.project.canManage ? h('button', { type: 'button', class: 'btn ghost small chat-more', 'aria-label': `Options for ${c.title}`, title: 'Archive or delete', onclick: () => chatOptions(c) }, ico('more')) : null);
   async function loadList(){
     const chats = await api('GET', `/api/projects/${id}/chats`);
+    if (!mine()) return chats;
     const open = openId();
     if (location.pathname.includes('/chat')) ctx.setSub(chats.find(c => c.id === open)?.title || 'New chat');
     const active = chats.filter(c => !c.archivedAt), archived = chats.filter(c => c.archivedAt);
@@ -137,7 +141,7 @@ function sideChatList(ctx){
   }
   ctx.loadList = loadList;
   ctx.chatsReady = loadList().catch(e => { fail(e); return []; });
-  const timer = setInterval(() => loadList().catch(() => {}), 10000);
+  const timer = setInterval(() => { if (mine()) loadList().catch(() => {}); else clearInterval(timer); }, 10000);
   onLeave(() => clearInterval(timer));
 }
 
@@ -150,6 +154,7 @@ async function chatTab(ctx, chatId){
     h('button', { type: 'button', class: 'btn ghost topbar-icon', 'aria-label': 'New chat', title: 'New chat', onclick: () => go(`/p/${id}/chat/new`) }, ico('plus')));
   body.append(chatEl);
   const chats = await ctx.chatsReady;
+  if (!chatEl.isConnected) return;   // left while the list loaded: don't redirect from a page that's gone
   if (!chatId){
     const recent = chats.find(c => c.mine && !c.archivedAt);
     if (recent) return go(`/p/${id}/chat/${recent.id}`, true);
@@ -305,7 +310,8 @@ function renderChat(ctx, el, chatId, loadList){
 
   const atBottom = () => transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 120;
   let autoUntil = 0;   // scrolls made by the code (following new output) don't count as the reader scrolling
-  const scroll = (force) => { if (force || atBottom()){ autoUntil = Date.now() + 200; transcript.scrollTop = transcript.scrollHeight; } };
+  let replaying = false;   // while a saved chat is drawn, scroll once at the end instead of after every event
+  const scroll = (force) => { if (replaying && !force) return; if (force || atBottom()){ autoUntil = Date.now() + 200; transcript.scrollTop = transcript.scrollHeight; } };
   // Phones: the top bar slides away while reading on through a long conversation, and comes back when scrolling back.
   let lastTop = 0, moved = 0, touchedAt = 0;
   for (const type of ['touchstart', 'touchmove', 'wheel']) transcript.addEventListener(type, () => { touchedAt = Date.now(); }, { passive: true });
@@ -471,8 +477,10 @@ function renderChat(ctx, el, chatId, loadList){
       chat = r.chat;
       if (chat.model){ model.value = chat.model; paintGear(); }
       if (chat.archivedAt) archivedNote.hidden = false;
+      if (!el.isConnected) return;
       inner.replaceChildren(working);
-      for (const ev of r.events){ lastSeq = ev.seq; addEvent(ev); }
+      replaying = true;
+      try { for (const ev of r.events){ lastSeq = ev.seq; addEvent(ev); } } finally { replaying = false; }
       if (!r.events.length) inner.insertBefore(emptyState(), working);
       setRunning(chat.running);
       scroll(true);

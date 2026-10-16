@@ -99,6 +99,16 @@ export function seed(){
       ev('result', { ok: true, durationMs: 188000, turns: 22, costUsd: 1.32 }),
     ] },
   ];
+  // PREVIEW_BIG_CHAT=1: a very long chat (like a whole day's session), for checking the chat page stays fast.
+  if (process.env.PREVIEW_BIG_CHAT){
+    const events = [];
+    for (let r = 0; r < 150; r++){
+      events.push(ev('user', { ...me, text: `Round ${r}: please change something in the sidebar and check it` }), ev('thinking', { text: 'Look first.' }), ev('text', { text: `Looking at round ${r}. Here is **some** markdown with \`code\` and a list:\n\n- one\n- two` }));
+      for (let k = 0; k < 6; k++) events.push(ev('tool', { id: `b${r}-${k}`, name: ['Read', 'Edit', 'Bash', 'Grep', 'Write', 'Bash'][k], input: { file_path: '/srv/projects/studio-src/repo/public/app.js', command: 'npm test', pattern: 'nav-item' } }), ev('tool_result', { id: `b${r}-${k}`, text: 'ok\n'.repeat(20) }));
+      events.push(ev('text', { text: `Done with round ${r}.` }), ev('result', { ok: true, durationMs: 17000, turns: 7, costUsd: 0.13 }));
+    }
+    chats.push({ id: 'big', projectId: 'p1', userId: 'u1', title: 'A very long chat', model: 'opus', mode: 'edit', updatedAt: t, events });
+  }
   for (const c of chats){ c.createdAt = c.updatedAt - hr; c.archivedAt ??= null; c.running ??= false; c.events.forEach((e, i) => { if (e.type === 'tool_result') e.isError = !!e.isError; e.seq = i; e.at = c.updatedAt - (c.events.length - i) * 20000; }); }
 
   const gitState = {
