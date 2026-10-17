@@ -9,11 +9,14 @@ SRC="$(cd "$(dirname "$0")/.." && pwd)"
 SHOTS="${1:-/tmp/studio-test-shots}"
 PORT="${STUDIO_TEST_PORT:-4310}"
 CHROME_BIN="${CHROME_BIN:-$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)}"
+# macOS keeps Chrome in an app bundle, off PATH.
+[ -n "$CHROME_BIN" ] || for c in "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" "/Applications/Chromium.app/Contents/MacOS/Chromium"; do [ -x "$c" ] && CHROME_BIN="$c" && break; done
 [ -n "$CHROME_BIN" ] || { echo "No Chrome found: set CHROME_BIN"; exit 2; }
 export CHROME_BIN
 
-# Packages, cached by the lock file's hash.
-CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/studio-test/$(sha1sum "$SRC/package-lock.json" | cut -c1-12)"
+# Packages, cached by the lock file's hash (sha1sum on Linux, shasum on macOS).
+sha1(){ if command -v sha1sum >/dev/null 2>&1; then sha1sum "$1"; else shasum "$1"; fi; }
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/studio-test/$(sha1 "$SRC/package-lock.json" | cut -c1-12)"
 if [ ! -d "$CACHE/node_modules" ]; then
   echo "Installing packages into $CACHE (once)…"
   rm -rf "$CACHE"; mkdir -p "$CACHE"
@@ -21,10 +24,12 @@ if [ ! -d "$CACHE/node_modules" ]; then
   ( cd "$CACHE" && npm ci --no-audit --no-fund >/dev/null )
 fi
 
-# A copy of the code as it is now, with its own data folder.
-WORK=$(mktemp -d /tmp/studio-test.XXXXXX)
+# A copy of the code as it is now, with its own data folder. pwd -P resolves symlinks (on macOS /tmp -> /private/tmp),
+# so paths here match a process's resolved cwd — Claude's session folder is keyed on the project path.
+WORK=$(cd "$(mktemp -d /tmp/studio-test.XXXXXX)" && pwd -P)
 SERVER=
 cleanup(){
+  set +e   # teardown must finish and keep the real exit code, even if a process is already gone (kill fails on macOS)
   touch "$WORK/stop"
   [ -n "$SERVER" ] && kill "$SERVER" 2>/dev/null
   [ -f "$WORK/server.pid" ] && kill "$(cat "$WORK/server.pid")" 2>/dev/null
@@ -34,7 +39,12 @@ cleanup(){
 }
 trap cleanup EXIT
 mkdir -p "$WORK/app" "$WORK/data" "$WORK/mock"
-( cd "$SRC" && git ls-files -z --cached --others --exclude-standard | while IFS= read -r -d '' f; do [ -e "$f" ] && printf '%s\0' "$f"; done | xargs -0 cp --parents -t "$WORK/app" )
+# Copy each tracked or untracked (non-ignored) file, keeping its folder. Plain cp/mkdir, so it works on macOS too
+# (GNU-only `cp --parents -t` isn't on BSD/macOS).
+( cd "$SRC" && git ls-files -z --cached --others --exclude-standard | while IFS= read -r -d '' f; do
+    [ -e "$f" ] || continue
+    mkdir -p "$WORK/app/$(dirname "$f")" && cp "$f" "$WORK/app/$f"
+  done )
 ln -s "$CACHE/node_modules" "$WORK/app/node_modules"
 
 if curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/"; then echo "Port $PORT is in use: set STUDIO_TEST_PORT"; exit 2; fi

@@ -32,22 +32,22 @@ trap 'failed "$BASH_COMMAND"' ERR
 if ! remote=$(git ls-remote "$URL" 'refs/heads/*' 2>&1); then
   trap - ERR; report 0 "GitHub refused the connection. Check the repo address, and that the deploy key is added with write access. ($(echo "$remote" | tail -1))"; exit 1
 fi
-declare -A there=()
-while read -r sha ref; do [ -n "$ref" ] && there[$ref]=$sha; done <<< "$remote"
-if [ -n "${there[refs/heads/main]:-}" ]; then git fetch -q --no-tags "$URL" +refs/heads/main:refs/heads/main; fi
+# The sha GitHub has for a ref, looked up without bash-4 associative arrays (macOS ships bash 3.2).
+there(){ printf '%s\n' "$remote" | awk -v r="$1" '$2==r{print $1; exit}'; }
+if [ -n "$(there refs/heads/main)" ]; then git fetch -q --no-tags "$URL" +refs/heads/main:refs/heads/main; fi
 prev=$(git rev-parse -q --verify refs/heads/main || true)
 
 push=() changed=() list=()
 for dir in "$PROJECTS"/*/repo; do
   slug=$(basename "$(dirname "$dir")")
   [[ "$slug" =~ ^[a-z][a-z0-9-]*[a-z0-9]$ ]] && [ -d "$dir/.git" ] || continue
-  owner=$(stat -c %U "$dir")
+  owner=$(stat -c %U "$dir" 2>/dev/null || stat -f %Su "$dir")   # GNU stat on Linux, BSD stat on macOS (tests)
   [ "$owner" != root ] || continue
   if [ "$(id -u)" = 0 ]; then up="/usr/sbin/runuser -u $owner -- git upload-pack"; else up="git upload-pack"; fi
   git fetch -q --no-tags --upload-pack="$up" "$dir" "+HEAD:refs/projects/$slug" 2>/dev/null || continue   # no commits yet
   head=$(git rev-parse "refs/projects/$slug")
   list+=("- **$slug**, branch \`projects/$slug\`: $(git log -1 --format='%s (%h, %cs)' "$head")")
-  if [ "${there[refs/heads/projects/$slug]:-}" != "$head" ]; then push+=("+refs/projects/$slug:refs/heads/projects/$slug"); changed+=("$slug"); fi
+  if [ "$(there "refs/heads/projects/$slug")" != "$head" ]; then push+=("+refs/projects/$slug:refs/heads/projects/$slug"); changed+=("$slug"); fi
 done
 
 # main: just a README listing every project and its branch.
