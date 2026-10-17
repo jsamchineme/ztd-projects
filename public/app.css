@@ -243,7 +243,11 @@ table.audit td.mono { font-size: 12px; } table.audit td.mono::before { content: 
 .chat-row { position: relative; }
 .chat-row .nav-item { padding-right: 34px; }
 .btn.chat-more { position: absolute; right: 3px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; min-height: 0; padding: 0; opacity: 0; box-shadow: none; }
-.chat-row:hover .chat-more, .chat-more:focus-visible, .chat-row .active ~ .chat-more { opacity: 1; }
+.chat-more:focus-visible, .chat-row .active ~ .chat-more { opacity: 1; }
+/* Only reveal the ⋯ button on hover where there is a real hover. On touch screens a hover-revealed button makes
+   Safari spend the first tap on the hover, so a chat took two taps to open; there the button just shows. */
+@media (hover: hover) { .chat-row:hover .chat-more { opacity: 1; } }
+@media (hover: none) { .btn.chat-more { opacity: 1; } }
 .chat-quote { margin: 0 0 10px; padding: 9px 14px; border-left: 3px solid var(--gold); background: var(--sunken); border-radius: var(--r-sm); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .side-foot { border-top: 1px solid var(--line); padding: 8px; display: flex; align-items: center; gap: 2px; }
 .me { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--r); text-decoration: none; color: var(--text); }

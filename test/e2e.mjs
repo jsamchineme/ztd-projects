@@ -682,6 +682,22 @@ await check('phone layout: chat usable at 390px', async () => {
   await page.screenshot({ path: `${SHOTS}/11-phone.png` });
   await page.setViewportSize({ width: 1280, height: 860 });
 }, page);
+await check('tablet: the chat list has no hover-only buttons, so one tap opens a chat', async () => {
+  const tc = await browser.newContext({ userAgent: UA, viewport: { width: 1024, height: 1366 }, hasTouch: true, isMobile: true, storageState: await ctx.storageState() });
+  try {
+    const tp = await tc.newPage();
+    await tp.goto(projectUrl + '/chat');
+    if (!await tp.evaluate(() => matchMedia('(hover: none)').matches)) throw new Error('the touch context still reports hover');
+    const rows = tp.locator('.chat-list .chat-row');
+    await rows.first().waitFor();
+    await tp.waitForFunction(() => [...document.querySelectorAll('.chat-list .chat-more')].at(-1)?.isConnected, null, { timeout: 5000 });
+    const opacity = await tp.evaluate(() => getComputedStyle([...document.querySelectorAll('.chat-list .chat-more')].at(-1)).opacity);
+    if (opacity !== '1') throw new Error('the ⋯ button is hidden until hover on touch screens (opacity ' + opacity + ')');
+    const href = await rows.last().locator('a.nav-item').getAttribute('href');
+    await rows.last().locator('a.nav-item').tap();
+    await tp.waitForURL(u => u.pathname === href);
+  } finally { await tc.close(); }
+}, page);
 await check('stop button interrupts a long run', async () => {
   await page.goto(projectUrl + '/chat/new');
   await page.fill('textarea', 'slow task please');

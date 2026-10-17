@@ -65,7 +65,9 @@ switch (cmd){
   case 'git': {
     const cwd = repo(a[0]);
     if (!existsSync(join(cwd, '.git'))){ console.error('Not a git repository'); process.exit(3); }
-    const g = (...x) => spawnSync('git', x, { cwd, encoding: 'utf8' });
+    // Without the identity of whoever runs the tests (a Studio chat sets GIT_AUTHOR_* etc.), as studio-ctl's clean env is.
+    const gitEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_(AUTHOR|COMMITTER)_/.test(k)));
+    const g = (...x) => spawnSync('git', x, { cwd, encoding: 'utf8', env: gitEnv });
     const act = a[1];
     if (act === 'status') process.stdout.write(g('status', '--porcelain=v1', '-b', '--untracked-files=all').stdout);
     else if (act === 'diff'){ process.stdout.write(g('diff', 'HEAD').stdout); for (const f of g('ls-files', '--others', '--exclude-standard').stdout.split('\n').filter(Boolean)) process.stdout.write(g('diff', '--no-index', '/dev/null', f).stdout); }
