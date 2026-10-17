@@ -5,6 +5,8 @@ import { spawn, spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, cpSync, rmSync, openSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gzipSync, gunzipSync } from 'node:zlib';
+import * as gitsync from '../ops/gitsync.mjs';
 
 const ROOT = process.env.MOCK_ROOT;
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -19,6 +21,12 @@ const repo = p => join(P, p, 'repo');
 const readStdin = () => { try { return readFileSync(0, 'utf8'); } catch { return ''; } };
 const alive = pid => { try { process.kill(pid, 0); return true; } catch { return false; } };
 const [cmd, ...a] = process.argv.slice(2);
+// Claude's home for chats run here (sessions are kept under it), apart from the real one of whoever runs the tests.
+const HOME = join(ROOT, 'home');
+const projectGit = p => (args, { input, env } = {}) => {
+  const r = spawnSync('git', args, { cwd: repo(p), input, env: { ...process.env, ...env }, maxBuffer: 1 << 30 });
+  return { status: r.status, stdout: r.stdout || Buffer.alloc(0), stderr: String(r.stderr || '') };
+};
 
 function startUnit(u){
   const x = st.units[u]; if (!x) throw new Error('no unit');
@@ -89,11 +97,33 @@ switch (cmd){
     if (!req.token && !req.apiKey){ console.error('No Claude connection'); process.exit(4); }
     const args = ['-p', '--output-format', 'stream-json', '--verbose', '--model', a[1], '--permission-mode', a[2] === 'plan' ? 'plan' : 'bypassPermissions'];
     if (a[3] && a[3] !== '-') args.push('--resume', a[3]);
-    const c = spawn('node', [FAKE, ...args], { cwd: repo(a[0]), env: { ...process.env, CLAUDE_CODE_OAUTH_TOKEN: req.token || '', ANTHROPIC_API_KEY: req.apiKey || '', ...(req.email ? { GIT_AUTHOR_NAME: req.name, GIT_COMMITTER_NAME: req.name, GIT_AUTHOR_EMAIL: req.email, GIT_COMMITTER_EMAIL: req.email } : {}) }, stdio: ['pipe', 'inherit', 'inherit'] });
+    const c = spawn('node', [FAKE, ...args], { cwd: repo(a[0]), env: { ...process.env, HOME, CLAUDE_CODE_OAUTH_TOKEN: req.token || '', ANTHROPIC_API_KEY: req.apiKey || '', ...(req.email ? { GIT_AUTHOR_NAME: req.name, GIT_COMMITTER_NAME: req.name, GIT_AUTHOR_EMAIL: req.email, GIT_COMMITTER_EMAIL: req.email } : {}) }, stdio: ['pipe', 'inherit', 'inherit'] });
     c.stdin.end(req.prompt);
     process.on('SIGTERM', () => c.kill('SIGTERM'));
     c.on('exit', code => process.exit(code ?? 1));
     break;
+  }
+  // Chats on people's computers (lib/runner.mjs), as studio-ctl does them.
+  case 'sync-out': {
+    const req = JSON.parse(readStdin() || '{}'), git = projectGit(a[0]);
+    const snap = gitsync.snapshot(git), b = gitsync.bundle(git, snap.snap, req.have || []);
+    console.log(JSON.stringify({ ...snap, bundle: b ? b.toString('base64') : null })); break;
+  }
+  case 'sync-in': {
+    const req = JSON.parse(readStdin() || '{}'), git = projectGit(a[0]);
+    if (req.bundle) gitsync.unbundle(git, Buffer.from(req.bundle, 'base64'), req.after);
+    console.log(JSON.stringify(gitsync.applyBack(git, req))); break;
+  }
+  case 'session-export': {
+    const f = join(gitsync.sessionDir(join(HOME, '.claude'), repo(a[0])), `${a[1]}.jsonl`);
+    if (existsSync(f)) process.stdout.write(gzipSync(readFileSync(f)).toString('base64'));
+    break;
+  }
+  case 'session-import': {
+    const dir = gitsync.sessionDir(join(HOME, '.claude'), repo(a[0]));
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, `${a[1]}.jsonl`), gunzipSync(Buffer.from(readStdin().trim(), 'base64')));
+    console.log('{"ok":true}'); break;
   }
   case 'github-backup': {
     // The real ops/github-backup.sh, pushing to a local bare repo that stands in for GitHub.

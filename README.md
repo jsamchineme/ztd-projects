@@ -33,6 +33,9 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `lib/notify.mjs` | Notifications each person chooses on the Account page, by email and on their phone |
 | `lib/phone.mjs` | Phone notifications: pairing phones (a code shown once as a QR code; only its hash is kept), the WebSocket at `/api/phone/socket` the phone app keeps open, and a day of messages for phones that were offline |
 | `lib/webpush.mjs` | Web push: Studio added to a phone's Home Screen (or open in a desktop browser) gets notifications while closed. Studio's VAPID keys (made once, the private one encrypted), each browser's subscription (only real push services' addresses are accepted), and sending encrypted pushes. `public/sw.js` shows them; `public/push.js` turns them on and off and tells Studio when it's open, which stops reminders. |
+| `lib/runner.mjs` | People's own computers running their chats (Account → Your computers). See "Running chats on your own computer" below. |
+| `runner/` | What runs on such a computer: `studio-runner.mjs`, and `install.sh`, which the install command on the Account page fetches. Studio serves both at `/runner/`. |
+| `ops/gitsync.mjs` | Moving a project's files between Studio and a computer with git: snapshots of the working tree, bundles, and a three-way merge back. Used by `studio-ctl` (installed next to it), the runner and the tests. |
 | `lib/claude.mjs` | Each user's Claude connection: a subscription token via `claude setup-token`, or an API key. Stored encrypted (AES-256-GCM). |
 | `lib/ctl.mjs` | Runs `studio-ctl` through sudo |
 | `ops/studio-ctl.mjs` | The root helper. It's the only privileged code. AI agents (user `ztd` or a project's own user) may run only `status`, and `svc` and `logs` for projects that run as their own user. |
@@ -45,6 +48,34 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `mobile/` | The phone app (Expo, React Native) that rings for phone notifications. See `mobile/README.md`. Not installed on the server. |
 | `public/` | The front end. Plain ES modules, no build step and no CDNs. |
 | `test/` | `mock-ctl.mjs` and `e2e.mjs`: a 26-step browser test against a throwaway local instance |
+
+## Running chats on your own computer
+
+The server is small (2 CPUs, 4 GB). Anyone can add their own computer under **Account → Your computers** to run their chats on it, with its own CPU, memory and Claude Code login. The page shows a one-line command, with a code that's shown once (Studio keeps only its hash). That command installs Studio Runner in `~/StudioRunner`, with a LaunchAgent on a Mac, so it starts at login. It needs Node.js 22+, git and Claude Code signed in. The runner keeps an outgoing WebSocket open to `/api/runner/socket`, so nothing on the computer is opened to the internet.
+
+- **Whose chats:** only the computer owner's own prompts run on it, never teammates'. Each chat has a **Runs on** choice next to the model:
+  - **Auto:** the owner's computer if it's connected and has room, otherwise the server;
+  - **Your computer:** the computer, or an error;
+  - **Studio server.**
+
+  A computer runs up to 2 chats at once by default, and one at a time per project.
+- **Files:** the project stays on the server.
+  - Before each turn, Studio sends a snapshot of the folder, uncommitted changes included, as a git bundle with only what the computer lacks.
+  - The runner makes its copy (`~/StudioRunner/projects/<project>`) match it, keeping ignored files like `node_modules`.
+  - After the turn, the runner sends back a snapshot of its copy. Studio merges the difference into the project folder (`studio-ctl sync-in`), with conflict markers where someone changed the same lines meanwhile.
+  - Commits Claude made there become the project's if its history hasn't moved meanwhile; otherwise they come in as uncommitted changes.
+  - Changes that can't be added are kept in git as `refs/studio/unapplied/…`.
+- **Claude's session:** after every turn on a computer, its session transcript is copied to the project user's `~/.claude` on the server (`studio-ctl session-import`). Before a turn on a computer, if the chat last ran elsewhere, the server's copy goes to the computer. So a chat can switch between turns in either direction and Claude remembers it. Claude is told when a chat has moved, since the paths differ.
+- **Interruptions:** a turn on a computer carries on if its connection drops or Studio restarts.
+  - The runner keeps the output and the changes (in `~/StudioRunner/pending`) until Studio has them, and Studio picks up from the last line it had.
+  - If the computer doesn't come back within 15 minutes, Studio ends the turn. Its changes come in when it reconnects.
+  - Chats never move to the server in the middle of a turn.
+- **Limits:**
+  - Turns on a computer use its own Claude, so they don't count against daily budgets.
+  - Claude there can't restart the server's services, so it says which ones need a restart.
+  - Attachments are sent along with the prompt.
+  - Claude runs with full permissions as the computer's user.
+- **Updates:** runners update themselves to the version Studio serves, between turns.
 
 ## Server layout
 

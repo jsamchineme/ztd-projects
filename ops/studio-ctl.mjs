@@ -7,6 +7,8 @@ import { spawn, spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, readdirSync, renameSync, chmodSync, cpSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
+import { gzipSync, gunzipSync } from 'node:zlib';
+import * as gitsync from './gitsync.mjs';
 
 const CONF_FILE = '/etc/studio/ctl.json';
 const CONF = JSON.parse(readFileSync(CONF_FILE, 'utf8'));
@@ -39,6 +41,16 @@ const AGENT_USERS = new Set([RUN_USER, ...Object.values(PROJECT_USERS)]);
 const uploads = p => join(CONF.uploadsDir || '/srv/studio-uploads', slug(p));   // chat attachments, written by Studio
 const sh = (cmd, args, opts = {}) => spawnSync(cmd, args, { encoding: 'utf8', ...opts });
 const asUser = (user, args, opts = {}) => sh(RUNUSER, ['-u', user, '--', ...args], { env: userEnv(user), ...opts });
+// git in a project folder as its user, for ops/gitsync.mjs: git(args, { input, env }) -> { status, stdout (Buffer), stderr }.
+function projectGit(p){
+  const cwd = repo(p), user = userOf(p);
+  if (!existsSync(join(cwd, '.git'))) die('Not a git repository', 3);
+  return (args, { input, env } = {}) => {
+    const r = sh(RUNUSER, ['-u', user, '--', 'git', '-c', 'core.quotepath=off', '-c', `safe.directory=${cwd}`, ...args],
+      { cwd, input, env: userEnv(user, env), encoding: 'buffer', maxBuffer: 1024 * 1024 * 1024 });
+    return { status: r.status, stdout: r.stdout || Buffer.alloc(0), stderr: String(r.stderr || r.error?.message || '') };
+  };
+}
 function userEnv(user, extra = {}){
   return { HOME: homeOf(user), USER: user, LOGNAME: user, LANG: 'C.UTF-8', PATH: '/usr/local/bin:/usr/bin:/bin', ...extra };
 }
@@ -487,6 +499,45 @@ WantedBy=multi-user.target
     });
     if (r.status !== 0) die((r.stderr || r.error?.message || 'The check failed').trim().split('\n').pop(), 1);
     process.stdout.write(r.stdout.trim().split('\n')[0] + '\n');
+  },
+  // ----- chats on people's own computers (lib/runner.mjs): moving files and Claude's sessions, as the project user -----
+  'sync-out'(p){
+    // stdin: {"have":[commits the computer has]}. Prints {"branch","head","snap","bundle": base64 or null}: a snapshot of
+    // the project folder and what the computer lacks of it (see ops/gitsync.mjs).
+    const req = JSON.parse(readStdin() || '{}');
+    const git = projectGit(p);
+    const s = gitsync.snapshot(git);
+    const b = gitsync.bundle(git, s.snap, (Array.isArray(req.have) ? req.have : []).filter(h => gitsync.SHA.test(h)).slice(0, 10));
+    console.log(JSON.stringify({ ...s, bundle: b ? b.toString('base64') : null }));
+  },
+  'sync-in'(p){
+    // stdin: {"base","head","after","headAfter","bundle": base64 or null}. Adds the computer's changes to the project
+    // folder. Prints {"changed","conflicts","commits","unapplied"}.
+    const req = JSON.parse(readStdin() || '{}');
+    for (const k of ['base', 'head', 'after', 'headAfter']) need(req[k], gitsync.SHA, k);
+    const git = projectGit(p);
+    if (req.bundle) gitsync.unbundle(git, Buffer.from(String(req.bundle), 'base64'), req.after);
+    const r = gitsync.applyBack(git, req);
+    log(`sync-in ${p}: ${r.changed ? 'changed' : 'no changes'}${r.conflicts.length ? `, ${r.conflicts.length} conflicts` : ''}`);
+    console.log(JSON.stringify(r));
+  },
+  'session-export'(p, id){
+    // Prints a chat's Claude session (its transcript, gzipped, in base64), or nothing if there isn't one.
+    need(id, gitsync.SESSION, 'session');
+    const user = userOf(p);
+    const r = asUser(user, ['cat', join(gitsync.sessionDir(join(homeOf(user), '.claude'), repo(p)), `${id}.jsonl`)], { encoding: 'buffer', maxBuffer: 512 * 1024 * 1024 });
+    if (r.status === 0 && r.stdout.length) process.stdout.write(gzipSync(r.stdout).toString('base64'));
+  },
+  'session-import'(p, id){
+    // stdin: a session transcript, gzipped, in base64. Saved where `claude --resume` looks for it in the project folder.
+    need(id, gitsync.SESSION, 'session');
+    const data = gunzipSync(Buffer.from(readStdin().trim(), 'base64'), { maxOutputLength: 512 * 1024 * 1024 });
+    const user = userOf(p);
+    const dir = gitsync.sessionDir(join(homeOf(user), '.claude'), repo(p));
+    if (asUser(user, ['mkdir', '-p', dir]).status !== 0) die('Could not make the session folder', 1);
+    const r = asUser(user, ['sh', '-c', 'cat > "$1"', 'sh', join(dir, `${id}.jsonl`)], { input: data });
+    if (r.status !== 0) die(r.stderr || 'Could not save the session', 1);
+    console.log(JSON.stringify({ ok: true }));
   },
   'claude-token'(){
     // Runs `claude setup-token` under a pty. Studio relays the sign-in link and the pasted code; the token is printed at the end.

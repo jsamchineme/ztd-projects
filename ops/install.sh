@@ -52,6 +52,7 @@ chmod 755 "$APP"
 
 # Root helper and starters
 install_helpers(){
+  install -m 644 -o root -g root "$APP/ops/gitsync.mjs" /usr/local/lib/studio/gitsync.mjs   # studio-ctl imports it
   install -m 755 -o root -g root "$APP/ops/studio-ctl.mjs" /usr/local/lib/studio/studio-ctl.mjs
   install -m 755 -o root -g root "$APP/ops/fake-claude.mjs" /usr/local/lib/studio/fake-claude.mjs
   ln -sf /usr/local/lib/studio/studio-ctl.mjs /usr/local/sbin/studio-ctl

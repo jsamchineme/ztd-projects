@@ -187,6 +187,22 @@ function renderChat(ctx, el, chatId, loadList){
   model.value = localStorageGet('model') || 'opus';
   model.onchange = () => { localStorageSet('model', model.value); paintGear(); };
   let mode = localStorageGet('mode') || 'edit';
+  // Where turns run, for people who've added a computer (Account → Your computers, lib/runner.mjs).
+  const hint = h('div', { class: 'composer-hint' });
+  const paintHint = () => { hint.textContent = 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach' + (micBtn ? ' · Tap the mic to speak' : '') +
+    (runOn.hidden || runOn.value === 'server' ? ' · Claude works in this project’s folder on the server' : runOn.value === 'computer' ? ' · Claude works on your computer' : ' · Claude works on your computer when it’s connected, otherwise on the server'); };
+  const runOn = h('select', { 'aria-label': 'Where Claude runs', title: 'Where Claude runs: on your computer when it’s connected (Auto), only there, or on the Studio server', hidden: true },
+    [['auto', 'Auto'], ['computer', 'Your computer'], ['server', 'Studio server']].map(([v, l]) => h('option', { value: v }, l)));
+  runOn.value = localStorageGet('runOn') || 'auto';
+  runOn.onchange = () => { localStorageSet('runOn', runOn.value); paintHint(); };
+  api('GET', '/api/me/runners').then(list => {
+    if (!list.length) return;
+    runOn.hidden = runRow.hidden = false;
+    paintHint();
+    const on = list.filter(r => r.connected);
+    runOn.options[0].textContent = on.length ? `Auto (${on[0].name})` : 'Auto (Studio server now)';
+    runOn.options[1].textContent = list.length === 1 ? list[0].name : 'Your computer';
+  }).catch(() => {});
   const seg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Mode' });
   const paintSeg = () => { paintGear(); seg.replaceChildren(
     h('button', { type: 'button', class: mode === 'edit' ? 'on' : '', 'aria-pressed': String(mode === 'edit'), title: 'Claude edits files and runs commands', onclick: () => { mode = 'edit'; localStorageSet('mode', mode); paintSeg(); } }, 'Edit'),
@@ -263,14 +279,16 @@ function renderChat(ctx, el, chatId, loadList){
   });
   const noClaude = !state.me.claude?.connected ? h('div', { class: 'note banner' }, ico('sparkle'),
     h('span', null, 'Connect your Claude account before sending prompts.'), h('span', { class: 'spacer' }), h('a', { class: 'btn primary small', href: '/account#claude', 'data-link': '' }, 'Connect Claude')) : null;
+  paintHint();
   const form = h('form', { class: 'composer', onsubmit: e => { e.preventDefault(); running ? stop() : submit(); } },
-    chips, ta, picker, h('div', { class: 'composer-bar' }, attachBtn, model, seg,
+    chips, ta, picker, h('div', { class: 'composer-bar' }, attachBtn, model, seg, runOn,
       h('div', { class: 'spacer' }), gear, micBtn, send));
   const modelRow = h('label', { class: 'opts-row' }, h('span', null, 'Model'));
   const modeRow = h('div', { class: 'opts-row' }, h('span', null, 'Mode'));
-  const opts = h('div', { class: 'composer-opts', hidden: true }, modelRow, modeRow);
+  const runRow = h('label', { class: 'opts-row', hidden: true }, h('span', null, 'Runs on'));
+  const opts = h('div', { class: 'composer-opts', hidden: true }, modelRow, modeRow, runRow);
   form.append(opts);
-  const placeOpts = () => { if (phone.matches){ modelRow.append(model); modeRow.append(seg); } else { attachBtn.after(model, seg); showOpts(false); } };
+  const placeOpts = () => { if (phone.matches){ modelRow.append(model); modeRow.append(seg); runRow.append(runOn); } else { attachBtn.after(model, seg, runOn); showOpts(false); } };
   function showOpts(open){ opts.hidden = !open; gear.setAttribute('aria-expanded', String(open)); }
   onTap(gear, () => showOpts(opts.hidden));
   const outside = e => { if (!opts.hidden && !opts.contains(e.target) && !gear.contains(e.target)) showOpts(false); };
@@ -309,7 +327,7 @@ function renderChat(ctx, el, chatId, loadList){
       archivedNote.hidden = true; toast('Chat restored'); loadList?.().catch(() => {});
     }).catch(() => {}) }, 'Unarchive'));
   el.append(transcript, h('div', { class: 'composer-wrap' }, h('div', { class: 'composer-col' }, updateBar, noClaude, archivedNote, form,
-    h('div', { class: 'composer-hint' }, 'Enter to send · Shift+Enter for a new line · Paste or drop files to attach' + (micBtn ? ' · Tap the mic to speak' : '') + ' · Claude works in this project’s folder on the server'))));
+    hint)));
   autosize();
   paintSend();
 
@@ -492,6 +510,7 @@ function renderChat(ctx, el, chatId, loadList){
       const r = await api('GET', `/api/chats/${chatId}`);
       chat = r.chat;
       if (chat.model){ model.value = chat.model; paintGear(); }
+      if (chat.runOn){ runOn.value = chat.runOn; paintHint(); }
       if (chat.archivedAt) archivedNote.hidden = false;
       if (!el.isConnected) return;
       inner.replaceChildren(working);
@@ -521,7 +540,7 @@ function renderChat(ctx, el, chatId, loadList){
       }
       $('.empty-chat', inner)?.remove();
       const before = lastSeq;
-      await api('POST', `/api/chats/${chat.id}/messages`, { prompt, model: model.value, mode, attachments });
+      await api('POST', `/api/chats/${chat.id}/messages`, { prompt, model: model.value, mode, attachments, runOn: runOn.value });
       // The message is saved: if it hasn't come back over the connection soon, that connection is stuck.
       setTimeout(() => { if (lastSeq === before) connect(); }, 3000);
       ta.value = ''; localStorageSet(draftKey, ''); autosize();

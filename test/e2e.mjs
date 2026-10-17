@@ -2,8 +2,9 @@
 // which starts that instance; by hand: node test/e2e.mjs http://studio.localhost:4310 localhost:4310 <screenshot dir>
 import { chromium } from 'playwright-core';
 import { createHmac, createECDH, createDecipheriv, randomBytes } from 'node:crypto';
-import { mkdirSync, readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { execFileSync, spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import net from 'node:net';
 import http from 'node:http';
 
@@ -786,6 +787,95 @@ await check('output that only mentions background work doesn’t make a chat car
   if (r.chat.running || r.events.filter(e => e.type === 'result').length !== 1 || r.events.some(e => e.type === 'notice' && /carry on/.test(e.text)))
     throw new Error('the chat carried on');
 }, page);
+// A computer that runs the owner's chats (lib/runner.mjs): the real runner code, served by Studio, with the fake Claude
+// signed in "on the computer", in its own folder.
+let runner = null, runnerHome = null, runnerLog = '', runnerId = null;
+const chatTurns = async (chatId, n) => {
+  let r;
+  for (let i = 0; i < 120; i++){
+    r = await (await page.request.get(`${BASE}/api/chats/${chatId}`)).json();
+    if (!r.chat.running && r.events.filter(e => e.type === 'result').length >= n) break;
+    await new Promise(r => setTimeout(r, 250));
+  }
+  const results = r.events.filter(e => e.type === 'result').length;
+  if (results !== n) throw new Error(`expected ${n} finished turns, got ${results}; ${r.events.filter(e => e.type === 'error' || e.type === 'notice').map(e => e.text).join(' / ')}`);
+  return r.events;
+};
+const lastText = ev => ev.filter(e => e.type === 'text').pop()?.text || '';
+await check('a computer added on the Account page runs its owner’s chats; files and Claude’s session move between it and the server', async () => {
+  const H = { headers: { Origin: BASE } };
+  await page.goto(`${BASE}/account`);
+  await page.getByRole('button', { name: 'Add a computer' }).click();
+  await page.locator('dialog input').fill('Test Mac');
+  await page.getByRole('button', { name: 'Show install command' }).click();
+  const command = (await page.locator('.runner-command').textContent()).trim();
+  if (!command.startsWith(`curl -fsSL ${BASE}/runner/install.sh | bash -s -- `)) throw new Error('unexpected command: ' + command);
+  if (!(await (await page.request.get(`${BASE}/runner/install.sh`)).text()).includes(`STUDIO="${BASE}"`)) throw new Error('install.sh lacks Studio’s address');
+  // Set up as install.sh does, from the files Studio serves
+  runnerHome = mkdtempSync('/tmp/studio-runner-');
+  mkdirSync(`${runnerHome}/app`);
+  for (const f of ['studio-runner.mjs', 'gitsync.mjs']) writeFileSync(`${runnerHome}/app/${f}`, await (await page.request.get(`${BASE}/runner/${f}`)).text());
+  const fake = fileURLToPath(new URL('../ops/fake-claude.mjs', import.meta.url));
+  writeFileSync(`${runnerHome}/config.json`, JSON.stringify({ studio: BASE, token: command.split(' ').pop(), claude: fake, git: 'git' }));
+  runner = spawn(process.execPath, [`${runnerHome}/app/studio-runner.mjs`], { env: { ...process.env, STUDIO_RUNNER_HOME: runnerHome, HOME: `${runnerHome}/mac`, CLAUDE_CODE_OAUTH_TOKEN: 'signed-in-on-the-mac' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  runner.stdout.on('data', d => { runnerLog += d; }); runner.stderr.on('data', d => { runnerLog += d; });
+  await page.getByText('✓ Connected').waitFor({ timeout: 15000 }).catch(() => { throw new Error('the runner didn’t connect: ' + runnerLog.slice(-500)); });
+  await page.screenshot({ path: `${SHOTS}/40-runner-added.png` });
+  await page.getByRole('button', { name: 'Done' }).click();
+  await page.locator('.runner-row').getByText('Connected').waitFor();
+  runnerId = (await (await page.request.get(`${BASE}/api/me/runners`)).json())[0].id;
+
+  const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const demo = teams.find(t => t.name === 'Pipeline Team').projects.find(p => p.name === 'Demo Site');
+  const chat = await (await page.request.post(`${BASE}/api/projects/${demo.id}/chats`, { ...H, data: {} })).json();
+  const say = async (prompt, runOn) => { const r = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt, runOn } }); if (!r.ok()) throw new Error(`prompt refused: ${await r.text()}`); };
+  // 1. On the computer: Claude works in its copy, and the change comes back to the project here
+  await say('edit the page on my computer', 'auto');
+  let ev = await chatTurns(chat.id, 1);
+  if (!ev.some(e => e.type === 'notice' && e.text === 'Running on Test Mac.')) throw new Error('no “Running on Test Mac” notice');
+  if (!lastText(ev).includes(`${runnerHome}/projects/${demo.slug}`)) throw new Error('it didn’t run in the computer’s folder: ' + lastText(ev));
+  const diff = await (await page.request.get(`${BASE}/api/projects/${demo.id}/git/diff`)).text();
+  if (!diff.includes('edit the page on my computer')) throw new Error('the change made on the computer isn’t in the project');
+  // 2. On the server: the same Claude session, brought back from the computer
+  await say('now on the server', 'server');
+  ev = await chatTurns(chat.id, 2);
+  if (!ev.some(e => e.type === 'notice' && e.text === 'Running on the Studio server.')) throw new Error('no “Running on the Studio server” notice');
+  if (!/remembers: 1\b/.test(lastText(ev)) || lastText(ev).includes(runnerHome)) throw new Error('the server didn’t carry on the computer’s session: ' + lastText(ev));
+  // 3. Back on the computer, with the session from the server
+  await say('back to my computer', 'computer');
+  ev = await chatTurns(chat.id, 3);
+  if (!/remembers: 2\b/.test(lastText(ev)) || !lastText(ev).includes(runnerHome)) throw new Error('the computer didn’t carry on the server’s session: ' + lastText(ev));
+  if (ev.some(e => e.type === 'error')) throw new Error('a turn showed an error: ' + ev.filter(e => e.type === 'error').map(e => e.text).join(' / '));
+  await page.goto(`${BASE}/p/${demo.id}/chat/${chat.id}`);
+  await page.getByText('Running on Test Mac.').first().waitFor();
+  await page.screenshot({ path: `${SHOTS}/41-runner-chat.png` });
+}, page);
+await check('a turn on a computer carries on while Studio restarts, and its changes still come in', async () => {
+  const H = { headers: { Origin: BASE } };
+  if (!runner) throw new Error('no runner (the step before failed)');
+  const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const demo = teams.find(t => t.name === 'Pipeline Team').projects.find(p => p.name === 'Demo Site');
+  const chat = await (await page.request.post(`${BASE}/api/projects/${demo.id}/chats`, { ...H, data: {} })).json();
+  const sent = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt: 'slow edit while Studio restarts', runOn: 'computer' } });
+  if (!sent.ok()) throw new Error('prompt refused: ' + await sent.text());
+  await new Promise(r => setTimeout(r, 1500));
+  process.kill(Number(readFileSync(process.env.STUDIO_PID_FILE, 'utf8')), 'SIGTERM');
+  await new Promise(r => setTimeout(r, 1000));
+  for (let i = 0; i < 60; i++){ try { if ((await page.request.get(`${BASE}/api/me`)).ok()) break; } catch {} await new Promise(r => setTimeout(r, 250)); }
+  const ev = await chatTurns(chat.id, 1);
+  if (ev.some(e => e.type === 'error')) throw new Error('the turn showed an error: ' + ev.filter(e => e.type === 'error').map(e => e.text).join(' / '));
+  const diff = await (await page.request.get(`${BASE}/api/projects/${demo.id}/git/diff`)).text();
+  if (!diff.includes('while Studio restarts')) throw new Error('the change made during the restart isn’t in the project');
+}, page);
+await check('removing a computer stops its runner', async () => {
+  if (!runner) throw new Error('no runner (an earlier step failed)');
+  const r = await page.request.delete(`${BASE}/api/me/runners/${runnerId}`, { headers: { Origin: BASE } });
+  if (!r.ok()) throw new Error(await r.text());
+  for (let i = 0; i < 40 && runner.exitCode === null; i++) await new Promise(r => setTimeout(r, 250));
+  if (runner.exitCode !== 0) throw new Error(`the runner is still running (exit code ${runner.exitCode})`);
+}, page);
+if (runner && runner.exitCode === null) runner.kill('SIGKILL');
+if (runnerHome) rmSync(runnerHome, { recursive: true, force: true });
 // A fake Anthropic API for projects' AI workers (STUDIO_ANTHROPIC_URL in test/run.sh): every Messages call reports usage.
 const anthropic = http.createServer((req, res) => {
   let body = '';

@@ -17,6 +17,7 @@ import * as A from './lib/agent.mjs';
 import * as C from './lib/claude.mjs';
 import * as U from './lib/uploads.mjs';
 import * as B from './lib/budget.mjs';
+import * as R from './lib/runner.mjs';
 import { requestEmailChange, confirmEmailChange } from './lib/account.mjs';
 import { ctl, ctlOk, ctlJson, spawnCtl } from './lib/ctl.mjs';
 import { subdomainOf, handleProjectRequest, handleProjectUpgrade, issueGateToken, canAccessOrg } from './lib/gate.mjs';
@@ -115,6 +116,11 @@ route('POST', '/api/me/push/seen', async ({ user }) => { markSeen(user.id); retu
 route('POST', '/api/me/phones', async ({ user, body, req }) => pairPhone(user, body.name, ipOf(req)));
 route('DELETE', '/api/me/phones/:id', async ({ user, params, req }) => { removePhone(user, params.id, ipOf(req)); return { ok: true }; });
 route('POST', '/api/me/phones/test', async ({ user }) => testPhones(user));
+// Computers that run this person's chats (lib/runner.mjs). The computer itself connects to /api/runner/socket.
+route('GET', '/api/me/runners', async ({ user }) => R.listRunners(user.id));
+route('POST', '/api/me/runners', async ({ user, body, req }) => R.addRunner(user, body.name, ipOf(req)));
+route('PATCH', '/api/me/runners/:id', async ({ user, params, body }) => { if (body.maxChats !== undefined) R.setMaxChats(user, params.id, body.maxChats); return R.listRunners(user.id); });
+route('DELETE', '/api/me/runners/:id', async ({ user, params, req }) => { R.removeRunner(user, params.id, ipOf(req)); return { ok: true }; });
 route('PUT', '/api/me/phone-prefs', async ({ user, body }) => setPhonePrefs(user, body));
 // Opens the phone app in Expo Go: a link that works anywhere an exp:// link isn't clickable.
 route('GET', '/api/phone/app', async (_, res) => { res.writeHead(302, { Location: PHONE_APP_URL, 'Cache-Control': 'no-store' }); res.end(); }, { public: true });
@@ -579,6 +585,11 @@ async function handleStudio(req, res){
     });
     return authHandler(req, res);
   }
+  // The runner's install script and code (lib/runner.mjs), fetched by the install command on a computer.
+  if (url.pathname.startsWith('/runner/') && req.method === 'GET'){
+    const text = R.runnerFile(url.pathname.slice('/runner/'.length));
+    return text === null ? send(res, 404, 'Not found', 'text/plain') : send(res, 200, text, url.pathname.endsWith('.sh') ? 'text/x-shellscript; charset=utf-8' : 'text/javascript; charset=utf-8');
+  }
   if (!url.pathname.startsWith('/api/')) return serveStatic(req, res, url.pathname);
 
   for (const r of routes){
@@ -626,6 +637,7 @@ server.on('upgrade', (req, socket, head) => {
   const sub = subdomainOf(host);
   if (sub && host !== STUDIO_HOST) return handleProjectUpgrade(req, socket, head, sub);
   if ((host === STUDIO_HOST || host === 'localhost' || host === '127.0.0.1') && req.url.split('?')[0] === '/api/phone/socket') return handlePhoneUpgrade(req, socket, head);
+  if ((host === STUDIO_HOST || host === 'localhost' || host === '127.0.0.1') && req.url.split('?')[0] === '/api/runner/socket') return R.handleRunnerUpgrade(req, socket, head);
   socket.destroy();
 });
 server.requestTimeout = 0;

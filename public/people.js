@@ -23,6 +23,7 @@ export async function renderAccount(main){
   const sessionsCard = h('div', { class: 'devices' });
   const emailCard = h('div', { class: 'card-body' });
   const phoneCard = h('div', { class: 'card-body' });
+  const runnersCard = h('div', { class: 'card-body' });
 
   const name = h('input', { type: 'text', value: me.name, maxlength: 80 });
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
@@ -36,7 +37,7 @@ export async function renderAccount(main){
   inner.append(
     pageHead('Account', 'Your profile, your Claude connection and how you sign in.'),
     h('div', { class: 'settings-layout' },
-      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-email', 'mail', 'Email notifications'], ['acc-phone', 'phone', 'Push notifications'], ['acc-devices', 'laptop', 'Devices']]),
+      subnav([['acc-profile', 'user', 'Profile'], ['claude', 'sparkle', 'Claude'], ['acc-address', 'mail', 'Email address'], ['acc-password', 'lock', 'Password'], ['acc-mfa', 'shield', 'Two-step sign-in'], ['acc-email', 'mail', 'Email notifications'], ['acc-phone', 'phone', 'Push notifications'], ['acc-computers', 'laptop', 'Your computers'], ['acc-devices', 'laptop', 'Devices']]),
       h('div', { class: 'stack' },
         h('section', { class: 'card profile', id: 'acc-profile' }, h('span', { class: 'avatar lg' }, initials(me.name)),
           h('div', null, h('h2', null, me.name), h('div', { class: 'muted' }, me.email),
@@ -79,12 +80,14 @@ export async function renderAccount(main){
           h('span', { class: 'spacer' }), h('span', { class: 'pill ok' }, ico('check'), 'On')),
         section('acc-email', 'Email notifications', `Sent to ${me.email}.`, emailCard),
         section('acc-phone', 'Push notifications', 'On your phone or computer, even with Studio closed.', phoneCard),
+        section('acc-computers', 'Your computers', 'Run your chats on your own computer, with its CPU and memory and its own Claude, instead of on the Studio server.', runnersCard),
         section('acc-devices', 'Devices', 'Where you’re signed in.', sessionsCard))));
 
   paintClaude(claudeCard);
   paintSessions(sessionsCard);
   paintEmailPrefs(emailCard);
   paintPhones(phoneCard);
+  paintRunners(runnersCard);
   if (location.hash === '#claude') claudeCard.scrollIntoView({ block: 'center' });
   // Back from the link in a confirm-your-new-email message (see lib/account.mjs).
   const emailResult = new URLSearchParams(location.search).get('email');
@@ -204,6 +207,58 @@ function pairDialog(done){
   } }, h('h2', null, 'Pair a phone'), field('Name for this phone', name, 'so you can tell your phones apart'),
     h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Show pairing code'))));
   d.el.addEventListener('close', () => { clearInterval(poll); done(); });
+}
+
+// Computers that run this person's chats (lib/runner.mjs, runner/): each one's state, how many chats it runs at once,
+// and adding one with an install command.
+async function paintRunners(card){
+  let list;
+  try { list = await api('GET', '/api/me/runners'); } catch (e){ card.replaceChildren(h('p', null, e.message)); return; }
+  const repaint = () => paintRunners(card);
+  const row = r => {
+    const max = h('select', { 'aria-label': `Chats at once on ${r.name}` }, [1, 2, 3, 4, 5, 6].map(n => h('option', { value: n }, `${n} at once`)));
+    max.value = String(r.maxChats);
+    max.onchange = async () => { try { await api('PATCH', `/api/me/runners/${r.id}`, { maxChats: Number(max.value) }); toast(`${r.name} runs up to ${max.value} chat${max.value === '1' ? '' : 's'} at once`); } catch (e){ fail(e); } };
+    return h('div', { class: 'phone-row runner-row' },
+      h('span', { class: 'dev-ico' }, ico('laptop')),
+      h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, r.name),
+        r.connected ? h('span', { class: 'pill ok', style: { marginLeft: '8px' } }, r.running ? `Running ${r.running} chat${r.running > 1 ? 's' : ''}` : 'Connected') : null,
+        h('div', { class: 'small muted' }, [r.connected ? r.host : r.lastSeenAt ? `Last connected ${ago(r.lastSeenAt)}` : 'Not connected yet: run the install command on it', r.claude].filter(Boolean).join(' · '))),
+      max,
+      h('button', { class: 'btn small', onclick: e => confirmDialog(`Remove ${r.name}?`, 'Its runner stops, and your chats run on the Studio server again. Its copies of your projects stay on it until you delete ~/StudioRunner.', 'Remove')
+        .then(ok => ok && busy(e.target, async () => { await api('DELETE', `/api/me/runners/${r.id}`); toast(`${r.name} removed`); repaint(); })).catch(() => {}) }, 'Remove'));
+  };
+  card.replaceChildren(
+    list.length ? h('div', { class: 'phones' }, list.map(row)) : null,
+    h('p', { class: 'muted small', style: list.length ? { marginTop: '12px' } : { marginTop: 0 } },
+      'When one of your computers is connected, your prompts run on it (choose where in each chat: Auto, Your computer or Studio server). ',
+      'Studio sends it the project’s files, Claude works there with the Claude Code signed in on that computer, and the changes come back to the project here when each turn ends. Only your own chats run on it.'),
+    h('button', { class: 'btn', onclick: () => addRunnerDialog(repaint) }, ico('plus'), 'Add a computer'));
+}
+
+function addRunnerDialog(repaint){
+  const name = h('input', { type: 'text', maxlength: 60, value: /Mac/.test(navigator.userAgent) ? 'My Mac' : 'My computer', required: true });
+  let poll = null;
+  const d = dialog(close => h('form', { onsubmit: async e => {
+    e.preventDefault();
+    await busy(e.submitter, async () => {
+      const r = await api('POST', '/api/me/runners', { name: name.value.trim() });
+      const status = h('p', { class: 'muted small runner-status' }, 'Waiting for it to connect…');
+      e.target.replaceChildren(h('h2', null, `Add ${r.name}`),
+        h('p', null, 'On that computer, open Terminal and paste this command. It needs Node.js 22 or newer, git, and Claude Code signed in (run ', h('span', { class: 'mono' }, 'claude'), ' once first).'),
+        h('pre', { class: 'runner-command' }, r.command),
+        h('div', { class: 'row', style: { margin: '10px 0' } }, h('button', { class: 'btn', type: 'button', onclick: () => copy(r.command) }, 'Copy command')),
+        h('p', { class: 'muted small' }, 'The command contains this computer’s code and is shown only once, so don’t share it. It installs Studio Runner in ~/StudioRunner and starts it when you log in. Claude runs there with full permissions, as your user on that computer.'),
+        status,
+        h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn primary', type: 'button', onclick: close }, 'Done')));
+      poll = setInterval(async () => {
+        const it = (await api('GET', '/api/me/runners').catch(() => []))?.find(x => x.id === r.id);
+        if (it?.connected){ clearInterval(poll); status.textContent = `✓ Connected${it.host ? ` (${it.host})` : ''}. Your chats now run on it when it’s on.`; status.classList.remove('muted'); repaint(); }
+      }, 2000);
+    }).catch(() => {});
+  } }, h('h2', null, 'Add a computer'), field('Name for this computer', name, 'shown in your chats when a turn runs on it'),
+    h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Show install command'))));
+  d.el.addEventListener('close', () => { clearInterval(poll); repaint(); });
 }
 
 function newBackupCodes(){

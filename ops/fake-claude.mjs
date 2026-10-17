@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // A stand-in for the claude CLI, for testing Studio without spending money.
 // Enable it by setting "fakeClaude" in /etc/studio/ctl.json to this file's path; remove it to use real Claude.
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { createInterface } from 'node:readline';
 
@@ -53,6 +55,13 @@ if (args[0] === 'setup-token'){
       out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 'td', name: 'Bash', input: { command: 'cat README.md' } }] } });
       out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'td', content: 'Notes\nAnything left running in the background is stopped.\nCommand running in background with ID: b2', is_error: false }] } });
     }
+    // Like Claude Code, it keeps each session's prompts in a transcript under the config folder, and a resumed session
+    // remembers the prompts before (so tests can tell a session moved between machines with its chat).
+    const dir = join(process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude'), 'projects', process.cwd().replace(/[^a-zA-Z0-9]/g, '-'));
+    const transcript = join(dir, session + '.jsonl');
+    const remembers = i < 0 ? 0 : existsSync(transcript) ? readFileSync(transcript, 'utf8').split('\n').filter(Boolean).length : 'nothing (no transcript)';
+    mkdirSync(dir, { recursive: true });
+    appendFileSync(transcript, JSON.stringify({ type: 'user', cwd: process.cwd(), prompt: prompt.slice(0, 200) }) + '\n');
     let edited = false;
     if (/edit|change|write/i.test(prompt)){
       writeFileSync('STUDIO-TEST.md', `Written by the fake Claude.\n\nPrompt: ${prompt}\n`);
@@ -60,7 +69,7 @@ if (args[0] === 'setup-token'){
       out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 't2', name: 'Write', input: { file_path: process.cwd() + '/STUDIO-TEST.md', content: '…' } }] } });
       out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 't2', content: 'File created', is_error: false }] } });
     }
-    const reply = `**Fake Claude** got your prompt (${prompt.length} characters) in \`${process.cwd()}\`${edited ? ' and wrote `STUDIO-TEST.md`' : ''}.\n\n- model: ${args[args.indexOf('--model') + 1]}\n- mode: ${args[args.indexOf('--permission-mode') + 1]}\n- resumed: ${i >= 0 ? 'yes' : 'no'}\n- attached: ${(prompt.match(/^- \//gm) || []).length}`;
+    const reply = `**Fake Claude** got your prompt (${prompt.length} characters) in \`${process.cwd()}\`${edited ? ' and wrote `STUDIO-TEST.md`' : ''}.\n\n- model: ${args[args.indexOf('--model') + 1]}\n- mode: ${args[args.indexOf('--permission-mode') + 1]}\n- resumed: ${i >= 0 ? 'yes' : 'no'}\n- remembers: ${remembers}\n- attached: ${(prompt.match(/^- \//gm) || []).length}`;
     out({ type: 'assistant', message: { content: [{ type: 'text', text: reply }] } });
     out({ type: 'result', subtype: 'success', is_error: false, result: reply, session_id: session, total_cost_usd: 0.0123, duration_ms: 1500, num_turns: 3 });
   });
