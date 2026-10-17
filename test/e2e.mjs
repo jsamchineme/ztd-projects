@@ -255,6 +255,24 @@ await check('teammate accepts invite, creates account, sets up two-step, sees pr
   await p2.getByText('Only team owners and admins').waitFor();
   await c2.close();
 });
+await check('admin adds a teammate to a second team, keeping the first (a member can be in many teams)', async () => {
+  await page.goto(BASE + '/team');
+  await page.click('button:has-text("New team")');
+  await page.fill('dialog input', 'Second Team');
+  await page.click('dialog button[type=submit]');
+  await page.getByText('Team created').waitFor();
+  await page.locator('tr', { hasText: 'mia@example.com' }).locator('button:has-text("Add to team")').click();
+  await page.getByRole('heading', { name: 'Add Mia Member to another team' }).waitFor();
+  await page.selectOption('dialog select[aria-label="Add to team"]', { label: 'Second Team' });
+  await page.selectOption('dialog select[aria-label="Role"]', 'admin');
+  await page.click('dialog button:has-text("Add to team")');
+  await page.getByText('Mia Member added to Second Team').waitFor();
+  const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const inTeam = name => teams.find(t => t.name === name)?.members.some(m => m.email === 'mia@example.com');
+  if (!inTeam('Pipeline Team') || !inTeam('Second Team')) throw new Error('Mia should be in both teams: ' + JSON.stringify(teams.map(t => [t.name, t.members.map(m => m.email)])));
+  const mia = teams.find(t => t.name === 'Second Team').members.find(m => m.email === 'mia@example.com');
+  if (mia.role !== 'admin') throw new Error('expected admin role in Second Team, got ' + mia.role);
+}, page);
 await check('sign out, then sign in again needs the authenticator code', async () => {
   await page.goto(BASE + '/');
   await page.click('button[aria-label="Sign out"]');
@@ -272,7 +290,7 @@ await check('sign out, then sign in again needs the authenticator code', async (
 }, page);
 await check('admin page: people and activity log; reset link for teammate', async () => {
   await page.goto(BASE + '/admin');
-  await page.getByText('mia@example.com').waitFor();
+  await page.getByText('mia@example.com', { exact: true }).waitFor();
   await page.locator('tr', { hasText: 'mia@example.com' }).locator('button:has-text("Reset link")').click();
   await page.getByRole('heading', { name: 'Password reset link' }).waitFor();
   const link = (await page.locator('dialog .secret').textContent()).trim();
@@ -929,11 +947,12 @@ await check('daily budgets: a shared Claude’s limit stops a project’s AI wor
   const proxied = base.replace(/^http:\/\/127\.0\.0\.1:\d+/, BASE) + '/v1/messages';
   // Olu sets Mia's limit from the team page
   await page.goto(BASE + '/team');
-  await page.locator('tr', { hasText: 'mia@example.com' }).getByRole('button', { name: 'Set daily limit' }).click();
+  const miaRow = page.locator('.team-card', { hasText: 'Pipeline Team' }).locator('tr', { hasText: 'mia@example.com' });
+  await miaRow.getByRole('button', { name: 'Set daily limit' }).click();
   await page.fill('dialog input[type=number]', '0.05');
   await page.locator('dialog').getByRole('button', { name: 'Save' }).click();
   await page.getByText('Mia Member can spend $0.05 a day').waitFor();
-  await page.locator('tr', { hasText: 'mia@example.com' }).getByText('$0.00 of $0.05 today').waitFor();
+  await miaRow.getByText('$0.00 of $0.05 today').waitFor();
   // Streamed: 1000 in + 2000 out on Opus 5.5 = $0.044; then plain JSON: 10000 in + 1000 out = $0.06
   const s1 = await page.request.post(proxied, { data: { model: 'claude-opus-5-5', stream: true, messages: [] } });
   if (!s1.ok() || !(await s1.text()).includes('message_stop')) throw new Error('streamed call wasn’t passed through');

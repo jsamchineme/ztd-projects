@@ -452,6 +452,24 @@ route('POST', '/api/teams/:orgId/members/:memberId/move', async ({ user, params,
   audit(user.id, 'team.move-member', who, `${from} → ${dest.name}`, ipOf(req));
   return { ok: true };
 });
+// Adds someone who's already in one team you administer to another, keeping their current teams.
+// They end up in both; the adder must administer both teams.
+route('POST', '/api/teams/:orgId/members/:memberId/add-to', async ({ user, params, body, req }) => {
+  const m = db.prepare('SELECT * FROM member WHERE id = ? AND organizationId = ?').get(params.memberId, params.orgId);
+  if (!m) throw err(404, 'Person not found in this team');
+  const dest = db.prepare('SELECT id, name FROM organization WHERE id = ?').get(body.organizationId);
+  if (!dest) throw err(404, 'Team not found');
+  if (db.prepare('SELECT 1 FROM member WHERE userId = ? AND organizationId = ?').get(m.userId, dest.id)) throw err(400, 'They’re already in that team.');
+  const isAdmin = r => ['site-admin', 'owner', 'admin'].includes(r);
+  if (!isAdmin(orgRole(user, m.organizationId)) || !isAdmin(orgRole(user, dest.id))) throw err(403, 'You must be an admin of both teams.');
+  const role = ['member', 'admin', 'owner'].includes(body.role) ? body.role : 'member';
+  // Only an owner (or Studio admin) of the destination can make someone an owner there.
+  if (role === 'owner' && !['site-admin', 'owner'].includes(orgRole(user, dest.id))) throw err(403, 'Only an owner can add someone as an owner.');
+  await auth.api.addMember({ body: { userId: m.userId, organizationId: dest.id, role } });
+  const who = db.prepare('SELECT email FROM user WHERE id = ?').get(m.userId)?.email;
+  audit(user.id, 'team.add-member', who, `${dest.name} · ${role}`, ipOf(req));
+  return { ok: true };
+});
 
 // Site admin
 const needAdmin = user => { if (user.role !== 'admin') throw err(403, 'Admins only'); };

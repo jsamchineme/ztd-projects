@@ -380,6 +380,8 @@ export async function renderTeams(main){
 
 function teamCard(t, reload, teams){
   const others = teams.filter(o => o.canAdmin && o.organizationId !== t.organizationId);
+  // Teams the admin runs that a given person isn't in yet, so they can be added without leaving this one.
+  const teamsFor = m => teams.filter(o => o.canAdmin && !o.members.some(x => x.userId === m.userId));
   const email = h('input', { type: 'email', required: true, placeholder: 'name@example.com', 'aria-label': 'Email to invite' });
   // Only your own connection can be shared, not one shared with you.
   const canShare = state.me.claude?.connected && !state.me.claude.sharedBy;
@@ -400,10 +402,10 @@ function teamCard(t, reload, teams){
           h('td', null, h('div', { class: 'row', style: { gap: '8px', flexWrap: 'nowrap' } }, h('span', { class: 'avatar' }, initials(m.name)), h('div', null, m.name, m.userId === state.me.user.id ? ' (you)' : '', h('div', { class: 'small muted' }, m.email), m.claudeFrom ? claudeFromLine(m, reload) : null))),
           h('td', null, sel),
           h('td', { class: 'small' }, m.twoFactorEnabled ? h('span', { class: 'pill ok' }, ico('check'), 'On') : h('span', { class: 'pill warn' }, ico('alert'), 'Not set up')),
-          h('td', { class: 'right' }, t.canAdmin && m.userId !== state.me.user.id ? h('div', { class: 'row tight end' }, others.length ? h('button', { class: 'btn small ghost', onclick: () => moveMember(t, m, others, reload) }, 'Move') : null, h('button', { class: 'btn small ghost danger', onclick: async e => {
+          h('td', { class: 'right' }, t.canAdmin && m.userId !== state.me.user.id ? (() => { const addable = teamsFor(m); return h('div', { class: 'row tight end' }, addable.length ? h('button', { class: 'btn small ghost', onclick: () => addToTeam(t, m, addable, reload) }, 'Add to team') : null, others.length ? h('button', { class: 'btn small ghost', onclick: () => moveMember(t, m, others, reload) }, 'Move') : null, h('button', { class: 'btn small ghost danger', onclick: async e => {
             if (await confirmDialog(`Remove ${m.name}?`, `They lose access to ${t.name}'s projects straight away.`, 'Remove', true))
               busy(e.target, async () => { await authApi('/organization/remove-member', { memberIdOrEmail: m.id, organizationId: t.organizationId }); reload(); });
-          } }, 'Remove')) : null));
+          } }, 'Remove')); })() : null));
       })))),
     t.canAdmin ? h('div', null,
       t.invites.length ? h('div', { class: 'card-body invites' }, h('div', { class: 'small muted label' }, 'Waiting to join'),
@@ -437,6 +439,22 @@ function moveMember(t, m, others, reload){
     h('p', { class: 'muted' }, `They lose access to ${t.name}’s projects and get access to the new team’s, with the same role. Projects here that use their Claude switch to the team owner’s.`),
     field('Team', to),
     h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Move'))));
+}
+
+// Adds someone to another team you administer without removing them from this one; they end up in both.
+function addToTeam(t, m, addable, reload){
+  const to = h('select', { 'aria-label': 'Add to team' }, addable.map(o => h('option', { value: o.organizationId }, o.name)));
+  const role = h('select', { 'aria-label': 'Role', style: { width: 'auto' } }, h('option', { value: 'member' }, 'Member'), h('option', { value: 'admin' }, 'Admin'));
+  dialog(close => h('form', { class: 'dialog-body', onsubmit: async e => {
+    e.preventDefault();
+    await busy(e.submitter, async () => {
+      await api('POST', `/api/teams/${t.organizationId}/members/${m.id}/add-to`, { organizationId: to.value, role: role.value });
+      close(); toast(`${m.name} added to ${to.selectedOptions[0].textContent}`); reload();
+    }).catch(() => {});
+  } }, h('h2', null, `Add ${m.name} to another team`),
+    h('p', { class: 'muted' }, `They stay in ${t.name} and also get access to the team you pick, so they can be in both. You can change their role there afterwards.`),
+    field('Team', to), field('Role', role),
+    h('div', { class: 'row end', style: { marginTop: '16px' } }, h('button', { class: 'btn', type: 'button', onclick: close }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Add to team'))));
 }
 
 // "Uses Samuel's Claude", with a way to stop it for the person sharing, the person using it, or a site admin.
