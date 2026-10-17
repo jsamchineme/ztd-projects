@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Screenshots a page at phone, tablet and desktop widths, and reports layout problems a person should look at:
-// sideways scrolling, elements poking past the screen edge, and text that overlaps or is clipped.
+// sideways scrolling, elements poking past the screen edge, text that overlaps or is clipped, header menu links
+// that wrap onto two lines, empty space below the footer, and a focus ring put on a link when the phone menu opens.
+// It also saves a shot of the open phone menu (<viewport>-menu.png).
 // Usage: node pipeline/viewports.mjs <url> <out dir> [width,width,...]
 import { chromium } from 'playwright-core';
 import { mkdir, writeFile, readdir, rm } from 'node:fs/promises';
@@ -67,6 +69,18 @@ export async function shoot(url, outDir, widths){
           const x = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left), y = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
           if (x > 4 && y > 4 && overlaps++ < 6) out.push(`Overlapping: ${name(a.el)} and ${name(b.el)}`);
         }
+        // Header menu links that wrap onto a second line ("Visit and / join"): the row needs more room or a later breakpoint.
+        let wraps = 0;
+        for (const a of document.querySelectorAll('header nav a, header .site-nav a')){
+          if (!visible(a) || !a.textContent.trim()) continue;
+          // Only the words count (icons and dots sit at their own height); a new line starts more than half a line lower.
+          const rects = [], walk = document.createTreeWalker(a, NodeFilter.SHOW_TEXT);
+          for (let n; (n = walk.nextNode());){ if (!n.textContent.trim() || srOnly(n.parentElement)) continue; const rg = document.createRange(); rg.selectNodeContents(n); rects.push(...[...rg.getClientRects()].filter(r => r.width > 1)); }
+          rects.sort((x, y) => x.top - y.top);
+          let lines = rects.length ? 1 : 0;
+          for (let i = 1; i < rects.length; i++) if (rects[i].top - rects[i - 1].top > rects[i - 1].height / 2) lines++;
+          if (lines > 1 && wraps++ < 6) out.push(`Menu link wraps onto ${lines} lines: ${name(a)} “${a.textContent.trim().slice(0, 40)}”`);
+        }
         return { issues: out, height: de.scrollHeight };
       });
       const files = [], total = Math.min(issues.height, SLICE * 8);
@@ -75,12 +89,58 @@ export async function shoot(url, outDir, widths){
         await page.screenshot({ path: join(outDir, file), fullPage: true, clip: { x: 0, y, width: vp.width, height: Math.min(SLICE, total - y) } });
         files.push(file);
       }
+      issues.issues.push(...await footerGap(page), ...await menuFocus(page, vp, outDir, files));
       report.push({ viewport: vp.name, width: vp.width, height: issues.height, issues: issues.issues, files });
       await ctx.close();
     }
   } finally { await browser.close(); }
   await writeFile(join(outDir, 'viewports.json'), JSON.stringify(report, null, 1));
   return report;
+}
+
+// Empty space below the footer at the bottom of the page, e.g. padding kept for a phone call bar that has tucked away.
+// Space is fine while a fixed bar (touching the bottom edge or floating just above it) is actually showing over it.
+async function footerGap(page){
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(700);
+  const gap = await page.evaluate(() => {
+    const vis = el => { const s = getComputedStyle(el), r = el.getBoundingClientRect(); return s.display !== 'none' && s.visibility !== 'hidden' && r.height > 0; };
+    const feet = [...document.querySelectorAll('footer, [role="contentinfo"]')].filter(f => vis(f) && !f.closest('dialog, header, main, article, aside'));
+    if (!feet.length) return 0;
+    const bottom = Math.max(...feet.map(f => f.getBoundingClientRect().bottom)) + scrollY;
+    const gap = Math.round(document.documentElement.scrollHeight - bottom);
+    if (gap <= 12) return 0;
+    // A fixed or sticky bar showing at the bottom of the screen explains the space.
+    for (const el of document.querySelectorAll('body *')){
+      const s = getComputedStyle(el);
+      if ((s.position === 'fixed' || s.position === 'sticky') && vis(el) && s.opacity !== '0'){
+        const r = el.getBoundingClientRect();
+        if (r.bottom >= innerHeight - 24 && r.top < innerHeight - 8 && r.width > innerWidth / 2 && innerHeight - r.top >= gap - 16) return 0;
+      }
+    }
+    return gap;
+  });
+  await page.evaluate(() => scrollTo(0, 0));
+  return gap ? [`Empty space below the footer: ${gap}px at the bottom of the page`] : [];
+}
+
+// Open the phone menu like a person would. If that moves focus onto a link or button, iPhone Safari draws a focus ring
+// round it on every open (it looks like a box round the logo). Focus the menu panel itself instead.
+async function menuFocus(page, vp, outDir, files){
+  const sel = '[data-menu-open], [data-menu-toggle], header .menu-toggle, header .nav__toggle, header .menu-button, header .menu-btn, header button[aria-controls][aria-expanded]';
+  const toggle = await page.$$(sel).then(async list => { for (const el of list) if (await el.isVisible()) return el; return null; });
+  if (!toggle) return [];
+  if (vp.mobile) await toggle.tap(); else await toggle.click();
+  await page.waitForTimeout(500);
+  const file = `${vp.name}-menu.png`;
+  await page.screenshot({ path: join(outDir, file) });
+  files.push(file);
+  const hit = await toggle.evaluate(t => {
+    const a = document.activeElement;
+    if (!a || a === t || a === document.body || !a.matches('a[href], button, input, select, textarea, summary')) return '';
+    return `${a.tagName.toLowerCase()}${a.classList[0] ? '.' + a.classList[0] : ''} “${(a.textContent || a.getAttribute('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 30)}”`;
+  });
+  return hit ? [`Opening the menu puts focus on ${hit}: phones show a focus ring round it. Focus the menu panel instead`] : [];
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === new URL(import.meta.url).pathname){

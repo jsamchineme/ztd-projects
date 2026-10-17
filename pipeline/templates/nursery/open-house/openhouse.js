@@ -16,7 +16,8 @@
     var open = function () {
       nav.classList.add('is-open'); document.body.classList.add('menu-open');
       btn.setAttribute('aria-expanded', 'true');
-      var first = nav.querySelector('a'); if (first) first.focus();
+      /* Focus the sheet itself, not its first link: otherwise phones draw a focus ring round that link on every open. Tab still starts there. */
+      nav.setAttribute('tabindex', '-1'); nav.focus();
     };
     var close = function (refocus) {
       nav.classList.remove('is-open'); document.body.classList.remove('menu-open');
@@ -29,7 +30,7 @@
       if (e.key === 'Escape' && nav.classList.contains('is-open')) close(true);
       if (e.key === 'Tab' && nav.classList.contains('is-open')) { /* keep focus inside the sheet */
         var f = nav.querySelectorAll('a, button'); var a = f[0], z = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
+        if (e.shiftKey && (document.activeElement === a || document.activeElement === nav)) { e.preventDefault(); z.focus(); }
         else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
       }
     });

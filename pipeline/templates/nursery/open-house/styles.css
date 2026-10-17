@@ -524,3 +524,6 @@ ol.steps li + li { margin-top: 12px; }
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
   .pause-btn { display: none; }
 }
+
+/* The phone menu sheet takes focus itself when it opens (the script); no ring round the whole sheet */
+#site-nav:focus { outline: none; }

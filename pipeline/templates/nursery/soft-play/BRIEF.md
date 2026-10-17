@@ -54,7 +54,7 @@ It deliberately avoids every signature device of our earlier templates (luggage 
 | 6 | **Book a visit band**: deep pool blue with generous padding, one centred white card with a gently bouncing beach ball on its edge, one button and Phone, and a pile of foam at its foot. | S13 one primary action; Sunflower's single-card visit band; Ball-pit edging removed on the owner's feedback (too busy). |
 | 7 | **"Book a visit"** in tomato-deep everywhere; Phone is always a plain text link with a handset icon. | S13. Playhouse's repeated "Enquire now" is the model. |
 | 8 | Inner pages: page band (eyebrow with Home, H1 ≤6 words, intro ≤35 words, one action, the page's foam shape large in its colour), "On this page" with foam-cube bullets, sections of ≤120 words, `<details>` for reference, a **Next** door, the visit band. | S10. Sunflower's calm band on every inner page; Playhouse's room colour coding. |
-| 9 | Menu of 6 items plus Book a visit; on phones a full-height sheet, one 56px link per row with the page's foam shape, Phone and Book a visit at the bottom. | S11; §6.1. Playhouse's 12 flat items shown twice is the anti-pattern. |
+| 9 | Menu of 6 items plus Book a visit; on phones a full-height sheet, one 56px link per row with the page's foam shape, Phone and Book a visit at the bottom. When the sheet opens, the sheet itself takes focus (not its first link, which phones would ring); Tab starts at the first link and Escape returns to the Menu button. | S11; §6.1. Playhouse's 12 flat items shown twice is the anti-pattern. |
 | 10 | Sticky phone bar (Book a visit, Phone) only after the hero, hidden while the visit band or footer is on screen; the body is padded by its height. | S11: allowed if it never covers content or focus. |
 | 11 | Body text 18px on a phone, 20px on desktop, line height 1.6, 60ch measure, ink at 16:1; Bagel only for H1, H2 and door labels, never more than 5 words. | S8; §6.5. Playhouse's 14px grey and Sunflower's 13px read as busy. |
 | 12 | Rooms on Our nursery each get a colour and a drawn line icon (rattle, duck, rocket, watering can). Only the room names the nursery uses. | Playhouse's room identity (bunny, owl, tepee), made our own. |
@@ -124,7 +124,7 @@ Samuel noticed that the other nursery templates are photo-rich and Soft Play was
 | < 600px | 24px gutters. Hero photo 4:3 below the words. Staircase bars stepping in 12px. Tour film full row. Room stops one per row; tiles 2 per row. Doors one per row (shape 104px left, label right). Sticky phone bar after the hero. Tables stack to label/value rows. |
 | 600 to 899px | 40px gutters. Room stops 2 per row from 760px, the second column stepped down 80px. Doors 2 per row from 760px (labels only change size). |
 | ≥ 900px | Hero in two columns (words left, the photo right). Staircase becomes 5 rising steps. Tour: words left, film right. Tiles 4 in a row. Page bands in two columns with the foam shape right. Gallery 3 columns. |
-| ≥ 1024px | Desktop nav replaces the Menu button; phone bar off. Doors 3 by 2 with a tinted hover. |
+| ≥ 1024px | Desktop nav replaces the Menu button (links and Book a visit on one line); phone bar off. Doors 3 by 2 with a tinted hover. |
 | ≥ 1248px | 64px gutters; container 1,120px. |
 
 ## 6. Components (all in `styles.css`)

@@ -42,7 +42,7 @@ Studio's code isn't in this repo any more. It lives in its own **Studio** projec
 | `pipeline/index.html` | Board UI: cards, panel, workflows drawer, template picker |
 | `pipeline/audit.mjs` | Playwright and axe browser audit. `node pipeline/audit.mjs <url> <outdir>` |
 | `pipeline/crawl.mjs` | Crawls a practice's current site into `work/<card>/source/` (SITE.md, page texts, photos, documents). Runs before Redesign study. `node pipeline/crawl.mjs <url> <outdir> [max pages]` |
-| `pipeline/viewports.mjs` | Screenshots and layout flags at 9 widths from 360 to 1440px. `node pipeline/viewports.mjs <url> <outdir> [widths]` |
+| `pipeline/viewports.mjs` | Screenshots and layout flags at 9 widths from 360 to 1440px: sideways scroll, overlaps, header menu links that wrap, empty space below the footer, and focus jumping onto a link when the phone menu opens (also saves `<width>-menu.png`). `node pipeline/viewports.mjs <url> <outdir> [widths]` |
 | `pipeline/template-thumbs.mjs` | Regenerates `templates/*/thumb.jpg` for the picker |
 | `pipeline/notify.mjs` | Notifications (needs attention, ready for review, workflow ended, workers gave up): desktop via the board, email via Gmail SMTP. Settings in `pipeline/notify.local.json` (git-ignored) |
 | `pipeline/cli.mjs` | CLI for agents. See `pipeline/AGENTS.md` |

@@ -786,3 +786,9 @@ body:has(.lightbox[open]) { overflow: hidden; }
   body { background: #fff; padding: 0; }
   a { text-decoration: underline; }
 }
+
+/* The phone menu sheet takes focus itself when it opens (the script); no ring round the whole sheet */
+#menu:focus { outline: none; }
+
+/* Header menu: links and the button stay on one line ("Visit and / join" looked broken at 1024px) */
+.site-nav a { white-space: nowrap; }

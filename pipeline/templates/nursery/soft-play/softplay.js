@@ -22,7 +22,8 @@
     var open = function () {
       sheet.hidden = false; menuBtn.setAttribute('aria-expanded', 'true');
       document.body.classList.add('menu-open');
-      var first = $('a, button', sheet); if (first) first.focus();
+      /* Focus the sheet itself, not its first link: otherwise phones draw a focus ring round the logo on every open. Tab still starts there. */
+      sheet.setAttribute('tabindex', '-1'); sheet.focus();
     };
     var close = function () {
       sheet.hidden = true; menuBtn.setAttribute('aria-expanded', 'false');
@@ -34,7 +35,7 @@
       if (e.key === 'Escape') { close(); return; }
       if (e.key !== 'Tab') return;
       var f = $$('a, button', sheet); var a = f[0], z = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
+      if (e.shiftKey && (document.activeElement === a || document.activeElement === sheet)) { e.preventDefault(); z.focus(); }
       else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
     });
     $$('a[href^="#"], a[href*=".html#"]', sheet).forEach(function (l) { l.addEventListener('click', function () { if (!sheet.hidden) close(); }); });

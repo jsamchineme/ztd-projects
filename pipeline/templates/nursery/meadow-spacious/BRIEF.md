@@ -16,7 +16,7 @@ The owner found the original "a bit cramped, especially in mobile view" and want
 
 **Every page**
 - **Space tokens (S1, S2, S7, S8):** `--gutter` 24 / 40 / 64px; `--section` `clamp(5rem, 3.6rem + 5.6vw, 8rem)` (80px phone, 128px at 1280); `--group` 48 / 64px; `--gap-cards` 24 / 32px; `--measure` 60ch. Body stays 18px (19px from 48em), line height 1.6.
-- **Menu (S11):** 6 items (Home dropped: the logo is the home link) plus "Book a visit". Phones get a full-height sheet with 56px rows in door order and Book a visit and Phone at the bottom. The header is sticky below 64em; under 30em its Phone button is icon-only so the name stays on 2 lines.
+- **Menu (S11):** 6 items (Home dropped: the logo is the home link) plus "Book a visit". Phones get a full-height sheet with 56px rows in door order and Book a visit and Phone at the bottom. The header is sticky below 68em; under 30em its Phone button is icon-only so the name stays on 2 lines.
 - **One per row on phones (S6):** team cards and animal cards became rows (pebble photo left, name, role and line right); garden features are a ruled list instead of wrapping pills; grade rosettes sit one per row beside their question.
 - **Footer:** "Help for families" (3 links) and "See our photos" were dropped from the footer: every one of those links is in the body of Fees and funding, or the menu. The footer is now contact + About us.
 
@@ -142,7 +142,7 @@ It must not reuse the signature devices of our earlier nursery templates: no lug
 ## 4. Homepage structure (keep this order)
 
 1. Skip link, inline SVG sprite (icons, the brand mark, doodles).
-2. **Header** `header.site-header` (sticky below 64em): `a.brand`, `a.header-call` (icon only under 30em, "Phone" to 48em, then the number), `button.menu-toggle` ("Menu", hidden from 64em), `nav#site-nav` with 6 items in door order and `.nav-extra` (Book a visit, Phone).
+2. **Header** `header.site-header` (sticky below 68em): `a.brand`, `a.header-call` (icon only under 30em, "Phone" to 48em, then the number), `button.menu-toggle` ("Menu", hidden from 68em), `nav#site-nav` with 6 items in door order and `.nav-extra` (Book a visit, Phone).
 3. **Hero** `section.hero`: `.scene` (the SVG as `<img alt="">`), then `.hero__body`: `p.place-tag`, `h1`, `p.hero__lead` (one sentence), `.actions` (Book a visit to `join-us.html#visit`; Phone). At least 70% of the first phone screen.
 4. **The essentials** `section.section--tint`: `h2`, `ul.essentials` of 5 `li` (`span.pebble` with a doodle, then the line), `p.go-row > a.go` "All the details".
 5. **Life on the farm** `.farm`: `.farm__text` (h2, one sentence, one `.go`), `.pair` of a `.blob` and the `figure.living`.
@@ -164,7 +164,8 @@ Checked with `viewports.mjs` at 360, 390, 430, 600, 768, 834, 1024, 1280 and 144
 | 46em | Room blocks, people (3), animals (3) and answer cards go to 2 or 3 columns. |
 | 48em | Body text 19px. The header shows the phone number. The call bar goes. The living photo may autoplay. |
 | 52em | Stones in one staggered row of 5. Collage becomes the 12-column scrapbook. `.split` goes to 2 columns. Snapshot strip in one row. Footer in 3 columns. |
-| 64em | Full nav row; Menu goes. Tiles 4:3, wider gaps. Mosaic 4 columns. Rooms in 4, people in 4, animals in 4. |
+| 64em | Tiles 4:3, wider gaps. Mosaic 4 columns. Rooms in 4, people in 4, animals in 4. |
+| 68em | Full nav row (it needs about 1,080px); Menu goes. Links and Book a visit stay on one line. |
 
 Rules: grid children have `min-width: 0` so tables and long emails never push the page sideways; emails wrap anywhere; tables sit in `.table-wrap`.
 

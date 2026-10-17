@@ -206,7 +206,8 @@ a[href^="mailto:"] { overflow-wrap: anywhere; word-break: break-word; }
 .site-nav .nav-extra .btn--ghost { color: var(--ink); }
 .site-nav .nav-extra .btn:hover { background: var(--action-strong); }
 .site-nav .nav-extra .btn--ghost:hover { background: var(--mint); }
-@media (max-width: 63.99em) {
+/* The full menu row needs about 1,080px, so it starts at 68em; below that, Menu opens the sheet */
+@media (max-width: 67.99em) {
   .site-nav { padding-bottom: 1rem; }
   .site-nav ul { display: grid; gap: 0; }
   .site-nav li { border-bottom: 2px dotted var(--line); }
@@ -217,7 +218,7 @@ a[href^="mailto:"] { overflow-wrap: anywhere; word-break: break-word; }
   body.menu-open { overflow: hidden; }
   body.menu-open .callbar { visibility: hidden; }
 }
-@media (min-width: 64em) {
+@media (min-width: 68em) {
   .site-header { position: relative; }
   :root { --header-h: 0px; }
   .menu-toggle { display: none; }
@@ -736,3 +737,6 @@ main:has(> .visit-band:last-child) + .site-footer { margin-top: 0; }
 @media (max-width: 45.99em) { #grades .centre { text-align: left; } #grades .centre p { margin-inline: 0; } }
 main li > a[href^="tel:"], main p > a[href^="tel:"]:not([class]) { display: inline-block; padding-block: .5rem; }
 @media (max-width: 51.99em) { .farm .pair { max-width: 30rem; } }
+
+/* Header: the Book a visit button stays on one line */
+.site-nav .nav-extra .btn { white-space: nowrap; }

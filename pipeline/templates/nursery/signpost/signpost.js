@@ -30,7 +30,7 @@
     nav.addEventListener("click", function (e) {
       if (e.target.closest("a") && toggle.getAttribute("aria-expanded") === "true") setOpen(false);
     });
-    window.matchMedia("(min-width: 64em)").addEventListener("change", function () { setOpen(false); });
+    window.matchMedia("(min-width: 68em)").addEventListener("change", function () { setOpen(false); });
   }
 
   /* Phone dock: shows after the first screen, hides once the footer is in view. */

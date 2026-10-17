@@ -35,7 +35,7 @@
       if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") { setOpen(false); toggle.focus(); }
     });
     nav.addEventListener("click", function (e) { if (e.target.closest("a") && toggle.getAttribute("aria-expanded") === "true") setOpen(false); });
-    if (window.matchMedia) matchMedia("(min-width: 64em)").addEventListener("change", function () { setOpen(false); });
+    if (window.matchMedia) matchMedia("(min-width: 68em)").addEventListener("change", function () { setOpen(false); });
   }
 
   /* ---- 4. Living photo -------------------------------------------- */

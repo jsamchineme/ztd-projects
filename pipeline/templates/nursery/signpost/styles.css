@@ -209,7 +209,8 @@ a:focus-visible { background-color: var(--focus); color: var(--focus-ink); text-
 .tab-team { --tab: var(--team); } .tab-parents { --tab: var(--parents); } .tab-gallery { --tab: var(--gallery); }
 body.menu-open { overflow: hidden; }
 
-@media (min-width: 64em) {
+/* The full menu row needs about 1,080px, so it starts at 68em; below that, Menu opens the sheet */
+@media (min-width: 68em) {
   .menu-toggle { display: none; }
   .site-header__bar { min-height: 5rem; }
   .site-nav, .site-nav.is-open { display: flex; position: static; flex-direction: row; align-items: center; gap: 1.25rem; padding: 0; background: none; overflow: visible; }
@@ -224,7 +225,7 @@ body.menu-open { overflow: hidden; }
   .brand__mark { width: 2.75rem; height: 3rem; }
   .brand__name { font-size: 1.25rem; }
 }
-@media (min-width: 64em) and (max-width: 74.99em) {
+@media (min-width: 68em) and (max-width: 74.99em) {
   .nav-list { gap: 0.25rem 0.75rem; }
   .nav-list a { font-size: 0.9375rem; }
 }
@@ -585,3 +586,6 @@ tbody th { width: 55%; }
   .board::before, .page-band { background: none !important; color: var(--ink); }
   .board { color: var(--ink); }
 }
+
+/* Header: the Book a visit button stays on one line */
+.nav-extra .btn { white-space: nowrap; }
