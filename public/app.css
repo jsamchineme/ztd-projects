@@ -110,8 +110,13 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .phone-row { display: flex; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); }
 .phone-row:last-child { border-bottom: 0; }
 .runner-row select { width: auto; }
+.runner-actions { display: flex; gap: 10px; align-items: center; flex: none; }
 .runner-command { white-space: pre-wrap; word-break: break-all; user-select: all; font-size: 12.5px; background: var(--code-bg); border: 1px solid var(--line); padding: 10px 12px; border-radius: var(--r); margin: 0; }
-@media (max-width: 600px){ .runner-row { flex-wrap: wrap; } }
+@media (max-width: 600px){
+  .runner-row { flex-wrap: wrap; }
+  .runner-row .runner-actions { flex-basis: 100%; margin-left: 52px; }
+  .runner-row select { flex: 1; }
+}
 .push-sub { margin: 20px 0 8px; font-size: 14px; }
 .push-app { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
 .push-app summary { cursor: pointer; font-weight: 600; }

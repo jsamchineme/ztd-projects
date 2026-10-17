@@ -224,9 +224,9 @@ async function paintRunners(card){
       h('div', { style: { flex: 1, minWidth: 0 } }, h('strong', null, r.name),
         r.connected ? h('span', { class: 'pill ok', style: { marginLeft: '8px' } }, r.running ? `Running ${r.running} chat${r.running > 1 ? 's' : ''}` : 'Connected') : null,
         h('div', { class: 'small muted' }, [r.connected ? r.host : r.lastSeenAt ? `Last connected ${ago(r.lastSeenAt)}` : 'Not connected yet: run the install command on it', r.claude].filter(Boolean).join(' · '))),
-      max,
-      h('button', { class: 'btn small', onclick: e => confirmDialog(`Remove ${r.name}?`, 'Its runner stops, and your chats run on the Studio server again. Its copies of your projects stay on it until you delete ~/StudioRunner.', 'Remove')
-        .then(ok => ok && busy(e.target, async () => { await api('DELETE', `/api/me/runners/${r.id}`); toast(`${r.name} removed`); repaint(); })).catch(() => {}) }, 'Remove'));
+      h('div', { class: 'runner-actions' }, max,
+        h('button', { class: 'btn small', onclick: e => confirmDialog(`Remove ${r.name}?`, 'Its runner stops, and your chats run on the Studio server again. Its copies of your projects stay on it until you delete ~/StudioRunner.', 'Remove')
+          .then(ok => ok && busy(e.target, async () => { await api('DELETE', `/api/me/runners/${r.id}`); toast(`${r.name} removed`); repaint(); })).catch(() => {}) }, 'Remove')));
   };
   card.replaceChildren(
     list.length ? h('div', { class: 'phones' }, list.map(row)) : null,
