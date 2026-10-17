@@ -690,11 +690,24 @@ function servicesTab(ctx){
   }
 
   function editServices(p){
-    const rows = p.services.map(s => ({ ...s, envText: s.envKeys.map(k => `${k}=`).join('\n') }));
+    const rows = p.services.map(s => ({ ...s, envVars: s.envKeys.map(k => ({ key: k, value: '', existing: true })) }));
     const list = h('div');
+    // A small key/value editor for one service's environment variables — easier to fill in than a raw textarea.
+    const envRows = s => {
+      const box = h('div', { class: 'env-list' });
+      const draw = () => box.replaceChildren(
+        ...s.envVars.map((e, j) => {
+          const key = h('input', { type: 'text', value: e.key, placeholder: 'NAME', class: 'mono', spellcheck: 'false', autocapitalize: 'off', 'aria-label': 'Variable name' }); key.oninput = () => { e.key = key.value; };
+          const val = h('input', { type: 'text', value: e.value, placeholder: e.existing ? 'set — leave empty to keep' : 'value', class: 'mono', spellcheck: 'false', autocapitalize: 'off', 'aria-label': 'Value' }); val.oninput = () => { e.value = val.value; };
+          const rm = h('button', { class: 'btn small danger', type: 'button', title: 'Remove variable', 'aria-label': 'Remove variable', onclick: () => { s.envVars.splice(j, 1); draw(); } }, ico('x'));
+          return h('div', { class: 'env-row' }, key, val, rm);
+        }),
+        h('button', { class: 'btn small', type: 'button', onclick: () => { s.envVars.push({ key: '', value: '', existing: false }); draw(); } }, '+ Add variable'));
+      draw();
+      return box;
+    };
     const paintRows = () => list.replaceChildren(...rows.map((s, i) => {
       const inp = (k, attrs = {}) => { const el = h('input', { type: 'text', value: s[k] ?? '', ...attrs }); el.oninput = () => { s[k] = attrs.type === 'number' ? Number(el.value) : el.value; }; return el; };
-      const env = h('textarea', { rows: 3, value: s.envText || '', placeholder: 'NAME=value, one per line', class: 'mono' }); env.oninput = () => { s.envText = env.value; };
       const auto = h('input', { type: 'checkbox', checked: s.autostart !== 0 && s.autostart !== false }); auto.onchange = () => { s.autostart = auto.checked; };
       const pub = h('input', { type: 'checkbox', checked: !!s.publicAccess }); pub.onchange = () => { s.publicAccess = pub.checked; };
       return h('div', { class: 'svc-edit' },
@@ -702,7 +715,7 @@ function servicesTab(ctx){
         field('Start command', inp('command', { class: 'mono' }), 'runs in the project folder; $PORT is set'),
         h('div', { class: 'grid2' }, field('Port', inp('port', { type: 'number', min: 4301, max: 4999 })), field('Memory limit (MB)', inp('memoryMB', { type: 'number', min: 128, max: 3072 }))),
         field('Web address', inp('subdomain', { placeholder: 'leave empty for none' }), `becomes <name>.${state.me.domain}`),
-        field('Settings (environment variables)', env, 'values are hidden; leave a value empty to keep it'),
+        h('div', null, h('label', null, 'Environment variables', h('span', { class: 'hint' }, ' saved values are hidden — leave a value empty to keep it')), envRows(s)),
         h('label', { class: 'check' }, auto, 'Start automatically when the server starts'),
         h('label', { class: 'check' }, pub, 'Public: anyone with the link can open it, no Studio sign-in (for client previews)'),
         h('button', { class: 'btn small danger', type: 'button', onclick: () => { rows.splice(i, 1); paintRows(); } }, 'Remove service'));
@@ -712,14 +725,14 @@ function servicesTab(ctx){
       e.preventDefault();
       const btn = e.submitter;
       await busy(btn, async () => {
-        const r = await api('PUT', `/api/projects/${ctx.id}/services`, { services: rows.map(s => ({ id: s.id, name: s.name, label: s.label, command: s.command, port: s.port, subdomain: s.subdomain || null, memoryMB: s.memoryMB, autostart: s.autostart !== 0 && s.autostart !== false, publicAccess: !!s.publicAccess, envText: s.envText })) });
+        const r = await api('PUT', `/api/projects/${ctx.id}/services`, { services: rows.map(s => ({ id: s.id, name: s.name, label: s.label, command: s.command, port: s.port, subdomain: s.subdomain || null, memoryMB: s.memoryMB, autostart: s.autostart !== 0 && s.autostart !== false, publicAccess: !!s.publicAccess, envText: s.envVars.filter(e => e.key.trim()).map(e => `${e.key.trim()}=${e.value}`).join('\n') })) });
         close(); paint(r); toast('Services saved. Restart them to apply new settings.');
       }, 'Saving…').catch(() => {});
     } },
       h('h2', null, 'Edit services'),
       h('p', { class: 'muted small' }, 'New web addresses get an HTTPS certificate automatically, which takes about a minute.'),
       list,
-      h('button', { class: 'btn small', type: 'button', onclick: async () => { rows.push({ name: '', label: '', command: 'node server.mjs', port: 4400 + Math.floor(Math.random() * 500), memoryMB: 800, autostart: true, envText: '' }); paintRows(); } }, '+ Add a service'),
+      h('button', { class: 'btn small', type: 'button', onclick: async () => { rows.push({ name: '', label: '', command: 'node server.mjs', port: 4400 + Math.floor(Math.random() * 500), memoryMB: 800, autostart: true, envVars: [] }); paintRows(); } }, '+ Add a service'),
       h('div', { class: 'row end', style: { marginTop: '18px' } }, h('button', { class: 'btn', type: 'button', onclick: () => close() }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Save'))));
   }
 

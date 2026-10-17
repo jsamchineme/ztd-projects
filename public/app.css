@@ -467,6 +467,9 @@ a.attach-chip:hover { border-color: var(--accent); }
 .term-head .dot { box-shadow: none; }
 .logs { background: var(--term); color: #d7e1ee; font-family: var(--mono); font-size: 12px; line-height: 1.65; padding: 12px 16px; height: 380px; overflow: auto; white-space: pre-wrap; word-break: break-all; margin: 0; }
 .svc-edit { border: 1px solid var(--line); border-radius: var(--r-lg); padding: 4px 16px 16px; margin: 12px 0; background: var(--sunken); }
+.env-list { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.env-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto; gap: 8px; align-items: center; width: 100%; }
+.env-row .btn { padding: 0; width: 40px; min-height: 40px; display: inline-grid; place-items: center; flex: none; }
 
 /* ---------- changes ---------- */
 .changes-layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 20px; align-items: start; }
@@ -596,6 +599,7 @@ dialog.palette { width: min(620px, calc(100vw - 32px)); margin-top: 12vh; overfl
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .subnav { display: flex; overflow-x: auto; position: static; } .subnav a { white-space: nowrap; }
   .svc-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } .svc-meta > div:nth-child(2) { border-right: 0; } .svc-meta > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .env-row { grid-template-columns: minmax(0, 1fr) auto; } .env-row > input:first-child { grid-column: 1 / -1; }
   .files-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .tree-pane { border-right: 0; border-bottom: 1px solid var(--line); max-height: 38vh; }
   .changes-files { position: static; }
