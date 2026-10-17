@@ -1,5 +1,5 @@
 // A project: chat with Claude, running services, changes, files and settings.
-import { h, $, fill, onTap, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy, ico } from './ui.js';
+import { h, $, fill, onTap, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy, ico, enhanceCode } from './ui.js';
 import { state, go, onLeave, refreshProjects, setTitle, setTopbar, hideTopbar, localStorageSet, localStorageGet, renderSideProjects, sideChats, projectState } from './app.js';
 import { runStudioUpdate } from './people.js';
 
@@ -445,6 +445,7 @@ function renderChat(ctx, el, chatId, loadList){
       live?.remove(); live = null; liveThinking?.remove(); liveThinking = null;
       head();
       node = h('div', { class: 'msg md', html: md(ev.text) });
+      enhanceCode(node);
     } else if (ev.type === 'thinking'){
       liveThinking?.remove(); liveThinking = null;
       node = h('details', { class: 'thinking' }, h('summary', null, 'Thought for a moment'), h('div', null, ev.text));

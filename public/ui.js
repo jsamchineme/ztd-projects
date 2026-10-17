@@ -173,6 +173,23 @@ export async function copy(text){
   catch { toast('Copy failed. Select the text and copy it yourself.', true); }
 }
 
+// Adds a click-to-copy button to each fenced code block (<pre><code>) inside a rendered markdown node.
+// Safe to call again on the same node: blocks that already have a button are skipped.
+export function enhanceCode(root){
+  for (const pre of root.querySelectorAll('pre')){
+    const code = pre.querySelector('code');
+    if (!code || pre.querySelector(':scope > .copy-code')) continue;
+    const btn = h('button', { class: 'copy-code', type: 'button', title: 'Copy', 'aria-label': 'Copy to clipboard' }, ico('copy'));
+    btn.onclick = async e => {
+      e.stopPropagation();
+      await copy(code.textContent);
+      btn.replaceChildren(ico('check')); btn.classList.add('ok');
+      setTimeout(() => { btn.replaceChildren(ico('copy')); btn.classList.remove('ok'); }, 1400);
+    };
+    pre.appendChild(btn);
+  }
+}
+
 // ---------- markdown (escapes everything first, so output is safe to insert) ----------
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 export { esc };

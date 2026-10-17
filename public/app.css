@@ -341,9 +341,15 @@ table.audit td.mono { font-size: 12px; } table.audit td.mono::before { content: 
 .md p { margin: 0 0 10px; }
 .md ul, .md ol { margin: 0 0 10px; padding-left: 22px; } .md li { margin: 3px 0; } .md li::marker { color: var(--faint); }
 .md h1, .md h2, .md h3, .md h4, .md h5 { font-size: 1.08rem; margin: 16px 0 6px; }
-.md pre { background: var(--code-bg); border: 1px solid var(--line); padding: 12px 14px; border-radius: var(--r); overflow-x: auto; margin: 0 0 10px; line-height: 1.6; }
+.md pre { position: relative; background: var(--code-bg); border: 1px solid var(--line); padding: 12px 44px 12px 14px; border-radius: var(--r); overflow-x: auto; margin: 0 0 10px; line-height: 1.6; }
 .md code { background: var(--code-bg); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; }
 .md pre code { background: none; border: 0; padding: 0; }
+/* Click-to-copy button on code blocks. Always shown on touch (no hover); fades in on hover for pointer devices. */
+.copy-code { position: absolute; top: 6px; right: 6px; display: inline-grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--muted); cursor: pointer; transition: color .12s, opacity .12s, background .12s; }
+.copy-code:hover { color: var(--text); background: var(--hover); }
+.copy-code.ok { color: var(--accent); opacity: 1; }
+.copy-code .ico { width: 15px; height: 15px; }
+@media (hover: hover) { .copy-code { opacity: 0; } .md pre:hover .copy-code, .copy-code:focus-visible { opacity: 1; } }
 .md a { word-break: break-all; }
 .md table { border-collapse: collapse; margin: 0 0 10px; font-size: 14px; display: block; overflow-x: auto; }
 .md td, .md th { border: 1px solid var(--line); padding: 5px 10px; text-align: left; } .md th { background: var(--sunken); }
