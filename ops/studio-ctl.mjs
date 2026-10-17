@@ -425,7 +425,10 @@ WantedBy=multi-user.target
     if (typeof req.email === 'string' && /^[^\s<>@]+@[^\s<>@]+$/.test(req.email)) extra.GIT_AUTHOR_EMAIL = extra.GIT_COMMITTER_EMAIL = req.email;
     const bin = CONF.fakeClaude && existsSync(CONF.fakeClaude) ? CONF.fakeClaude : CLAUDE;
     const args = ['-p', '--output-format', 'stream-json', '--verbose', '--include-partial-messages', '--model', model,
-      '--permission-mode', mode === 'plan' ? 'plan' : 'bypassPermissions'];
+      '--permission-mode', mode === 'plan' ? 'plan' : 'bypassPermissions',
+      // Headless (-p) chats have no one at a terminal to answer, so AskUserQuestion always errors mid-turn. Turn it off so
+      // Claude asks in its reply instead; the person answers in their next prompt.
+      '--disallowedTools', 'AskUserQuestion'];
     if (resume && resume !== '-') args.push('--resume', resume);
     if (existsSync(uploads(p))) args.push('--add-dir', uploads(p));   // chat attachments, readable in Plan mode too
     if (req.system) args.push('--append-system-prompt', String(req.system).slice(0, 20000));
