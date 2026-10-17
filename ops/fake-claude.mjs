@@ -43,6 +43,11 @@ if (args[0] === 'setup-token'){
     out({ type: 'assistant', message: { content: [{ type: 'text', text: 'Let me look at the project first.' }] } });
     out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 't1', name: 'Bash', input: { command: 'ls', description: 'List files' } }] } });
     out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 't1', content: 'server.mjs\npublic\n', is_error: false }] } });
+    // "leave it running": starts a command in the background and ends the turn without waiting for it.
+    if (/leave it running/i.test(prompt)){
+      out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 'tb', name: 'Bash', input: { command: 'sleep 600', run_in_background: true } }] } });
+      out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'tb', content: 'Command running in background with ID: b1', is_error: false }] } });
+    }
     let edited = false;
     if (/edit|change|write/i.test(prompt)){
       writeFileSync('STUDIO-TEST.md', `Written by the fake Claude.\n\nPrompt: ${prompt}\n`);

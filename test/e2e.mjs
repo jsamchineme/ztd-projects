@@ -748,6 +748,26 @@ await check('a chat that was running when Studio restarted carries on by itself'
   if (ev.some(e => e.type === 'error' || (e.type === 'notice' && e.text === 'Stopped.'))) throw new Error('the restart showed as an error or a stop');
   if (ev.filter(e => e.type === 'user').length !== 1) throw new Error('the pick-up showed as a new message');
 }, page);
+await check('a chat whose turn ends with work still running in the background carries on by itself', async () => {
+  const H = { headers: { Origin: BASE } };
+  const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const demo = teams.find(t => t.name === 'Pipeline Team').projects.find(p => p.name === 'Demo Site');
+  const chat = await (await page.request.post(`${BASE}/api/projects/${demo.id}/chats`, { ...H, data: {} })).json();
+  const sent = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt: 'start the build and leave it running' } });
+  if (!sent.ok()) throw new Error('prompt not accepted: ' + sent.status());
+  await page.goto(`${projectUrl}/chat/${chat.id}`);
+  await page.getByText('Asking it to carry on').waitFor();
+  let ev = [];
+  for (let i = 0; i < 40; i++){
+    const r = await (await page.request.get(`${BASE}/api/chats/${chat.id}`)).json();
+    ev = r.events;
+    if (!r.chat.running && ev.filter(e => e.type === 'result').length >= 2) break;
+    await new Promise(r => setTimeout(r, 250));
+  }
+  if (ev.filter(e => e.type === 'result').length !== 2) throw new Error(`expected 2 runs, got ${ev.filter(e => e.type === 'result').length}`);
+  if (ev.filter(e => e.type === 'user').length !== 1) throw new Error('carrying on showed as a new message');
+  if (ev.some(e => e.type === 'error')) throw new Error('carrying on showed an error');
+}, page);
 // A fake Anthropic API for projects' AI workers (STUDIO_ANTHROPIC_URL in test/run.sh): every Messages call reports usage.
 const anthropic = http.createServer((req, res) => {
   let body = '';
