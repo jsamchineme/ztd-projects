@@ -1,22 +1,76 @@
-// A small static web server. Studio sets PORT. Ask Claude in Studio to turn this into anything.
-import http from 'node:http';
-import { readFile } from 'node:fs/promises';
-import { join, extname, normalize } from 'node:path';
+// Studio "web" service entry point. Studio runs `node server.mjs` on $PORT with the
+// service env file loaded, so this file prepares everything a restart needs:
+//
+//   1. `prisma migrate deploy`   — apply pending migrations to DATABASE_URL
+//   2. seed, only if the DB is empty (first deploy)
+//   3. `next build`, only if the source changed since the last build
+//   4. boot Next.js
+//
+// Local development: use `npm run dev` instead.
+import { createServer } from "node:http";
+import { execSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
-const PORT = Number(process.env.PORT || 4400);
-const ROOT = join(import.meta.dirname, 'public');
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.json': 'application/json' };
+const root = import.meta.dirname;
+const dev = process.env.NODE_ENV === "development";
+if (!dev) process.env.NODE_ENV = "production";
 
-http.createServer(async (req, res) => {
-  const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^(\.\.[\/\\])+/, '');
-  let file = join(ROOT, path.endsWith('/') ? path + 'index.html' : path);
-  if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end(); }
-  try {
-    const body = await readFile(file);
-    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream' });
-    res.end(body);
-  } catch {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not found');
+const port = Number(process.env.PORT || 4402);
+const hostname = process.env.HOST || "127.0.0.1";
+
+function run(cmd) {
+  console.log(`$ ${cmd}`);
+  execSync(cmd, { cwd: root, stdio: "inherit", env: process.env });
+}
+
+// Hash of every tracked or untracked-but-not-ignored file, so any code change triggers a rebuild.
+function sourceHash() {
+  const files = execSync("git ls-files -co --exclude-standard", { cwd: root })
+    .toString()
+    .split("\n")
+    .filter(Boolean)
+    .sort();
+  const hash = createHash("sha256");
+  for (const f of files) {
+    const p = join(root, f);
+    if (!existsSync(p)) continue;
+    hash.update(f).update(readFileSync(p));
   }
-}).listen(PORT, '127.0.0.1', () => console.log(`Listening on ${PORT}`));
+  return hash.digest("hex");
+}
+
+if (!dev) {
+  if (!process.env.DATABASE_URL) {
+    console.error("DATABASE_URL is not set — add it to the Studio service env.");
+    process.exit(1);
+  }
+
+  run("npx prisma migrate deploy");
+  run("npx tsx prisma/seed.ts --if-empty");
+
+  const stampFile = join(root, ".next", "source-hash");
+  const current = sourceHash();
+  const built = existsSync(stampFile) ? readFileSync(stampFile, "utf8") : "";
+  if (current !== built || !existsSync(join(root, ".next", "BUILD_ID"))) {
+    run("npm run build");
+    writeFileSync(stampFile, current);
+  } else {
+    console.log("Build is up to date — skipping next build.");
+  }
+}
+
+const { default: next } = await import("next");
+const app = next({ dev, hostname, port, dir: root });
+const handle = app.getRequestHandler();
+
+await app.prepare();
+
+createServer((req, res) => {
+  handle(req, res);
+}).listen(port, hostname, () => {
+  console.log(
+    `▲ Debb's Kitchen ready on http://${hostname}:${port} (${dev ? "development" : "production"})`,
+  );
+});

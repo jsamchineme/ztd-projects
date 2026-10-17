@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth (admin/CMS users) ────────────────────────────────────────────────
+
+model User {
+  id               String   @id @default(cuid())
+  name             String
+  email            String   @unique
+  password         String
+  role             UserRole @default(EDITOR)
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @default("")
+  access_token      String? @default("")
+  expires_at        Int?
+  token_type        String? @default("")
+  scope             String? @default("")
+  id_token          String? @default("")
+  session_state     String? @default("")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  AUTHOR
+}
+
+// ─── CMS pages (section-based editor) ──────────────────────────────────────
+
+model Page {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  metaDescription String?
+  sections        String?  // JSON array of section objects
+  published       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ─── Commerce ──────────────────────────────────────────────────────────────
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  order     Int       @default(0)
+  published Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  description    String?
+  body           String?  // TipTap JSON output (long description)
+  priceCents     Int
+  compareAtCents Int?     // original price for "on sale" display
+  imageUrl       String?
+  images         String?  // JSON array of extra image URLs
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  inStock        Boolean  @default(true)
+  bestSeller     Boolean  @default(false)
+  featured       Boolean  @default(false)
+  freeShipping   Boolean  @default(true)
+  onSale         Boolean  @default(false)
+  order          Int      @default(0)
+  published      Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  reference     String      @unique // human-friendly order number
+  name          String?
+  email         String
+  phone         String?
+  address       String?
+  city          String?
+  postalCode    String?
+  note          String?
+  subtotalCents Int
+  shippingCents Int         @default(0)
+  totalCents    Int
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id            String  @id @default(cuid())
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String?
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  nameSnapshot  String
+  priceCents    Int
+  quantity      Int     @default(1)
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FULFILLED
+  CANCELLED
+}
+
+// ─── Stores (physical / popup locations) ───────────────────────────────────
+
+model Store {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  city      String?
+  region    String?
+  hours     String?
+  phone     String?
+  mapUrl    String?
+  imageUrl  String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── DK Show (video episodes) ──────────────────────────────────────────────
+
+model Video {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  description  String?
+  youtubeUrl   String
+  thumbnailUrl String?
+  episode      String?
+  order        Int      @default(0)
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ─── Blog ──────────────────────────────────────────────────────────────────
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  excerpt   String?
+  category  String?
+  author    String?
+  imageUrl  String?
+  body      String?  // TipTap JSON output
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Testimonials ──────────────────────────────────────────────────────────
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  quote     String
+  author    String
+  role      String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ─── Contact + newsletter ──────────────────────────────────────────────────
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+// ─── Settings + media ──────────────────────────────────────────────────────
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String // JSON string for complex values
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  publicId  String?
+  type      String   // "image" | "document" | "audio"
+  size      Int
+  createdAt DateTime @default(now())
+}
