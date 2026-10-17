@@ -635,4 +635,6 @@ const fromSystemd = process.env.LISTEN_FDS === '1' && Number(process.env.LISTEN_
 if (fromSystemd) server.listen({ fd: 3 }, () => console.log(`${APP_NAME} on the systemd socket (${STUDIO_URL})`));
 else server.listen(PORT, '127.0.0.1', () => console.log(`${APP_NAME} on http://127.0.0.1:${PORT} (${STUDIO_URL})`));
 setInterval(() => P.allStatus().catch(() => {}), 5000);
-for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { for (const id of A.runningChats()) A.stop(id); setTimeout(() => process.exit(0), 500); });
+// Chats running when Studio stops are picked up again a few seconds after it starts (lib/agent.mjs).
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { A.shutdown(); setTimeout(() => process.exit(0), 500); });
+setTimeout(() => { try { A.resumeInterrupted(); } catch (e){ console.error(e); } }, 3000);

@@ -25,7 +25,9 @@ fi
 WORK=$(mktemp -d /tmp/studio-test.XXXXXX)
 SERVER=
 cleanup(){
+  touch "$WORK/stop"
   [ -n "$SERVER" ] && kill "$SERVER" 2>/dev/null
+  [ -f "$WORK/server.pid" ] && kill "$(cat "$WORK/server.pid")" 2>/dev/null
   # services started by mock-ctl run in their own process groups
   [ -f "$WORK/mock/state.json" ] && node -e 'for (const u of Object.values(require(process.argv[1]).units)) if (u.pid) try { process.kill(-u.pid) } catch {}' "$WORK/mock/state.json" 2>/dev/null
   rm -rf "$WORK"
@@ -36,15 +38,16 @@ mkdir -p "$WORK/app" "$WORK/data" "$WORK/mock"
 ln -s "$CACHE/node_modules" "$WORK/app/node_modules"
 
 if curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/"; then echo "Port $PORT is in use: set STUDIO_TEST_PORT"; exit 2; fi
-( cd "$WORK/app" && exec env STUDIO_ALLOW_FIRST_SIGNUP=1 STUDIO_SECRET=local-test-secret-0123456789abcdefghijklmnop \
+# Like systemd, start Studio again whenever it stops (the test restarts it through $WORK/server.pid).
+( cd "$WORK/app" && while :; do env STUDIO_ALLOW_FIRST_SIGNUP=1 STUDIO_SECRET=local-test-secret-0123456789abcdefghijklmnop \
     STUDIO_DATA="$WORK/data" PORT="$PORT" STUDIO_DOMAIN=localhost STUDIO_HOST=studio.localhost STUDIO_URL="http://studio.localhost:$PORT" \
     STUDIO_FIRST_SERVICE_PORT=4971 STUDIO_CTL="$WORK/app/test/mock-ctl.mjs" STUDIO_CTL_SUDO=0 MOCK_ROOT="$WORK/mock" \
-    STUDIO_EXPO_PUSH_URL="http://127.0.0.1:$((PORT + 1))/push" STUDIO_PUSH_REPEAT_MS=300 STUDIO_PUSH_HOSTS="127.0.0.1:$((PORT + 1))" STUDIO_ANTHROPIC_URL="http://127.0.0.1:$((PORT + 2))" node server.mjs ) > "$WORK/server.log" 2>&1 &
+    STUDIO_EXPO_PUSH_URL="http://127.0.0.1:$((PORT + 1))/push" STUDIO_PUSH_REPEAT_MS=300 STUDIO_PUSH_HOSTS="127.0.0.1:$((PORT + 1))" STUDIO_ANTHROPIC_URL="http://127.0.0.1:$((PORT + 2))" node server.mjs & echo $! > "$WORK/server.pid"; wait $!; [ -f "$WORK/stop" ] && break; sleep 0.2; done ) > "$WORK/server.log" 2>&1 &
 SERVER=$!
 for _ in $(seq 40); do curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/" && break; sleep 0.25; done
 curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/" || { echo "Studio didn't start:"; cat "$WORK/server.log"; exit 1; }
 
 code=0
-MOCK_ROOT="$WORK/mock" node "$WORK/app/test/e2e.mjs" "http://studio.localhost:$PORT" "localhost:$PORT" "$SHOTS" || code=$?
+MOCK_ROOT="$WORK/mock" STUDIO_PID_FILE="$WORK/server.pid" node "$WORK/app/test/e2e.mjs" "http://studio.localhost:$PORT" "localhost:$PORT" "$SHOTS" || code=$?
 [ "$code" = 0 ] || { echo; echo "Studio's log (last 30 lines):"; tail -30 "$WORK/server.log"; echo "Screenshots: $SHOTS"; }
 exit "$code"

@@ -707,6 +707,25 @@ await check('a chat can be archived, unarchived and deleted', async () => {
   await page.waitForURL(/\/chat\/new$/);
   if (await row.count()) throw new Error('the deleted chat is still listed');
 }, page);
+await check('a chat that was running when Studio restarted carries on by itself', async () => {
+  const H = { headers: { Origin: BASE } };
+  const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const demo = teams.find(t => t.name === 'Pipeline Team').projects.find(p => p.name === 'Demo Site');
+  const chat = await (await page.request.post(`${BASE}/api/projects/${demo.id}/chats`, { ...H, data: {} })).json();
+  const sent = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt: 'take it slow please' } });
+  if (!sent.ok()) throw new Error('prompt not accepted: ' + sent.status());
+  const events = async () => (await (await page.request.get(`${BASE}/api/chats/${chat.id}`)).json()).events;
+  await new Promise(r => setTimeout(r, 1500));   // Claude has started its session
+  process.kill(Number(readFileSync(process.env.STUDIO_PID_FILE, 'utf8')), 'SIGTERM');
+  await new Promise(r => setTimeout(r, 1000));
+  for (let i = 0; i < 60; i++){ try { if ((await page.request.get(`${BASE}/api/me`)).ok()) break; } catch {} await new Promise(r => setTimeout(r, 250)); }
+  await page.goto(`${projectUrl}/chat/${chat.id}`);
+  await page.getByText('Picking up where it left off').waitFor();
+  await page.getByText('resumed: yes').waitFor();
+  const ev = await events();
+  if (ev.some(e => e.type === 'error' || (e.type === 'notice' && e.text === 'Stopped.'))) throw new Error('the restart showed as an error or a stop');
+  if (ev.filter(e => e.type === 'user').length !== 1) throw new Error('the pick-up showed as a new message');
+}, page);
 // A fake Anthropic API for projects' AI workers (STUDIO_ANTHROPIC_URL in test/run.sh): every Messages call reports usage.
 const anthropic = http.createServer((req, res) => {
   let body = '';
