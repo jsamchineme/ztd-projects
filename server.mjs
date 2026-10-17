@@ -2,7 +2,7 @@
 // service env file loaded, so this file prepares everything a restart needs:
 //
 //   1. `prisma migrate deploy`   — apply pending migrations to DATABASE_URL
-//   2. seed, only if the DB is empty (first deploy)
+//   2. seed (upserts), only when the seed or its scraped data changed
 //   3. `next build`, only if the source changed since the last build
 //   4. boot Next.js
 //
@@ -10,7 +10,7 @@
 import { createServer } from "node:http";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = import.meta.dirname;
@@ -47,8 +47,41 @@ if (!dev) {
     process.exit(1);
   }
 
-  run("npx prisma migrate deploy");
-  run("npx tsx prisma/seed.ts --if-empty");
+  // Migrations + seed only when the migrations, the seed/scraped data, or the
+  // target DB changed; a plain restart skips straight to booting.
+  // NOTE: while the site is being migrated from Wix the seed is the source of
+  // truth, so a changed seed re-applies its content (upserts) to the DB.
+  const bin = (name) => join(root, "node_modules", ".bin", name);
+  const dbStampFile = join(root, ".next", "db-hash");
+  const dbHash = createHash("sha256").update(process.env.DATABASE_URL);
+  const dbFiles = execSync(
+    "git ls-files -co --exclude-standard prisma/migrations prisma/seed.ts prisma/data",
+    { cwd: root },
+  )
+    .toString()
+    .split("\n")
+    .filter(Boolean)
+    .sort();
+  for (const f of dbFiles) dbHash.update(f).update(readFileSync(join(root, f)));
+  const dbCurrent = dbHash.digest("hex");
+  const dbBuilt = existsSync(dbStampFile) ? readFileSync(dbStampFile, "utf8") : "";
+  if (dbCurrent !== dbBuilt) {
+    // Migrations run over Neon's direct host (the pooler breaks session state),
+    // without Prisma's advisory lock: a lock left behind on a pooled connection
+    // otherwise blocks every start. Safe here — this service is the only deployer.
+    const directUrl = process.env.DATABASE_URL.replace("-pooler.", ".");
+    console.log(`$ ${bin("prisma")} migrate deploy`);
+    execSync(`${bin("prisma")} migrate deploy`, {
+      cwd: root,
+      stdio: "inherit",
+      env: { ...process.env, DATABASE_URL: directUrl, PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK: "1" },
+    });
+    run(`${bin("tsx")} prisma/seed.ts`);
+    mkdirSync(join(root, ".next"), { recursive: true });
+    writeFileSync(dbStampFile, dbCurrent);
+  } else {
+    console.log("Database is up to date — skipping migrations.");
+  }
 
   const stampFile = join(root, ".next", "source-hash");
   const current = sourceHash();

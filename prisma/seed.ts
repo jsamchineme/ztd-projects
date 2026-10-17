@@ -3,6 +3,14 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import bcrypt from "bcryptjs";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+// Scraped from the live Wix store: per-product description, keyed by slug.
+// Product photos live at public/products/<slug>.jpg.
+const scraped: Record<string, { description?: string }> = JSON.parse(
+  readFileSync(join(import.meta.dirname, "data", "products.json"), "utf8"),
+);
 
 const connectionString = process.env.DATABASE_URL ?? "";
 const adapter = /neon\.tech/.test(connectionString)
@@ -70,30 +78,44 @@ async function main() {
     featured?: boolean;
     onSale?: boolean;
     inStock?: boolean;
+    imageUrl?: string;
   }> = [
-    { slug: "suya-pepper-blend", name: "Suya Pepper Blend", description: "Smoky West-African street-food spice with roasted peanut, ginger and chili. Rub it on skewers, chicken or roasted vegetables.", priceCents: 1000, category: "spice-blends", bestSeller: true, featured: true },
-    { slug: "habanero-chile-powder", name: "Habanero Chile Powder", description: "Bright, fruity heat from sun-dried habaneros. A little goes a long way in sauces, stews and marinades.", priceCents: 1500, category: "single-spices", bestSeller: true },
-    { slug: "adobo-all-purpose", name: "Adobo All-Purpose Seasoning", description: "A balanced, garlicky everyday blend for meats, beans, rice and roasted vegetables.", priceCents: 1000, category: "spice-blends", bestSeller: true, featured: true },
-    { slug: "berbere", name: "Berbere", description: "Warm Ethiopian blend of chili, fenugreek, and warm baking spices. The heart of a great wot.", priceCents: 1500, category: "spice-blends", inStock: false },
-    { slug: "jollof-rice-seasoning", name: "Jollof Rice Seasoning", description: "Everything you need for a deep, smoky party-style jollof — tomato, pepper, thyme and bay.", priceCents: 950, category: "spice-blends", featured: true },
-    { slug: "flippin-chicken", name: "Flippin' Chicken Rub", description: "A crowd-pleasing poultry rub: paprika, garlic, herbs and a touch of brown-sugar sweetness.", priceCents: 950, category: "spice-blends", bestSeller: true },
-    { slug: "ny-pizza-seasoning", name: "NY Pizza Sauce Seasoning", description: "Oregano-forward Italian blend that turns canned tomatoes into a proper pizzeria sauce.", priceCents: 750, category: "spice-blends" },
-    { slug: "maharajah-curry", name: "Organic Maharajah Curry", description: "A luxurious saffron-kissed curry powder — golden, aromatic and never harsh.", priceCents: 1200, category: "spice-blends", featured: true },
-    { slug: "garlic-powder", name: "Garlic Powder", description: "Pure, pungent granulated garlic. A pantry essential for rubs, dressings and doughs.", priceCents: 850, category: "single-spices" },
+    // ── Full catalog migrated from the live site (names, prices, categories,
+    //    stock). Photos and descriptions are merged in from the scrape below. ──
+    { slug: "ny-pizza-sauce-seasoning", name: "NY Pizza Sauce Seasoning", description: "Oregano-forward Italian blend that turns canned tomatoes into a proper pizzeria sauce.", priceCents: 750, category: "spice-blends" },
+    { slug: "flippin-chicken", name: "Flippin Chicken", description: "A crowd-pleasing poultry rub: paprika, garlic, herbs and a touch of sweetness.", priceCents: 950, category: "spice-blends" },
+    { slug: "chefs-blend-extra-virgin-olive-oil", name: "Chef's Blend Extra Virgin Olive Oil", description: "Cold-pressed, peppery-finish olive oil for finishing, dipping and dressing.", priceCents: 2300, category: "olive-oil" },
+    { slug: "organic-maharajah-curry", name: "Organic Maharajah Curry", description: "A luxurious saffron-kissed curry powder — golden, aromatic and never harsh.", priceCents: 1200, category: "spice-blends" },
+    { slug: "african-birdseye-chile-powder", name: "African Birdseye Chile Powder", description: "Fiery, fruity heat from African birdseye chilies. Use sparingly.", priceCents: 1500, category: "single-spices" },
+    { slug: "suya-yaji", name: "Suya Yaji", description: "Smoky West-African street-food spice with roasted peanut, ginger and chili. Rub it on skewers, chicken or roasted vegetables.", priceCents: 1000, category: "spice-blends", bestSeller: true, featured: true, imageUrl: "/products/suya-yaji.jpg" },
+    { slug: "onion-powder", name: "Onion Powder", description: "Sweet, savory granulated onion for rubs, soups, dips and doughs.", priceCents: 850, category: "single-spices" },
+    { slug: "mediterranean-thyme", name: "Mediterranean Thyme", description: "Fragrant dried thyme for roasts, marinades and slow-cooked dishes.", priceCents: 750, category: "single-spices" },
+    { slug: "habanero-chile-powder", name: "Habanero Chile Powder", description: "Bright, fruity heat from sun-dried habaneros. A little goes a long way in sauces, stews and marinades.", priceCents: 1500, category: "single-spices", bestSeller: true, imageUrl: "/products/habanero-chile-powder.jpg" },
     { slug: "ground-cumin", name: "Ground Cumin", description: "Earthy, toasty and freshly milled — the backbone of countless spice blends.", priceCents: 800, category: "single-spices" },
     { slug: "ginger-powder", name: "Ginger Powder", description: "Warm, zesty ground ginger for baking, tea and savory marinades.", priceCents: 750, category: "single-spices" },
-    { slug: "himalayan-pink-salt", name: "Coarse Himalayan Pink Salt", description: "Hand-mined mineral-rich salt with a clean, rounded flavor. Perfect for grinders.", priceCents: 1000, category: "single-spices", inStock: false },
-    { slug: "smoked-paprika", name: "Smoked Paprika", description: "Sweet Spanish pimentón smoked over oak. Deep color and gentle smoke for any dish.", priceCents: 900, category: "single-spices" },
-    { slug: "chefs-blend-evoo", name: "Chef's Blend Extra Virgin Olive Oil", description: "Cold-pressed, peppery-finish olive oil for finishing, dipping and dressing.", priceCents: 2300, compareAtCents: 2800, category: "olive-oil", onSale: true, featured: true },
-    { slug: "herb-infused-evoo", name: "Herb-Infused Olive Oil", description: "Extra virgin olive oil infused with rosemary, thyme and garlic.", priceCents: 1900, category: "olive-oil" },
-    { slug: "aged-balsamic", name: "Aged Balsamic Vinegar", description: "Syrupy, barrel-aged balsamic with a sweet-tart balance. Drizzle over anything.", priceCents: 2100, category: "vinegar", featured: true },
-    { slug: "apple-cider-vinegar", name: "Raw Apple Cider Vinegar", description: "Unfiltered, with the mother. Bright acidity for dressings, brines and tonics.", priceCents: 1400, category: "vinegar" },
+    { slug: "garlic-powder", name: "Garlic Powder", description: "Pure, pungent granulated garlic. A pantry essential for rubs, dressings and doughs.", priceCents: 850, category: "single-spices" },
+    { slug: "coarse-himalayan-pink-salt", name: "Coarse Himalayan Pink Salt", description: "Hand-mined mineral-rich salt with a clean, rounded flavor. Perfect for grinders.", priceCents: 1000, category: "single-spices" },
+    { slug: "berbere", name: "Berbere", description: "Warm Ethiopian blend of chili, fenugreek, and warm baking spices. The heart of a great wot.", priceCents: 1500, category: "spice-blends", bestSeller: true, inStock: false, imageUrl: "/products/berbere.jpg" },
+    { slug: "adobo-seasoning", name: "Adobo Seasoning", description: "A balanced, garlicky everyday blend for meats, beans, rice and roasted vegetables.", priceCents: 1000, category: "spice-blends", bestSeller: true, featured: true, imageUrl: "/products/adobo-seasoning.jpg" },
+    { slug: "chefs-reserve-balsamic-vinegar", name: "Chef's Reserve Balsamic Vinegar", description: "Syrupy, barrel-aged balsamic with a sweet-tart balance. Drizzle over anything.", priceCents: 1800, category: "vinegar" },
+    { slug: "ras-el-hanout", name: "Ras El Hanout", description: "A fragrant North-African blend of warm spices, florals and gentle heat.", priceCents: 1500, category: "spice-blends" },
+    { slug: "cajun-seasoning", name: "Cajun Seasoning", description: "Bold, smoky Louisiana-style blend for blackening, rice and seafood.", priceCents: 1000, category: "spice-blends" },
   ];
 
   let order = 0;
   for (const p of products) {
     order += 1;
-    const { category, ...rest } = p;
+    const { category, ...base } = p;
+    const photo = `/products/${p.slug}.jpg`;
+    const rest = {
+      ...base,
+      // Explicit defaults so re-seeding clears flags left by earlier seeds.
+      bestSeller: base.bestSeller ?? false,
+      featured: base.featured ?? false,
+      compareAtCents: base.compareAtCents ?? null,
+      description: scraped[p.slug]?.description || base.description,
+      imageUrl: existsSync(join(import.meta.dirname, "..", "public", photo)) ? photo : base.imageUrl,
+    };
     await prisma.product.upsert({
       where: { slug: p.slug },
       update: {
@@ -112,6 +134,10 @@ async function main() {
       },
     });
   }
+  // Drop any products no longer in the seed set (e.g. renamed slugs).
+  await prisma.product.deleteMany({
+    where: { slug: { notIn: products.map((p) => p.slug) } },
+  });
 
   // ── Stores ────────────────────────────────────────────────────────────────
   const stores = [
@@ -136,8 +162,17 @@ async function main() {
 
   // ── Blog ──────────────────────────────────────────────────────────────────
   const posts = [
-    { slug: "building-a-spice-rack", title: "Building a Spice Rack That Actually Gets Used", excerpt: "The ten spices and blends worth keeping within arm's reach.", category: "Guides", author: "Deborah", published: true },
-    { slug: "the-art-of-the-rub", title: "The Art of the Rub", excerpt: "How to season big cuts of meat so the flavor goes all the way through.", category: "Technique", author: "Deborah", published: true },
+    {
+      slug: "stop-shop-welcomes-debbs-kitchen-spices",
+      title: "Stop & Shop welcomes Debbs Kitchen Spices",
+      excerpt:
+        "Press release provided by Debbskitchen.com — healthier spices with no additives for customers, home cooks, chefs, & food lovers.",
+      category: "Press",
+      author: "Deborah Odunze",
+      imageUrl: "/brand/dk-logo.png",
+      body: "<p>Debbs Kitchen is proud to announce that its line of healthier, additive-free spices is now available at Stop &amp; Shop. Our blends are crafted for customers, home cooks, chefs and food lovers who want fresh, flavorful seasoning without the extras.</p><p>Elevate your taste. Savor every moment.</p>",
+      published: true,
+    },
   ];
   for (const b of posts) {
     await prisma.blogPost.upsert({ where: { slug: b.slug }, update: b, create: b });
@@ -178,16 +213,13 @@ async function main() {
 
   // ── Pages ───────────────────────────────────────────────────────────────────
   const homeSections = [
-    section("promoBanner", 0, { text: "Free shipping on orders over $100", link: "/shop" }),
     section("hero", 1, {
-      headline: "Spice that tells a story",
+      eyebrow: "Debb's Kitchen",
+      headline: "Elevate your taste. Savor every moment.",
       subheadline:
         "Chef-crafted blends, single spices, oils and vinegars — Afro-continental flavor for every kitchen.",
-      backgroundImage: "",
-      buttons: [
-        { label: "Shop the Collection", href: "/shop", variant: "gold" },
-        { label: "Meet Debb", href: "/about", variant: "ghost" },
-      ],
+      backgroundImage: "/home/hero-popup.jpg",
+      buttons: [{ label: "Shop Now", href: "/shop", variant: "gold" }],
     }),
     section("bestSellers", 2, { eyebrow: "Crowd favorites", title: "Best Sellers", subtitle: "The blends our customers reach for again and again.", count: 4 }),
     section("featuresGrid", 3, {
@@ -205,12 +237,17 @@ async function main() {
   ];
 
   const aboutSections = [
-    section("pageHero", 0, { eyebrow: "Our Story", headline: "Meet Deborah Odunze", subtitle: "Chef, nurse, and the cook behind every blend." }),
+    section("pageHero", 0, {
+      eyebrow: "Preparation. Portion. Presentation.",
+      headline: "About Debbs Kitchen",
+      subtitle:
+        "My culinary ideology is summarized in these three words: PREPARATION, PORTION and PRESENTATION. The joy of sharing a well-prepared meal is a powerful connector for humanity. Welcome to Debbs Kitchen — elevate your taste, savor every moment.",
+    }),
     section("splitContent", 1, {
-      imageUrl: "",
-      eyebrow: "The beginning",
+      imageUrl: "/home/dk-wall.jpg",
+      eyebrow: "Meet Deborah",
       headline: "Food should be fresh, fun and wholesome",
-      body: "Deborah is a professionally trained chef and registered nurse whose cooking is rooted in her Nigerian childhood and sharpened by years working alongside chefs from Italy, France, and the Americas. Debb's Kitchen is where those worlds meet — what she calls Afro-continental cuisine.",
+      body: "Deborah Odunze is a professionally trained Chef and Registered Nurse — a graduate of the University of Texas Health Science Center in San Antonio and The International Culinary School at the Art Institute of Houston. Her fusion of the medical profession and culinary practice stems from a desire to help people lead better, healthier lives one meal at a time. She calls her style 'Afro-continental cuisine' — a celebration of rich African flavors with cuisines from other parts of the world. Born to loving parents in Nigeria, her first culinary influence is her mother; she has also worked with chefs from Italy, France, America, and South America. Deborah is a wife and mother to three precious children.",
       ctaLabel: "Shop the Collection",
       ctaLink: "/shop",
     }),
@@ -236,7 +273,8 @@ async function main() {
     { slug: "specials", title: "Special Deals", sections: [section("pageHero", 0, { eyebrow: "Save", headline: "Special Deals", subtitle: "Limited-time offers on favorite blends." }), section("productGrid", 1, { title: "On Sale Now", filter: "onSale", count: 8 })], metaDescription: "Special deals from Debb's Kitchen." },
     { slug: "events-gifts", title: "Events & Gifts", sections: simplePage("Events & Gifts", "Celebrate", "Events & Gifts", "Gift sets, corporate orders and catering — flavor worth sharing."), metaDescription: "Events and gifts from Debb's Kitchen." },
     { slug: "gift-card", title: "Gift Card", sections: simplePage("Give flavor", "Gift Card", "Debb's Kitchen Gift Card", "The perfect gift for the cook who has everything (except the right spice)."), metaDescription: "Debb's Kitchen gift cards." },
-    { slug: "careers", title: "Careers", sections: simplePage("Join us", "Careers", "Work with Debb's Kitchen", "We're a small team that loves food. Check back for openings."), metaDescription: "Careers at Debb's Kitchen." },
+    { slug: "careers", title: "Careers", sections: [section("pageHero", 0, { eyebrow: "Join us", headline: "Careers", subtitle: "Hello! We currently have open positions for Sales Associates. Debb's Kitchen is a close-knit team in a fast-growing young business — get in touch if you'd like to grow with us." })], metaDescription: "Careers at Debb's Kitchen." },
+    { slug: "terms-conditions", title: "Terms & Conditions", sections: [section("pageHero", 0, { eyebrow: "Legal", headline: "Terms & Conditions", subtitle: "Shipping, returns and the terms of using Debb's Kitchen." }), section("textContent", 1, { html: "<p>All orders are processed and shipped within 2–5 business days. Free shipping is applied automatically on orders over $100. If something isn't right with your order, contact us at hello@debbskitchen.com and we'll make it right.</p>" })], metaDescription: "Debb's Kitchen terms, shipping and returns." },
   ];
 
   for (const p of pages) {
@@ -248,7 +286,7 @@ async function main() {
   }
 
   console.log("✓ Seed complete");
-  console.log(`  Admin login: ${adminEmail} / ${adminPassword}`);
+  console.log(`  Admin user: ${adminEmail}`);
 }
 
 main()

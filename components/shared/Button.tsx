@@ -4,15 +4,16 @@ import { cn } from "@/lib/utils";
 type Variant = "gold" | "primary" | "ghost" | "dark";
 
 const base =
-  "inline-flex items-center justify-center gap-2 py-[13px] px-[28px] rounded-full font-sans font-medium text-[.95rem] tracking-[0.01em] transition-all duration-200 cursor-pointer border disabled:opacity-60 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 py-[13px] px-[30px] rounded-[2px] font-sans font-medium text-[.78rem] uppercase tracking-[0.14em] transition-all duration-200 cursor-pointer border disabled:opacity-60 disabled:cursor-not-allowed";
 
 const variants: Record<Variant, string> = {
-  gold: "bg-gold text-ink border-gold hover:bg-gold-dark hover:text-white hover:-translate-y-[2px]",
+  gold: "bg-gold text-white border-gold hover:bg-gold-dark hover:border-gold-dark",
+  // Primary CTA on the live site is the gold/amber button.
   primary:
-    "bg-burgundy text-white border-burgundy hover:bg-burgundy-dark hover:-translate-y-[2px]",
-  dark: "bg-ink text-white border-ink hover:opacity-90 hover:-translate-y-[2px]",
+    "bg-gold text-white border-gold hover:bg-gold-dark hover:border-gold-dark",
+  dark: "bg-ink text-white border-ink hover:opacity-90",
   ghost:
-    "bg-transparent text-ink border-line hover:border-gold hover:text-gold-dark",
+    "bg-transparent text-ink border-ink hover:bg-ink hover:text-white",
 };
 
 interface ButtonProps {

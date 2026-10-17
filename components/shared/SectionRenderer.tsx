@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "./Button";
 import { SectionHead } from "./SectionHead";
 import { ProductCard, type ProductCardData } from "./ProductCard";
+import { BestSellersCarousel } from "./BestSellersCarousel";
 import { NewsletterForm } from "./NewsletterForm";
 import { ContactForm } from "./ContactForm";
 import { youtubeId } from "@/lib/youtube";
@@ -41,32 +42,42 @@ export interface SectionContext {
 
 function HeroSection({ content }: { content: Record<string, any> }) {
   const buttons: { label: string; href: string; variant?: string }[] = content.buttons ?? [];
+  const hasImage = Boolean(content.backgroundImage);
   return (
-    <section className="relative bg-cream overflow-hidden">
-      <div className="wrap grid md:grid-cols-2 gap-10 items-center py-[72px] md:py-[104px]">
-        <div className="animate-fade">
-          <h1 className="text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.02] mb-5">
-            {content.headline}
-          </h1>
-          <p className="text-muted text-[1.15rem] max-w-[520px] mb-8">
-            {content.subheadline}
-          </p>
+    <section className="relative overflow-hidden bg-ink">
+      {hasImage && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={content.backgroundImage}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+      {/* readability overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/25 to-black/20" />
+      <div className="relative wrap min-h-[440px] md:min-h-[560px] flex flex-col justify-end pb-[56px] pt-[120px]">
+        <div className="max-w-[640px] animate-fade">
+          {content.eyebrow && (
+            <div className="font-sans text-[0.74rem] tracking-[0.2em] uppercase text-gold-light font-semibold mb-3">
+              {content.eyebrow}
+            </div>
+          )}
+          {content.headline && (
+            <h1 className="text-white text-[clamp(2.2rem,5vw,3.6rem)] leading-[1.05] mb-4 drop-shadow">
+              {content.headline}
+            </h1>
+          )}
+          {content.subheadline && (
+            <p className="text-white/90 text-[1.1rem] max-w-[520px] mb-7">
+              {content.subheadline}
+            </p>
+          )}
           <div className="flex flex-wrap gap-3">
             {buttons.map((b, i) => (
-              <Button key={i} href={b.href} variant={(b.variant as any) ?? "primary"}>
+              <Button key={i} href={b.href} variant={(b.variant as any) ?? "gold"}>
                 {b.label}
               </Button>
             ))}
-          </div>
-        </div>
-        <div className="relative">
-          <div className="aspect-[4/3] rounded bg-gradient-to-br from-accent-soft to-gold/30 border border-line overflow-hidden flex items-center justify-center">
-            {content.backgroundImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={content.backgroundImage} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-[6rem]">🌶️</span>
-            )}
           </div>
         </div>
       </div>
@@ -121,10 +132,12 @@ export function SectionRenderer({
             return (
               <section key={key} className="section-padding">
                 <div className="wrap">
-                  <SectionHead eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
-                  <ProductRow products={(context.bestSellers ?? []).slice(0, content.count ?? 4)} />
+                  <h2 className="text-center font-sans font-light uppercase tracking-[0.2em] text-[clamp(1.9rem,4vw,2.4rem)] mb-[48px]">
+                    {content.title ?? "Best Sellers"}
+                  </h2>
+                  <BestSellersCarousel products={context.bestSellers ?? []} />
                   <div className="text-center mt-[44px]">
-                    <Button href="/shop" variant="ghost">Shop all products</Button>
+                    <Button href="/shop" variant="gold">Shop All</Button>
                   </div>
                 </div>
               </section>

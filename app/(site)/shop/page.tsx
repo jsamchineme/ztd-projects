@@ -34,13 +34,10 @@ export default async function ShopPage({
 
   return (
     <>
-      <section className="bg-cream">
-        <div className="wrap py-[56px] text-center">
-          <div className="font-sans text-[0.74rem] tracking-[0.2em] uppercase text-gold-dark font-semibold mb-3">
-            The Pantry
-          </div>
-          <h1 className="text-[clamp(2.4rem,5vw,3.4rem)]">Shop the Collection</h1>
-          <p className="text-muted mt-3">Free shipping on orders over $100.</p>
+      <section className="bg-paper">
+        <div className="wrap pt-[48px] pb-[16px] text-center">
+          <h1 className="text-[clamp(2.2rem,4.5vw,3rem)] tracking-[0.02em]">SHOP</h1>
+          <p className="text-muted mt-2">Explore our healthy, flavorful, &amp; unique spices!</p>
         </div>
       </section>
 

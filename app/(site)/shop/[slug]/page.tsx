@@ -98,7 +98,7 @@ export default async function ProductPage({
               )}
             </div>
             {product.description && (
-              <p className="text-muted text-[1.05rem] mb-7">{product.description}</p>
+              <p className="text-muted text-[1.05rem] mb-7 whitespace-pre-line">{product.description}</p>
             )}
 
             <div className="max-w-[320px]">

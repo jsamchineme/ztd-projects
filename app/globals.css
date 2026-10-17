@@ -2,65 +2,70 @@
 @plugin "@tailwindcss/typography";
 
 /* ============================================================
-   Debb's Kitchen — design tokens (warm-spice palette).
-   Provisional brand values; refine against the live site.
-   Token names are kept compatible with the shared component set
-   (e.g. `burgundy` = primary spice red, `gold` = turmeric accent).
+   Debb's Kitchen — design tokens.
+   Palette + type matched to the live site's design language
+   (white ground, amber/gold accent, deep brown, geometric sans,
+   sharp corners). Imagery and copy are original placeholders.
    ============================================================ */
 
 @theme inline {
-  /* ── Colors ─────────────────────────────────────── */
-  --color-ink: #2a1d16;
-  --color-paper: #fcf8f2;
-  --color-cream: #f5ebdd;
-  --color-soft: #faf5ec;
-  --color-line: #ead9c4;
-  --color-gold: #e3a52c;
-  --color-gold-dark: #b87d12;
-  --color-burgundy: #bf3c2b;
-  --color-burgundy-dark: #972a1d;
-  --color-accent-soft: #f6e4d2;
-  --color-muted: #7a6b5d;
+  /* ── Colors (from the live Wix palette) ──────────── */
+  --color-ink: #292116;          /* dark brown text  (color_30) */
+  --color-paper: #ffffff;
+  --color-cream: #fef3e5;        /* warm light bg */
+  --color-soft: #fcfbfa;
+  --color-line: #e8e6e6;
+  --color-gold: #db8707;         /* amber accent     (color_18) */
+  --color-gold-dark: #925a05;    /* dark gold        (color_19) */
+  --color-gold-light: #f3d4a5;   /* light gold       (color_16) */
+  --color-green: #068e78;        /* brand teal-green (color_24) */
+  --color-green-dark: #03473c;   /* dark teal        (color_25) */
+  --color-teal-bar: #5ba596;     /* announcement bar */
+  --color-mint: #a5ded4;         /* footer background */
+  --color-brown: #492d02;        /* deep brown       (color_20) */
+  /* `burgundy` tokens kept for component compatibility, repointed to the
+     brand's teal-green so existing primary buttons read on-brand. */
+  --color-burgundy: #068e78;
+  --color-burgundy-dark: #03473c;
+  --color-accent-soft: #e4f0ea;
+  --color-muted: #737373;
   --color-white: #ffffff;
 
-  /* ── Typography ──────────────────────────────────── */
-  --font-display: "Fraunces", Georgia, serif;
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-serif: "Fraunces", Georgia, serif;
+  /* ── Typography (Assistant — used on the live site) ─ */
+  --font-display: "Assistant", "Avenir", system-ui, sans-serif;
+  --font-sans: "Assistant", system-ui, sans-serif;
+  --font-serif: "Assistant", system-ui, sans-serif;
 
   /* ── Font sizes ──────────────────────────────────── */
-  --text-eyebrow: 0.74rem;
-  --text-tag: 0.70rem;
-  --text-lead: 1.18rem;
-  --text-card-title: 1.4rem;
-  --text-section-h2: clamp(2.1rem, 4.4vw, 3.1rem);
-  --text-page-h1: clamp(2.6rem, 5.4vw, 4rem);
-  --text-hero-h1: clamp(2.8rem, 6vw, 5rem);
-  --text-quote: 1.2rem;
-  --text-faq-q: 1.2rem;
+  --text-eyebrow: 0.72rem;
+  --text-tag: 0.68rem;
+  --text-lead: 1.12rem;
+  --text-card-title: 1.15rem;
+  --text-section-h2: clamp(1.8rem, 3.6vw, 2.6rem);
+  --text-page-h1: clamp(2.2rem, 4.6vw, 3.2rem);
+  --text-hero-h1: clamp(2.4rem, 5vw, 4rem);
 
   /* ── Letter spacing ──────────────────────────────── */
-  --tracking-eyebrow: 0.20em;
-  --tracking-tag: 0.14em;
-  --tracking-wide-sm: 0.04em;
-  --tracking-btn: 0.01em;
+  --tracking-eyebrow: 0.22em;
+  --tracking-tag: 0.16em;
+  --tracking-wide-sm: 0.06em;
+  --tracking-btn: 0.14em;
 
-  /* ── Border radius ───────────────────────────────── */
-  --radius-DEFAULT: 18px;
-  --radius-full: 50px;
-  --radius-input: 12px;
-  --radius: 18px;
+  /* ── Border radius (sharp) ───────────────────────── */
+  --radius-DEFAULT: 2px;
+  --radius-full: 2px;
+  --radius-input: 2px;
+  --radius: 2px;
 
   /* ── Shadows ─────────────────────────────────────── */
-  --shadow-card: 0 20px 50px rgba(60, 35, 15, 0.12);
-  --shadow-menu: 0 24px 60px rgba(60, 35, 15, 0.14);
+  --shadow-card: 0 12px 34px rgba(30, 22, 10, 0.08);
+  --shadow-menu: 0 18px 50px rgba(30, 22, 10, 0.12);
 
   /* ── Spacing / layout ────────────────────────────── */
-  --spacing-header-height: 74px;
+  --spacing-header-height: 72px;
   --spacing-section: 6rem;
   --spacing-section-mobile: 4rem;
-  --spacing-section-head-bottom: 56px;
-  --max-width-wrap: 1200px;
+  --max-width-wrap: 1240px;
   --max-width-section-head: 680px;
   --max-width-faq: 820px;
 }
@@ -74,16 +79,16 @@
     font-family: var(--font-sans);
     color: var(--color-ink);
     background: var(--color-paper);
-    line-height: 1.65;
-    font-weight: 400;
+    line-height: 1.7;
+    font-weight: 300;
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0.01em;
     color: var(--color-ink);
   }
 
@@ -100,18 +105,28 @@
 
 /* ── Utilities ──────────────────────────────────────── */
 .wrap {
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding-inline: 26px;
+  padding-inline: 28px;
 }
 
 .section-padding {
-  padding: 96px 0;
+  padding: 92px 0;
 }
 @media (max-width: 900px) {
   .section-padding {
-    padding: 64px 0;
+    padding: 60px 0;
   }
+}
+
+/* Uppercase section eyebrow / label */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  font-weight: 500;
 }
 
 @keyframes fade {

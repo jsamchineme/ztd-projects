@@ -26,7 +26,7 @@ export function AddToCartButton({
     return (
       <span
         className={cn(
-          "inline-flex items-center justify-center py-[11px] px-[22px] rounded-full font-sans font-medium text-[.9rem] border border-line text-muted bg-cream cursor-not-allowed",
+          "inline-flex items-center justify-center py-[11px] px-[22px] rounded-[2px] font-sans font-medium text-[.74rem] uppercase tracking-[0.12em] border border-line text-muted bg-soft cursor-not-allowed",
           fullWidth && "w-full",
           className,
         )}
@@ -37,9 +37,9 @@ export function AddToCartButton({
   }
 
   const styles: Record<string, string> = {
-    gold: "bg-gold text-ink border-gold hover:bg-gold-dark hover:text-white",
-    primary: "bg-burgundy text-white border-burgundy hover:bg-burgundy-dark",
-    ghost: "bg-transparent text-ink border-line hover:border-gold hover:text-gold-dark",
+    gold: "bg-gold text-white border-gold hover:bg-gold-dark hover:border-gold-dark",
+    primary: "bg-ink text-white border-ink hover:bg-brown hover:border-brown",
+    ghost: "bg-transparent text-ink border-ink hover:bg-ink hover:text-white",
   };
 
   return (
@@ -51,7 +51,7 @@ export function AddToCartButton({
         setTimeout(() => setAdded(false), 1400);
       }}
       className={cn(
-        "inline-flex items-center justify-center gap-2 py-[11px] px-[22px] rounded-full font-sans font-medium text-[.9rem] border transition-all duration-200 cursor-pointer hover:-translate-y-[1px]",
+        "inline-flex items-center justify-center gap-2 py-[11px] px-[22px] rounded-[2px] font-sans font-medium text-[.74rem] uppercase tracking-[0.12em] border transition-all duration-200 cursor-pointer",
         styles[variant],
         fullWidth && "w-full",
         className,
