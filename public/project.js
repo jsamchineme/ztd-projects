@@ -172,6 +172,7 @@ function renderChat(ctx, el, chatId, loadList){
   const { project, id } = ctx;
   let chat = null, running = false, es = null, live = null, liveThinking = null;
   const pendingTools = new Map();
+  let pendingQuestion = null;   // an unanswered AskUserQuestion card; locked once a prompt follows it
   const inner = h('div', { class: 'transcript-inner' });
   const transcript = h('div', { class: 'transcript', role: 'log', 'aria-label': 'Conversation' }, inner);
   const working = h('div', { class: 'working', hidden: true }, h('span', { class: 'dot busy' }), h('span', null, 'Claude is working…'));
@@ -431,6 +432,7 @@ function renderChat(ctx, el, chatId, loadList){
     if (ev.type === 'state'){ setRunning(ev.running); if (!ev.running) loadList?.().catch(() => {}); return; }
     let node = null;
     if (ev.type === 'user'){
+      lockQuestion();   // a prompt (including an answer) follows the question: the card is no longer open
       needHead = true;
       const mine = ev.userId === state.me.user.id;
       node = h('div', null, mine ? null : h('div', { class: 'who' }, ev.userName),
@@ -476,8 +478,66 @@ function renderChat(ctx, el, chatId, loadList){
       node = h('div', { class: 'flag-note' }, h('strong', null, 'Flagged as off-topic for this project. '), ev.text, ' Admins can see this in the Activity log.');
     } else if (ev.type === 'notice'){
       node = h('div', { class: 'notice' }, ev.text);
+    } else if (ev.type === 'question'){
+      live?.remove(); live = null; liveThinking?.remove(); liveThinking = null;
+      head();
+      node = questionCard(ev);
     }
     if (node){ inner.insertBefore(node, working); scroll(); }
+  }
+
+  // Claude asked with AskUserQuestion (lib/agent.mjs ended the turn here). Show its questions as tappable options;
+  // picking them sends the choice as the next prompt, which resumes the same Claude session.
+  function lockQuestion(){ pendingQuestion?.lock(); pendingQuestion = null; }
+  function questionCard(ev){
+    const questions = (ev.questions || []).filter(q => q && Array.isArray(q.options) && q.options.length);
+    if (!questions.length) return h('div', { class: 'notice' }, 'Claude asked a question. Reply below to answer.');
+    const picks = questions.map(() => new Set());
+    const lone = questions.length === 1 && !questions[0].multiSelect;   // one single-choice question: a tap answers it
+    let sendBtn, locked = false;
+    const send = () => {
+      if (locked || !questions.every((q, i) => picks[i].size)) return;
+      const text = questions.length === 1 ? [...picks[0]].join(', ')
+        : questions.map((q, i) => `${q.header || q.question}: ${[...picks[i]].join(', ')}`).join('\n');
+      ctrl.lock();
+      answerWith(text);
+    };
+    const blocks = questions.map((q, i) => {
+      const opts = q.options.map(o => {
+        const btn = h('button', { type: 'button', class: 'q-option', onclick: () => {
+          if (locked) return;
+          if (q.multiSelect){ picks[i].has(o.label) ? picks[i].delete(o.label) : picks[i].add(o.label); }
+          else { picks[i].clear(); picks[i].add(o.label); }
+          for (const b of opts) b.classList.toggle('on', picks[i].has(b._label));
+          if (lone) return send();
+          if (sendBtn) sendBtn.disabled = !questions.every((qq, j) => picks[j].size);
+        } }, h('span', { class: 'q-label' }, o.label), o.description && o.description !== o.label ? h('span', { class: 'q-desc' }, o.description) : null);
+        btn._label = o.label;
+        return btn;
+      });
+      return h('div', { class: 'q-block' },
+        q.header ? h('div', { class: 'q-header' }, q.header) : null,
+        h('div', { class: 'q-text' }, q.question),
+        h('div', { class: 'q-options' + (q.multiSelect ? ' multi' : '') }, opts));
+    });
+    sendBtn = lone ? null : h('button', { type: 'button', class: 'btn primary small', disabled: true, onclick: send }, 'Send answer');
+    const card = h('div', { class: 'question-card' },
+      h('div', { class: 'q-head' }, ico('chat'), 'Claude is asking'),
+      ...blocks, sendBtn ? h('div', { class: 'q-send' }, sendBtn) : null);
+    const ctrl = { lock(){ locked = true; card.classList.add('answered'); card.querySelectorAll('button').forEach(b => { b.disabled = true; }); } };
+    pendingQuestion = ctrl;
+    return card;
+  }
+  async function answerWith(text){
+    if (!chat || !text.trim()) return;
+    if (!state.me.claude?.connected) return toast('Connect your Claude account first (Account page).', true);
+    try {
+      const before = lastSeq;
+      await api('POST', `/api/chats/${chat.id}/messages`, { prompt: text, model: model.value, mode, attachments: [], runOn: runOn.value });
+      setTimeout(() => { if (lastSeq === before) connect(); }, 3000);
+      loadList?.().catch(() => {});
+      scroll(true);
+    } catch (e){ fail(e); if (e.code === 'no_claude') go('/account#claude'); }
   }
 
   // Live events. Each connection asks for everything after the last event this page has, so reconnecting never

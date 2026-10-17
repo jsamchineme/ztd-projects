@@ -101,10 +101,7 @@ function startJob(m){
 function runClaude(job, m, dir, prompt, resume){
   const [cmd, ...pre] = claudeCmd();
   const args = [...pre, '-p', '--output-format', 'stream-json', '--verbose', '--include-partial-messages', '--model', m.model,
-    '--permission-mode', m.mode === 'plan' ? 'plan' : 'bypassPermissions',
-    // Headless (-p) chats have no one at a terminal to answer, so AskUserQuestion always errors mid-turn. Turn it off so
-    // Claude asks in its reply instead; the person answers in their next prompt.
-    '--disallowedTools', 'AskUserQuestion'];
+    '--permission-mode', m.mode === 'plan' ? 'plan' : 'bypassPermissions'];
   if (resume) args.push('--resume', resume);
   if (existsSync(join(UPLOADS, m.slug))) args.push('--add-dir', join(UPLOADS, m.slug));
   if (m.system) args.push('--append-system-prompt', String(m.system).slice(0, 20000));

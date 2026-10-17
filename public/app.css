@@ -375,6 +375,23 @@ table.audit td.mono { font-size: 12px; } table.audit td.mono::before { content: 
 .flag-note { font-size: 13.5px; color: var(--text); background: var(--gold-soft); border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent); padding: 10px 14px; border-radius: var(--r); margin: 0 0 16px; }
 .flag-note strong { color: var(--warn); font-weight: 600; }
 .chat-error { background: var(--bad-soft); color: var(--bad); padding: 10px 14px; border-radius: var(--r); margin: 0 0 16px; white-space: pre-wrap; font-size: 14px; border: 1px solid color-mix(in srgb, var(--bad) 22%, transparent); }
+/* AskUserQuestion shown as a card with tappable options (public/project.js). */
+.question-card { border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--panel); padding: 14px 16px; margin: 0 0 18px; max-width: 640px; }
+.question-card .q-head { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; margin-bottom: 12px; }
+.question-card .q-head .ico { width: 16px; height: 16px; color: var(--accent); }
+.q-block + .q-block { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.q-header { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 4px; }
+.q-text { font-size: 14.5px; margin-bottom: 10px; }
+.q-options { display: flex; flex-direction: column; gap: 8px; }
+.q-option { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--panel); color: var(--text); cursor: pointer; transition: background-color .12s, border-color .12s; }
+.q-option:hover:not(:disabled) { background: var(--sunken); border-color: var(--accent); }
+.q-option.on { border-color: var(--accent); background: var(--accent-soft); }
+.q-option:disabled { cursor: default; }
+.q-option:disabled:not(.on) { opacity: .55; }
+.q-label { font-weight: 500; font-size: 14px; }
+.q-desc { font-size: 12.5px; color: var(--muted); }
+.q-send { margin-top: 14px; }
+.question-card.answered { opacity: .85; }
 .working { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; margin: 4px 0 16px; }
 .working::after { content: ""; width: 90px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent) no-repeat; background-size: 40% 100%; background-color: var(--line); animation: slide 1.2s infinite ease-in-out; }
 @keyframes slide { from { background-position: -40% 0; } to { background-position: 140% 0; } }

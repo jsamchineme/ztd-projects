@@ -45,6 +45,14 @@ if (args[0] === 'setup-token'){
     out({ type: 'assistant', message: { content: [{ type: 'text', text: 'Let me look at the project first.' }] } });
     out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 't1', name: 'Bash', input: { command: 'ls', description: 'List files' } }] } });
     out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 't1', content: 'server.mjs\npublic\n', is_error: false }] } });
+    // "ask me": like real Claude headless, AskUserQuestion errors (no one at a terminal). Studio ends the turn on the
+    // tool_use and shows a question card; the person's pick comes back as the next prompt.
+    if (/ask me/i.test(prompt)){
+      out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 'tq', name: 'AskUserQuestion', input: { questions: [{ question: 'Which option do you want?', header: 'Pick one', multiSelect: false, options: [{ label: 'First', description: 'The first option' }, { label: 'Second', description: 'The second option' }] }] } }] } });
+      out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'tq', content: 'Answer questions?', is_error: true }] } });
+      await sleep(10000);   // Studio sends SIGTERM to end the turn here; if it doesn't, just stop without a result
+      return;
+    }
     // "leave it running": starts a command in the background and ends the turn without waiting for it.
     if (/leave it running/i.test(prompt)){
       out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 'tb', name: 'Bash', input: { command: 'sleep 600', run_in_background: true } }] } });

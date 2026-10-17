@@ -787,6 +787,28 @@ await check('output that only mentions background work doesn’t make a chat car
   if (r.chat.running || r.events.filter(e => e.type === 'result').length !== 1 || r.events.some(e => e.type === 'notice' && /carry on/.test(e.text)))
     throw new Error('the chat carried on');
 }, page);
+await check('AskUserQuestion shows a question card; picking an option answers it and resumes the session', async () => {
+  const H = { headers: { Origin: BASE } };
+  const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const demo = teams.find(t => t.name === 'Pipeline Team').projects.find(p => p.name === 'Demo Site');
+  const chat = await (await page.request.post(`${BASE}/api/projects/${demo.id}/chats`, { ...H, data: {} })).json();
+  await page.goto(`${projectUrl}/chat/${chat.id}`);
+  const sent = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt: 'ask me which option' } });
+  if (!sent.ok()) throw new Error('prompt not accepted: ' + sent.status());
+  // The question becomes a tappable card, and the turn ends without an error or a "Stopped." notice.
+  await page.locator('.question-card .q-option', { hasText: 'First' }).waitFor();
+  const r1 = await (await page.request.get(`${BASE}/api/chats/${chat.id}`)).json();
+  if (!r1.events.some(e => e.type === 'question')) throw new Error('no question event was stored');
+  if (r1.events.some(e => e.type === 'error' || (e.type === 'notice' && e.text === 'Stopped.'))) throw new Error('the question showed as an error or a stop');
+  if (r1.events.some(e => e.type === 'tool_result' && e.name === 'AskUserQuestion')) throw new Error('the AskUserQuestion error leaked as a tool result');
+  // Picking an option sends it as the next prompt, which resumes the same Claude session.
+  await page.locator('.question-card .q-option', { hasText: 'First' }).click();
+  await page.getByText('resumed: yes').waitFor();
+  const r2 = await (await page.request.get(`${BASE}/api/chats/${chat.id}`)).json();
+  const users = r2.events.filter(e => e.type === 'user');
+  if (users.length !== 2 || users[1].text !== 'First') throw new Error('the pick was not sent as the answer');
+  if (r2.events.some(e => e.type === 'error')) throw new Error('answering showed an error');
+}, page);
 // A computer that runs the owner's chats (lib/runner.mjs): the real runner code, served by Studio, with the fake Claude
 // signed in "on the computer", in its own folder.
 let runner = null, runnerHome = null, runnerLog = '', runnerId = null;
