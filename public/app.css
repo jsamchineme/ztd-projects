@@ -19,6 +19,7 @@
   --code-bg: #f3f4f1; --user-bg: #eaf0f7; --term: #0b1220;
   --shadow-sm: 0 1px 2px rgba(0,40,80,.06); --shadow: 0 1px 0 rgba(0,40,80,.04), 0 10px 30px rgba(0,40,80,.07); --shadow-lg: 0 24px 70px rgba(0,30,60,.22);
   --ring: 0 0 0 3px rgba(0,66,124,.18);
+  --select-caret: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%235f6368%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E");
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -29,6 +30,7 @@
     --gold-soft: #2e2614; --ok: #6cc591; --ok-soft: #12291c; --warn: #ffc349; --warn-soft: #2a2213; --bad: #f08a80; --bad-soft: #351b1a;
     --code-bg: #0d131c; --user-bg: #142033;
     --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow: 0 10px 30px rgba(0,0,0,.4); --shadow-lg: 0 24px 70px rgba(0,0,0,.6); --ring: 0 0 0 3px rgba(106,166,230,.25);
+    --select-caret: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239aa5b4%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E");
     color-scheme: dark;
   }
 }
@@ -39,6 +41,7 @@
   --gold-soft: #2e2614; --ok: #6cc591; --ok-soft: #12291c; --warn: #ffc349; --warn-soft: #2a2213; --bad: #f08a80; --bad-soft: #351b1a;
   --code-bg: #0d131c; --user-bg: #142033;
   --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow: 0 10px 30px rgba(0,0,0,.4); --shadow-lg: 0 24px 70px rgba(0,0,0,.6); --ring: 0 0 0 3px rgba(106,166,230,.25);
+  --select-caret: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239aa5b4%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E");
   color-scheme: dark;
 }
 
@@ -83,6 +86,10 @@ label { display: block; font-weight: 600; font-size: 14px; margin: 14px 0 6px; }
 label .hint, .hint { font-weight: 400; color: var(--muted); font-size: 13px; }
 input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea {
   width: 100%; padding: 9px 12px; border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--panel); min-height: 40px; transition: border-color .12s, box-shadow .12s; }
+/* Selects wear the theme's own chevron, not the browser's, so they match the inputs in both light and dark. */
+select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 36px;
+  background-image: var(--select-caret); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; }
+select::-ms-expand { display: none; }
 input::placeholder, textarea::placeholder { color: var(--faint); }
 input[disabled] { background: var(--sunken); color: var(--muted); }
 textarea { resize: vertical; }
