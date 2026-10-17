@@ -115,7 +115,6 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 @media (max-width: 600px){
   .runner-row { flex-wrap: wrap; }
   .runner-row .runner-actions { flex-basis: 100%; margin-left: 52px; }
-  .runner-row select { flex: 1; }
 }
 .push-sub { margin: 20px 0 8px; font-size: 14px; }
 .push-app { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
