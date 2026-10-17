@@ -48,6 +48,11 @@ if (args[0] === 'setup-token'){
       out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 'tb', name: 'Bash', input: { command: 'sleep 600', run_in_background: true } }] } });
       out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'tb', content: 'Command running in background with ID: b1', is_error: false }] } });
     }
+    // "print the docs": a command whose output only mentions background work.
+    if (/print the docs/i.test(prompt)){
+      out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 'td', name: 'Bash', input: { command: 'cat README.md' } }] } });
+      out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'td', content: 'Notes\nAnything left running in the background is stopped.\nCommand running in background with ID: b2', is_error: false }] } });
+    }
     let edited = false;
     if (/edit|change|write/i.test(prompt)){
       writeFileSync('STUDIO-TEST.md', `Written by the fake Claude.\n\nPrompt: ${prompt}\n`);

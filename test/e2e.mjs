@@ -768,6 +768,24 @@ await check('a chat whose turn ends with work still running in the background ca
   if (ev.filter(e => e.type === 'user').length !== 1) throw new Error('carrying on showed as a new message');
   if (ev.some(e => e.type === 'error')) throw new Error('carrying on showed an error');
 }, page);
+await check('output that only mentions background work doesn’t make a chat carry on', async () => {
+  const H = { headers: { Origin: BASE } };
+  const teams = await (await page.request.get(`${BASE}/api/teams`)).json();
+  const demo = teams.find(t => t.name === 'Pipeline Team').projects.find(p => p.name === 'Demo Site');
+  const chat = await (await page.request.post(`${BASE}/api/projects/${demo.id}/chats`, { ...H, data: {} })).json();
+  const sent = await page.request.post(`${BASE}/api/chats/${chat.id}/messages`, { ...H, data: { prompt: 'print the docs' } });
+  if (!sent.ok()) throw new Error('prompt not accepted: ' + sent.status());
+  let r;
+  for (let i = 0; i < 40; i++){
+    r = await (await page.request.get(`${BASE}/api/chats/${chat.id}`)).json();
+    if (!r.chat.running && r.events.some(e => e.type === 'result')) break;
+    await new Promise(r => setTimeout(r, 250));
+  }
+  await new Promise(r => setTimeout(r, 1000));
+  r = await (await page.request.get(`${BASE}/api/chats/${chat.id}`)).json();
+  if (r.chat.running || r.events.filter(e => e.type === 'result').length !== 1 || r.events.some(e => e.type === 'notice' && /carry on/.test(e.text)))
+    throw new Error('the chat carried on');
+}, page);
 // A fake Anthropic API for projects' AI workers (STUDIO_ANTHROPIC_URL in test/run.sh): every Messages call reports usage.
 const anthropic = http.createServer((req, res) => {
   let body = '';
