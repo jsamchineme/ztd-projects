@@ -275,11 +275,9 @@ WantedBy=multi-user.target
         // stdin: {"message","name","email","files":[optional paths]}
         const c = JSON.parse(readStdin() || '{}');
         if (typeof c.message !== 'string' || !c.message.trim() || c.message.length > 5000) die('A commit message is needed');
-        // The repo's own identity (git config --local) wins, so every commit in a project is made as the same
-        // person whichever Studio user presses Commit. Without one, the Studio user's name and email are used.
-        const local = k => g('config', '--local', '--get', k).stdout.trim();
-        const name = need(local('user.name') || c.name || 'Studio user', /^[^\n<>]{1,100}$/, 'name');
-        const email = need(local('user.email') || c.email || 'studio@localhost', /^[^\s<>@]+@[^\s<>@]+$/, 'email');
+        // Made as the Studio user who presses Commit, whatever identity the repo's own git config has.
+        const name = need(c.name || 'Studio user', /^[^\n<>]{1,100}$/, 'name');
+        const email = need(c.email || 'studio@localhost', /^[^\s<>@]+@[^\s<>@]+$/, 'email');
         const add = g('add', '-A'); if (add.status !== 0) die(add.stderr, 1);
         return out(g('-c', `user.name=${name}`, '-c', `user.email=${email}`, 'commit', '-q', '-m', c.message));
       }
@@ -410,6 +408,9 @@ WantedBy=multi-user.target
     if (req.token) extra.CLAUDE_CODE_OAUTH_TOKEN = String(req.token);
     else if (req.apiKey) extra.ANTHROPIC_API_KEY = String(req.apiKey);
     else die('No Claude connection. Connect Claude in your Studio account settings.', 4);
+    // Commits Claude makes in the chat are made as the Studio user who sent the prompt (env beats git config).
+    if (typeof req.name === 'string' && /^[^\n<>]{1,100}$/.test(req.name)) extra.GIT_AUTHOR_NAME = extra.GIT_COMMITTER_NAME = req.name;
+    if (typeof req.email === 'string' && /^[^\s<>@]+@[^\s<>@]+$/.test(req.email)) extra.GIT_AUTHOR_EMAIL = extra.GIT_COMMITTER_EMAIL = req.email;
     const bin = CONF.fakeClaude && existsSync(CONF.fakeClaude) ? CONF.fakeClaude : CLAUDE;
     const args = ['-p', '--output-format', 'stream-json', '--verbose', '--include-partial-messages', '--model', model,
       '--permission-mode', mode === 'plan' ? 'plan' : 'bypassPermissions'];

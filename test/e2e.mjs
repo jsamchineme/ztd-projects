@@ -176,9 +176,15 @@ await check('Changes tab shows the new file and diff, then commits', async () =>
   await page.locator('.diff .add', { hasText: 'Written by the fake Claude' }).waitFor();
   await page.screenshot({ path: `${SHOTS}/06-changes.png`, fullPage: true });
   await page.fill('textarea', 'Add test file');
+  const git = (...a) => execFileSync('git', ['-C', `${process.env.MOCK_ROOT}/projects/demo-site/repo`, ...a], { encoding: 'utf8' }).trim();
+  if (process.env.MOCK_ROOT) git('config', '--local', 'user.email', 'repo-identity@example.com');
   await page.click('button:has-text("Commit 1 file")');
   await page.getByText('No uncommitted changes.').waitFor();
   await page.locator('td', { hasText: 'Add test file' }).waitFor();
+  if (process.env.MOCK_ROOT){
+    const who = git('log', '-1', '--format=%ae %ce'), me = (await (await page.request.get(`${BASE}/api/me`)).json()).user.email;
+    if (who !== `${me} ${me}`) throw new Error(`commit was made as ${who}, not ${me}`);
+  }
 }, page);
 await check('Services tab: service is running; restart; logs stream', async () => {
   await page.click('.tab:has-text("Services")');

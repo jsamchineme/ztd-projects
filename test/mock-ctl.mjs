@@ -70,7 +70,7 @@ switch (cmd){
     if (act === 'status') process.stdout.write(g('status', '--porcelain=v1', '-b', '--untracked-files=all').stdout);
     else if (act === 'diff'){ process.stdout.write(g('diff', 'HEAD').stdout); for (const f of g('ls-files', '--others', '--exclude-standard').stdout.split('\n').filter(Boolean)) process.stdout.write(g('diff', '--no-index', '/dev/null', f).stdout); }
     else if (act === 'log') process.stdout.write(g('log', '-n', '30', '--date=iso-strict', '--pretty=format:%H%x1f%an%x1f%ad%x1f%s').stdout);
-    else if (act === 'commit'){ const c = JSON.parse(readStdin()); const local = k => g('config', '--local', '--get', k).stdout.trim(); g('add', '-A'); const r = g('-c', `user.name=${local('user.name') || c.name}`, '-c', `user.email=${local('user.email') || c.email}`, 'commit', '-qm', c.message); if (r.status){ console.error(r.stderr || r.stdout); process.exit(1); } }
+    else if (act === 'commit'){ const c = JSON.parse(readStdin()); g('add', '-A'); const r = g('-c', `user.name=${c.name}`, '-c', `user.email=${c.email}`, 'commit', '-qm', c.message); if (r.status){ console.error(r.stderr || r.stdout); process.exit(1); } }
     else if (act === 'discard'){ const c = JSON.parse(readStdin()); for (const f of c.files){ if (g('ls-files', '--error-unmatch', '--', f).status === 0) g('checkout', 'HEAD', '--', f); else g('clean', '-fq', '--', f); } console.log('{"ok":true}'); }
     else if (act === 'revert-last') process.stdout.write(g('revert', '--no-edit', 'HEAD').stdout);
     break;
@@ -87,7 +87,7 @@ switch (cmd){
     if (!req.token && !req.apiKey){ console.error('No Claude connection'); process.exit(4); }
     const args = ['-p', '--output-format', 'stream-json', '--verbose', '--model', a[1], '--permission-mode', a[2] === 'plan' ? 'plan' : 'bypassPermissions'];
     if (a[3] && a[3] !== '-') args.push('--resume', a[3]);
-    const c = spawn('node', [FAKE, ...args], { cwd: repo(a[0]), env: { ...process.env, CLAUDE_CODE_OAUTH_TOKEN: req.token || '', ANTHROPIC_API_KEY: req.apiKey || '' }, stdio: ['pipe', 'inherit', 'inherit'] });
+    const c = spawn('node', [FAKE, ...args], { cwd: repo(a[0]), env: { ...process.env, CLAUDE_CODE_OAUTH_TOKEN: req.token || '', ANTHROPIC_API_KEY: req.apiKey || '', ...(req.email ? { GIT_AUTHOR_NAME: req.name, GIT_COMMITTER_NAME: req.name, GIT_AUTHOR_EMAIL: req.email, GIT_COMMITTER_EMAIL: req.email } : {}) }, stdio: ['pipe', 'inherit', 'inherit'] });
     c.stdin.end(req.prompt);
     process.on('SIGTERM', () => c.kill('SIGTERM'));
     c.on('exit', code => process.exit(code ?? 1));
