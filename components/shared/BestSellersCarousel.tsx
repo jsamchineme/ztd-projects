@@ -25,12 +25,12 @@ export function BestSellersCarousel({ products }: { products: ProductCardData[] 
       >
         {products.map((p) => (
           <div key={p.id} className="snap-center shrink-0 basis-full lg:basis-auto px-10 lg:px-0 text-center">
-            <Link href={`/shop/${p.slug}`} className="group relative block mx-auto w-full max-w-[277px] aspect-[277/369] bg-white">
+            <Link href={`/shop/${p.slug}`} className="group relative block mx-auto w-full max-w-[277px] aspect-[277/369] bg-white overflow-hidden">
               {p.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-110" />
               ) : null}
-              <span className="absolute inset-x-0 bottom-0 h-[38px] hidden lg:flex items-center justify-center bg-white/80 font-sans font-light text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="absolute inset-x-0 bottom-0 h-[38px] hidden lg:flex items-center justify-center bg-white/80 font-sans font-light text-[14px] opacity-0 translate-y-[6px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,translate] duration-300 ease-out">
                 Quick View
               </span>
             </Link>

@@ -70,12 +70,12 @@ export function RelatedProducts({ items }: { items: Item[] }) {
       <div className="hidden lg:flex mt-8 gap-[20px] overflow-x-auto snap-x pb-2 [scrollbar-width:thin]">
         {items.map((p) => (
           <Link key={p.id} href={`/shop/${p.slug}`} className="group snap-start shrink-0 w-[210px]">
-            <div className="relative aspect-square bg-white">
+            <div className="relative aspect-square bg-white overflow-hidden">
               {p.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-110" />
               )}
-              <span className="absolute inset-x-0 bottom-0 h-[30px] flex items-center justify-center bg-white/85 text-[13px] opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="absolute inset-x-0 bottom-0 h-[30px] flex items-center justify-center bg-white/85 text-[13px] opacity-0 translate-y-[6px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,translate] duration-300 ease-out">
                 Quick View
               </span>
             </div>

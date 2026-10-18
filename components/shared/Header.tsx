@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { X, Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import { DesktopSearch, MobileSearch } from "./SearchPanel";
 
@@ -69,17 +69,16 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         aria-label="Menu"
         aria-hidden={!open}
         inert={!open}
-        className={`lg:hidden fixed inset-0 z-[80] bg-[#ace3da] overflow-y-auto pb-10 transition-[transform,visibility] duration-[400ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
-          open ? "translate-x-0 visible" : "translate-x-full invisible"
+        className={`lg:hidden fixed inset-0 z-[80] bg-[#ace3da] overflow-y-auto pb-10 transition-[opacity,visibility] duration-[400ms] ease-out ${
+          open ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       >
+        {/* Contents ease down into place as the panel fades in. */}
+        <div className={`transition-transform duration-[400ms] ease-out ${open ? "translate-y-0" : "-translate-y-6"}`}>
         <Link href="/admin" onClick={onClose} className="mt-[88px] ml-[62px] flex w-fit items-center gap-[20px] h-[29px] text-green font-sans font-light text-[22px]">
           <UserIcon className="w-[29px] h-[29px]" />
           Log In
         </Link>
-        <button type="button" onClick={onClose} aria-label="Close menu" className="absolute top-[114px] right-[19px] p-[5px]">
-          <X className="w-[28px] h-[28px]" strokeWidth={1.7} />
-        </button>
         <button
           type="button"
           onClick={() => setSearching(true)}
@@ -119,6 +118,13 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
             </div>
           ))}
         </nav>
+        </div>
+        {/* The menu button's three bars turn into an X in the same spot. */}
+        <button type="button" onClick={onClose} aria-label="Close menu" className="absolute top-[118px] right-[24px] w-[27px] h-[26px]">
+          <span className={`absolute left-0 top-0 w-full h-[2.5px] bg-ink transition-transform duration-[400ms] ease-out ${open ? "translate-y-[11.5px] rotate-45" : ""}`} />
+          <span className={`absolute left-0 top-[11.5px] w-full h-[2.5px] bg-ink transition-opacity duration-200 ${open ? "opacity-0" : "opacity-100"}`} />
+          <span className={`absolute left-0 top-[23px] w-full h-[2.5px] bg-ink transition-transform duration-[400ms] ease-out ${open ? "-translate-y-[11.5px] -rotate-45" : ""}`} />
+        </button>
       </div>
       {open && searching && <MobileSearch onBack={() => setSearching(false)} onDone={onClose} />}
     </>
