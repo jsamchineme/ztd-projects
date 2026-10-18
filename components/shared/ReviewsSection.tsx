@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
-import { Search, ChevronRight, MoreVertical, ChevronDown, Pencil } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { Search, ChevronRight, MoreVertical, ChevronDown, Pencil, X } from "lucide-react";
 
 export interface ReviewItem {
   id: string;
@@ -50,14 +50,72 @@ function Verified() {
 }
 
 const CUT = 72; // the widget's preview length before "...SHOW MORE"
+const muted = "text-[#737373]";
+const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 
-function ReviewCard({ r }: { r: ReviewItem }) {
-  const [full, setFull] = useState(false);
-  const [replyOpen, setReplyOpen] = useState(false);
-  const long = (r.body?.length ?? 0) > CUT + 3;
-  const muted = "text-[#737373]";
+function ReplyBox({ reply, wide }: { reply: NonNullable<ReviewItem["reply"]>; wide?: boolean }) {
+  const [open, setOpen] = useState(false);
   return (
-    <article className="bg-white border border-[#f2f2f2] shadow-[6px_6px_24px_#e6e6e6]">
+    <div
+      onClick={stop}
+      className={`relative mt-[19.5px] sm:mt-[16px] ${wide ? "block" : "inline-block"} max-w-full bg-[#fafafa] border border-[#f2f2f2] px-[19.5px] py-[14.5px] sm:px-[16px] sm:py-[12px] cursor-default`}
+    >
+      {/* speech-bubble notch */}
+      <span className="absolute -top-[7px] left-[22px] w-[12px] h-[12px] rotate-45 bg-[#fafafa] border-l border-t border-[#f2f2f2]" />
+      <div className={`relative flex items-center justify-between gap-[56px] sm:gap-[28px] whitespace-nowrap text-[14.5px] sm:text-[12px] ${muted}`}>
+        <button type="button" onClick={() => setOpen((v) => !v)} className="hover:underline">
+          {open ? "Hide Reply" : "Show Reply (1)"}
+        </button>
+        <span>{reply.ago}</span>
+      </div>
+      {open && (
+        <div className="relative mt-[12px] text-[17px] sm:text-[14px] leading-[1.4] whitespace-pre-line text-ink">
+          {reply.body}
+          <p className="mt-[10px] font-semibold">Debbs Kitchen</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProductRow({ r, className }: { r: ReviewItem; className: string }) {
+  if (r.product) {
+    return (
+      <Link href={`/shop/${r.product.slug}`} onClick={stop} className={`flex items-center gap-[15px] sm:gap-[12px] text-[#444] hover:bg-[#fafafa] ${className}`}>
+        {r.product.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={r.product.imageUrl} alt="" className="w-[49px] h-[49px] sm:w-[40px] sm:h-[40px] object-contain" />
+        )}
+        <span className="flex-1 min-w-0 font-semibold text-[19.5px] sm:text-[16px] leading-[1.4]">
+          View product
+          <span className="block font-normal text-[17px] sm:text-[14px]">{r.product.name}</span>
+        </span>
+        <ChevronRight className="w-[23px] h-[23px] sm:w-[19px] sm:h-[19px]" strokeWidth={1.5} />
+      </Link>
+    );
+  }
+  return r.productName ? (
+    <p className={`text-[17px] sm:text-[14px] text-[#444] truncate ${className}`}>Product: {r.productName}</p>
+  ) : null;
+}
+
+// Clicking anywhere on a card opens the full review, as the live widget does.
+function ReviewCard({ r, onOpen }: { r: ReviewItem; onOpen: () => void }) {
+  const long = (r.body?.length ?? 0) > CUT + 3;
+  return (
+    <article
+      role="button"
+      tabIndex={0}
+      aria-label={`Read review: ${r.title}`}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className="bg-white border border-[#f2f2f2] shadow-[6px_6px_24px_#e6e6e6] cursor-pointer text-left"
+    >
       <div className="px-[25px] pt-[25px] pb-[24px] sm:p-[20px]">
         <div className="flex items-center justify-between">
           <Stars value={r.rating} className="w-[24px] h-[24px] sm:w-[20px] sm:h-[20px]" />
@@ -71,16 +129,10 @@ function ReviewCard({ r }: { r: ReviewItem }) {
           <h3 className="mt-[24px] sm:mt-[20px] font-reviews font-semibold tracking-normal text-[22px] sm:text-[18px] leading-[1.4]">{r.title}</h3>
           {r.body && (
             <p className="mt-[15px] sm:mt-[12px] text-[19.5px] sm:text-[16px] leading-[1.4] whitespace-pre-line">
-              {long && !full ? (
+              {long ? (
                 <>
                   {r.body.slice(0, CUT).trimEnd()}...
-                  <button
-                    type="button"
-                    onClick={() => setFull(true)}
-                    className={`uppercase text-[15.5px] sm:text-[12.8px] ${muted} hover:underline`}
-                  >
-                    Show More
-                  </button>
+                  <span className={`uppercase text-[15.5px] sm:text-[12.8px] ${muted} hover:underline`}>Show More</span>
                 </>
               ) : (
                 r.body
@@ -91,49 +143,67 @@ function ReviewCard({ r }: { r: ReviewItem }) {
             {r.author} {r.verified && <Verified />}
           </p>
           {r.location && <p className="text-[17px] sm:text-[14px] text-[#444]">{r.location}</p>}
-          {r.reply && (
-            <div className="relative mt-[19.5px] sm:mt-[16px] inline-block max-w-full bg-[#fafafa] border border-[#f2f2f2] px-[19.5px] py-[14.5px] sm:px-[16px] sm:py-[12px]">
-              {/* speech-bubble notch */}
-              <span className="absolute -top-[7px] left-[22px] w-[12px] h-[12px] rotate-45 bg-[#fafafa] border-l border-t border-[#f2f2f2]" />
-              <div className={`relative flex items-center justify-between gap-[56px] sm:gap-[28px] whitespace-nowrap text-[14.5px] sm:text-[12px] ${muted}`}>
-                <button type="button" onClick={() => setReplyOpen((v) => !v)} className="hover:underline">
-                  {replyOpen ? "Hide Reply" : "Show Reply (1)"}
-                </button>
-                <span>{r.reply.ago}</span>
-              </div>
-              {replyOpen && (
-                <div className="relative mt-[12px] text-[17px] sm:text-[14px] leading-[1.4] whitespace-pre-line">
-                  {r.reply.body}
-                  <p className="mt-[10px] font-semibold">Debbs Kitchen</p>
-                </div>
-              )}
-            </div>
-          )}
+          {r.reply && <ReplyBox reply={r.reply} />}
         </div>
       </div>
-      {r.product ? (
-        <Link
-          href={`/shop/${r.product.slug}`}
-          className="flex items-center gap-[15px] sm:gap-[12px] border-t border-[#f2f2f2] p-[24px] sm:p-[20px] text-[#444] hover:bg-[#fafafa]"
-        >
-          {r.product.imageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={r.product.imageUrl} alt="" className="w-[49px] h-[49px] sm:w-[40px] sm:h-[40px] object-contain" />
-          )}
-          <span className="flex-1 min-w-0 font-semibold text-[19.5px] sm:text-[16px] leading-[1.4]">
-            View product
-            <span className="block font-normal text-[17px] sm:text-[14px]">{r.product.name}</span>
-          </span>
-          <ChevronRight className="w-[23px] h-[23px] sm:w-[19px] sm:h-[19px]" strokeWidth={1.5} />
-        </Link>
-      ) : (
-        r.productName && (
-          <p className="border-t border-[#f2f2f2] p-[24px] sm:p-[20px] text-[17px] sm:text-[14px] text-[#444] truncate">
-            Product: {r.productName}
-          </p>
-        )
-      )}
+      <ProductRow r={r} className="border-t border-[#f2f2f2] p-[24px] sm:p-[20px]" />
     </article>
+  );
+}
+
+// "Product Review" popup: the whole review, centred over a dimmed page.
+function ReviewModal({ r, onClose }: { r: ReviewItem; onClose: () => void }) {
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div onClick={onClose} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 font-reviews">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Product Review"
+        onClick={stop}
+        className="relative w-full max-w-[500px] max-h-[calc(100vh-32px)] overflow-y-auto bg-white px-[24px] pt-[24px] pb-[16px]"
+      >
+        <h2 className="pr-8 text-[22px] leading-[1.3]">Product Review</h2>
+        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-[22px] top-[25px] p-1 text-[#444]">
+          <X className="w-[18px] h-[18px]" strokeWidth={1.5} />
+        </button>
+
+        <div className="mt-[16px] flex items-center justify-between">
+          <Stars value={r.rating} className="w-[26px] h-[26px]" />
+          <span className={`text-[14px] ${muted}`}>{r.ago}</span>
+        </div>
+        <h3 className="mt-[16px] font-semibold text-[18px] leading-[1.4]">{r.title}</h3>
+        {r.body && <p className="mt-[12px] text-[16px] leading-[1.4] whitespace-pre-line">{r.body}</p>}
+
+        <div className="mt-[16px] flex items-center gap-[13px]">
+          <span className="relative flex shrink-0 items-center justify-center w-[40px] h-[40px] rounded-[50%] bg-[#bae2e8] text-white text-[18px]">
+            {r.author.trim().charAt(0).toUpperCase()}
+            {r.verified && (
+              <span className="absolute -right-[2px] -bottom-[2px] rounded-[50%] bg-white p-[1px] [&_svg]:!w-[13px] [&_svg]:!h-[13px]">
+                <Verified />
+              </span>
+            )}
+          </span>
+          <span className="min-w-0">
+            <span className="block font-semibold text-[16px] leading-[1.4]">{r.author}</span>
+            {r.location && <span className="block text-[14px] text-[#444]">{r.location}</span>}
+          </span>
+        </div>
+        {r.reply && <ReplyBox reply={r.reply} wide />}
+
+        <ProductRow r={r} className="mt-[20px] border-t border-[#ddd] py-[20px]" />
+      </div>
+    </div>
   );
 }
 
@@ -165,6 +235,8 @@ export function ReviewsSection({
   variant?: "grid" | "list";
 }) {
   const [q, setQ] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const closeModal = useCallback(() => setOpenId(null), []);
   // The widget pages 6 at a time on phones and 12 on larger screens.
   const isPhone = useSyncExternalStore(subscribePhone, isPhoneNow, () => false);
   const page = isPhone ? 6 : 12;
@@ -180,6 +252,7 @@ export function ReviewsSection({
     );
   }, [q, reviews]);
   const visible = filtered.slice(0, shown);
+  const openReview = reviews.find((r) => r.id === openId);
 
   if (!reviews.length) return null;
 
@@ -246,7 +319,7 @@ export function ReviewsSection({
         {variant === "list" ? (
           <div className="mt-[41px] sm:mt-5 space-y-[18px] sm:space-y-[16px]">
             {visible.map((r) => (
-              <ReviewCard key={r.id} r={r} />
+              <ReviewCard key={r.id} r={r} onOpen={() => setOpenId(r.id)} />
             ))}
           </div>
         ) : (
@@ -257,7 +330,7 @@ export function ReviewsSection({
                   {visible
                     .filter((_, k) => k % cols === c)
                     .map((r) => (
-                      <ReviewCard key={r.id} r={r} />
+                      <ReviewCard key={r.id} r={r} onOpen={() => setOpenId(r.id)} />
                     ))}
                 </div>
               ))}
@@ -277,6 +350,7 @@ export function ReviewsSection({
           </div>
         )}
       </div>
+      {openReview && <ReviewModal r={openReview} onClose={closeModal} />}
     </section>
   );
 }
