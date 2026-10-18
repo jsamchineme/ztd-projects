@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImageField } from "./ImageField";
+import { Select } from "./Select";
 import { btnSecondary, inputCls } from "./ui";
 import { cn } from "@/lib/utils";
 
@@ -281,14 +282,14 @@ export function SectionsEditor({ name, defaultValue }: { name: string; defaultVa
       ))}
       {!sections.length && <p className="text-sm text-neutral-500">This page has no sections yet.</p>}
       <div className="flex flex-wrap items-center gap-2 pt-1">
-        <select value={adding} onChange={(e) => setAdding(e.target.value)} className={cn(inputCls, "max-w-64")}>
-          <option value="">Add a section…</option>
-          {Object.keys(TEMPLATES).map((t) => (
-            <option key={t} value={t}>
-              {TYPE_LABELS[t] ?? t}
-            </option>
-          ))}
-        </select>
+        <Select
+          value={adding}
+          onChange={setAdding}
+          placeholder="Add a section…"
+          aria-label="Add a section"
+          className="max-w-64"
+          options={Object.keys(TEMPLATES).map((t) => ({ value: t, label: TYPE_LABELS[t] ?? t }))}
+        />
         <button
           type="button"
           className={btnSecondary}

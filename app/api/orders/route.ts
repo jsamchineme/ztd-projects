@@ -75,8 +75,8 @@ export async function POST(req: Request) {
       subtotalCents,
       shippingCents,
       totalCents,
-      status: "PENDING",
       items: { create: lineItems },
+      activity: { create: { message: `${customer.name?.trim() || "A customer"} placed an order` } },
     },
   });
 

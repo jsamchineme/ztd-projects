@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { EDITORS, requireUser } from "@/lib/admin";
 import { dateInput } from "@/lib/admin-format";
 import { Card, Check, Field, PageHeader, SavedNotice, inputCls } from "@/components/admin/ui";
+import { Select } from "@/components/admin/Select";
 import { DeleteButton, SubmitButton } from "@/components/admin/buttons";
 import { deleteReview, saveReview } from "../actions";
 
@@ -35,13 +36,11 @@ export default async function EditReview({
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-[120px_1fr]">
                 <Field label="Rating">
-                  <select name="rating" defaultValue={r?.rating ?? 5} className={inputCls}>
-                    {[5, 4, 3, 2, 1].map((n) => (
-                      <option key={n} value={n}>
-                        {"★".repeat(n)} {n}
-                      </option>
-                    ))}
-                  </select>
+                  <Select
+                    name="rating"
+                    defaultValue={r?.rating ?? 5}
+                    options={[5, 4, 3, 2, 1].map((n) => ({ value: String(n), label: `${"★".repeat(n)} ${n}` }))}
+                  />
                 </Field>
                 <Field label="Title">
                   <input name="title" required defaultValue={r?.title} className={inputCls} />
@@ -76,14 +75,11 @@ export default async function EditReview({
           <Card title="Details">
             <div className="space-y-4">
               <Field label="Product">
-                <select name="productId" defaultValue={r?.productId ?? ""} className={inputCls}>
-                  <option value="">None</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  name="productId"
+                  defaultValue={r?.productId ?? ""}
+                  options={[{ value: "", label: "None" }, ...products.map((p) => ({ value: p.id, label: p.name }))]}
+                />
               </Field>
               <Field label="Product name (not in shop)" hint="Only used when no product is selected.">
                 <input name="productName" defaultValue={r?.productName ?? ""} className={inputCls} />

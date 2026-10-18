@@ -2,7 +2,7 @@
 // service env file loaded, so this file prepares everything a restart needs:
 //
 //   1. `prisma migrate deploy`   — apply pending migrations to DATABASE_URL
-//   2. seed (upserts), only when the seed or its scraped data changed
+//   2. `prisma generate` + seed (upserts), only when the seed or its scraped data changed
 //   3. `next build`, only if the source changed since the last build
 //   4. boot Next.js
 //
@@ -76,6 +76,9 @@ if (!dev) {
       stdio: "inherit",
       env: { ...process.env, DATABASE_URL: directUrl, PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK: "1" },
     });
+    // The seed uses the generated client, so it must match the schema just migrated
+    // (`npm run build` regenerates too, but only after the seed has run).
+    run(`${bin("prisma")} generate`);
     run(`${bin("tsx")} prisma/seed.ts`);
     mkdirSync(join(root, ".next"), { recursive: true });
     writeFileSync(dbStampFile, dbCurrent);

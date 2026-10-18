@@ -1,8 +1,24 @@
-import type { OrderStatus } from "@prisma/client";
+import type { FulfillmentStatus, PaymentStatus } from "@prisma/client";
 import { Badge } from "./ui";
 
-const TONE = { PENDING: "amber", PAID: "blue", FULFILLED: "green", CANCELLED: "red" } as const;
+const PAYMENT = {
+  PAID: { tone: "green", label: "Paid" },
+  UNPAID: { tone: "red", label: "Unpaid" },
+  REFUNDED: { tone: "gray", label: "Refunded" },
+} as const;
 
-export function OrderStatusBadge({ status }: { status: OrderStatus }) {
-  return <Badge tone={TONE[status]}>{status.charAt(0) + status.slice(1).toLowerCase()}</Badge>;
+const FULFILLMENT = {
+  FULFILLED: { tone: "green", label: "Fulfilled" },
+  UNFULFILLED: { tone: "red", label: "Unfulfilled" },
+  CANCELLED: { tone: "dark", label: "Canceled" },
+} as const;
+
+export function PaymentBadge({ status }: { status: PaymentStatus }) {
+  const { tone, label } = PAYMENT[status];
+  return <Badge tone={tone}>{label}</Badge>;
+}
+
+export function FulfillmentBadge({ status }: { status: FulfillmentStatus }) {
+  const { tone, label } = FULFILLMENT[status];
+  return <Badge tone={tone}>{label}</Badge>;
 }

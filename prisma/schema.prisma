@@ -118,39 +118,67 @@ model Product {
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  reference     String      @unique // human-friendly order number
-  name          String?
-  email         String
-  phone         String?
-  address       String?
-  city          String?
-  postalCode    String?
-  note          String?
-  subtotalCents Int
-  shippingCents Int         @default(0)
-  totalCents    Int
-  status        OrderStatus @default(PENDING)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id                String            @id @default(cuid())
+  reference         String            @unique // human-friendly order number
+  name              String?
+  email             String
+  phone             String?
+  address           String?
+  city              String?
+  region            String? // state / province
+  postalCode        String?
+  country           String?
+  note              String? // the customer's note at checkout
+  subtotalCents     Int
+  shippingCents     Int               @default(0)
+  taxCents          Int               @default(0)
+  totalCents        Int
+  paymentStatus     PaymentStatus     @default(UNPAID)
+  fulfillmentStatus FulfillmentStatus @default(UNFULFILLED)
+  paymentMethod     String? // e.g. "Card", "PayPal"
+  deliveryMethod    String? // e.g. "USPS", "Pickup"
+  trackingNumber    String?
+  tags              String[]          @default([])
+  archived          Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
-  items OrderItem[]
+  items    OrderItem[]
+  activity OrderActivity[]
 }
 
 model OrderItem {
-  id            String  @id @default(cuid())
-  orderId       String
-  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId     String?
-  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  nameSnapshot  String
-  priceCents    Int
-  quantity      Int     @default(1)
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  nameSnapshot String
+  priceCents   Int
+  quantity     Int      @default(1)
+  fulfilled    Boolean  @default(false)
 }
 
-enum OrderStatus {
-  PENDING
+/// Timeline of notes and system events shown on an order. Newest first in the UI.
+model OrderActivity {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kind      String   @default("system") // "system" | "note"
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+enum PaymentStatus {
+  UNPAID
   PAID
+  REFUNDED
+}
+
+enum FulfillmentStatus {
+  UNFULFILLED
   FULFILLED
   CANCELLED
 }

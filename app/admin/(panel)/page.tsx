@@ -2,10 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/admin";
-import { dateTime } from "@/lib/admin-format";
+import { dateTime, orderNumber } from "@/lib/admin-format";
 import { formatPrice } from "@/lib/utils";
 import { Card, PageHeader, Table, td } from "@/components/admin/ui";
-import { OrderStatusBadge } from "@/components/admin/OrderStatusBadge";
+import { FulfillmentBadge, PaymentBadge } from "@/components/admin/OrderStatusBadge";
 
 export default async function Dashboard() {
   const user = await requireUser();
@@ -13,8 +13,8 @@ export default async function Dashboard() {
 
   const [products, pending, revenue, messages, subscribers, reviews, orders, unread] = await Promise.all([
     prisma.product.count({ where: { published: true } }),
-    prisma.order.count({ where: { status: "PENDING" } }),
-    prisma.order.aggregate({ where: { status: { in: ["PAID", "FULFILLED"] } }, _sum: { totalCents: true } }),
+    prisma.order.count({ where: { archived: false, OR: [{ paymentStatus: "UNPAID" }, { fulfillmentStatus: "UNFULFILLED" }] } }),
+    prisma.order.aggregate({ where: { paymentStatus: "PAID" }, _sum: { totalCents: true } }),
     prisma.contactMessage.count(),
     prisma.newsletterSubscriber.count(),
     prisma.review.count(),
@@ -23,7 +23,7 @@ export default async function Dashboard() {
   ]);
 
   const stats = [
-    { label: "Pending orders", value: pending, href: "/admin/orders?status=PENDING" },
+    { label: "Open orders", value: pending, href: "/admin/orders?fulfillment=UNFULFILLED" },
     { label: "Revenue (paid)", value: formatPrice(revenue._sum.totalCents ?? 0), href: "/admin/orders" },
     { label: "Live products", value: products, href: "/admin/products" },
     { label: "Reviews", value: reviews, href: "/admin/reviews" },
@@ -57,13 +57,16 @@ export default async function Dashboard() {
                 <tr key={o.id} className="hover:bg-neutral-50">
                   <td className={td}>
                     <Link href={`/admin/orders/${o.id}`} className="font-medium text-green hover:underline">
-                      {o.reference}
+                      {orderNumber(o.reference)}
                     </Link>
                   </td>
                   <td className={td}>{o.name || o.email}</td>
                   <td className={td}>{formatPrice(o.totalCents)}</td>
                   <td className={td}>
-                    <OrderStatusBadge status={o.status} />
+                    <div className="flex flex-wrap gap-1">
+                      <PaymentBadge status={o.paymentStatus} />
+                      <FulfillmentBadge status={o.fulfillmentStatus} />
+                    </div>
                   </td>
                   <td className={`${td} text-neutral-500`}>{dateTime(o.createdAt)}</td>
                 </tr>

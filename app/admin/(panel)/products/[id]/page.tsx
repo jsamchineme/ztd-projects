@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { EDITORS, requireUser } from "@/lib/admin";
 import { centsInput } from "@/lib/admin-format";
 import { Card, Check, Field, PageHeader, SavedNotice, btnSecondary, inputCls } from "@/components/admin/ui";
+import { Select } from "@/components/admin/Select";
 import { DeleteButton, SubmitButton } from "@/components/admin/buttons";
 import { ImageField } from "@/components/admin/ImageField";
 import { deleteProduct, saveProduct } from "../actions";
@@ -80,14 +81,11 @@ export default async function EditProduct({
           <Card title="Organization">
             <div className="space-y-4">
               <Field label="Category">
-                <select name="categoryId" defaultValue={p?.categoryId ?? ""} className={inputCls}>
-                  <option value="">None</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  name="categoryId"
+                  defaultValue={p?.categoryId ?? ""}
+                  options={[{ value: "", label: "None" }, ...categories.map((c) => ({ value: c.id, label: c.name }))]}
+                />
               </Field>
               <Field label="Sort order" hint="Lower numbers show first in the shop.">
                 <input name="order" type="number" defaultValue={p?.order ?? 0} className={inputCls} />

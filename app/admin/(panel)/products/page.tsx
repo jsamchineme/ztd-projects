@@ -3,7 +3,8 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { EDITORS, requireUser } from "@/lib/admin";
 import { formatPrice } from "@/lib/utils";
-import { Badge, Empty, PageHeader, SearchBox, Table, btnPrimary, inputCls, td } from "@/components/admin/ui";
+import { Badge, Empty, PageHeader, SearchBox, Table, btnPrimary, td } from "@/components/admin/ui";
+import { Select } from "@/components/admin/Select";
 import { toggleProduct } from "./actions";
 
 export const metadata = { title: "Products" };
@@ -41,14 +42,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         </Link>
       </PageHeader>
       <SearchBox q={q} placeholder="Search products…">
-        <select name="category" defaultValue={category ?? ""} className={`${inputCls} max-w-48`}>
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <Select
+          name="category"
+          defaultValue={category ?? ""}
+          aria-label="Filter by category"
+          className="w-48"
+          options={[{ value: "", label: "All categories" }, ...categories.map((c) => ({ value: c.id, label: c.name }))]}
+        />
       </SearchBox>
       {products.length ? (
         <Table head={["", "Product", "Category", "Price", "Visibility", "Stock", "Best seller", "Sale"]}>

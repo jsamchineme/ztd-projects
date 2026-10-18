@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "debbskitchen.ztddevs.com" },
     ],
   },
+  experimental: {
+    serverActions: {
+      // Studio's proxy forwards requests with the Origin rewritten to the
+      // internal address, which Next's server-action CSRF check would reject.
+      allowedOrigins: [
+        "debbskitchen.ztddevs.com",
+        `localhost:${process.env.PORT || 4402}`,
+        `127.0.0.1:${process.env.PORT || 4402}`,
+      ],
+    },
+  },
   reactStrictMode: true,
   compress: true,
   async headers() {

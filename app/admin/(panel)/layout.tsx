@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const isEditor = user.role !== "AUTHOR";
   const [pendingOrders, unread] = isEditor
     ? await Promise.all([
-        prisma.order.count({ where: { status: "PENDING" } }),
+        prisma.order.count({ where: { archived: false, OR: [{ paymentStatus: "UNPAID" }, { fulfillmentStatus: "UNFULFILLED" }] } }),
         prisma.contactMessage.count({ where: { read: false } }),
       ])
     : [0, 0];

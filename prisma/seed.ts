@@ -189,6 +189,119 @@ async function main() {
     else await prisma.store.create({ data: s });
   }
 
+  // ── Orders (sample data so the admin Orders module has realistic content).
+  //    Upserted by reference; items + activity are rebuilt each seed so this
+  //    stays the source of truth. Real checkout orders (ref "DK-…") are left
+  //    untouched. ────────────────────────────────────────────────────────────
+  const prodBySlug = Object.fromEntries(
+    (await prisma.product.findMany({ select: { id: true, slug: true, name: true, priceCents: true } })).map((p) => [p.slug, p]),
+  );
+  type SeedItem = { slug?: string; name?: string; priceCents?: number; qty: number };
+  type SeedOrder = {
+    ref: string;
+    name: string;
+    email: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    region?: string;
+    postalCode?: string;
+    country?: string;
+    payment: "UNPAID" | "PAID" | "REFUNDED";
+    fulfillment: "UNFULFILLED" | "FULFILLED" | "CANCELLED";
+    paymentMethod?: string;
+    deliveryMethod?: string;
+    tracking?: string;
+    tags?: string[];
+    note?: string;
+    shippingCents: number;
+    taxCents?: number;
+    date: string; // ISO
+    items: SeedItem[];
+  };
+  const orderSeed: SeedOrder[] = [
+    { ref: "10058", name: "Samuel Ankamah", email: "s.ankamah@gmail.com", phone: "6175550148", address: "88 Maple Ave", city: "Natick", region: "Massachusetts", postalCode: "01760", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "9400111899223197428490", tags: ["Repeat"], shippingCents: 895, date: "2026-10-15T19:39:00", items: [{ slug: "suya-yaji", qty: 1 }, { slug: "berbere", qty: 1 }] },
+    { ref: "10057", name: "James Sheffield", email: "jsheffield@outlook.com", phone: "7815550192", address: "214 Beacon St", city: "Boston", region: "Massachusetts", postalCode: "02116", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "PayPal", deliveryMethod: "USPS", tracking: "9400111899223188311204", shippingCents: 895, date: "2026-09-26T22:37:00", items: [{ slug: "adobo-seasoning", qty: 1 }, { slug: "habanero-chile-powder", qty: 1 }] },
+    { ref: "10056", name: "Lorraine Allen", email: "lorraine.allen@gmail.com", phone: "2025550171", address: "1510 K St NW", city: "Washington", region: "District of Columbia", postalCode: "20005", country: "United States", payment: "PAID", fulfillment: "CANCELLED", paymentMethod: "Card", deliveryMethod: "USPS", note: "Customer requested cancellation — refund issued.", shippingCents: 895, date: "2026-08-21T17:44:00", items: [{ slug: "ras-el-hanout", qty: 1 }, { slug: "cajun-seasoning", qty: 1 }] },
+    { ref: "10055", name: "Deborah Odunze", email: "deborah@debbskitchen.com", phone: "5085550130", address: "1245 Worcester St", city: "Natick", region: "Massachusetts", postalCode: "01760", country: "United States", payment: "UNPAID", fulfillment: "UNFULFILLED", deliveryMethod: "USPS", tags: ["Wholesale"], note: "Bulk restock for the Natick pop-up.", shippingCents: 0, date: "2026-06-04T11:35:00", items: [{ slug: "suya-yaji", qty: 4 }, { slug: "adobo-seasoning", qty: 3 }, { slug: "berbere", qty: 3 }] },
+    { ref: "10034", name: "Franklin Ndille", email: "fndille@gmail.com", phone: "3015550166", address: "77 Garrett Park Rd", city: "Rockville", region: "Maryland", postalCode: "20850", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "9400111899223176540981", shippingCents: 895, date: "2023-07-28T11:23:00", items: [{ slug: "ground-cumin", qty: 1 }, { slug: "garlic-powder", qty: 1 }, { slug: "onion-powder", qty: 1 }, { slug: "ginger-powder", qty: 1 }, { slug: "mediterranean-thyme", qty: 1 }] },
+    { ref: "10033", name: "Margaret Cai", email: "margaret.cai@gmail.com", phone: "6465550119", address: "320 W 38th St", city: "New York", region: "New York", postalCode: "10018", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "PayPal", deliveryMethod: "USPS", tracking: "9400111899223165327110", shippingCents: 895, date: "2023-06-12T17:42:00", items: [{ slug: "adobo-seasoning", qty: 1 }, { slug: "cajun-seasoning", qty: 1 }] },
+    { ref: "10032", name: "Anwuli Odebala", email: "anwuli.o@gmail.com", phone: "7135550144", address: "5005 Westheimer Rd", city: "Houston", region: "Texas", postalCode: "77056", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "9400111899223154229087", shippingCents: 895, date: "2023-05-18T23:35:00", items: [{ slug: "habanero-chile-powder", qty: 1 }, { slug: "ginger-powder", qty: 1 }] },
+    { ref: "10031", name: "Lukesh Singla", email: "lukesh.singla@gmail.com", phone: "4085550108", address: "2200 Mission College Blvd", city: "Santa Clara", region: "California", postalCode: "95054", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "9400111899223143119034", shippingCents: 895, date: "2023-04-29T10:52:00", items: [{ slug: "organic-maharajah-curry", qty: 1 }, { slug: "ground-cumin", qty: 1 }] },
+    { ref: "10030", name: "Rodney Thompson", email: "rodt34@gmail.com", phone: "5712284537", address: "19123 Dalton Points Place", city: "Leesburg", region: "Virginia", postalCode: "20176", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "92055901755477300118792742", shippingCents: 895, date: "2023-04-27T13:04:00", items: [{ name: "Sale Set (Oregano, Berbere, & Pink Salt)", priceCents: 2400, qty: 1 }] },
+    { ref: "10029", name: "Meiko Bauchman", email: "meiko.b@gmail.com", phone: "2065550137", address: "400 Pine St", city: "Seattle", region: "Washington", postalCode: "98101", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "PayPal", deliveryMethod: "USPS", tracking: "9400111899223132008921", shippingCents: 895, date: "2023-04-21T08:38:00", items: [{ slug: "suya-yaji", qty: 1 }, { slug: "adobo-seasoning", qty: 1 }, { slug: "garlic-powder", qty: 1 }, { slug: "onion-powder", qty: 1 }] },
+    { ref: "10028", name: "Kathy Patrovanie", email: "kpatrovanie@gmail.com", phone: "3125550123", address: "233 S Wacker Dr", city: "Chicago", region: "Illinois", postalCode: "60606", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "9400111899223120998418", shippingCents: 895, date: "2023-03-19T19:39:00", items: [{ slug: "ground-cumin", qty: 1 }, { slug: "garlic-powder", qty: 1 }, { slug: "onion-powder", qty: 1 }, { slug: "ginger-powder", qty: 1 }, { slug: "mediterranean-thyme", qty: 1 }, { slug: "habanero-chile-powder", qty: 1 }] },
+    { ref: "10027", name: "Galia Afedo", email: "galia.afedo@gmail.com", phone: "4045550155", address: "191 Peachtree St NE", city: "Atlanta", region: "Georgia", postalCode: "30303", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "9400111899223119887305", shippingCents: 895, date: "2023-03-10T18:14:00", items: [{ slug: "chefs-blend-extra-virgin-olive-oil", qty: 1 }, { slug: "chefs-reserve-balsamic-vinegar", qty: 1 }, { slug: "mediterranean-thyme", qty: 1 }] },
+    { ref: "10026", name: "Franklin Ndille", email: "fndille@gmail.com", phone: "3015550166", address: "77 Garrett Park Rd", city: "Rockville", region: "Maryland", postalCode: "20850", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "Card", deliveryMethod: "USPS", tracking: "9400111899223108776292", tags: ["Repeat"], shippingCents: 0, date: "2023-02-10T10:00:00", items: [{ slug: "suya-yaji", qty: 2 }, { slug: "berbere", qty: 2 }, { slug: "adobo-seasoning", qty: 2 }, { slug: "habanero-chile-powder", qty: 2 }] },
+    { ref: "10025", name: "Paula Paris", email: "paula.paris@gmail.com", phone: "5615550182", address: "525 Okeechobee Blvd", city: "West Palm Beach", region: "Florida", postalCode: "33401", country: "United States", payment: "PAID", fulfillment: "FULFILLED", paymentMethod: "PayPal", deliveryMethod: "USPS", tracking: "9400111899223197665189", shippingCents: 895, date: "2023-02-08T12:46:00", items: [{ slug: "cajun-seasoning", qty: 1 }] },
+  ];
+
+  for (const o of orderSeed) {
+    const lineItems = o.items.map((it) => {
+      const p = it.slug ? prodBySlug[it.slug] : undefined;
+      return {
+        productId: p?.id ?? null,
+        nameSnapshot: it.name ?? p?.name ?? "Item",
+        priceCents: it.priceCents ?? p?.priceCents ?? 0,
+        quantity: it.qty,
+        fulfilled: o.fulfillment === "FULFILLED",
+      };
+    });
+    const subtotalCents = lineItems.reduce((n, i) => n + i.priceCents * i.quantity, 0);
+    const taxCents = o.taxCents ?? 0;
+    const totalCents = subtotalCents + o.shippingCents + taxCents;
+    const placedAt = new Date(o.date);
+
+    const scalars = {
+      name: o.name,
+      email: o.email,
+      phone: o.phone ?? null,
+      address: o.address ?? null,
+      city: o.city ?? null,
+      region: o.region ?? null,
+      postalCode: o.postalCode ?? null,
+      country: o.country ?? null,
+      note: o.note ?? null,
+      subtotalCents,
+      shippingCents: o.shippingCents,
+      taxCents,
+      totalCents,
+      paymentStatus: o.payment,
+      fulfillmentStatus: o.fulfillment,
+      paymentMethod: o.paymentMethod ?? null,
+      deliveryMethod: o.deliveryMethod ?? null,
+      trackingNumber: o.tracking ?? null,
+      tags: o.tags ?? [],
+      createdAt: placedAt,
+    } as const;
+
+    const existing = await prisma.order.findUnique({ where: { reference: o.ref } });
+    const id = existing
+      ? (await prisma.order.update({ where: { reference: o.ref }, data: scalars })).id
+      : (await prisma.order.create({ data: { reference: o.ref, ...scalars } })).id;
+
+    await prisma.orderItem.deleteMany({ where: { orderId: id } });
+    await prisma.orderItem.createMany({ data: lineItems.map((li) => ({ ...li, orderId: id })) });
+
+    // Rebuild the activity timeline (newest events have later timestamps).
+    const activity: { kind: string; message: string; createdAt: Date }[] = [
+      { kind: "system", message: `${o.name} placed an order`, createdAt: placedAt },
+    ];
+    const at = (mins: number) => new Date(placedAt.getTime() + mins * 60000);
+    if (o.payment === "PAID") activity.push({ kind: "system", message: "Order marked as Paid", createdAt: at(1) });
+    if (o.payment === "REFUNDED") activity.push({ kind: "system", message: "Payment refunded to customer", createdAt: at(1) });
+    if (o.fulfillment === "FULFILLED") {
+      if (o.tracking) {
+        activity.push({ kind: "system", message: "Tracking number added", createdAt: at(120) });
+        activity.push({ kind: "system", message: "Tracking link added", createdAt: at(121) });
+      }
+      activity.push({ kind: "system", message: `Shipping confirmation email sent to ${o.name}`, createdAt: at(122) });
+    }
+    if (o.fulfillment === "CANCELLED") activity.push({ kind: "system", message: "Order canceled", createdAt: at(60) });
+    await prisma.orderActivity.deleteMany({ where: { orderId: id } });
+    await prisma.orderActivity.createMany({ data: activity.map((a) => ({ ...a, orderId: id })) });
+  }
+
   // ── Videos (DK Show) — the real episodes from the live site ─────────────
   const videos: Array<{ slug: string; title: string; youtubeId: string; duration?: string }> = content.videos;
   for (const [i, v] of videos.entries()) {
