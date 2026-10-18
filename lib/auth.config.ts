@@ -74,7 +74,9 @@ export const authConfig: NextAuthConfig = {
         };
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findFirst({
+          where: { email: { equals: email.trim(), mode: "insensitive" } },
+        });
         if (!user) return null;
 
         const isValid = await bcrypt.compare(password, user.password);

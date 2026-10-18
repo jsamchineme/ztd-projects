@@ -45,7 +45,9 @@ export async function uploadImage(
   const name = `${Date.now()}-${base}.webp`;
   await writeFile(join(dir, name), optimized);
 
-  return { url: `/uploads/${name}`, publicId: `local:${name}` };
+  // Served by app/media/[name]/route.ts: the production server only serves
+  // public/ files that existed when it started, so new uploads go via a route.
+  return { url: `/media/${name}`, publicId: `local:${name}` };
 }
 
 /** Delete an image by the publicId returned from uploadImage(). */

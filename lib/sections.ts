@@ -14,7 +14,8 @@ export async function getPageSections(slug: string): Promise<{
   sections: Section[];
 } | null> {
   const page = await prisma.page.findUnique({ where: { slug } });
-  if (!page) return null;
+  // Unpublished pages are hidden (the home page always renders).
+  if (!page || (!page.published && slug !== "home")) return null;
 
   let sections: Section[] = [];
   if (page.sections) {

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { orderSchema } from "@/lib/validations";
+import { getSetting } from "@/lib/settings";
 
-const FREE_SHIP_THRESHOLD = 10000;
 const FLAT_SHIPPING = 800;
 
 function orderReference(): string {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   }
 
   const subtotalCents = lineItems.reduce((n, i) => n + i.priceCents * i.quantity, 0);
-  const shippingCents = subtotalCents >= FREE_SHIP_THRESHOLD ? 0 : FLAT_SHIPPING;
+  const shippingCents = subtotalCents >= (await getSetting("freeShippingThresholdCents", 10000)) ? 0 : FLAT_SHIPPING;
   const totalCents = subtotalCents + shippingCents;
 
   const order = await prisma.order.create({

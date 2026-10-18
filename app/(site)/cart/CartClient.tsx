@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatPrice } from "@/lib/utils";
 
-const FREE_SHIP_THRESHOLD = 10000;
-
-export function CartClient() {
+export function CartClient({ freeShipThreshold: FREE_SHIP_THRESHOLD }: { freeShipThreshold: number }) {
   const { items, subtotalCents, setQuantity, remove, clear } = useCart();
   const [placing, setPlacing] = useState(false);
   const [done, setDone] = useState<string | null>(null);
