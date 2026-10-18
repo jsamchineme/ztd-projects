@@ -4,7 +4,7 @@ import { state, go, onLeave, refreshProjects, setTitle, setTopbar, hideTopbar, l
 import { runStudioUpdate } from './people.js';
 
 const MODELS = [['opus', 'Opus'], ['fable', 'Fable'], ['sonnet', 'Sonnet'], ['haiku', 'Haiku']];
-const MAX_FILES = 10, MAX_BYTES = 20 * 1024 * 1024;
+const MAX_FILES = 10, MAX_BYTES = 100 * 1024 * 1024;
 const fileIcon = kind => ({ image: '🖼', pdf: '📄', notebook: '📓', text: '📝' })[kind] || '📦';
 const sizeText = n => n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`;
 // A line icon in the style of Claude.ai's composer (drawn here; they take the button's text colour).
@@ -234,7 +234,7 @@ function renderChat(ctx, el, chatId, loadList){
     for (const file of [...list]){
       if (files.length >= MAX_FILES){ toast(`Attach ${MAX_FILES} files at most per message.`, true); break; }
       const f = { name: file.name || 'pasted file', size: file.size };
-      if (file.size > MAX_BYTES) f.error = 'Too large (max 20 MB)';
+      if (file.size > MAX_BYTES) f.error = 'Too large (max 100 MB)';
       files.push(f);
       if (!f.error) upload(file).then(u => Object.assign(f, u), e => { f.error = e.message || 'Upload failed'; }).finally(paintChips);
     }

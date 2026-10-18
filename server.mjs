@@ -386,7 +386,7 @@ route('POST', '/api/chats/:id/messages', async ({ user, params, body }) => {
 route('POST', '/api/projects/:id/uploads', async ({ user, params, body }) => {
   const p = P.getProject(params.id); projectRole(user, p);
   return U.saveUpload(p, user, body);
-}, { limit: 28_000_000 });
+}, { limit: 140_000_000 });
 route('GET', '/api/uploads/:id', async ({ user, params }, res) => {
   const u = U.getUpload(params.id);
   if (!u) throw err(404, 'File not found');
@@ -619,10 +619,10 @@ async function handleStudio(req, res){
         if (req.headers.origin !== STUDIO_URL) throw err(403, 'Bad origin');
         if (Number(req.headers['content-length']) > (r.limit || 1_000_000)){
           // Read and drop the rest of the body, so the sender gets this 413 rather than a broken connection
-          // (closing at once raced with the upload still arriving). Bodies over 64 MB are cut off.
+          // (closing at once raced with the upload still arriving). Bodies over 200 MB are cut off.
           let dropped = 0;
-          req.on('data', c => { dropped += c.length; if (dropped > 64_000_000) req.destroy(); });
-          throw err(413, r.limit ? 'That file is too large (20 MB at most).' : 'Too large');
+          req.on('data', c => { dropped += c.length; if (dropped > 200_000_000) req.destroy(); });
+          throw err(413, r.limit ? 'That file is too large (100 MB at most).' : 'Too large');
         }
         if (!String(req.headers['content-type'] || '').includes('application/json') && req.headers['content-length'] !== '0' && req.headers['content-length']) throw err(415, 'Send JSON');
       }

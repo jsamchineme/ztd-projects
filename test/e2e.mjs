@@ -148,8 +148,8 @@ await check('attach an image and a text file and send them', async () => {
   await page.locator('.sent-image img').waitFor();
   if (!(await page.evaluate(() => document.querySelector('.sent-image img').naturalWidth === 1))) throw new Error('thumbnail did not load');
   await page.locator('a.attach-chip', { hasText: 'notes.md' }).waitFor();
-  const big = await page.request.post(`${BASE}/api/projects/${projectUrl.split('/p/')[1]}/uploads`, { headers: { Origin: BASE }, data: { name: 'big.bin', data: Buffer.alloc(21 * 1024 * 1024).toString('base64') } });
-  if (big.status() !== 413) throw new Error(`21 MB upload gave ${big.status()}`);
+  const big = await page.request.post(`${BASE}/api/projects/${projectUrl.split('/p/')[1]}/uploads`, { headers: { Origin: BASE }, data: { name: 'big.bin', data: Buffer.alloc(101 * 1024 * 1024).toString('base64') } });
+  if (big.status() !== 413) throw new Error(`101 MB upload gave ${big.status()}`);
   await page.screenshot({ path: `${SHOTS}/05b-attachments.png` });
 }, page);
 await check('a prompt still shows up when the live connection is stuck (no refresh needed)', async () => {
