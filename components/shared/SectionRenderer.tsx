@@ -3,6 +3,16 @@ import { Button } from "./Button";
 import { SectionHead } from "./SectionHead";
 import { ProductCard, type ProductCardData } from "./ProductCard";
 import { BestSellersCarousel } from "./BestSellersCarousel";
+import { HeroSlideshow } from "./HeroSlideshow";
+import { DkShowBand } from "./DkShowBand";
+import { InstagramFeed } from "./InstagramFeed";
+import { ReviewsSection, type ReviewItem } from "./ReviewsSection";
+import { AboutPage } from "@/components/pages/AboutPage";
+import { StoresPage } from "@/components/pages/StoresPage";
+import { TermsPage } from "@/components/pages/TermsPage";
+import { EventsGiftsPage } from "@/components/pages/EventsGiftsPage";
+import { GiftCardPage } from "@/components/pages/GiftCardPage";
+import { CareersPage } from "@/components/pages/CareersPage";
 import { NewsletterForm } from "./NewsletterForm";
 import { ContactForm } from "./ContactForm";
 import { youtubeId } from "@/lib/youtube";
@@ -38,6 +48,7 @@ export interface SectionContext {
   stores?: StoreData[];
   featuredVideo?: VideoData | null;
   testimonials?: { quote: string; author: string; role?: string | null }[];
+  reviews?: ReviewItem[];
 }
 
 function HeroSection({ content }: { content: Record<string, any> }) {
@@ -125,20 +136,69 @@ export function SectionRenderer({
               </div>
             );
 
+          // Whole-page layouts migrated from the Wix site (content is CMS JSON).
+          case "aboutPage":
+            return <AboutPage key={key} c={content as never} />;
+          case "storesPage":
+            return <StoresPage key={key} c={content as never} />;
+          case "termsPage":
+            return <TermsPage key={key} c={content as never} />;
+          case "eventsGiftsPage":
+            return <EventsGiftsPage key={key} c={content as never} />;
+          case "giftCardPage":
+            return <GiftCardPage key={key} c={content as never} />;
+          case "careersPage":
+            return <CareersPage key={key} c={content as never} />;
+
+          case "heroSlideshow":
+            return <HeroSlideshow key={key} slides={content.slides ?? []} interval={content.interval} />;
+
+          case "dkShowBand":
+            return (
+              <DkShowBand
+                key={key}
+                youtubeId={content.youtubeId}
+                title={content.title}
+                poster={content.poster}
+              />
+            );
+
+          case "instagram":
+            return (
+              <InstagramFeed
+                key={key}
+                handle={content.handle}
+                posts={content.posts}
+                followers={content.followers}
+                following={content.following}
+                bio={content.bio ?? []}
+                link={content.link}
+                images={content.images ?? []}
+              />
+            );
+
+          case "reviews":
+            return <ReviewsSection key={key} reviews={context.reviews ?? []} />;
+
           case "hero":
             return <HeroSection key={key} content={content} />;
 
           case "bestSellers":
             return (
-              <section key={key} className="section-padding">
-                <div className="wrap">
-                  <h2 className="text-center font-sans font-light uppercase tracking-[0.2em] text-[clamp(1.9rem,4vw,2.4rem)] mb-[48px]">
-                    {content.title ?? "Best Sellers"}
+              <section key={key} className="pt-[70px] lg:pt-[132px] pb-[70px] lg:pb-[140px]">
+                <div className="px-4">
+                  <h2 className="text-center font-sans font-light text-[30px] lg:text-[40px] tracking-[0.1em] mb-[40px] lg:mb-[66px]">
+                    {content.title ?? "BEST SELLERS"}
                   </h2>
-                  <BestSellersCarousel products={context.bestSellers ?? []} />
-                  <div className="text-center mt-[44px]">
-                    <Button href="/shop" variant="gold">Shop All</Button>
-                  </div>
+                  <BestSellersCarousel
+                    products={
+                      content.slugs
+                        ? (content.slugs as string[])
+                            .map((s) => (context.bestSellers ?? []).find((p) => p.slug === s))
+                            .filter((p): p is ProductCardData => Boolean(p))
+                        : (context.bestSellers ?? [])
+                    }
+                  />
                 </div>
               </section>
             );

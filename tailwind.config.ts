@@ -12,7 +12,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#292116",
+        ink: "#000000",
         paper: "#ffffff",
         cream: "#fef3e5",
         soft: "#fcfbfa",

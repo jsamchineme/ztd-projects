@@ -8,6 +8,8 @@ import { join } from "node:path";
 
 // Scraped from the live Wix store: per-product description, keyed by slug.
 // Product photos live at public/products/<slug>.jpg.
+// Page text, blog posts and DK Show episodes migrated from the live Wix site.
+const content = JSON.parse(readFileSync(join(import.meta.dirname, "data", "content.json"), "utf8"));
 const scraped: Record<string, { description?: string }> = JSON.parse(
   readFileSync(join(import.meta.dirname, "data", "products.json"), "utf8"),
 );
@@ -139,6 +141,27 @@ async function main() {
     where: { slug: { notIn: products.map((p) => p.slug) } },
   });
 
+  // ── Reviews (migrated from the Wix Reviews app; dates approximated from
+  //    the "Xmo ago" labels at capture time) ──────────────────────────────
+  const reviews: Array<{ rating: number; title: string; body: string | null; author: string; location: string | null; product: string | null; date: string }> =
+    JSON.parse(readFileSync(join(import.meta.dirname, "data", "reviews.json"), "utf8"));
+  const productIds = Object.fromEntries(
+    (await prisma.product.findMany({ select: { id: true, slug: true } })).map((p) => [p.slug, p.id]),
+  );
+  await prisma.review.deleteMany({});
+  await prisma.review.createMany({
+    data: reviews.map((r, i) => ({
+      position: i,
+      rating: r.rating,
+      title: r.title,
+      body: r.body,
+      author: r.author,
+      location: r.location,
+      productId: r.product ? productIds[r.product] ?? null : null,
+      createdAt: new Date(r.date),
+    })),
+  });
+
   // ── Stores ────────────────────────────────────────────────────────────────
   const stores = [
     { name: "Natick Mall Pop-Up", address: "1245 Worcester St", city: "Natick, MA", hours: "Mon–Sat 10am–8pm, Sun 11am–6pm", order: 1 },
@@ -150,44 +173,32 @@ async function main() {
     else await prisma.store.create({ data: s });
   }
 
-  // ── Videos (DK Show) ──────────────────────────────────────────────────────
-  const videos = [
-    { slug: "spicy-mango-salsa", title: "Spicy Mango Salsa with Plantain Chips", description: "A bright, fiery salsa that comes together in minutes.", youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", episode: "Ep 4", order: 1 },
-    { slug: "weeknight-jollof", title: "Weeknight Jollof Rice", description: "Smoky, party-style jollof for a busy evening.", youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", episode: "Ep 3", order: 2 },
-    { slug: "berbere-chicken-stew", title: "Berbere Chicken Stew", description: "A warming Ethiopian-inspired stew built on berbere.", youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", episode: "Ep 2", order: 3 },
-  ];
-  for (const v of videos) {
-    await prisma.video.upsert({ where: { slug: v.slug }, update: v, create: v });
+  // ── Videos (DK Show) — the real episodes from the live site ─────────────
+  const videos: Array<{ slug: string; title: string; youtubeId: string }> = content.videos;
+  for (const [i, v] of videos.entries()) {
+    const data = {
+      slug: v.slug,
+      title: v.title,
+      youtubeUrl: `https://www.youtube.com/watch?v=${v.youtubeId}`,
+      thumbnailUrl: `/videos/${v.youtubeId}.jpg`,
+      order: i + 1,
+    };
+    await prisma.video.upsert({ where: { slug: v.slug }, update: data, create: data });
   }
+  await prisma.video.deleteMany({ where: { slug: { notIn: videos.map((v) => v.slug) } } });
 
   // ── Blog ──────────────────────────────────────────────────────────────────
-  const posts = [
-    {
-      slug: "stop-shop-welcomes-debbs-kitchen-spices",
-      title: "Stop & Shop welcomes Debbs Kitchen Spices",
-      excerpt:
-        "Press release provided by Debbskitchen.com — healthier spices with no additives for customers, home cooks, chefs, & food lovers.",
-      category: "Press",
-      author: "Deborah Odunze",
-      imageUrl: "/brand/dk-logo.png",
-      body: "<p>Debbs Kitchen is proud to announce that its line of healthier, additive-free spices is now available at Stop &amp; Shop. Our blends are crafted for customers, home cooks, chefs and food lovers who want fresh, flavorful seasoning without the extras.</p><p>Elevate your taste. Savor every moment.</p>",
-      published: true,
-    },
-  ];
-  for (const b of posts) {
-    await prisma.blogPost.upsert({ where: { slug: b.slug }, update: b, create: b });
+  const posts: Array<{ slug: string; title: string; excerpt: string; author: string; category: string; imageUrl: string; date: string; body: string }> =
+    content.blog;
+  for (const { date, ...b } of posts) {
+    const data = { ...b, published: true, createdAt: new Date(date) };
+    await prisma.blogPost.upsert({ where: { slug: b.slug }, update: data, create: data });
   }
+  await prisma.blogPost.deleteMany({ where: { slug: { notIn: posts.map((p) => p.slug) } } });
 
-  // ── Testimonials ────────────────────────────────────────────────────────────
-  const testimonials = [
-    { quote: "The Suya Pepper Blend changed my grilling forever. I put it on everything.", author: "Amara O.", order: 1 },
-    { quote: "Finally, an adobo that tastes like home. Perfectly balanced.", author: "Luis M.", order: 2 },
-    { quote: "Fresh, fragrant, and clearly made with care. You can taste the difference.", author: "Grace T.", order: 3 },
-  ];
-  for (const t of testimonials) {
-    const existing = await prisma.testimonial.findFirst({ where: { author: t.author, quote: t.quote } });
-    if (!existing) await prisma.testimonial.create({ data: t });
-  }
+  // The live site has no testimonials (it uses product reviews); clear any
+  // placeholder rows left by earlier seeds.
+  await prisma.testimonial.deleteMany({});
 
   // ── Settings ──────────────────────────────────────────────────────────────
   const settings: Record<string, unknown> = {
@@ -212,69 +223,65 @@ async function main() {
   }
 
   // ── Pages ───────────────────────────────────────────────────────────────────
+  // Home page, in the live site's order.
   const homeSections = [
-    section("hero", 1, {
-      eyebrow: "Debb's Kitchen",
-      headline: "Elevate your taste. Savor every moment.",
-      subheadline:
-        "Chef-crafted blends, single spices, oils and vinegars — Afro-continental flavor for every kitchen.",
-      backgroundImage: "/home/hero-popup.jpg",
-      buttons: [{ label: "Shop Now", href: "/shop", variant: "gold" }],
-    }),
-    section("bestSellers", 2, { eyebrow: "Crowd favorites", title: "Best Sellers", subtitle: "The blends our customers reach for again and again.", count: 4 }),
-    section("featuresGrid", 3, {
-      eyebrow: "Why Debb's Kitchen",
-      title: "Preparation. Portion. Presentation.",
-      items: [
-        { icon: "🌿", title: "Fresh & Wholesome", description: "Milled in small batches so every jar is fragrant and full of life." },
-        { icon: "🌍", title: "Afro-Continental", description: "Flavors drawn from Africa and blended with global culinary traditions." },
-        { icon: "👩🏾‍🍳", title: "Chef-Crafted", description: "Built by a professionally trained chef who cooks with them every day." },
+    section("heroSlideshow", 0, {
+      interval: 4500,
+      slides: [
+        {
+          image: "/home/hero-1.jpg",
+          layout: "top",
+          eyebrow: "HAND-BLENDED, SMALL BATCH, NO ADDITIVES SPICES & SEASONINGS",
+          title: "ELEVATE YOUR TASTE",
+          buttonLabel: "Shop Now",
+          buttonHref: "/shop",
+        },
+        {
+          image: "/home/hero-2.jpg",
+          layout: "low",
+          title: "SUPPORT OUR BLACK WOMAN OWNED SMALL BUSINESS",
+          buttonLabel: "Shop Now",
+          buttonHref: "/shop",
+        },
+        { image: "/home/hero-3.jpg" },
       ],
     }),
-    section("videoFeature", 4, { eyebrow: "The DK Show", title: "Cook along with Debb", videoSlug: "spicy-mango-salsa" }),
-    section("testimonials", 5, { eyebrow: "Kind words", title: "What cooks are saying" }),
-    section("newsletter", 6, { title: "Join the table", subtitle: "Recipes, new blends and the occasional discount — straight to your inbox." }),
-  ];
-
-  const aboutSections = [
-    section("pageHero", 0, {
-      eyebrow: "Preparation. Portion. Presentation.",
-      headline: "About Debbs Kitchen",
-      subtitle:
-        "My culinary ideology is summarized in these three words: PREPARATION, PORTION and PRESENTATION. The joy of sharing a well-prepared meal is a powerful connector for humanity. Welcome to Debbs Kitchen — elevate your taste, savor every moment.",
+    section("bestSellers", 1, {
+      title: "BEST SELLERS",
+      slugs: ["berbere", "suya-yaji", "habanero-chile-powder", "adobo-seasoning"],
     }),
-    section("splitContent", 1, {
-      imageUrl: "/home/dk-wall.jpg",
-      eyebrow: "Meet Deborah",
-      headline: "Food should be fresh, fun and wholesome",
-      body: "Deborah Odunze is a professionally trained Chef and Registered Nurse — a graduate of the University of Texas Health Science Center in San Antonio and The International Culinary School at the Art Institute of Houston. Her fusion of the medical profession and culinary practice stems from a desire to help people lead better, healthier lives one meal at a time. She calls her style 'Afro-continental cuisine' — a celebration of rich African flavors with cuisines from other parts of the world. Born to loving parents in Nigeria, her first culinary influence is her mother; she has also worked with chefs from Italy, France, America, and South America. Deborah is a wife and mother to three precious children.",
-      ctaLabel: "Shop the Collection",
-      ctaLink: "/shop",
+    section("dkShowBand", 2, {
+      youtubeId: "V4WHyHvF9WE",
+      title: "Ep4 Spicy Mango Salsa with Plantain Chips",
+      poster: "/home/dkshow-poster.jpg",
     }),
-    section("featuresGrid", 2, {
-      eyebrow: "What we believe",
-      title: "Preparation. Portion. Presentation.",
-      items: [
-        { icon: "🥣", title: "Preparation", description: "Great meals begin long before the stove is lit." },
-        { icon: "⚖️", title: "Portion", description: "Balance on the plate, balance in the blend." },
-        { icon: "✨", title: "Presentation", description: "We eat with our eyes first — so make it beautiful." },
+    section("instagram", 3, {
+      handle: "shopdebbskitchen",
+      posts: 329,
+      followers: 788,
+      following: 23,
+      bio: [
+        "Debbs Kitchen",
+        "*Where everyone cooks!",
+        "*Our spices turn your meals into memories",
+        "*Visit our store online at",
       ],
+      link: "http://www.debbskitchen.com/",
+      images: Array.from({ length: 10 }, (_, i) => `/home/ig/ig-${i + 1}.jpg`),
     }),
-  ];
-
-  const simplePage = (title: string, eyebrow: string, headline: string, subtitle: string) => [
-    section("pageHero", 0, { eyebrow, headline, subtitle }),
+    section("reviews", 4, {}),
   ];
 
   const pages = [
     { slug: "home", title: "Home", sections: homeSections, metaDescription: "Chef-crafted spices, blends, oils and vinegars from Debb's Kitchen." },
-    { slug: "about", title: "About", sections: aboutSections, metaDescription: "The story of Deborah Odunze and Debb's Kitchen." },
-    { slug: "stores", title: "Stores", sections: [section("pageHero", 0, { eyebrow: "Visit us", headline: "Find Debb's Kitchen", subtitle: "Come taste the range at one of our locations and pop-ups." }), section("storeList", 1, {})], metaDescription: "Debb's Kitchen store and pop-up locations." },
+    { slug: "about", title: "About", sections: [section("aboutPage", 0, content.pages.about)], metaDescription: "The story of Deborah Odunze and Debbs Kitchen." },
+    { slug: "stores", title: "Store Locations", sections: [section("storesPage", 0, content.pages.stores)], metaDescription: "Find Debbs Kitchen spices in grocery stores and online." },
     { slug: "specials", title: "Special Deals", sections: [section("pageHero", 0, { eyebrow: "Save", headline: "Special Deals", subtitle: "Limited-time offers on favorite blends." }), section("productGrid", 1, { title: "On Sale Now", filter: "onSale", count: 8 })], metaDescription: "Special deals from Debb's Kitchen." },
-    { slug: "events-gifts", title: "Events & Gifts", sections: simplePage("Events & Gifts", "Celebrate", "Events & Gifts", "Gift sets, corporate orders and catering — flavor worth sharing."), metaDescription: "Events and gifts from Debb's Kitchen." },
-    { slug: "gift-card", title: "Gift Card", sections: simplePage("Give flavor", "Gift Card", "Debb's Kitchen Gift Card", "The perfect gift for the cook who has everything (except the right spice)."), metaDescription: "Debb's Kitchen gift cards." },
-    { slug: "careers", title: "Careers", sections: [section("pageHero", 0, { eyebrow: "Join us", headline: "Careers", subtitle: "Hello! We currently have open positions for Sales Associates. Debb's Kitchen is a close-knit team in a fast-growing young business — get in touch if you'd like to grow with us." })], metaDescription: "Careers at Debb's Kitchen." },
-    { slug: "terms-conditions", title: "Terms & Conditions", sections: [section("pageHero", 0, { eyebrow: "Legal", headline: "Terms & Conditions", subtitle: "Shipping, returns and the terms of using Debb's Kitchen." }), section("textContent", 1, { html: "<p>All orders are processed and shipped within 2–5 business days. Free shipping is applied automatically on orders over $100. If something isn't right with your order, contact us at hello@debbskitchen.com and we'll make it right.</p>" })], metaDescription: "Debb's Kitchen terms, shipping and returns." },
+    { slug: "events-gifts", title: "Events & Gifts", sections: [section("eventsGiftsPage", 0, { ...content.pages["events-gifts"], spices: products.map((p) => p.name) })], metaDescription: "Event gifts and bulk orders from Debbs Kitchen." },
+    { slug: "gift-card", title: "eGift Card", sections: [section("giftCardPage", 0, content.pages["gift-card"])], metaDescription: "Debbs Kitchen eGift Cards." },
+    { slug: "careers", title: "Careers", sections: [section("careersPage", 0, content.pages.careers)], metaDescription: "Careers at Debbs Kitchen." },
+    { slug: "contact", title: "Contact Us", sections: [section("pageHero", 0, { eyebrow: "Get in touch", headline: "Contact Us", subtitle: "Questions, wholesale or event orders — send us a note and we'll get back to you." }), section("contactForm", 1, {})], metaDescription: "Contact Debb's Kitchen." },
+    { slug: "terms-conditions", title: "Terms & Conditions", sections: [section("termsPage", 0, content.pages["terms-conditions"])], metaDescription: "Debbs Kitchen terms and conditions." },
   ];
 
   for (const p of pages) {

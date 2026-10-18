@@ -1,119 +1,118 @@
 import Link from "next/link";
-import { NewsletterForm } from "./NewsletterForm";
-import {
-  FacebookIcon,
-  InstagramIcon,
-  YoutubeIcon,
-  TwitterIcon,
-} from "./SocialIcons";
+import { BackToTop } from "./BackToTop";
+import { FooterNewsletter } from "./FooterNewsletter";
+import { SOCIAL_LINKS } from "./SocialBar";
 
-const SHOP_LINKS = [
-  { label: "Shop All", href: "/shop" },
-  { label: "Events & Gifts", href: "/events-gifts" },
-  { label: "E-Gift Card", href: "/gift-card" },
+const GROUPS: { title: string[]; links: { label: string; href: string }[] }[] = [
+  {
+    title: ["SHOP"],
+    links: [
+      { label: "SHOP ALL", href: "/shop" },
+      { label: "EVENTS & GIFTS", href: "/events-gifts" },
+      { label: "E-GIFT CARD", href: "/gift-card" },
+    ],
+  },
+  {
+    title: ["HELP"],
+    links: [
+      { label: "TERMS & CONDITIONS", href: "/terms-conditions" },
+      { label: "SHIPPING & RETURNS", href: "/terms-conditions" },
+    ],
+  },
+  {
+    title: ["DEBBS", "KITCHEN"],
+    links: [
+      { label: "OUR STORY", href: "/about" },
+      { label: "STORE LOCATIONS", href: "/stores" },
+      { label: "SUBSCRIBE", href: "#subscribe" },
+      { label: "CONTACT US", href: "/contact" },
+    ],
+  },
 ];
 
-const HELP_LINKS = [
-  { label: "Terms & Conditions", href: "/terms-conditions" },
-  { label: "Shipping & Returns", href: "/terms-conditions" },
-];
-
-const COMPANY_LINKS = [
-  { label: "Our Story", href: "/about" },
-  { label: "Store Locations", href: "/stores" },
-  { label: "DK Show", href: "/dk-show" },
-  { label: "Careers", href: "/careers" },
-];
-
-const SOCIALS = [
-  { label: "Facebook", href: "https://facebook.com/debbskitchen", Icon: FacebookIcon },
-  { label: "Instagram", href: "https://instagram.com/shopdebbskitchen", Icon: InstagramIcon },
-  { label: "YouTube", href: "https://youtube.com/c/DebbsKitchenShow", Icon: YoutubeIcon },
-  { label: "Twitter", href: "https://twitter.com/debbskitchen", Icon: TwitterIcon },
-];
-
-function LinkCol({
-  title,
-  links,
-}: {
-  title: string;
-  links: { label: string; href: string }[];
-}) {
+function Socials({ size }: { size: string }) {
   return (
-    <div>
-      <h4 className="text-green-dark text-[0.82rem] tracking-[0.12em] uppercase font-semibold mb-4">
-        {title}
-      </h4>
-      <ul className="space-y-2">
-        {links.map((l) => (
-          <li key={l.label}>
-            <Link
-              href={l.href}
-              className="text-[0.92rem] text-ink/70 hover:text-green-dark transition-colors"
-            >
-              {l.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="flex gap-[13px] lg:gap-[13px]">
+      {SOCIAL_LINKS.map((s) => (
+        <a key={s.label} href={s.href} aria-label={s.label} target="_blank" rel="noopener noreferrer">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={s.icon} alt="" className={size} />
+        </a>
+      ))}
     </div>
   );
 }
 
 export function Footer() {
   return (
-    <footer className="bg-mint text-ink mt-auto">
-      <div className="wrap py-[56px] grid gap-[40px] md:grid-cols-[1.5fr_1fr_1fr_1.1fr]">
-        <div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/dk-logo.png" alt="Debb's Kitchen" className="h-[52px] w-auto mb-5" />
-          <p className="text-[0.78rem] tracking-[0.1em] uppercase text-ink/70 mb-3 max-w-[300px]">
-            Be the first to know about sales &amp; other news!
-          </p>
-          <NewsletterForm />
+    <footer className="mt-auto text-ink">
+      <div className="relative bg-[#ace3da] overflow-hidden">
+        {/* faint green diamond texture, as on the live footer */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 opacity-[0.09]"
+          style={{ backgroundImage: "url(/brand/pattern-a.png)", backgroundSize: "201px" }}
+        />
+        <div className="relative mx-auto max-w-[1512px] px-6 lg:pl-[208px] lg:pr-[60px] pt-[60px] lg:pt-[87px] pb-[40px] lg:pb-[52px] grid gap-[48px] lg:gap-0 lg:grid-cols-[541px_203px_194px_1fr]">
+          <div id="subscribe" className="scroll-mt-28">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/dk-logo-black.png" alt="Debb's Kitchen" className="w-[110px] h-auto" />
+            <div className="mt-[34px] w-full max-w-[410px] bg-white/45 px-[13px] py-[14px] lg:-ml-[13px]">
+              <p className="font-sans font-light text-[13px] tracking-[0.04em] uppercase">
+                Be the first to know about sales &amp; other news!
+              </p>
+              <FooterNewsletter />
+            </div>
+          </div>
+
+          {GROUPS.map((g) => (
+            <div key={g.title.join(" ")} className="flex gap-6 lg:block">
+              <h4 className="flex shrink-0 rotate-180 [writing-mode:vertical-rl] lg:rotate-0 lg:[writing-mode:horizontal-tb] lg:block font-sans font-light text-[30px] lg:text-[28px] leading-[1.05] lg:leading-[1.2] tracking-[0.04em] lg:tracking-normal">
+                {g.title.map((line) => (
+                  <span key={line} className="lg:mr-[0.3em]">
+                    {line}
+                  </span>
+                ))}
+              </h4>
+              <div className="lg:mt-[18px]">
+                <ul className="space-y-5 lg:space-y-[13px]">
+                  {g.links.map((l) => (
+                    <li key={l.label}>
+                      <Link
+                        href={l.href}
+                        className="font-sans font-light text-[17px] lg:text-[14px] lg:leading-[17px] tracking-[0.18em] lg:tracking-[0.1em] hover:text-green-dark transition-colors"
+                      >
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                {g.title[0] === "DEBBS" && (
+                  <div className="hidden lg:block mt-[22px]">
+                    <Socials size="w-[25px] h-[25px]" />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <LinkCol title="Shop" links={SHOP_LINKS} />
-        <LinkCol title="Help" links={HELP_LINKS} />
-
-        <div>
-          <h4 className="text-green-dark text-[0.82rem] tracking-[0.12em] uppercase font-semibold mb-4">
-            Debb&apos;s Kitchen
-          </h4>
-          <ul className="space-y-2 mb-5">
-            {COMPANY_LINKS.map((l) => (
-              <li key={l.label}>
-                <Link
-                  href={l.href}
-                  className="text-[0.92rem] text-ink/70 hover:text-green-dark transition-colors"
-                >
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className="flex gap-2">
-            {SOCIALS.map(({ label, href, Icon }) => (
-              <a
-                key={label}
-                href={href}
-                aria-label={label}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/60 text-green-dark flex items-center justify-center hover:bg-green hover:text-white transition-colors"
-              >
-                <Icon className="w-4 h-4" />
-              </a>
-            ))}
+        {/* Phones: divider + larger social row, as on the live mobile footer */}
+        <div className="relative lg:hidden px-6">
+          <div className="border-t border-green/60 py-8">
+            <Socials size="w-[32px] h-[32px]" />
           </div>
         </div>
       </div>
 
-      <div className="bg-green text-white/90">
-        <div className="wrap py-4 text-center text-[0.8rem]">
-          © {new Date().getFullYear()} Debb&apos;s Kitchen. All rights reserved.
-        </div>
+      <div className="bg-green text-[#fcfcfc]">
+        <p className="mx-auto max-w-[1512px] px-6 py-[10px] text-center font-sans font-light text-[15px] lg:text-[14px] tracking-[0.15em]">
+          © {new Date().getFullYear()} by Debbs Kitchen.
+          <br className="lg:hidden" /> All Rights Reserved
+        </p>
       </div>
+
+      <BackToTop />
     </footer>
   );
 }

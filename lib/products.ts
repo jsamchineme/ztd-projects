@@ -34,27 +34,41 @@ export async function getSaleProducts(limit = 12): Promise<ProductCardData[]> {
 
 export interface ShopFilters {
   category?: string;
-  sort?: "featured" | "price-asc" | "price-desc";
+  sort?: string; // featured | price-asc | price-desc | name-asc | name-desc
+  q?: string;
+  minCents?: number;
+  maxCents?: number;
 }
 
-export async function getShopProducts(filters: ShopFilters = {}): Promise<ProductCardData[]> {
-  const orderBy =
-    filters.sort === "price-asc"
-      ? { priceCents: "asc" as const }
-      : filters.sort === "price-desc"
-        ? { priceCents: "desc" as const }
-        : { order: "asc" as const };
+const SORTS: Record<string, Record<string, "asc" | "desc">> = {
+  "price-asc": { priceCents: "asc" },
+  "price-desc": { priceCents: "desc" },
+  "name-asc": { name: "asc" },
+  "name-desc": { name: "desc" },
+};
 
+export async function getShopProducts(filters: ShopFilters = {}): Promise<ProductCardData[]> {
+  const { category, sort, q, minCents, maxCents } = filters;
   return prisma.product.findMany({
     where: {
       published: true,
-      ...(filters.category && filters.category !== "all"
-        ? filters.category === "most-popular"
+      ...(category && category !== "all"
+        ? category === "most-popular"
           ? { bestSeller: true }
-          : { category: { slug: filters.category } }
+          : { category: { slug: category } }
+        : {}),
+      ...(q ? { name: { contains: q, mode: "insensitive" as const } } : {}),
+      ...(minCents != null || maxCents != null
+        ? { priceCents: { ...(minCents != null ? { gte: minCents } : {}), ...(maxCents != null ? { lte: maxCents } : {}) } }
         : {}),
     },
-    orderBy,
+    orderBy: SORTS[sort ?? ""] ?? { order: "asc" },
     select: cardSelect,
   });
+}
+
+/** Lowest and highest catalog price, for the shop's price filter. */
+export async function getPriceBounds(): Promise<{ min: number; max: number }> {
+  const r = await prisma.product.aggregate({ where: { published: true }, _min: { priceCents: true }, _max: { priceCents: true } });
+  return { min: r._min.priceCents ?? 0, max: r._max.priceCents ?? 0 };
 }

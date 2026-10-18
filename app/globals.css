@@ -10,7 +10,7 @@
 
 @theme inline {
   /* ── Colors (from the live Wix palette) ──────────── */
-  --color-ink: #292116;          /* dark brown text  (color_30) */
+  --color-ink: #000000;          /* live site text is pure black */
   --color-paper: #ffffff;
   --color-cream: #fef3e5;        /* warm light bg */
   --color-soft: #fcfbfa;
@@ -32,9 +32,11 @@
   --color-white: #ffffff;
 
   /* ── Typography (Assistant — used on the live site) ─ */
-  --font-display: "Assistant", "Avenir", system-ui, sans-serif;
-  --font-sans: "Assistant", system-ui, sans-serif;
-  --font-serif: "Assistant", system-ui, sans-serif;
+  --font-display: var(--font-nunito), system-ui, sans-serif;
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+  --font-serif: var(--font-nunito), system-ui, sans-serif;
+  --font-nav: var(--font-barlow), system-ui, sans-serif;
+  --font-reviews: var(--font-assistant), system-ui, sans-serif;
 
   /* ── Font sizes ──────────────────────────────────── */
   --text-eyebrow: 0.72rem;
@@ -76,7 +78,7 @@
   }
 
   body {
-    font-family: var(--font-sans);
+    font-family: var(--font-nunito), system-ui, sans-serif;
     color: var(--color-ink);
     background: var(--color-paper);
     line-height: 1.7;
@@ -85,7 +87,7 @@
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-display);
+    font-family: var(--font-nunito), system-ui, sans-serif;
     font-weight: 400;
     line-height: 1.12;
     letter-spacing: 0.01em;
@@ -121,7 +123,7 @@
 
 /* Uppercase section eyebrow / label */
 .eyebrow {
-  font-family: var(--font-sans);
+  font-family: var(--font-nunito), system-ui, sans-serif;
   font-size: var(--text-eyebrow);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;

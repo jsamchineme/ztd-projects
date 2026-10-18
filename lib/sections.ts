@@ -40,5 +40,6 @@ export function neededData(sections: Section[]) {
     stores: types.has("storeList"),
     featuredVideo: types.has("videoFeature"),
     testimonials: types.has("testimonials"),
+    reviews: types.has("reviews"),
   };
 }

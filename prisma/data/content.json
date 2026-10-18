@@ -1,0 +1,201 @@
+{
+  "pages": {
+    "about": {
+      "title": "About Debbs Kitchen",
+      "subtitle": "PREPARATION, PORTION, PRESENTATION",
+      "intro": [
+        "My culinary ideology is summarized in these three words above. I call them the 3P's of life and cooking. The joy of sharing a well prepared meal is a powerful connector for humanity. I am excited to explore this complete kitchen and lifestyle experience with you. Let's elevate your taste. Savor every moment.",
+        "Welcome to Debbs Kitchen...where everyone cooks!"
+      ],
+      "image": "/pages/about-kitchen.jpg",
+      "meetTitle": "Meet Deborah",
+      "bio": [
+        "Deborah Odunze is a professionally trained Chef and Registered Nurse. A graduate of the University of Texas Health Science Center in San Antonio and The International Culinary School of the Art Institute of Houston. This young chef is passionate about food and health. Her fusion of the medical profession and culinary practice stems from a desire to help people live better and healthier lives one meal at a time. This practice lead to what she terms “Afro-continental cuisine”- a celebration of rich African flavors with cuisines from other parts of the world. As Deborah fondly puts it, \"This can be easily derived from leftovers, or a well planned meal.\"",
+        "Born to loving parents in Nigeria, West Africa, her first culinary influence is her mother. Deborah has also worked with chefs from Italy, France, America, and South America. Deborah enjoys creating recipes and entertaining. Her many creations have endeared her to family, friends and fans.",
+        "Her culinary ideology is based on three words she fondly calls 3Ps. The right Preparation, Portion and Presentation. Deborah believes food should be fresh, fun and wholesome.",
+        "In her spare time, Deborah enjoys traveling, running, reading, going to the movies, spending time with friends, family and working in her garden. Deborah is a wife and mother to three precious children."
+      ]
+    },
+    "stores": {
+      "title": "STORE LOCATIONS",
+      "subtitle": "Find a store near you.",
+      "note": "Our products can also be found in grocery stores and other online listings.",
+      "buttonLabel": "FIND OUR PRODUCTS",
+      "image": "/pages/stores-hero.jpg",
+      "groceryTitle": "GROCERY STORES",
+      "groceryIntro": "Our products can be found in these grocery stores:",
+      "grocery": [
+        {
+          "name": "Concord Market",
+          "lines": [
+            "77 Lowell Rd",
+            "Concord, MA 01742"
+          ],
+          "mapUrl": "https://www.google.com/maps/place/The+Concord+Market/@42.3373501,-71.090219,15.32z/data=!4m5!3m4!1s0x89e39bec28ac2c99:0x1202a0b86a64b841!8m2!3d42.4628253!4d-71.3516522"
+        },
+        {
+          "name": "Tropical Foods",
+          "lines": [
+            "450 Melnea Cass Blvd",
+            "Roxbury, MA 02119"
+          ],
+          "mapUrl": "https://www.google.com/maps/place/Tropical+Foods+(El+Platanero)/@42.3373501,-71.090219,15.32z/data=!4m5!3m4!1s0x89e37a3c649e959d:0xbcd99dc09d5a14be!8m2!3d42.3332522!4d-71.0819807"
+        }
+      ],
+      "onlineTitle": "ONLINE LISTINGS",
+      "onlineIntro": "Our products can be found in the following online stores:",
+      "online": [
+        {
+          "name": "Walmart:",
+          "label": "Shop Walmart.com",
+          "url": "https://www.walmart.com/c/brand/debbs-kitchen"
+        },
+        {
+          "name": "Faire:",
+          "label": "Shop Faire.com",
+          "url": "https://www.faire.com/brand/b_ga63ja39zn?refS=debbs%20kitchen"
+        },
+        {
+          "name": "Etsy:",
+          "label": "Shop Esty.com",
+          "url": "https://www.etsy.com/shop/DebbsKitchen?ref=search_shop_redirect"
+        }
+      ]
+    },
+    "events-gifts": {
+      "heroImage": "/pages/events-hero.jpg",
+      "title": "Events & Gifts",
+      "intro": [
+        "Debbs Kitchen spices are a treat that's bursting with flavor and quality. Surprise your employees, birthday friends, new brides, new moms, and more!",
+        "Contact us if you have any specific requests. We strive to cater to your needs!"
+      ],
+      "bulkImage": "/pages/events-bulk.jpg",
+      "bulkTitle": "Events & Bulk Gifts",
+      "bulkText": "Do you need to send out gifts for events? Looking to buy a unique gift for employees? Our spices & seasonings make great gifts for anyone, chef or not! You can order a higher quantity than what is in our online store. We are also able to package and ship the items to multiple locations. Simply click the button below to start!",
+      "bandImage": "/home/gift-boxes.jpg",
+      "workTitle": "Let's Work Together",
+      "workText": "Hello! We are open to forming partnerships and business relations. Let us know what you have in mind!"
+    },
+    "gift-card": {
+      "image": "/pages/gift-card.png",
+      "title": "eGift Card",
+      "description": "You can't go wrong with a Debbs Kitchen gift card. Choose an amount and write a personalized message to make this gift your own.",
+      "amounts": [
+        15,
+        25,
+        50,
+        100,
+        150,
+        200
+      ]
+    },
+    "careers": {
+      "title": "Careers",
+      "lead": "Hello! We currently have open positions for Sales Associates.",
+      "body": "Would you like to be part of a close-knit team where everyone helps each other out? At Debbs Kitchen, everyone is like family and we support and learn from each other. We're also a fast-growing and young business, so you'll be a part of something big! There are lots of opportunities at Debbs Kitchen, whether it's practicing interpersonal skills or contributing to marketing and management. Don't miss this opportunity, and get in touch with us right away with the form below!",
+      "formTitle": "We’re Hiring Sales Associates",
+      "locations": [
+        "Cambridgeside Mall",
+        "Chestnut Hill Mall",
+        "Natick Mall"
+      ]
+    },
+    "terms-conditions": {
+      "title": "TERMS & CONDITIONS",
+      "sections": [
+        {
+          "heading": "CUSTOMER CARE",
+          "paragraphs": [
+            "Thank you for being a Debbs Kitchen customer! We care about your satisfaction with our products. Although we cannot offer <a href=\"/terms-conditions\">returns</a> at this time due to state COVID guidelines, you can still let us know via <a href=\"/contact\">our contact form</a> how satisfied you are with your purchase. If you are happy with your purchase, you can also <a href=\"#subscribe\">sign up</a> to be part of your community!"
+          ]
+        },
+        {
+          "heading": "PRIVACY & SAFETY",
+          "paragraphs": [
+            "We will only collect and store information that you give to us, and we will only disclose your information to third parties when absolutely necessary to carry out our services. The third parties we use are Wix (for E-mails) and Square (for payments)."
+          ],
+          "bullets": [
+            "We may store personal information you give to us when subscribing to our E-mails, such as your name and email address. We only use this information to contact you about our latest store news and sales, often via Wix's E-mail service.",
+            "We use Square to process payments in-store, but we do not store your payment information."
+          ]
+        },
+        {
+          "heading": "WHOLESALE INQUIRIES",
+          "paragraphs": [
+            "If you would like to use our spices to spice up your business, or would like to sell our products, let us know! We are open to considering partnerships; <a href=\"/contact\">contact us here</a> to get the conversation started."
+          ]
+        },
+        {
+          "heading": "PAYMENT METHODS",
+          "groups": [
+            {
+              "label": "Online payment:",
+              "items": [
+                "Credit / Debit Cards",
+                "E-Gift card"
+              ]
+            },
+            {
+              "label": "In-store Payments:",
+              "items": [
+                "Credit / Debit Cards",
+                "Cash",
+                "Apple Pay",
+                "Physical gift cards"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "blog": [
+    {
+      "slug": "stop-shop-welcomes-debbs-kitchen-spices",
+      "title": "Stop & Shop welcomes Debbs Kitchen Spices",
+      "excerpt": "Press release provided by Debbskitchen.com 19:33PM ET Healthier spices with no additives for customers, home cooks, chefs, & food enthusiast that want only the best for their health and wellbeing.",
+      "author": "Deborah Odunze",
+      "category": "Press",
+      "imageUrl": "/pages/blog-cover.jpg",
+      "date": "2023-02-14",
+      "body": "<img src=\"/pages/post-1.jpg\" alt=\"Debbs Kitchen Spices at Stop &amp; Shop\" /><p>Press release provided by <a href=\"https://debbskitchen.com/\">Debbskitchen.com</a><br/>19:33PM ET</p><p><strong><em>Healthier spices with no additives for customers, home cooks, chefs, &amp; food enthusiast that want only the best for their health and wellbeing.</em></strong></p><p>Boston, MA - February 14, 2023 Debbs Kitchen, a food company and the world&#x27;s leading purveyors of high quality, healthy, no additive, salt-free &amp; flavorful <strong><em>Spices</em></strong> is now available in Stop &amp; Shop. Through its local rack program, the grocery giant located in Northeastern, United States is supporting black woman owned small businesses to reach a wider and diverse customer base.</p><p>With 126 Stop &amp; Shop stores in Massachusetts, Debbs Kitchen Spices will be available in 10 stores with plans for expansion. This is the beginning of a valuable partnership for Debbs Kitchen company. Our mission is to help people live a healthier life one meal at a time, said Deborah Odunze, nurse, founder and owner of Debbs Kitchen.</p><img src=\"/pages/post-2.jpg\" alt=\"Debbs Kitchen Spices rack\" /><p>On February 3, 2023, Stop &amp; Shop store #776 located at 905 Massachusetts Avenue Arlington, MA 02174 was the first recipient. Customers in the Arlington, MA and surrounding areas can spot Debbs Kitchen Spices rack on Aisle 3. The aromatic and flavorful spices on display are Berbere, African Birdseye Chile, Ras El Hanout, Moroccan Chicken Spice RUB, Flippin Chicken, Suya Yaji, Hawaiian Black Lava Sea Salt, Baharat, Adobo Seasoning, Salt Free Steak RUB. The other 9 stores will be rolled out through February &amp; March, 2023.</p><img src=\"/pages/post-3.jpg\" alt=\"Debbs Kitchen Spices on display\" /><p>Hand blended and small batched, our spices and seasonings turn your meals into memories. Our products also make the perfect gifts for any occasion, friend or family who love to cook. Savor the difference with Debbs Kitchen Spices and elevate your food and lifestyle!</p>"
+    }
+  ],
+  "videos": [
+    {
+      "slug": "debbs-kitchen-introduction",
+      "title": "Debbs Kitchen Introduction",
+      "youtubeId": "MGlHRsdX2Go"
+    },
+    {
+      "slug": "s1-ep1-asian-noodles",
+      "title": "S1 Ep1 Asian Noodles In Turkey Pepper Soup",
+      "youtubeId": "lO69i1GHOmo"
+    },
+    {
+      "slug": "s1-ep2-shrimp-vegetable-stew",
+      "title": "S1 Ep2 Shrimp Vegetable Stew & White Rice",
+      "youtubeId": "R8gxLn2P8kM"
+    },
+    {
+      "slug": "ep3-part-1-okro-soup",
+      "title": "Ep3 Part 1 Feat. Emmy Odunze Classic Nigerian Seafood Okro Soup and Fufu",
+      "youtubeId": "OaDQElyYRaE"
+    },
+    {
+      "slug": "ep3-part-2-okro-soup",
+      "title": "Ep3 Part 2 Feat. Emmy Odunze Classic Nigerian Seafood Okro Soup and Fufu",
+      "youtubeId": "HpVLDAGugjc"
+    },
+    {
+      "slug": "ep3-part-3-okro-soup",
+      "title": "Ep3 Part 3 Feat. Emmy Odunze Classic Nigerian Seafood Okro Soup and Fufu",
+      "youtubeId": "pBUak7WYQQQ"
+    },
+    {
+      "slug": "ep4-spicy-mango-salsa",
+      "title": "Ep4 Spicy Mango Salsa with Plantain Chips",
+      "youtubeId": "V4WHyHvF9WE"
+    }
+  ]
+}

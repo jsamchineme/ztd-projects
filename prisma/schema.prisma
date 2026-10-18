@@ -114,6 +114,7 @@ model Product {
   updatedAt      DateTime @updatedAt
 
   orderItems OrderItem[]
+  reviews    Review[]
 }
 
 model Order {
@@ -202,6 +203,23 @@ model BlogPost {
   published Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ─── Product reviews (migrated from the Wix Reviews app) ────────────────────
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  title     String
+  body      String?
+  author    String
+  location  String?
+  verified  Boolean  @default(true)
+  position  Int      @default(0) // display order (the live widget's order)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 // ─── Testimonials ──────────────────────────────────────────────────────────

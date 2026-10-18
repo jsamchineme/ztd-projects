@@ -2,78 +2,70 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import type { ProductCardData } from "./ProductCard";
 
-// Matches the live site's best-sellers strip: image, name, short rule, then
-// price or "Out of stock". One per view on phones, four on desktop.
+// Live site: four across on desktop (277×369 images); on phones a one-per-view
+// carousel with thin arrows. Under each image: name, short rule, price or
+// "Out of stock", and "Free Shipping" for in-stock items.
 export function BestSellersCarousel({ products }: { products: ProductCardData[] }) {
   const track = useRef<HTMLDivElement>(null);
-
   const scroll = (dir: 1 | -1) => {
     const el = track.current;
-    if (!el) return;
-    const item = el.querySelector<HTMLElement>("[data-slide]");
-    el.scrollBy({ left: dir * (item?.offsetWidth ?? el.clientWidth), behavior: "smooth" });
+    if (el) el.scrollBy({ left: dir * el.clientWidth, behavior: "smooth" });
   };
 
-  if (!products.length) {
-    return <p className="text-center text-muted">No products yet.</p>;
-  }
+  if (!products.length) return <p className="text-center text-muted">No products yet.</p>;
 
   return (
-    <div className="relative">
+    <div className="relative mx-auto max-w-[1270px]">
       <div
         ref={track}
-        className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex lg:grid lg:grid-cols-4 lg:gap-[54px] snap-x snap-mandatory overflow-x-auto lg:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {products.map((p) => (
-          <Link
-            key={p.id}
-            href={`/shop/${p.slug}`}
-            data-slide
-            className="group snap-center shrink-0 basis-full md:basis-1/4 px-6 text-center"
-          >
-            <div className="aspect-[3/4] flex items-center justify-center">
+          <div key={p.id} className="snap-center shrink-0 basis-full lg:basis-auto px-10 lg:px-0 text-center">
+            <Link href={`/shop/${p.slug}`} className="group relative block mx-auto w-full max-w-[277px] aspect-[277/369] bg-white">
               {p.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={p.imageUrl}
-                  alt={p.name}
-                  className="max-h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105"
-                />
-              ) : (
-                <span className="text-6xl opacity-40">🫙</span>
-              )}
-            </div>
-            <h3 className="mt-6 font-sans font-light text-[1.6rem] md:text-[1.15rem] tracking-[0.02em]">
-              {p.name}
-            </h3>
-            <div className="mx-auto my-3 h-px w-8 bg-ink" />
-            <p className="font-sans font-light text-[1.4rem] md:text-[1rem]">
+                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+              ) : null}
+              <span className="absolute inset-x-0 bottom-0 h-[38px] hidden lg:flex items-center justify-center bg-white/80 font-sans font-light text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">
+                Quick View
+              </span>
+            </Link>
+            <Link href={`/shop/${p.slug}`} className="block mt-4">
+              <h3 className="font-sans font-light text-[24px] lg:text-[17px] leading-[1.4]">{p.name}</h3>
+            </Link>
+            <div className="mx-auto my-[8px] h-px w-[16px] lg:w-[12px] bg-ink" />
+            <p className="font-sans font-light text-[22px] lg:text-[16px] leading-[1.5]">
               {p.inStock ? formatPrice(p.priceCents) : "Out of stock"}
             </p>
-          </Link>
+            {p.inStock && p.freeShipping && (
+              <Link href={`/shop/${p.slug}`} className="inline-block mt-1 font-sans font-light text-[17px] underline underline-offset-2">
+                Free Shipping
+              </Link>
+            )}
+          </div>
         ))}
       </div>
 
-      <button
-        type="button"
-        aria-label="Previous"
-        onClick={() => scroll(-1)}
-        className="absolute left-0 top-[38%] -translate-y-1/2 p-2 text-ink/80 hover:text-ink md:-left-4"
-      >
-        <ChevronLeft className="w-8 h-8" strokeWidth={1} />
-      </button>
-      <button
-        type="button"
-        aria-label="Next"
-        onClick={() => scroll(1)}
-        className="absolute right-0 top-[38%] -translate-y-1/2 p-2 text-ink/80 hover:text-ink md:-right-4"
-      >
-        <ChevronRight className="w-8 h-8" strokeWidth={1} />
-      </button>
+      {[-1, 1].map((d) => (
+        <button
+          key={d}
+          type="button"
+          aria-label={d < 0 ? "Previous" : "Next"}
+          onClick={() => scroll(d as 1 | -1)}
+          className={`lg:hidden absolute top-[30%] -translate-y-1/2 p-2 ${d < 0 ? "left-0" : "right-0"}`}
+        >
+          <svg viewBox="0 0 21 41" className="w-[14px] h-[28px]" aria-hidden="true">
+            <path
+              d={d < 0 ? "M20.3 40.8 0 20.5 20.3.2l.7.7L1.3 20.5 21 40.1z" : "M.7 40.8 21 20.5.7.2 0 .9l19.7 19.6L0 40.1z"}
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      ))}
     </div>
   );
 }

@@ -1,12 +1,26 @@
 import type { Metadata } from "next";
-import { Assistant } from "next/font/google";
+import { Assistant, Barlow, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 
-// Assistant — the sans used on the live site (alongside Avenir Light).
+// The live site uses Avenir Light (body/headings), DIN Next Light (menu) and
+// Assistant (reviews). Nunito Sans and Barlow are the closest free matches.
+const nunito = Nunito_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-nunito",
+  display: "swap",
+});
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  variable: "--font-barlow",
+  display: "swap",
+});
 const assistant = Assistant({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-sans",
+  weight: ["400", "600", "700"],
+  variable: "--font-assistant",
   display: "swap",
 });
 
@@ -23,7 +37,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${assistant.variable} h-full antialiased`}>
+    <html lang="en" className={`${nunito.variable} ${barlow.variable} ${assistant.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

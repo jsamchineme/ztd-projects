@@ -1,99 +1,70 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { prisma } from "@/lib/db";
-import { getShopProducts } from "@/lib/products";
-import { ProductCard } from "@/components/shared/ProductCard";
+import { getPriceBounds, getShopProducts } from "@/lib/products";
+import { ShopProductCard } from "@/components/shop/ShopProductCard";
+import { ShopSidebar, SortBy } from "@/components/shop/ShopSidebar";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Shop chef-crafted spices, blends, oils and vinegars from Debb's Kitchen.",
+  description: "Explore our healthy, flavorful, & unique spices!",
 };
 
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; sort?: string }>;
+  searchParams: Promise<{ category?: string; sort?: string; q?: string; min?: string; max?: string }>;
 }) {
-  const { category = "all", sort } = await searchParams;
-
-  const [categories, products] = await Promise.all([
+  const sp = await searchParams;
+  const [categories, products, bounds] = await Promise.all([
     prisma.category.findMany({ where: { published: true }, orderBy: { order: "asc" } }),
-    getShopProducts({ category, sort: sort as never }),
+    getShopProducts({
+      category: sp.category,
+      sort: sp.sort,
+      q: sp.q?.trim() || undefined,
+      minCents: sp.min ? Number(sp.min) * 100 : undefined,
+      maxCents: sp.max ? Number(sp.max) * 100 : undefined,
+    }),
+    getPriceBounds(),
   ]);
 
-  const pills = [
-    { slug: "all", name: "All" },
-    { slug: "most-popular", name: "Most Popular" },
-    ...categories.map((c) => ({ slug: c.slug, name: c.name })),
-  ];
-
-  const qs = (cat: string) =>
-    `/shop?category=${cat}${sort ? `&sort=${sort}` : ""}`;
-
   return (
-    <>
-      <section className="bg-paper">
-        <div className="wrap pt-[48px] pb-[16px] text-center">
-          <h1 className="text-[clamp(2.2rem,4.5vw,3rem)] tracking-[0.02em]">SHOP</h1>
-          <p className="text-muted mt-2">Explore our healthy, flavorful, &amp; unique spices!</p>
-        </div>
-      </section>
+    <div className="mx-auto max-w-[1512px] px-4 lg:px-[85px] pt-[40px] lg:pt-[55px] pb-[110px]">
+      <div className="text-center">
+        <h1 className="font-sans font-light text-[44px] lg:text-[65px] leading-[1.15]">SHOP</h1>
+        <p className="mt-3 font-sans font-light text-[17px] tracking-[0.05em]">
+          Explore our healthy, flavorful, &amp; unique spices!
+        </p>
+      </div>
 
-      <section className="section-padding">
-        <div className="wrap">
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {pills.map((p) => {
-              const active = category === p.slug;
-              return (
-                <Link
-                  key={p.slug}
-                  href={qs(p.slug)}
-                  className={`py-[9px] px-[18px] rounded-full border text-[0.9rem] font-sans transition-colors ${
-                    active
-                      ? "bg-burgundy text-white border-burgundy"
-                      : "bg-white text-ink border-line hover:border-gold"
-                  }`}
-                >
-                  {p.name}
-                </Link>
-              );
-            })}
-          </div>
+      <div className="mt-[50px] lg:mt-[70px] grid gap-10 lg:grid-cols-[200px_1fr] lg:gap-[52px]">
+        <Suspense>
+          <ShopSidebar categories={categories.map((c) => ({ slug: c.slug, name: c.name }))} bounds={bounds} />
+        </Suspense>
 
-          <div className="flex justify-end mb-6 gap-2 text-[0.85rem]">
-            <span className="text-muted self-center">Sort:</span>
-            {[
-              { v: "featured", label: "Featured" },
-              { v: "price-asc", label: "Price ↑" },
-              { v: "price-desc", label: "Price ↓" },
-            ].map((s) => (
-              <Link
-                key={s.v}
-                href={`/shop?category=${category}&sort=${s.v}`}
-                className={`py-1 px-3 rounded-full border ${
-                  (sort ?? "featured") === s.v
-                    ? "border-gold text-gold-dark"
-                    : "border-line text-muted hover:border-gold"
-                }`}
-              >
-                {s.label}
-              </Link>
-            ))}
+        <div>
+          <div className="flex items-center justify-between gap-4 mb-[30px] lg:-mt-[4px]">
+            <p className="font-sans font-light text-[14px] text-muted">
+              {sp.q ? `${products.length} ${products.length === 1 ? "result" : "results"} for “${sp.q}”` : ""}
+            </p>
+            <Suspense>
+              <SortBy />
+            </Suspense>
           </div>
 
           {products.length === 0 ? (
-            <p className="text-center text-muted py-20">No products in this category yet.</p>
+            <p className="py-20 text-center font-sans text-muted">No products match these filters.</p>
           ) : (
-            <div className="grid gap-[24px] grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-12 lg:gap-x-[62px] lg:gap-y-[60px] lg:max-w-[1078px]">
               {products.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ShopProductCard key={p.id} product={p} />
               ))}
             </div>
           )}
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 }
