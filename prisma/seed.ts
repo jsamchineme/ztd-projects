@@ -141,9 +141,21 @@ async function main() {
     where: { slug: { notIn: products.map((p) => p.slug) } },
   });
 
-  // ── Reviews (migrated from the Wix Reviews app; dates approximated from
-  //    the "Xmo ago" labels at capture time) ──────────────────────────────
-  const reviews: Array<{ rating: number; title: string; body: string | null; author: string; location: string | null; product: string | null; date: string }> =
+  // ── Reviews (migrated from the live Fera reviews widget, in its display
+  //    order, with full text and the store's replies) ─────────────────────
+  const reviews: Array<{
+    rating: number;
+    title: string;
+    body: string | null;
+    author: string;
+    location: string | null;
+    verified: boolean;
+    product: string | null;
+    productName?: string;
+    date: string;
+    reply?: string;
+    replyDate?: string | null;
+  }> =
     JSON.parse(readFileSync(join(import.meta.dirname, "data", "reviews.json"), "utf8"));
   const productIds = Object.fromEntries(
     (await prisma.product.findMany({ select: { id: true, slug: true } })).map((p) => [p.slug, p.id]),
@@ -157,7 +169,11 @@ async function main() {
       body: r.body,
       author: r.author,
       location: r.location,
+      verified: r.verified,
       productId: r.product ? productIds[r.product] ?? null : null,
+      productName: r.productName ?? null,
+      reply: r.reply ?? null,
+      replyAt: r.reply ? new Date(r.replyDate ?? r.date) : null,
       createdAt: new Date(r.date),
     })),
   });

@@ -219,6 +219,9 @@ model Review {
   position  Int      @default(0) // display order (the live widget's order)
   productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName String? // product no longer in the shop: shown without a link
+  reply     String? // the store's public reply
+  replyAt   DateTime?
   published Boolean  @default(true)
   createdAt DateTime @default(now())
 }

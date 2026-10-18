@@ -2,6 +2,7 @@ import { prisma } from "./db";
 import { getBestSellers, getSaleProducts } from "./products";
 import { neededData, type Section } from "./sections";
 import type { SectionContext } from "@/components/shared/SectionRenderer";
+import type { ReviewItem } from "@/components/shared/ReviewsSection";
 
 /** "5mo ago"-style label, as the Wix Reviews widget shows. */
 export function ago(date: Date): string {
@@ -9,6 +10,38 @@ export function ago(date: Date): string {
   if (days < 30) return `${Math.max(1, days)}d ago`;
   if (days < 365) return `${Math.floor(days / 30)}mo ago`;
   return `${Math.floor(days / 365)}y ago`;
+}
+
+/** A stored review in the shape the reviews widget renders. */
+export function reviewItem(
+  r: {
+    id: string;
+    rating: number;
+    title: string;
+    body: string | null;
+    author: string;
+    location: string | null;
+    verified: boolean;
+    productName: string | null;
+    reply: string | null;
+    replyAt: Date | null;
+    createdAt: Date;
+  },
+  product: ReviewItem["product"],
+): ReviewItem {
+  return {
+    id: r.id,
+    rating: r.rating,
+    title: r.title,
+    body: r.body,
+    author: r.author,
+    location: r.location,
+    verified: r.verified,
+    ago: ago(r.createdAt),
+    product,
+    productName: r.productName,
+    reply: r.reply ? { body: r.reply, ago: ago(r.replyAt ?? r.createdAt) } : null,
+  };
 }
 
 /** Fetch exactly the dynamic data a page's sections require. */
@@ -56,16 +89,7 @@ export async function buildSectionContext(sections: Section[]): Promise<SectionC
         })
         .then(
           (r) =>
-            void (ctx.reviews = r.map((x) => ({
-              id: x.id,
-              rating: x.rating,
-              title: x.title,
-              body: x.body,
-              author: x.author,
-              location: x.location,
-              ago: ago(x.createdAt),
-              product: x.product,
-            }))),
+            void (ctx.reviews = r.map((x) => reviewItem(x, x.product))),
         ),
     );
   }

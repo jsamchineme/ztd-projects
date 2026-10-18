@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/utils";
-import { ago } from "@/lib/page-data";
+import { reviewItem } from "@/lib/page-data";
 import { ProductBuyBox } from "@/components/shop/ProductBuyBox";
 import { RelatedProducts } from "@/components/shop/RelatedProducts";
 import { ReviewsSection } from "@/components/shared/ReviewsSection";
@@ -109,16 +109,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <ReviewsSection
             title="Product Reviews"
             variant="list"
-            reviews={reviews.map((r) => ({
-              id: r.id,
-              rating: r.rating,
-              title: r.title,
-              body: r.body,
-              author: r.author,
-              location: r.location,
-              ago: ago(r.createdAt),
-              product: null,
-            }))}
+            reviews={reviews.map((r) => reviewItem(r, null))}
           />
         </div>
       )}

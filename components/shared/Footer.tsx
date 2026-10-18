@@ -47,11 +47,12 @@ export function Footer() {
   return (
     <footer className="mt-auto text-ink">
       <div className="relative bg-[#ace3da] overflow-hidden">
-        {/* faint green diamond texture, as on the live footer */}
+        {/* faint, softly blurred green diamond texture, as on the live footer
+            (inset past the edges so the blur doesn't fade at the sides) */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 opacity-[0.09]"
-          style={{ backgroundImage: "url(/brand/pattern-a.png)", backgroundSize: "201px" }}
+          className="absolute -inset-[6px] opacity-[0.065] blur-[1.5px]"
+          style={{ backgroundImage: "url(/brand/pattern-a.png)", backgroundSize: "245px" }}
         />
         <div className="relative mx-auto max-w-[1512px] px-[22px] lg:pl-[208px] lg:pr-[60px] pt-0 lg:pt-[89px] pb-[60px] lg:pb-[52px] grid gap-[70px] lg:gap-0 lg:grid-cols-[541px_203px_194px_1fr]">
           <div id="subscribe" className="scroll-mt-28 lg:scroll-mt-[130px] -mx-[22px] lg:mx-0">
