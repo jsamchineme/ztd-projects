@@ -16,7 +16,7 @@ export function DkShowBand({ youtubeId, title, poster }: DkShowBandProps) {
   return (
     <section>
       {/* Phones: black letterbox with a ⋮ menu. Desktop: striped teal band. */}
-      <div className="relative bg-black py-[42px] lg:py-0 lg:bg-teal-bar lg:[background-image:url(/brand/pattern-b.png)] lg:[background-size:176px]">
+      <div className="relative bg-black py-[42px] lg:py-0 lg:bg-teal-stripes">
         <a
           href={`https://www.youtube.com/watch?v=${youtubeId}`}
           target="_blank"

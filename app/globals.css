@@ -159,3 +159,43 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-muted);
 }
+
+/* Shop price filter: two range inputs stacked on one track; the inputs
+   ignore the pointer so both black handles stay grabbable. */
+.dual-range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+.dual-range::-webkit-slider-runnable-track { background: transparent; height: 16px; }
+.dual-range::-moz-range-track { background: transparent; }
+.dual-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: #000;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.dual-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #000;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Live site's striped teal (announcement bar, Events & Gifts panel, DK Show band):
+   45° stripes of #68b1a0 / #5ca695, 16px apart horizontally. */
+@utility bg-teal-stripes {
+  background-color: #5ca695;
+  background-image: repeating-linear-gradient(135deg, #68b1a0 0 5.9px, #5ca695 5.9px 11.31px);
+}

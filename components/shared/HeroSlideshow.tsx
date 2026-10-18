@@ -66,7 +66,7 @@ export function HeroSlideshow({ slides, interval = 4500 }: { slides: HeroSlide[]
               }`}
             >
               {s.eyebrow && (
-                <p className="font-sans font-normal lg:font-bold text-[20px] lg:text-[clamp(11px,1.39vw,21px)] leading-[1.35] tracking-[0.15em] lg:tracking-[0.1em] mb-[18px] lg:mb-[clamp(10px,1.3vw,20px)]">
+                <p className="font-sans font-normal text-[20px] lg:text-[clamp(11px,1.39vw,21px)] leading-[1.35] tracking-[0.15em] lg:tracking-[0.1em] mb-[18px] lg:mb-[clamp(10px,1.3vw,20px)]">
                   {s.eyebrow}
                 </p>
               )}

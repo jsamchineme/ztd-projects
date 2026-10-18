@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { Select } from "@/components/shared/Select";
 
 interface Props {
   categories: { slug: string; name: string }[];
@@ -16,7 +17,7 @@ export function ShopSidebar({ categories, bounds }: Props) {
   const params = useSearchParams();
   const active = params.get("category") ?? "all";
   const [catOpen, setCatOpen] = useState(true);
-  const [priceOpen, setPriceOpen] = useState(Boolean(params.get("min") || params.get("max")));
+  const [priceOpen, setPriceOpen] = useState(true);
   const lo = Math.floor(bounds.min / 100);
   const hi = Math.ceil(bounds.max / 100);
   const [min, setMin] = useState(Number(params.get("min") ?? lo));
@@ -38,7 +39,7 @@ export function ShopSidebar({ categories, bounds }: Props) {
   ];
 
   return (
-    <aside className="hidden lg:block font-sans">
+    <aside className="hidden lg:block lg:sticky lg:top-[126px] lg:self-start font-sans">
       <h2 className="font-light text-[26px]">SHOP</h2>
       <div className="mt-6 border-t border-ink/30">
         <button type="button" onClick={() => setCatOpen((v) => !v)} className="w-full flex items-center justify-between py-4 font-light text-[16px]">
@@ -65,15 +66,19 @@ export function ShopSidebar({ categories, bounds }: Props) {
           Price <span className="text-[20px] leading-none">{priceOpen ? "−" : "+"}</span>
         </button>
         {priceOpen && (
-          <div className="pb-5 space-y-3 text-[14px] font-light">
-            <label className="flex items-center gap-3">
-              <span className="w-8">${min}</span>
-              <input type="range" min={lo} max={hi} value={min} onChange={(e) => setMin(Math.min(Number(e.target.value), max))} onMouseUp={() => applyPrice(min, max)} onTouchEnd={() => applyPrice(min, max)} className="flex-1 accent-gold" aria-label="Minimum price" />
-            </label>
-            <label className="flex items-center gap-3">
-              <span className="w-8">${max}</span>
-              <input type="range" min={lo} max={hi} value={max} onChange={(e) => setMax(Math.max(Number(e.target.value), min))} onMouseUp={() => applyPrice(min, max)} onTouchEnd={() => applyPrice(min, max)} className="flex-1 accent-gold" aria-label="Maximum price" />
-            </label>
+          // One track with two black handles and the range underneath, as on
+          // the live site. Two overlaid range inputs; only their thumbs take
+          // the pointer (see .dual-range in globals.css).
+          <div className="pb-[22px] pt-[6px] font-light text-[14px]">
+            <div className="relative h-[16px]">
+              <div className="absolute left-[7px] right-[7px] top-1/2 h-[2px] -translate-y-1/2 bg-ink" />
+              <input type="range" min={lo} max={hi} value={min} onChange={(e) => setMin(Math.min(Number(e.target.value), max))} onMouseUp={() => applyPrice(min, max)} onTouchEnd={() => applyPrice(min, max)} onKeyUp={() => applyPrice(min, max)} className="dual-range" aria-label="Minimum price" />
+              <input type="range" min={lo} max={hi} value={max} onChange={(e) => setMax(Math.max(Number(e.target.value), min))} onMouseUp={() => applyPrice(min, max)} onTouchEnd={() => applyPrice(min, max)} onKeyUp={() => applyPrice(min, max)} className="dual-range" aria-label="Maximum price" />
+            </div>
+            <div className="mt-[6px] flex justify-between">
+              <span>${min}</span>
+              <span>${max}</span>
+            </div>
           </div>
         )}
       </div>
@@ -93,22 +98,19 @@ export function SortBy() {
   const router = useRouter();
   const params = useSearchParams();
   return (
-    <select
-      aria-label="Sort by"
-      value={params.get("sort") ?? ""}
-      onChange={(e) => {
-        const p = new URLSearchParams(params.toString());
-        if (e.target.value) p.set("sort", e.target.value);
-        else p.delete("sort");
-        router.push(p.toString() ? `/shop?${p}` : "/shop", { scroll: false });
-      }}
-      className="h-[38px] w-[200px] px-3 border border-ink/60 bg-white font-sans font-light text-[15px] outline-none"
-    >
-      {SORT_OPTIONS.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+    <div className="w-[200px]">
+      <Select
+        aria-label="Sort by"
+        options={SORT_OPTIONS}
+        value={params.get("sort") ?? ""}
+        onChange={(v) => {
+          const p = new URLSearchParams(params.toString());
+          if (v) p.set("sort", v);
+          else p.delete("sort");
+          router.push(p.toString() ? `/shop?${p}` : "/shop", { scroll: false });
+        }}
+        className="h-[39px] px-[12px] border border-ink bg-white font-sans font-light text-[16px]"
+      />
+    </div>
   );
 }

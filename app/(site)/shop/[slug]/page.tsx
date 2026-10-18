@@ -105,7 +105,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </div>
 
       {reviews.length > 0 && (
-        <div id="reviews" className="mt-[80px] -mx-4 lg:mx-0 scroll-mt-10">
+        <div id="reviews" className="mt-[80px] -mx-4 lg:mx-0 scroll-mt-10 lg:scroll-mt-[130px]">
           <ReviewsSection
             title="Product Reviews"
             variant="list"

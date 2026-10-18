@@ -54,7 +54,7 @@ export function Footer() {
           style={{ backgroundImage: "url(/brand/pattern-a.png)", backgroundSize: "201px" }}
         />
         <div className="relative mx-auto max-w-[1512px] px-[22px] lg:pl-[208px] lg:pr-[60px] pt-0 lg:pt-[89px] pb-[60px] lg:pb-[52px] grid gap-[70px] lg:gap-0 lg:grid-cols-[541px_203px_194px_1fr]">
-          <div id="subscribe" className="scroll-mt-28 -mx-[22px] lg:mx-0">
+          <div id="subscribe" className="scroll-mt-28 lg:scroll-mt-[130px] -mx-[22px] lg:mx-0">
             <div className="flex h-[172px] items-center justify-center lg:block lg:h-auto">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/brand/dk-logo-dark.png" alt="Debb's Kitchen" className="w-[146px] lg:w-[110px] h-auto" />

@@ -30,7 +30,7 @@ export function BestSellersCarousel({ products }: { products: ProductCardData[] 
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-110" />
               ) : null}
-              <span className="absolute inset-x-0 bottom-0 h-[38px] hidden lg:flex items-center justify-center bg-white/80 font-sans font-light text-[14px] opacity-0 translate-y-[6px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,translate] duration-300 ease-out">
+              <span className="absolute inset-x-0 bottom-0 h-[38px] hidden lg:flex items-center justify-center bg-white/90 font-sans font-light text-[14px] translate-y-full group-hover:translate-y-0 transition-[translate] duration-300 ease-out">
                 Quick View
               </span>
             </Link>

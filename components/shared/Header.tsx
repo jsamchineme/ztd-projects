@@ -136,21 +136,47 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  // After a dropdown link is clicked the pointer is still over the menu and
+  // the link keeps focus, so hide the dropdown until the pointer leaves.
+  const [dropdownShut, setDropdownShut] = useState(false);
   const pathname = usePathname();
   const { count } = useCart();
   const isActive = (href: string) => pathname.startsWith(href);
 
   useEffect(() => setOpen(false), [pathname]);
 
+  // Desktop: the header sticks to the top and slims down once the page is
+  // scrolled. The two thresholds stop it flickering, since shrinking the
+  // header itself moves the page.
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setCompact((c) => (c ? window.scrollY > 40 : window.scrollY > 250));
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="bg-white">
-      <div className="relative mx-auto max-w-[1512px] h-[91px] lg:h-[198px] pl-[27px] pr-[24px] lg:px-[58px] flex items-center">
+    <header
+      className={`bg-white lg:sticky lg:top-0 lg:z-50 lg:transition-shadow lg:duration-300 ${
+        compact ? "lg:shadow-[0_2px_10px_rgba(0,0,0,0.08)]" : ""
+      }`}
+    >
+      <div
+        className={`relative mx-auto max-w-[1512px] h-[91px] lg:transition-[height] lg:duration-300 lg:ease-out ${
+          compact ? "lg:h-[96px]" : "lg:h-[198px]"
+        } pl-[27px] pr-[24px] lg:px-[58px] flex items-center`}
+      >
         {/* Menu (desktop), SHOP has a hover dropdown */}
         <nav className="hidden lg:flex items-center gap-[22px]">
           {NAV.map((item) => (
-            <div key={item.href} className="relative group">
+            <div key={item.href} className="relative group" onMouseLeave={() => setDropdownShut(false)}>
               <Link
                 href={item.href}
+                onClick={(e) => {
+                  setDropdownShut(true);
+                  e.currentTarget.blur();
+                }}
                 className={`block font-nav font-light text-[16px] leading-[50px] h-[50px] px-[10px] transition-colors ${
                   isActive(item.href) || item.sub?.some((s) => isActive(s.href)) ? "bg-mint/70" : "hover:text-green"
                 }`}
@@ -158,9 +184,17 @@ export function Header() {
                 {item.label}
               </Link>
               {item.sub && (
-                <div className="absolute left-0 top-full z-50 hidden group-hover:block group-focus-within:block bg-white shadow-[0_6px_20px_rgba(0,0,0,0.12)] min-w-[190px] py-2">
+                <div className={`absolute left-0 top-full z-50 hidden ${dropdownShut ? "" : "group-hover:block group-focus-within:block"} bg-white shadow-[0_6px_20px_rgba(0,0,0,0.12)] min-w-[190px] py-2`}>
                   {item.sub.map((s) => (
-                    <Link key={s.href} href={s.href} className="block px-[14px] py-[9px] font-nav font-light text-[15px] hover:bg-mint/50">
+                    <Link
+                      key={s.href}
+                      href={s.href}
+                      onClick={(e) => {
+                        setDropdownShut(true);
+                        e.currentTarget.blur();
+                      }}
+                      className="block px-[14px] py-[9px] font-nav font-light text-[15px] hover:bg-mint/50"
+                    >
                       {s.label}
                     </Link>
                   ))}
@@ -173,7 +207,11 @@ export function Header() {
         {/* Logo: left on phones, centred on desktop */}
         <Link href="/" aria-label="Debb's Kitchen home" className="lg:absolute lg:left-1/2 lg:-translate-x-1/2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/dk-logo.png" alt="Debb's Kitchen" className="h-[60px] lg:h-[99px] w-auto" />
+          <img
+            src="/brand/dk-logo.png"
+            alt="Debb's Kitchen"
+            className={`h-[60px] w-auto lg:transition-[height] lg:duration-300 lg:ease-out ${compact ? "lg:h-[64px]" : "lg:h-[99px]"}`}
+          />
         </Link>
 
         <div className="ml-auto flex items-center gap-[48px] lg:gap-[34px]">

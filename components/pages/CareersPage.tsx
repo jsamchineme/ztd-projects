@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SOCIAL_LINKS } from "@/components/shared/SocialBar";
+import { Select } from "@/components/shared/Select";
 
 export interface CareersContent {
   title: string;
@@ -61,12 +62,13 @@ export function CareersPage({ c }: { c: CareersContent }) {
               <div className="grid grid-cols-2 gap-5">
                 <div>
                   <label className={lbl}>Closest Location</label>
-                  <select name="location" defaultValue="" className={input}>
-                    <option value="" disabled>Select store location</option>
-                    {c.locations.map((l) => (
-                      <option key={l}>{l}</option>
-                    ))}
-                  </select>
+                  <Select
+                    name="location"
+                    aria-label="Closest Location"
+                    placeholder="Select store location"
+                    options={c.locations.map((l) => ({ value: l, label: l }))}
+                    className={input}
+                  />
                 </div>
                 <div><label className={lbl}>Start Date</label><input name="startDate" type="date" className={input} /></div>
               </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { GoldButton } from "./GoldButton";
+import { Select } from "@/components/shared/Select";
 
 export interface EventsGiftsContent {
   heroImage: string;
@@ -55,8 +56,7 @@ function OrderForm({ spices, onClose }: { spices: string[]; onClose: () => void 
         role="dialog"
         aria-label="Tell Us About Your Order"
         onClick={(e) => e.stopPropagation()}
-        className="relative mx-auto my-10 w-[92%] max-w-[812px] bg-teal-bar text-[#fcfcfc] px-6 lg:px-[70px] py-[60px]"
-        style={{ backgroundImage: "url(/brand/pattern-b.png)", backgroundSize: "176px" }}
+        className="relative mx-auto my-10 w-[92%] max-w-[812px] bg-teal-stripes text-[#fcfcfc] px-6 lg:px-[70px] py-[60px]"
       >
         <button type="button" onClick={onClose} aria-label="Close" className="absolute right-5 top-5">
           <X className="w-7 h-7" strokeWidth={1.4} />
@@ -87,11 +87,13 @@ function OrderForm({ spices, onClose }: { spices: string[]; onClose: () => void 
             <div className="md:col-span-2 grid gap-6 md:grid-cols-[1fr_200px]">
               <div>
                 <label className={label}>Choose a spice</label>
-                <select name="spice" className={field}>
-                  {spices.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
+                <Select
+                  name="spice"
+                  aria-label="Choose a spice"
+                  placeholder="Choose a spice"
+                  options={spices.map((s) => ({ value: s, label: s }))}
+                  className={field}
+                />
               </div>
               <div><label className={label}>Quantity</label><input name="quantity" type="number" min={1} defaultValue={10} className={field} /></div>
             </div>

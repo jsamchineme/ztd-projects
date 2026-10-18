@@ -35,7 +35,7 @@ export function StoresPage({ c }: { c: StoresContent }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={c.image} alt="" className="w-full aspect-[1512/920] object-cover" />
 
-      <section id="findourproducts" className="scroll-mt-10 bg-[#fafafa] pt-[120px] lg:pt-[247px] px-6">
+      <section id="findourproducts" className="scroll-mt-10 lg:scroll-mt-[130px] bg-[#fafafa] pt-[120px] lg:pt-[247px] px-6">
         <h2 className={H}>{c.groceryTitle}</h2>
         <div className="mx-auto max-w-[644px] mt-10">
           <p className="font-sans font-light text-[16px]">{c.groceryIntro}</p>

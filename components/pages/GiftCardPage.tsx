@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Select } from "@/components/shared/Select";
 
 export interface GiftCardContent {
   image: string;
@@ -123,11 +124,13 @@ export function GiftCardPage({ c }: { c: GiftCardContent }) {
                 </div>
                 <div>
                   <label className={lbl}>Delivery time</label>
-                  <select name="deliveryTime" defaultValue="Now" className={input}>
-                    {["Now", "9:00 AM", "12:00 PM", "3:00 PM", "6:00 PM"].map((t) => (
-                      <option key={t}>{t}</option>
-                    ))}
-                  </select>
+                  <Select
+                    name="deliveryTime"
+                    aria-label="Delivery time"
+                    defaultValue="Now"
+                    options={["Now", "9:00 AM", "12:00 PM", "3:00 PM", "6:00 PM"].map((t) => ({ value: t, label: t }))}
+                    className={input}
+                  />
                 </div>
               </div>
               <p className="mt-2 font-sans font-light text-[14px]">Gift card never expires</p>

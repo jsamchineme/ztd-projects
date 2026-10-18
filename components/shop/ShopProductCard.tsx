@@ -3,7 +3,7 @@ import { formatPrice } from "@/lib/utils";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import type { ProductCardData } from "@/components/shared/ProductCard";
 
-// Live shop card: square image with a "Quick View" bar on hover, name, grey
+// Live shop card: square image with a black frame and "Quick View" bar on hover, name, grey
 // price, underlined "Free Shipping", and a full-width button shown on hover
 // (always shown on touch screens).
 export function ShopProductCard({ product: p }: { product: ProductCardData }) {
@@ -12,9 +12,11 @@ export function ShopProductCard({ product: p }: { product: ProductCardData }) {
       <Link href={`/shop/${p.slug}`} className="relative block aspect-square bg-white overflow-hidden">
         {p.imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-110" />
+          <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
         )}
-        <span className="absolute inset-x-0 bottom-0 h-[32px] hidden lg:flex items-center justify-center bg-white/85 text-[14px] opacity-0 translate-y-[6px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,translate] duration-300 ease-out">
+        {/* Hover: thin black frame round the still image, as on the live site */}
+        <span aria-hidden="true" className="absolute inset-0 z-10 hidden lg:block border border-ink opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+        <span className="absolute inset-x-0 bottom-0 h-[50px] hidden lg:flex items-center justify-center bg-white/70 text-[15px] translate-y-full group-hover:translate-y-0 transition-[translate] duration-300 ease-out">
           Quick View
         </span>
       </Link>

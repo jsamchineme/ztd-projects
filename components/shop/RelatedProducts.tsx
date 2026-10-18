@@ -75,7 +75,7 @@ export function RelatedProducts({ items }: { items: Item[] }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-110" />
               )}
-              <span className="absolute inset-x-0 bottom-0 h-[30px] flex items-center justify-center bg-white/85 text-[13px] opacity-0 translate-y-[6px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,translate] duration-300 ease-out">
+              <span className="absolute inset-x-0 bottom-0 h-[30px] flex items-center justify-center bg-white/90 text-[13px] translate-y-full group-hover:translate-y-0 transition-[translate] duration-300 ease-out">
                 Quick View
               </span>
             </div>
