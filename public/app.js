@@ -141,14 +141,17 @@ function shell(){
   startPush();
   const me = state.me.user;
   const mac = /Mac|iPhone|iPad/.test(navigator.platform);
-  app.replaceChildren(h('div', { class: 'shell' },
+  const sideMin = localStorageGet('sidebar') === 'min';
+  app.replaceChildren(h('div', { class: 'shell' + (sideMin ? ' side-min' : '') },
     h('aside', { class: 'side', 'aria-label': 'Studio navigation' },
-      h('a', { class: 'brand', href: '/', 'data-link': '' }, h('img', { src: '/icon.svg', alt: '' }), state.me.appName || 'Studio'),
-      h('button', { type: 'button', class: 'search', onclick: () => openPalette() }, ico('search'), h('span', null, 'Search or jump to…'), h('span', { class: 'kbd' }, mac ? '⌘K' : 'Ctrl K')),
+      h('div', { class: 'side-head' },
+        h('a', { class: 'brand', href: '/', 'data-link': '' }, h('img', { src: '/icon.svg', alt: '' }), h('span', { class: 'name' }, state.me.appName || 'Studio')),
+        h('button', { type: 'button', class: 'side-toggle', title: sideMin ? 'Expand sidebar' : 'Collapse sidebar', 'aria-label': sideMin ? 'Expand sidebar' : 'Collapse sidebar', onclick: toggleSidebar }, ico('chev'))),
+      h('button', { type: 'button', class: 'search', title: 'Search or jump to…', onclick: () => openPalette() }, ico('search'), h('span', { class: 'name' }, 'Search or jump to…'), h('span', { class: 'kbd' }, mac ? '⌘K' : 'Ctrl K')),
       h('nav', null,
-        h('a', { class: 'nav-item', href: '/', 'data-link': '' }, ico('grid'), h('span', { class: 'name' }, 'Projects')),
-        h('a', { class: 'nav-item', href: '/team', 'data-link': '' }, ico('users'), h('span', { class: 'name' }, 'Teams and people')),
-        me.role === 'admin' ? h('a', { class: 'nav-item', href: '/admin', 'data-link': '' }, ico('shield'), h('span', { class: 'name' }, 'Admin')) : null,
+        h('a', { class: 'nav-item', href: '/', 'data-link': '', title: 'Projects' }, ico('grid'), h('span', { class: 'name' }, 'Projects')),
+        h('a', { class: 'nav-item', href: '/team', 'data-link': '', title: 'Teams and people' }, ico('users'), h('span', { class: 'name' }, 'Teams and people')),
+        me.role === 'admin' ? h('a', { class: 'nav-item', href: '/admin', 'data-link': '', title: 'Admin' }, ico('shield'), h('span', { class: 'name' }, 'Admin')) : null,
         h('h2', null, 'Projects', canCreateProjects() ? h('button', { type: 'button', class: 'side-add', title: 'New project', 'aria-label': 'New project', onclick: () => newProjectDialog() }, ico('plus')) : null),
         h('div', { id: 'side-projects' })),
       h('div', { class: 'side-foot' },
@@ -215,6 +218,15 @@ function toggleTheme(){
   const next = dark ? 'light' : 'dark';
   document.documentElement.dataset.theme = next;
   localStorageSet('theme', next);
+}
+
+// Collapse the sidebar to an icon-only rail (desktop); the choice is remembered.
+function toggleSidebar(){
+  const shell = $('.shell');
+  const min = shell.classList.toggle('side-min');
+  localStorageSet('sidebar', min ? 'min' : '');
+  const btn = shell.querySelector('.side-toggle');
+  if (btn){ const label = min ? 'Expand sidebar' : 'Collapse sidebar'; btn.title = label; btn.setAttribute('aria-label', label); }
 }
 
 // ---------- search and jump (⌘K) ----------

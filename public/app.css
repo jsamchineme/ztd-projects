@@ -229,9 +229,14 @@ table.audit td.mono { font-size: 12px; } table.audit td.mono::before { content: 
 .secret { font-family: var(--mono); word-break: break-all; background: var(--code-bg); border: 1px solid var(--line); padding: 8px 12px; border-radius: var(--r-sm); font-size: 13px; }
 
 /* ---------- shell ---------- */
-.shell { display: grid; grid-template-columns: 272px minmax(0, 1fr); height: 100vh; height: 100dvh; }
+.shell { display: grid; grid-template-columns: 272px minmax(0, 1fr); height: 100vh; height: 100dvh; transition: grid-template-columns .2s ease; }
 .side { background: var(--side); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
-.side > .brand { padding: 16px 16px 6px; margin: 0; color: var(--text); text-decoration: none; }
+.side-head { display: flex; align-items: center; gap: 6px; padding: 16px 10px 6px 16px; }
+.side-head .brand { flex: 1; min-width: 0; margin: 0; color: var(--text); text-decoration: none; }
+.side-head .brand .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-toggle { flex-shrink: 0; border: 0; background: none; color: var(--faint); cursor: pointer; padding: 6px; border-radius: var(--r-sm); display: grid; place-items: center; }
+.side-toggle:hover { color: var(--text); background: var(--hover); }
+.side-toggle .ico { transform: rotate(180deg); transition: transform .2s; }  /* points left: collapse */
 .search { margin: 8px 12px 10px; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r); color: var(--faint); font-size: 13.5px; background: var(--panel); cursor: pointer; text-align: left; }
 .search:hover { border-color: var(--line-strong); color: var(--muted); }
 .search .kbd { margin-left: auto; }
@@ -268,6 +273,24 @@ table.audit td.mono { font-size: 12px; } table.audit td.mono::before { content: 
 .me:hover, .me.active { background: var(--hover); }
 .me-text { min-width: 0; } .me-text strong { display: block; font-size: 14px; font-weight: 600; }
 .me-text small { display: block; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Collapsed sidebar: a narrow icon-only rail (desktop only — phones use the slide-in menu). */
+@media (min-width: 720px) {
+  .shell.side-min { grid-template-columns: 64px minmax(0, 1fr); }
+  .shell.side-min .brand .name,
+  .shell.side-min .search .name, .shell.side-min .search .kbd,
+  .shell.side-min .nav-item .name,
+  .shell.side-min .side h2,
+  .shell.side-min .me-text,
+  .shell.side-min .proj-chats { display: none; }
+  .shell.side-min .side-head { flex-direction: column; gap: 2px; align-items: center; padding: 14px 6px 6px; }
+  .shell.side-min .side-head .brand { flex: none; }
+  .shell.side-min .side-toggle .ico { transform: rotate(0); }  /* points right: expand */
+  .shell.side-min .search { justify-content: center; margin: 8px 10px 10px; padding: 8px; }
+  .shell.side-min .nav-item { justify-content: center; padding: 7px; }
+  .shell.side-min .side-foot { flex-direction: column; gap: 6px; }
+  .shell.side-min .me { flex: none; justify-content: center; padding: 6px; }
+}
 
 /* ---------- projects home ---------- */
 .hello { font-size: 2.2rem !important; line-height: 1.15; }
