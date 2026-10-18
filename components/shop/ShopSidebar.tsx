@@ -38,7 +38,7 @@ export function ShopSidebar({ categories, bounds }: Props) {
   ];
 
   return (
-    <aside className="font-sans">
+    <aside className="hidden lg:block font-sans">
       <h2 className="font-light text-[26px]">SHOP</h2>
       <div className="mt-6 border-t border-ink/30">
         <button type="button" onClick={() => setCatOpen((v) => !v)} className="w-full flex items-center justify-between py-4 font-light text-[16px]">
@@ -81,6 +81,14 @@ export function ShopSidebar({ categories, bounds }: Props) {
   );
 }
 
+export const SORT_OPTIONS = [
+  { value: "", label: "Sort by" },
+  { value: "newest", label: "Newest" },
+  { value: "price-asc", label: "Price (low to high)" },
+  { value: "price-desc", label: "Price (high to low)" },
+  { value: "name-asc", label: "Name A-Z" },
+];
+
 export function SortBy() {
   const router = useRouter();
   const params = useSearchParams();
@@ -96,11 +104,11 @@ export function SortBy() {
       }}
       className="h-[38px] w-[200px] px-3 border border-ink/60 bg-white font-sans font-light text-[15px] outline-none"
     >
-      <option value="">Sort by</option>
-      <option value="price-asc">Price (low to high)</option>
-      <option value="price-desc">Price (high to low)</option>
-      <option value="name-asc">Name A-Z</option>
-      <option value="name-desc">Name Z-A</option>
+      {SORT_OPTIONS.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
     </select>
   );
 }

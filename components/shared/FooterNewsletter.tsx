@@ -31,7 +31,7 @@ export function FooterNewsletter() {
 
   return (
     <form onSubmit={submit} className="mt-2">
-      <label htmlFor="footer-email" className="block font-sans text-[13px] mb-1">
+      <label htmlFor="footer-email" className="block mt-[14px] lg:mt-0 font-sans font-light lg:font-normal text-[18px] lg:text-[13px] mb-[2px] lg:mb-1">
         Email *
       </label>
       <div className="flex items-end">
@@ -41,12 +41,12 @@ export function FooterNewsletter() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 min-w-0 h-[39px] bg-transparent border-b border-ink outline-none font-sans text-[15px]"
+          className="flex-1 min-w-0 h-[57px] lg:h-[39px] px-3 lg:px-0 bg-gradient-to-r from-white/70 to-white/40 lg:bg-none lg:bg-transparent border-b-2 lg:border-b border-ink outline-none font-sans text-[16px] lg:text-[15px]"
         />
         <button
           type="submit"
           disabled={state === "sending"}
-          className="h-[39px] w-[104px] bg-gold text-[#fcfcfc] font-sans font-light text-[14px] hover:bg-gold-dark disabled:opacity-70"
+          className="h-[57px] lg:h-[39px] w-[115px] lg:w-[104px] bg-gold text-[#fcfcfc] font-sans font-light text-[18px] lg:text-[14px] hover:bg-gold-dark disabled:opacity-70"
         >
           {state === "sending" ? "…" : "Subscribe"}
         </button>

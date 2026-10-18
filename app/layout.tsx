@@ -1,25 +1,29 @@
 import type { Metadata } from "next";
-import { Assistant, Barlow, Nunito_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 // The live site uses Avenir Light (body/headings), DIN Next Light (menu) and
 // Assistant (reviews). Nunito Sans and Barlow are the closest free matches.
-const nunito = Nunito_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "600", "700"],
-  style: ["normal", "italic"],
+// Fonts are self-hosted (app/fonts, SIL OFL) so builds never depend on
+// downloading from Google Fonts.
+const nunito = localFont({
+  src: [
+    { path: "./fonts/NunitoSans-300-700-normal.woff2", weight: "300 700", style: "normal" },
+    { path: "./fonts/NunitoSans-300-700-italic.woff2", weight: "300 700", style: "italic" },
+  ],
   variable: "--font-nunito",
   display: "swap",
 });
-const barlow = Barlow({
-  subsets: ["latin"],
-  weight: ["300", "400"],
+const barlow = localFont({
+  src: [
+    { path: "./fonts/Barlow-300-normal.woff2", weight: "300", style: "normal" },
+    { path: "./fonts/Barlow-400-normal.woff2", weight: "400", style: "normal" },
+  ],
   variable: "--font-barlow",
   display: "swap",
 });
-const assistant = Assistant({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
+const assistant = localFont({
+  src: [{ path: "./fonts/Assistant-400-700-normal.woff2", weight: "400 700", style: "normal" }],
   variable: "--font-assistant",
   display: "swap",
 });

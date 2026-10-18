@@ -34,13 +34,14 @@ export async function getSaleProducts(limit = 12): Promise<ProductCardData[]> {
 
 export interface ShopFilters {
   category?: string;
-  sort?: string; // featured | price-asc | price-desc | name-asc | name-desc
+  sort?: string; // featured | newest | price-asc | price-desc | name-asc | name-desc
   q?: string;
   minCents?: number;
   maxCents?: number;
 }
 
 const SORTS: Record<string, Record<string, "asc" | "desc">> = {
+  newest: { createdAt: "desc" },
   "price-asc": { priceCents: "asc" },
   "price-desc": { priceCents: "desc" },
   "name-asc": { name: "asc" },

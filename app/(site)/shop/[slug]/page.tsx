@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/utils";
 import { ago } from "@/lib/page-data";
 import { ProductBuyBox } from "@/components/shop/ProductBuyBox";
+import { RelatedProducts } from "@/components/shop/RelatedProducts";
 import { ReviewsSection } from "@/components/shared/ReviewsSection";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +55,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const paragraphs = (product.description ?? "").split("\n").map((p) => p.trim()).filter(Boolean);
 
   return (
-    <div className="mx-auto max-w-[890px] px-4 lg:px-0 pt-[40px] lg:pt-[62px] pb-[110px] font-sans">
+    <div className="mx-auto max-w-[890px] px-4 lg:px-0 pt-[40px] lg:pt-[62px] pb-[54px] lg:pb-[110px] font-sans">
       <nav className="font-light text-[16px]">
         <Link href="/" className="hover:text-green">Home</Link>
         <span className="mx-2">/</span>
@@ -123,27 +124,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       )}
 
       {related.length > 0 && (
-        <section className="mt-[80px]">
-          <h2 className="font-light text-[28px]">Related Products</h2>
-          <div className="mt-8 flex gap-[20px] overflow-x-auto snap-x pb-2 [scrollbar-width:thin]">
-            {related.map((p) => (
-              <Link key={p.id} href={`/shop/${p.slug}`} className="group snap-start shrink-0 w-[210px]">
-                <div className="relative aspect-square bg-white">
-                  {p.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
-                  )}
-                  <span className="absolute inset-x-0 bottom-0 h-[30px] hidden lg:flex items-center justify-center bg-white/85 text-[13px] opacity-0 group-hover:opacity-100 transition-opacity">
-                    Quick View
-                  </span>
-                </div>
-                <p className="mt-3 font-light text-[16px]">{p.name}</p>
-                <p className="mt-1 font-light text-[15px] text-muted">{formatPrice(p.priceCents)}</p>
-                {p.freeShipping && <p className="mt-1 font-light text-[12px] text-muted underline">Free Shipping</p>}
-              </Link>
-            ))}
-          </div>
-        </section>
+        <RelatedProducts
+          items={related.map((p) => ({ id: p.id, slug: p.slug, name: p.name, priceCents: p.priceCents, imageUrl: p.imageUrl, freeShipping: p.freeShipping }))}
+        />
       )}
     </div>
   );

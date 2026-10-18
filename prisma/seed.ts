@@ -239,6 +239,7 @@ async function main() {
         {
           image: "/home/hero-2.jpg",
           layout: "low",
+          focus: "88% 100%",
           title: "SUPPORT OUR BLACK WOMAN OWNED SMALL BUSINESS",
           buttonLabel: "Shop Now",
           buttonHref: "/shop",
