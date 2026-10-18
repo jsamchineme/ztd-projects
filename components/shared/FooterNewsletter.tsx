@@ -41,7 +41,7 @@ export function FooterNewsletter() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 min-w-0 h-[57px] lg:h-[39px] px-3 lg:px-0 bg-gradient-to-r from-white/70 to-white/40 lg:bg-none lg:bg-transparent border-b-2 lg:border-b border-ink outline-none font-sans text-[16px] lg:text-[15px]"
+          className="flex-1 min-w-0 h-[57px] lg:h-[39px] px-3 lg:px-0 bg-gradient-to-r from-white/70 to-white/40 lg:bg-none lg:bg-[#eaf6f4] lg:px-[6px] border-b-2 border-ink outline-none font-sans text-[16px] lg:text-[15px]"
         />
         <button
           type="submit"

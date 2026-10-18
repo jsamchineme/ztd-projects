@@ -13,7 +13,7 @@ export default async function DkShow() {
   const videos = await prisma.video.findMany({
     where: { published: true },
     orderBy: { order: "asc" },
-    select: { slug: true, title: true, youtubeUrl: true, thumbnailUrl: true },
+    select: { slug: true, title: true, youtubeUrl: true, thumbnailUrl: true, duration: true },
   });
   return <DkShowPage cover="/pages/dkshow-cover.jpg" videos={videos} />;
 }

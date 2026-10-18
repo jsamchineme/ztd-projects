@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./db";
 
 export const authConfig: NextAuthConfig = {
+  // Studio serves the app behind its own proxy (debbskitchen.ztddevs.com), so
+  // trust the forwarded host; without this every auth request fails with
+  // "UntrustedHost".
+  trustHost: true,
   pages: {
     signIn: "/admin/login",
   },

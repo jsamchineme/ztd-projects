@@ -165,37 +165,62 @@
     {
       "slug": "debbs-kitchen-introduction",
       "title": "Debbs Kitchen Introduction",
-      "youtubeId": "MGlHRsdX2Go"
+      "youtubeId": "MGlHRsdX2Go",
+      "duration": "01:48"
     },
     {
       "slug": "s1-ep1-asian-noodles",
       "title": "S1 Ep1 Asian Noodles In Turkey Pepper Soup",
-      "youtubeId": "lO69i1GHOmo"
+      "youtubeId": "lO69i1GHOmo",
+      "duration": "10:57"
     },
     {
       "slug": "s1-ep2-shrimp-vegetable-stew",
       "title": "S1 Ep2 Shrimp Vegetable Stew & White Rice",
-      "youtubeId": "R8gxLn2P8kM"
+      "youtubeId": "R8gxLn2P8kM",
+      "duration": "16:11"
     },
     {
       "slug": "ep3-part-1-okro-soup",
       "title": "Ep3 Part 1 Feat. Emmy Odunze Classic Nigerian Seafood Okro Soup and Fufu",
-      "youtubeId": "OaDQElyYRaE"
+      "youtubeId": "OaDQElyYRaE",
+      "duration": "05:20"
     },
     {
       "slug": "ep3-part-2-okro-soup",
       "title": "Ep3 Part 2 Feat. Emmy Odunze Classic Nigerian Seafood Okro Soup and Fufu",
-      "youtubeId": "HpVLDAGugjc"
+      "youtubeId": "HpVLDAGugjc",
+      "duration": "15:18"
     },
     {
       "slug": "ep3-part-3-okro-soup",
       "title": "Ep3 Part 3 Feat. Emmy Odunze Classic Nigerian Seafood Okro Soup and Fufu",
-      "youtubeId": "pBUak7WYQQQ"
+      "youtubeId": "pBUak7WYQQQ",
+      "duration": "10:15"
     },
     {
       "slug": "ep4-spicy-mango-salsa",
       "title": "Ep4 Spicy Mango Salsa with Plantain Chips",
-      "youtubeId": "V4WHyHvF9WE"
+      "youtubeId": "V4WHyHvF9WE",
+      "duration": "02:28"
+    },
+    {
+      "slug": "ep5-dk-power-punch",
+      "title": "Ep 5 DK Power Punch",
+      "youtubeId": "ZBFnlKcB7pg",
+      "duration": "03:17"
+    },
+    {
+      "slug": "ep6-parsley-yam-pottage",
+      "title": "Ep 06 DK Easy Parsley Yam Pottage",
+      "youtubeId": "rSwfun9Hhv0",
+      "duration": "05:50"
+    },
+    {
+      "slug": "trio-immune-juice",
+      "title": "Trio Immune Juice",
+      "youtubeId": "9f3kiujbo2Q",
+      "duration": "00:59"
     }
   ]
 }

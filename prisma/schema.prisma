@@ -182,6 +182,7 @@ model Video {
   description  String?
   youtubeUrl   String
   thumbnailUrl String?
+  duration     String? // "mm:ss", shown on the thumbnail
   episode      String?
   order        Int      @default(0)
   published    Boolean  @default(true)

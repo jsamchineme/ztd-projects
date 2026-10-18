@@ -32,16 +32,19 @@ function UserIcon({ className }: { className?: string }) {
   );
 }
 
+// Live site's cart bag: green outline with the item count inside in dark green.
 function CartBag({ count }: { count: number }) {
   return (
-    <Link href="/cart" aria-label={`Cart, ${count} items`} className="relative inline-flex text-green">
-      <svg viewBox="0 0 28 32" className="w-[30px] h-[36px] lg:w-[26px] lg:h-[30px]" aria-hidden="true">
-        <path d="M5 9h18l-1.4 20H6.4L5 9Z" fill="none" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M9.5 9V7a4.5 4.5 0 0 1 9 0v2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+    <Link href="/cart" aria-label={`Cart, ${count} items`} className="inline-flex">
+      <svg viewBox="33 25 142 167" className="w-[31px] h-[36px] lg:w-[26px] lg:h-[30px] font-sans" aria-hidden="true">
+        <g fill="none" stroke="#068e78" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M40 75H168L158 186H51Z" />
+          <path d="M75 93V58a30 30 0 0 1 60 0v35" />
+        </g>
+        <text x="105" y="158" textAnchor="middle" fill="#04473c" fontFamily="inherit" fontWeight="300" fontSize={count > 9 ? 66 : 90}>
+          {count > 99 ? "99+" : count}
+        </text>
       </svg>
-      <span className="absolute inset-x-0 top-[14px] lg:top-[12px] text-center text-[14px] lg:text-[11px] font-sans leading-none">
-        {count}
-      </span>
     </Link>
   );
 }

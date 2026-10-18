@@ -53,13 +53,13 @@ export function Footer() {
           className="absolute inset-0 opacity-[0.09]"
           style={{ backgroundImage: "url(/brand/pattern-a.png)", backgroundSize: "201px" }}
         />
-        <div className="relative mx-auto max-w-[1512px] px-[22px] lg:pl-[208px] lg:pr-[60px] pt-0 lg:pt-[87px] pb-[60px] lg:pb-[52px] grid gap-[70px] lg:gap-0 lg:grid-cols-[541px_203px_194px_1fr]">
+        <div className="relative mx-auto max-w-[1512px] px-[22px] lg:pl-[208px] lg:pr-[60px] pt-0 lg:pt-[89px] pb-[60px] lg:pb-[52px] grid gap-[70px] lg:gap-0 lg:grid-cols-[541px_203px_194px_1fr]">
           <div id="subscribe" className="scroll-mt-28 -mx-[22px] lg:mx-0">
             <div className="flex h-[172px] items-center justify-center lg:block lg:h-auto">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand/dk-logo-black.png" alt="Debb's Kitchen" className="w-[146px] lg:w-[110px] h-auto" />
+              <img src="/brand/dk-logo-dark.png" alt="Debb's Kitchen" className="w-[146px] lg:w-[110px] h-auto" />
             </div>
-            <div className="lg:mt-[34px] w-full lg:max-w-[410px] bg-white/45 px-[22px] lg:px-[13px] pt-[14px] pb-[50px] lg:py-[14px] lg:-ml-[13px]">
+            <div className="lg:mt-[38px] w-full lg:max-w-[410px] bg-white/45 px-[22px] lg:px-[13px] pt-[14px] pb-[50px] lg:pb-[30px] lg:-ml-[13px]">
               <p className="font-sans font-light text-[16px] lg:text-[13px] leading-[23px] lg:leading-normal tracking-[0.04em] uppercase">
                 Be the first to know about sales &amp; other news!
               </p>
@@ -72,7 +72,7 @@ export function Footer() {
           {GROUPS.map((g) => (
             <div key={g.title.join(" ")} className="flex gap-[21px] lg:block">
               <div className="flex w-[50px] shrink-0 justify-end items-start lg:block lg:w-auto">
-                <h4 className="flex flex-col shrink-0 rotate-180 [writing-mode:vertical-rl] lg:rotate-0 lg:[writing-mode:horizontal-tb] lg:block font-sans font-light text-[31px] lg:text-[28px] leading-[30px] lg:leading-[1.2] tracking-[0.04em] lg:tracking-normal">
+                <h4 className="flex flex-col shrink-0 rotate-180 [writing-mode:vertical-rl] lg:rotate-0 lg:[writing-mode:horizontal-tb] lg:block font-sans font-light text-[31px] lg:text-[29px] leading-[30px] lg:leading-[1.2] tracking-[0.04em] lg:tracking-[0.05em]">
                   {g.title.map((line) => (
                     <span key={line} className="lg:mr-[0.3em]">
                       {line}
@@ -80,13 +80,13 @@ export function Footer() {
                   ))}
                 </h4>
               </div>
-              <div className="lg:mt-[18px]">
-                <ul className="pt-[2px] lg:pt-0 space-y-[16px] lg:space-y-[13px]">
+              <div className="lg:mt-[15px]">
+                <ul className={`pt-[2px] lg:pt-0 space-y-[16px] lg:space-y-[10.5px] lg:leading-[21px] ${g.title[0] === "HELP" ? "lg:max-w-[120px]" : ""}`}>
                   {g.links.map((l) => (
                     <li key={l.label}>
                       <Link
                         href={l.href}
-                        className="font-sans font-light text-[17px] lg:text-[14px] lg:leading-[17px] tracking-[0.15em] lg:tracking-[0.1em] hover:text-green-dark transition-colors"
+                        className="font-sans font-light text-[17px] lg:text-[14px] lg:leading-[21px] tracking-[0.15em] lg:tracking-[0.1em] hover:text-green-dark transition-colors"
                       >
                         {l.label}
                       </Link>
@@ -94,7 +94,7 @@ export function Footer() {
                   ))}
                 </ul>
                 {g.title[0] === "DEBBS" && (
-                  <div className="hidden lg:block mt-[22px]">
+                  <div className="hidden lg:block mt-[19px]">
                     <Socials size="w-[25px] h-[25px]" />
                   </div>
                 )}
@@ -113,7 +113,7 @@ export function Footer() {
 
       <div className="bg-green text-[#fcfcfc]">
         <p className="mx-auto max-w-[1512px] px-6 py-[22px] lg:py-[10px] text-center font-sans font-light text-[16px] lg:text-[14px] leading-[19px] lg:leading-normal tracking-[0.2em] lg:tracking-[0.15em]">
-          © {new Date().getFullYear()} by Debbs Kitchen<span className="hidden lg:inline">.</span>
+          © {new Date().getFullYear()} by Debbs Kitchen<span className="hidden lg:inline">&nbsp;</span>
           <br className="lg:hidden" /> All Rights Reserved
         </p>
       </div>

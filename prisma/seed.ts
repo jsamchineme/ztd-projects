@@ -174,13 +174,14 @@ async function main() {
   }
 
   // ── Videos (DK Show) — the real episodes from the live site ─────────────
-  const videos: Array<{ slug: string; title: string; youtubeId: string }> = content.videos;
+  const videos: Array<{ slug: string; title: string; youtubeId: string; duration?: string }> = content.videos;
   for (const [i, v] of videos.entries()) {
     const data = {
       slug: v.slug,
       title: v.title,
       youtubeUrl: `https://www.youtube.com/watch?v=${v.youtubeId}`,
       thumbnailUrl: `/videos/${v.youtubeId}.jpg`,
+      duration: v.duration ?? null,
       order: i + 1,
     };
     await prisma.video.upsert({ where: { slug: v.slug }, update: data, create: data });
