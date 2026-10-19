@@ -1116,6 +1116,30 @@ await check('move a teammate to another team', async () => {
   const same = await page.request.post(`${BASE}/api/teams/${to.organizationId}/members/${m.id}/move`, { ...H, data: { organizationId: to.organizationId } });
   if (same.status() !== 400) throw new Error('moving to the same team was allowed');
 }, page);
+await check('a private repo over SSH: Studio shows the project’s key, a refused key says so, then the repo is copied in', async () => {
+  await page.goto(BASE + '/');
+  await page.click('.page button:has-text("New project")');
+  await page.fill('dialog input[placeholder="e.g. GP Pipeline"]', 'Private App');
+  await page.locator('dialog select').nth(1).selectOption('git');
+  await page.fill('dialog input[placeholder="https://github.com/owner/repo.git"]', 'git@github.com:someone/private-app.git');
+  await page.click('dialog button[type=submit]');
+  await page.getByText('Let Studio into the repo').waitFor();
+  await page.locator('pre', { hasText: 'ssh-ed25519 AAAAfake studio-private-app' }).waitFor();
+  if (await page.locator('a[href="https://github.com/someone/private-app/settings/keys/new"]').count() !== 1) throw new Error('no link to the repo’s deploy keys');
+  await page.click('button:has-text("copy the repo")');
+  await page.locator('.error-box', { hasText: 'didn’t let Studio in' }).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${SHOTS}/03b-private-repo-key.png`, fullPage: true });
+  const id = page.url().match(/\/p\/([^/]+)/)[1];
+  await page.click('button:has-text("copy the repo")');   // the stand-in accepts the key the second time
+  await page.getByText('What should we build?').waitFor({ timeout: 15000 });
+  await page.goto(BASE + `/p/${id}/settings`);
+  await page.click('button:has-text("Show the key")');
+  await page.locator('pre', { hasText: 'ssh-ed25519 AAAAfake' }).waitFor();
+  await page.goto(BASE + `/p/${id}/settings`);
+  await page.fill('input[aria-label="Type the short name to confirm"]', 'private-app');
+  await page.click('button:has-text("Delete project")');
+  await page.getByText('Project deleted').waitFor();
+}, page);
 await check('delete project needs the short name', async () => {
   await page.goto(projectUrl + '/settings');
   await page.click('button:has-text("Delete project")');

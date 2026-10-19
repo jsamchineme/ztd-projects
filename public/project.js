@@ -78,12 +78,54 @@ export async function renderProject(main, id, tab, sub){
   const ctx = { project, id, body, paintLinks, setSub, topbarActions, reload: async () => { ctx.project = await api('GET', `/api/projects/${id}`); paintLinks(ctx.project); return ctx.project; } };
   sideChatList(ctx);
 
+  if (project.status === 'needs-key' && tab !== 'settings') return needsKeyPage(ctx);
   if (tab === 'chat') return chatTab(ctx, sub);
   if (tab === 'board') return boardTab(ctx);
   if (tab === 'services') return servicesTab(ctx);
   if (tab === 'changes') return changesTab(ctx);
   if (tab === 'files') return filesTab(ctx);
   if (tab === 'settings') return settingsTab(ctx);
+}
+
+// =====================================================================
+// Private repo: waiting for its key
+// =====================================================================
+// How to give the project's SSH key to a repo, with a direct link on GitHub.
+function keySteps(publicKey, gitUrl, write){
+  const gh = /github\.com[:/]([\w.-]+\/[\w.-]+?)(?:\.git)?\/?$/.exec(gitUrl || '')?.[1];
+  const where = gh ? h('a', { href: `https://github.com/${gh}/settings/keys/new`, target: '_blank', rel: 'noopener' }, 'Settings → Deploy keys → Add deploy key')
+    : 'its deploy keys (or access keys) settings';
+  return [
+    h('p', { class: 'small' }, 'On the repo’s host, open ', gh ? h('strong', null, gh) : 'the repo', '’s ', where, ', paste this key, and ',
+      write ? ['tick ', h('strong', null, 'Allow write access'), ' so chats can push too.'] : ['tick Allow write access if chats should push to it too.']),
+    h('pre', { class: 'mono small', style: { whiteSpace: 'pre-wrap', wordBreak: 'break-all' } }, publicKey),
+    h('button', { class: 'btn', type: 'button', onclick: () => copy(publicKey) }, ico('copy'), 'Copy key')];
+}
+async function needsKeyPage(ctx){
+  const p = ctx.project;
+  const inner = h('div', { class: 'page-inner narrow' });
+  ctx.body.append(h('div', { class: 'page', style: { flex: 1 } }, inner));
+  ctx.setSub('Waiting for its key');
+  const head = h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Let Studio into the repo'),
+    h('p', null, 'This project copies ', h('span', { class: 'mono' }, p.gitUrl), ', a private repo. Studio made a key for it; the repo needs to accept that key first.')));
+  if (!p.canManage) return inner.append(head, h('div', { class: 'note' }, 'A team owner or admin needs to add the project’s key to the repo. Then it’s set up here.'));
+  const card = h('div', { class: 'card-body' }, h('p', { class: 'muted' }, 'Getting the key…'));
+  inner.append(head, h('section', { class: 'card' }, card));
+  let key;
+  try { key = (await api('GET', `/api/projects/${ctx.id}/ssh-key`)).publicKey; }
+  catch (e){ return fill(card, h('div', { class: 'error-box' }, e.message)); }
+  const error = h('div', { class: 'error-box', hidden: true });
+  fill(card, ...keySteps(key, p.gitUrl),
+    h('p', { class: 'small', style: { marginTop: '16px' } }, 'Then copy the repo in. It needs an npm start script for its website; Claude can help with that once it’s in.'),
+    error,
+    h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: e => busy(e.target, async () => {
+      error.hidden = true;
+      try { await api('POST', `/api/projects/${ctx.id}/clone`); }
+      catch (err){ error.textContent = err.message; error.hidden = false; return; }
+      toast('Copied. The project is ready in under a minute.');
+      await refreshProjects().catch(() => {});
+      go(`/p/${ctx.id}/chat/new`, true);
+    }, 'Copying…').catch(() => {}) }, 'I’ve added it: copy the repo')));
 }
 
 // =====================================================================
@@ -1121,13 +1163,20 @@ function settingsTab(ctx){
         toast(r.failed.length ? `Moved, but ${r.failed.join(', ')} didn’t start again: see Services.` : `Moved: ${p.name} now runs as ${r.user}`, !!r.failed.length);
         paintUser({ user: r.user, own: true });
       }, 'Moving…').catch(() => {}) }, 'Move to its own user')]);
+  // The project's SSH key, so its chats can pull from and push to a private repo.
+  const keyCard = h('div', { class: 'card-body' },
+    h('p', { style: { marginTop: 0 } }, 'Studio has an SSH key for this project. Add it to a private repo as a deploy key and the project’s chats can pull from and push to that repo over SSH (git@… addresses).'),
+    h('button', { class: 'btn', type: 'button', onclick: e => busy(e.target, async () => {
+      const { publicKey } = await api('GET', `/api/projects/${ctx.id}/ssh-key`);
+      fill(keyCard, ...keySteps(publicKey, p.gitUrl, true));
+    }, 'Getting it…').catch(() => {}) }, 'Show the key'));
   if (state.me.user.role === 'admin') api('GET', `/api/projects/${ctx.id}/user`).then(paintUser, e => fill(userCard, h('div', { class: 'error-box' }, e.message)));
   const card = (id, title, sub, ...body) => h('section', { class: 'card', id }, h('div', { class: 'card-head' }, h('div', null, h('h3', null, title), sub ? h('p', null, sub) : null)), ...body);
   const admin = state.me.user.role === 'admin';
   const jump = (id, icon, label, cls = '') => h('a', { class: cls, href: '#' + id, onclick: e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }, ico(icon), label);
   inner.append(
     h('div', { class: 'settings-layout' },
-      h('nav', { class: 'subnav', 'aria-label': 'Settings sections' }, jump('set-general', 'sliders', 'General', 'on'), admin ? jump('set-user', 'user', 'Who it runs as') : null, jump('set-delete', 'trash', 'Delete project', 'bad')),
+      h('nav', { class: 'subnav', 'aria-label': 'Settings sections' }, jump('set-general', 'sliders', 'General', 'on'), jump('set-git', 'key', 'Git access'), admin ? jump('set-user', 'user', 'Who it runs as') : null, jump('set-delete', 'trash', 'Delete project', 'bad')),
       h('div', { class: 'stack' },
         h('form', { class: 'card', id: 'set-general', onsubmit: async e => {
           e.preventDefault();
@@ -1143,6 +1192,7 @@ function settingsTab(ctx){
             field('Daily Claude budget, in dollars', budget, `chats and AI workers together, by Claude’s cost estimate; empty for no limit. $${(p.spentToday || 0).toFixed(2)} used today, resets at midnight`),
             h('div', null, h('label', null, 'Folder on the server'), h('div', { class: 'secret' }, `/srv/projects/${p.slug}/repo`))),
           h('div', { class: 'card-foot' }, h('div', { class: 'spacer' }), h('button', { class: 'btn primary', type: 'submit' }, 'Save'))),
+        card('set-git', 'Git access', 'For private repos.', keyCard),
         admin ? card('set-user', 'Who it runs as', 'Studio admins only.', userCard) : null,
         h('section', { class: 'card danger-zone', id: 'set-delete' },
           h('div', { class: 'card-head' }, h('div', null, h('h3', null, 'Delete project'), h('p', null, 'Stops its services and removes its web addresses.'))),
@@ -1168,9 +1218,9 @@ export function newProjectDialog(){
   const hint = h('span', { class: 'mono' }, `https://name.${state.me.domain}`);
   slug.oninput = () => { slugTouched = true; hint.textContent = `https://${slug.value || 'name'}.${state.me.domain}`; };
   const team = h('select', null, teams.map(t => h('option', { value: t.organizationId }, t.name)));
-  const start = h('select', null, h('option', { value: 'blank' }, 'A blank website (small Node server)'), h('option', { value: 'git' }, 'Copy a public Git repository'));
-  const git = h('input', { type: 'url', placeholder: 'https://github.com/owner/repo.git' });
-  const gitField = field('Git address', git, 'must be public; it needs an npm start script');
+  const start = h('select', null, h('option', { value: 'blank' }, 'A blank website (small Node server)'), h('option', { value: 'git' }, 'Copy a Git repository'));
+  const git = h('input', { type: 'text', placeholder: 'https://github.com/owner/repo.git', autocapitalize: 'off', spellcheck: false });
+  const gitField = field('Git address', git, 'https for a public repo; for a private one its SSH address, like git@github.com:owner/repo.git, and Studio then gives you a key to add to it. It needs an npm start script');
   gitField.hidden = true;
   start.onchange = () => { gitField.hidden = start.value !== 'git'; };
   const desc = h('textarea', { rows: 2, placeholder: 'What is it for? (optional)' });
@@ -1178,7 +1228,7 @@ export function newProjectDialog(){
     e.preventDefault();
     await busy(e.submitter, async () => {
       const p = await api('POST', '/api/projects', { name: name.value.trim(), slug: slug.value.trim(), organizationId: team.value, starter: start.value === 'git' ? null : 'blank', gitUrl: start.value === 'git' ? git.value.trim() : null, description: desc.value });
-      close(); toast('Creating the project. It’s ready in under a minute.');
+      close(); toast(p.status === 'needs-key' ? 'Created. Add its key to the repo next.' : 'Creating the project. It’s ready in under a minute.');
       await refreshProjects(); go(`/p/${p.id}/chat/new`);
     }, 'Creating…').catch(() => {});
   } },

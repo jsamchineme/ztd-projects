@@ -62,8 +62,17 @@ switch (cmd){
   case 'project-create': {
     const url = readStdin().trim();
     mkdirSync(join(P, a[0]), { recursive: true });
+    if (/^[\w.-]+@/.test(url)){ console.log(JSON.stringify({ ok: true, needsKey: true, publicKey: `ssh-ed25519 AAAAfake studio-${a[0]}@test` })); break; }
     if (url) { const r = spawnSync('git', ['clone', '--depth', '20', url, repo(a[0])]); if (r.status) { console.error(String(r.stderr)); process.exit(1); } }
     else { cpSync(join(STARTERS, a[1]), repo(a[0]), { recursive: true }); spawnSync('git', ['init', '-q', '-b', 'main'], { cwd: repo(a[0]) }); spawnSync('git', ['add', '-A'], { cwd: repo(a[0]) }); spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'Start project'], { cwd: repo(a[0]) }); }
+    console.log('{"ok":true}'); break;
+  }
+  // Private repos over SSH: a fake key. The first clone is refused, as if the key wasn't added yet; the next gives the blank starter.
+  case 'project-key': console.log(JSON.stringify({ publicKey: `ssh-ed25519 AAAAfake studio-${a[0]}@test` })); break;
+  case 'project-clone': {
+    const tried = join(P, a[0], '.tried');
+    if (!existsSync(tried)){ writeFileSync(tried, ''); console.error('git@github.com: Permission denied (publickey).\nfatal: Could not read from remote repository.'); process.exit(1); }
+    cpSync(join(STARTERS, 'blank'), repo(a[0]), { recursive: true }); spawnSync('git', ['init', '-q', '-b', 'main'], { cwd: repo(a[0]) }); spawnSync('git', ['add', '-A'], { cwd: repo(a[0]) }); spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'Cloned'], { cwd: repo(a[0]) });
     console.log('{"ok":true}'); break;
   }
   case 'project-delete': {

@@ -173,7 +173,8 @@ WantedBy=multi-user.target
 
   // ----- projects -----
   'project-create'(p, starter = 'blank'){
-    // stdin (optional): a public https git URL to clone
+    // stdin (optional): a git URL to clone. A public https one is cloned now. For an SSH one (a private repo) this
+    // only makes the project's key and prints it: the repo needs it as a deploy key first, then project-clone clones.
     const dir = join(PROJECTS, slug(p));
     if (existsSync(dir)) die('A project folder with that name already exists');
     const url = readStdin().trim();
@@ -185,8 +186,12 @@ WantedBy=multi-user.target
       sh('chown', [`studio:${user}`, up]); chmodSync(up, 0o2750);
     }
     if (user !== RUN_USER) chmodSync(dir, 0o700);
+    if (url && SSH_URL.test(url)){
+      log(`project-create ${p} (waiting for its key to be added to ${url})`);
+      return console.log(JSON.stringify({ ok: true, needsKey: true, publicKey: projectKey(p) }));
+    }
     if (url){
-      if (!/^https:\/\/[\w.-]+\/[\w./-]+$/.test(url)) die('Only public https git URLs are supported');
+      if (!/^https:\/\/[\w.-]+\/[\w./-]+$/.test(url)) die('Use a public https git address, or an SSH one like git@github.com:owner/repo.git');
       const r = asUser(user, ['git', 'clone', '--depth', '50', url, repo(p)], { timeout: 300000 });
       if (r.status !== 0){ rmSync(dir, { recursive: true, force: true }); die(r.stderr || 'Clone failed', 1); }
     } else {
@@ -199,6 +204,26 @@ WantedBy=multi-user.target
       asUser(user, ['git', '-c', 'user.name=ZTD Devs Studio', '-c', 'user.email=studio@localhost', 'commit', '-qm', 'Start project'], { cwd: repo(p) });
     }
     log(`project-create ${p}`);
+    console.log(JSON.stringify({ ok: true }));
+  },
+  // The project's SSH key for git (made if it has none yet), to add to a repo as a deploy key. Its repo uses it from
+  // then on, so chats can pull and push.
+  'project-key'(p){
+    slug(p);
+    console.log(JSON.stringify({ publicKey: projectKey(p) }));
+  },
+  'project-clone'(p){
+    // stdin: an SSH git URL. Clones it into a project made by project-create without a repo.
+    const url = readStdin().trim();
+    if (!SSH_URL.test(url)) die('Use an SSH git address, like git@github.com:owner/repo.git');
+    if (!existsSync(join(PROJECTS, slug(p)))) die('Project folder is missing');
+    if (existsSync(repo(p))) die('The project already has its files');
+    const user = userOf(p);
+    projectKey(p);
+    const r = asUser(user, ['git', 'clone', '-q', '--', url, repo(p)], { timeout: 300000, env: userEnv(user, { GIT_SSH_COMMAND: `${sshCommand(p)} -o BatchMode=yes -o ConnectTimeout=20` }) });
+    if (r.status !== 0){ rmSync(repo(p), { recursive: true, force: true }); die(r.stderr || 'Clone failed', 1); }
+    asUser(user, ['git', '-C', repo(p), 'config', 'core.sshCommand', sshCommand(p)]);
+    log(`project-clone ${p} ${url}`);
     console.log(JSON.stringify({ ok: true }));
   },
   'project-user'(p){
@@ -603,6 +628,21 @@ function makeProjectUser(p, record = true){
   chmodSync(`/home/${u}`, 0o750);
   if (record) recordProjectUser(p, u);
   return u;
+}
+// A project's SSH key for git: in its user's home, named after the project (older projects share the ztd user).
+const SSH_URL = /^(?:ssh:\/\/)?[A-Za-z0-9][\w.-]{0,63}@[A-Za-z0-9][\w.-]{0,253}(?::\d{1,5}\/|[:\/])[\w~][\w.\/~-]{0,300}$/;
+const keyFile = p => join(homeOf(userOf(p)), '.ssh', `studio-${slug(p)}`);
+const sshCommand = p => `ssh -i ${keyFile(p)} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new`;
+function projectKey(p){
+  const user = userOf(p), key = keyFile(p);
+  if (!existsSync(key)){
+    asUser(user, ['mkdir', '-p', '-m', '700', join(homeOf(user), '.ssh')]);
+    const k = asUser(user, ['ssh-keygen', '-q', '-t', 'ed25519', '-N', '', '-C', `studio-${p}@${CONF.domain}`, '-f', key]);
+    if (k.status !== 0) die(k.stderr || 'Could not make a key', 1);
+    log(`project-key ${p}: made`);
+  }
+  if (existsSync(join(repo(p), '.git'))) asUser(user, ['git', '-C', repo(p), '-c', `safe.directory=${repo(p)}`, 'config', 'core.sshCommand', sshCommand(p)]);
+  return readFileSync(key + '.pub', 'utf8').trim();
 }
 function recordProjectUser(p, u){
   const conf = JSON.parse(readFileSync(CONF_FILE, 'utf8'));

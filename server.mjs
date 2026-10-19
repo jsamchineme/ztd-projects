@@ -236,6 +236,15 @@ route('PATCH', '/api/projects/:id', async ({ user, params, body }) => {
   audit(user.id, 'project.update', p.slug, Object.keys(body).join(','));
   return projectView(P.getProject(p.id), user);
 });
+// The project's SSH key for git, to add to a repo as a deploy key; and copying in a private repo once it's added.
+route('GET', '/api/projects/:id/ssh-key', async ({ user, params }) => {
+  const p = P.getProject(params.id); needManage(user, p);
+  return ctlJson(['project-key', p.slug]);
+});
+route('POST', '/api/projects/:id/clone', async ({ user, params }) => {
+  const p = P.getProject(params.id); needManage(user, p);
+  return projectView(await P.cloneProject(p, user), user);
+});
 route('DELETE', '/api/projects/:id', async ({ user, params, body }) => {
   const p = P.getProject(params.id); needManage(user, p);
   if (body.confirm !== p.slug) throw err(400, `Type the project's short name (${p.slug}) to delete it.`);

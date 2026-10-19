@@ -72,6 +72,7 @@ export function projectState(p){
   const states = p.services.map(s => s.status.state);
   if (p.status === 'creating') return ['starting', 'Setting up'];
   if (p.status === 'error') return ['crashed', 'Setup failed'];
+  if (p.status === 'needs-key') return ['starting', 'Waiting for repo key'];
   if (p.running) return ['busy', 'Claude working'];
   if (states.includes('crashed')) return ['crashed', 'Needs a look'];
   if (states.includes('running')) return ['running', 'Running'];
