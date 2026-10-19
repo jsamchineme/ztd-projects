@@ -48,12 +48,77 @@ if [ "$(uname)" = "Darwin" ]; then
 EOF
   launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
   launchctl bootstrap "gui/$(id -u)" "$PLIST"
+
+  # A clickable "Reconnect to Studio" app in ~/Applications, so you can restart the runner without the Terminal.
+  # Best-effort: left of || disables set -e for this block, so a hiccup here never fails the install.
+  {
+    APP="$HOME/Applications/Reconnect to Studio.app"
+    WORK="$(mktemp -d)"
+    mkdir -p "$HOME/Applications"
+    cat > "$WORK/app.applescript" <<OSA
+on run
+	set logPath to "$DIR/runner.log"
+	set userID to do shell script "id -u"
+	do shell script "launchctl kickstart -k gui/" & userID & "/$LABEL 2>/dev/null; true"
+	set connected to false
+	set removed to false
+	repeat 12 times
+		delay 1
+		try
+			set tailOut to do shell script "tail -20 " & quoted form of logPath
+		on error
+			set tailOut to ""
+		end try
+		if tailOut contains "ready as" then
+			set connected to true
+			exit repeat
+		else if tailOut contains "removed from Studio" then
+			set removed to true
+			exit repeat
+		end if
+	end repeat
+	if connected then
+		display dialog "Connected to Studio." & return & return & "This Mac can now run your chats." buttons {"OK"} default button "OK" with title "Studio Runner" with icon note
+	else if removed then
+		display dialog "This Mac was removed from Studio." & return & return & "Open Studio, go to Account, then Your computers, and add it again." buttons {"OK"} default button "OK" with title "Studio Runner" with icon caution
+	else
+		try
+			set tailOut to do shell script "tail -20 " & quoted form of logPath
+		on error
+			set tailOut to "(no log yet at " & logPath & ")"
+		end try
+		display dialog "Still not connected. Latest log:" & return & return & tailOut buttons {"OK"} default button "OK" with title "Studio Runner" with icon caution
+	end if
+end run
+OSA
+    rm -rf "$APP"
+    if osacompile -o "$APP" "$WORK/app.applescript" 2>/dev/null; then
+      # Use the Studio icon. osacompile also bakes an icon into Assets.car, which overrides applet.icns — so remove it.
+      if curl -fsSL "$STUDIO/icon-512.png" -o "$WORK/icon.png" 2>/dev/null; then
+        ISET="$WORK/Studio.iconset"; mkdir -p "$ISET"
+        for s in 16 32 128 256 512; do
+          sips -z "$s" "$s" "$WORK/icon.png" --out "$ISET/icon_${s}x${s}.png" >/dev/null 2>&1
+          sips -z "$((s*2))" "$((s*2))" "$WORK/icon.png" --out "$ISET/icon_${s}x${s}@2x.png" >/dev/null 2>&1
+        done
+        if iconutil -c icns "$ISET" -o "$WORK/Studio.icns" 2>/dev/null; then
+          cp "$WORK/Studio.icns" "$APP/Contents/Resources/applet.icns"
+          rm -f "$APP/Contents/Resources/Assets.car"
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "$APP/Contents/Info.plist" 2>/dev/null || true
+          touch "$APP"
+          /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP" 2>/dev/null || true
+        fi
+      fi
+      echo "✓ Added a 'Reconnect to Studio' app (in your Applications) to restart the runner if it drops."
+    fi
+    rm -rf "$WORK"
+  } || true
+
   sleep 3
   if grep -q "ready as" "$DIR/runner.log" 2>/dev/null; then echo "✓ Connected to Studio. It starts by itself when you log in."
   else echo "Started. If Studio doesn't show this computer as connected within a minute, see $DIR/runner.log"; fi
   echo
   echo "To stop it:       launchctl bootout gui/\$(id -u)/$LABEL"
-  echo "To remove it:     remove this computer in Studio, then:  rm -rf \"$DIR\" \"$PLIST\""
+  echo "To remove it:     remove this computer in Studio, then:  rm -rf \"$DIR\" \"$PLIST\" \"$HOME/Applications/Reconnect to Studio.app\""
 else
   echo "✓ Installed. Run it with:"
   echo "  STUDIO_RUNNER_HOME=\"$DIR\" node \"$DIR/app/studio-runner.mjs\""
