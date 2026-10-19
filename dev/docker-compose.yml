@@ -6,9 +6,9 @@ services:
     image: stalwartlabs/stalwart:latest
     container_name: ztdmail-stalwart
     restart: unless-stopped
-    # First boot prints a one-time bootstrap admin password to the logs; it persists in
-    # the ./stalwart volume afterwards. (STALWART_RECOVERY_ADMIN is NOT used — it forces
-    # recovery mode, which disables the management API and mail services.)
+    # First boot prints a one-time bootstrap admin password to the logs. Config, mail data and
+    # logs persist in ./stalwart/{etc,data,logs}. (STALWART_RECOVERY_ADMIN is NOT used — it
+    # forces recovery mode, which disables the management API and mail services.)
     ports:
       - "8080:8080"   # web admin + JMAP + .well-known (http, dev only)
       - "1025:25"     # inbound SMTP (host 1025 -> container 25)
@@ -17,7 +17,9 @@ services:
       - "1143:143"    # IMAP
       - "1993:993"    # IMAPS
     volumes:
-      - ./stalwart:/opt/stalwart
+      - ./stalwart/etc:/etc/stalwart        # config (v0.16 image paths)
+      - ./stalwart/data:/var/lib/stalwart   # mail data (RocksDB)
+      - ./stalwart/logs:/var/log/stalwart   # logs
 
   bulwark:
     image: ghcr.io/bulwarkmail/webmail:latest

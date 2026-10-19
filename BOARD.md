@@ -145,6 +145,10 @@ Owner: Claude · Needs: Samuel to run Stalwart's 2-min first-time setup
 Owner: Samuel (DNS) + Claude (setup)
 - Done: Hetzner ARM VPS in Helsinki (62.238.17.8), hardened (key-only SSH, firewall, auto-updates), Docker + Stalwart deployed
 - Done: DNS live (A mail + mx1 → 62.238.17.8, MX ztdoffice.com → mx1.ztdoffice.com, reverse DNS → mx1.ztdoffice.com)
-- Remaining (from the Mac): rename server to mx1.ztdoffice.com, TLS, ztdoffice.com mail domain + mailboxes, webmail, Resend relay, SPF/DKIM/DMARC
+- Done: renamed to mx1.ztdoffice.com; Stalwart setup complete (admin admin@ztdoffice.com, creds root-only on the VPS); data on /opt/ztdmail/{etc,data,logs}; mail services running; DKIM keys generated
+- Done: Let's Encrypt TLS certificate issued for mx1/autoconfig/autodiscover/mta-sts/ua-auto-config (auto-renews); admin at https://mx1.ztdoffice.com/admin
+- Done: all DNS records live and verified (SPF, DKIM ed25519 + RSA, DMARC p=none, MTA-STS, TLS-RPT, auto-setup CNAMEs and SRV)
+- Remaining: add mail.ztdoffice.com to the cert; rotate admin password (exposed in chat); port 587 listener; mailboxes; webmail; Resend relay on 587; SPF/DKIM/DMARC records; send/receive test
+- SSH from the Studio server: ~/.ssh/ztdoffice-vps-studio
 
 ## Done
