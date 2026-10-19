@@ -183,6 +183,11 @@ Gmail showed a proper invitation with Yes/No/Maybe. Notes:
   served by nginx from `/opt/ztdmail/branding/`). The RSVP page fetches `https://mx1.ztdoffice.com/logo`,
   which returns the same image. Default templates contain no other Stalwart text, so no custom
   templates are needed. Per-client: set each client domain's (or tenant's) `logo` URL.
+- **Other Stalwart names replaced (2026-10-19):** default calendar / address book names
+  (`x:Calendar`/`x:AddressBook.defaultDisplayName`) → "Calendar" / "Contacts" (existing ones in
+  samuel@ and hello@ renamed too); reminder sender name (`x:CalendarAlarm.fromName`) → "ZTD Office
+  Calendar"; SMTP greeting (`x:MtaStageConnect.smtpGreeting`) → `220 mx1.ztdoffice.com ESMTP ZTD Office`.
+  A sweep of all settings found no other user-visible "Stalwart" text.
 - Bulwark display quirks (upstream, not server): an attendee's reply is shown as an invitation with a
   "sender isn't the organizer" warning, and UTC times in the invitation card aren't converted to
   local time.

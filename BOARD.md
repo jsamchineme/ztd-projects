@@ -105,6 +105,15 @@ Owner: Samuel (account) + Claude (config) · Depends on: 16
 - Tenants with automatic reputation policy, so one hacked account can't stop everyone's mail
 - Cancel the Resend plan once all mail goes through SES
 
+### 22. BIMI — show the ZTD Office logo in recipients' inboxes
+Owner: Samuel (trade mark, certificate) + Claude (logo file, DNS) · Depends on: 14, 20
+- Today Gmail/Outlook show a letter "S" next to mail from @ztdoffice.com; BIMI shows your logo instead (Gmail, Yahoo, Apple Mail)
+- Requires DMARC at p=quarantine or p=reject first (task 20)
+- Logo in the BIMI SVG format (SVG Tiny PS), hosted on HTTPS; BIMI DNS record `default._bimi.ztdoffice.com`
+- Gmail and Apple: a paid VMC/CMC certificate (~£1,000+/yr); a VMC usually needs the logo as a registered trade mark (task 14). Yahoo accepts the DNS record alone
+- Later: offer BIMI to clients as a premium add-on (per client domain)
+- Done: ztddevs.com favicon shows for @ztddevs.com senders in the webmail (Bulwark cached a blank icon at first; restarting the bulwark container clears it)
+
 ### 18. Rollout
 Owner: Samuel + Claude · Depends on: 11, 13, 15, 17
 - Migrate the remaining clients in batches
