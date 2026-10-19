@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en-GB" class="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Businessmail — UI sample (shadcn)</title>
+<style>
+  /* ============================================================
+     shadcn/ui design tokens — HSL channels, light + dark
+     ============================================================ */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --radius: 0.5rem;
+    /* one restrained brand accent for unread/active emphasis */
+    --brand: 221 83% 53%;
+  }
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --brand: 217 91% 60%;
+  }
+
+  * { box-sizing:border-box; border-color:hsl(var(--border)); }
+  html,body { height:100%; }
+  body {
+    margin:0;
+    font-family:"Inter",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:14px; line-height:1.5;
+    color:hsl(var(--foreground)); background:hsl(var(--background));
+    -webkit-font-smoothing:antialiased;
+  }
+  button { font-family:inherit; cursor:pointer; color:inherit; }
+  svg { width:16px; height:16px; stroke:currentColor; stroke-width:2; fill:none;
+        stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+  /* ---------- primitives ---------- */
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    height:36px; padding:0 16px; border-radius:var(--radius); font-size:14px; font-weight:500;
+    border:1px solid transparent; white-space:nowrap; transition:background .15s,color .15s,border-color .15s; }
+  .btn:focus-visible { outline:2px solid hsl(var(--ring)); outline-offset:2px; }
+  .btn-primary { background:hsl(var(--primary)); color:hsl(var(--primary-foreground)); }
+  .btn-primary:hover { background:hsl(var(--primary)/.9); }
+  .btn-outline { border-color:hsl(var(--border)); background:hsl(var(--background)); }
+  .btn-outline:hover { background:hsl(var(--accent)); }
+  .btn-secondary { background:hsl(var(--secondary)); color:hsl(var(--secondary-foreground)); }
+  .btn-secondary:hover { background:hsl(var(--secondary)/.8); }
+  .btn-ghost { background:transparent; }
+  .btn-ghost:hover { background:hsl(var(--accent)); }
+  .btn-sm { height:32px; padding:0 12px; font-size:13px; }
+  .btn-icon { height:36px; width:36px; padding:0; }
+
+  .badge { display:inline-flex; align-items:center; height:20px; padding:0 8px; border-radius:var(--rpill,9999px);
+    font-size:11px; font-weight:600; line-height:1; border:1px solid transparent; }
+  .badge-sec { background:hsl(var(--secondary)); color:hsl(var(--secondary-foreground)); }
+  .badge-outline { border-color:hsl(var(--border)); color:hsl(var(--muted-foreground)); }
+
+  .input { height:36px; width:100%; border:1px solid hsl(var(--input)); background:transparent;
+    border-radius:var(--radius); padding:0 12px 0 34px; font-size:14px; color:hsl(var(--foreground)); }
+  .input::placeholder { color:hsl(var(--muted-foreground)); }
+  .input:focus { outline:2px solid hsl(var(--ring)); outline-offset:1px; }
+
+  .avatar { border-radius:9999px; display:grid; place-items:center; color:#fff;
+    font-weight:600; font-size:12px; flex:none; }
+
+  .muted { color:hsl(var(--muted-foreground)); }
+
+  /* ============================================================ layout */
+  .app { display:grid; grid-template-rows:auto 1fr; height:100vh; }
+  .topbar { display:flex; align-items:center; gap:16px; height:56px; padding:0 16px;
+    border-bottom:1px solid hsl(var(--border)); }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px; }
+  .brand .mark { width:28px; height:28px; border-radius:7px; background:hsl(var(--primary));
+    color:hsl(var(--primary-foreground)); display:grid; place-items:center; }
+  .brand .mark svg { width:15px; height:15px; }
+  .searchwrap { position:relative; flex:1; max-width:560px; }
+  .searchwrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    color:hsl(var(--muted-foreground)); }
+  .grow { flex:1; }
+
+  .body { display:grid; grid-template-columns:240px 400px 1fr; min-height:0; }
+
+  /* sidebar */
+  .sidebar { border-right:1px solid hsl(var(--border)); padding:12px; overflow:auto;
+    display:flex; flex-direction:column; gap:4px; }
+  .navbtn { display:flex; align-items:center; gap:12px; width:100%; height:36px; padding:0 12px;
+    border-radius:var(--radius); font-size:14px; font-weight:500; background:transparent; border:0;
+    color:hsl(var(--foreground)); }
+  .navbtn:hover { background:hsl(var(--accent)); }
+  .navbtn.active { background:hsl(var(--secondary)); }
+  .navbtn .count { margin-left:auto; font-size:12px; color:hsl(var(--muted-foreground)); font-weight:500; }
+  .navbtn.active .count { color:hsl(var(--foreground)); }
+  .navlabel { padding:14px 12px 6px; font-size:11px; font-weight:600; letter-spacing:.04em;
+    text-transform:uppercase; color:hsl(var(--muted-foreground)); }
+  .swatch { width:9px; height:9px; border-radius:2px; flex:none; }
+
+  /* list column */
+  .list { border-right:1px solid hsl(var(--border)); display:flex; flex-direction:column; min-height:0; }
+  .list-head { padding:14px 16px 12px; display:flex; align-items:center; gap:12px;
+    border-bottom:1px solid hsl(var(--border)); }
+  .list-head h2 { margin:0; font-size:18px; font-weight:700; }
+  .tabs { margin-left:auto; display:inline-flex; background:hsl(var(--muted)); border-radius:var(--radius);
+    padding:3px; gap:2px; }
+  .tab { border:0; background:transparent; height:28px; padding:0 12px; border-radius:6px;
+    font-size:13px; font-weight:500; color:hsl(var(--muted-foreground)); }
+  .tab.active { background:hsl(var(--background)); color:hsl(var(--foreground));
+    box-shadow:0 1px 2px rgba(0,0,0,.08); }
+  .rows { overflow:auto; padding:8px; display:flex; flex-direction:column; gap:6px; }
+  .row { text-align:left; width:100%; border:1px solid transparent; background:transparent;
+    border-radius:var(--radius); padding:12px 14px; display:flex; flex-direction:column; gap:6px; }
+  .row:hover { background:hsl(var(--accent)); }
+  .row.selected { background:hsl(var(--accent)); border-color:hsl(var(--border)); }
+  .row .l1 { display:flex; align-items:center; gap:8px; }
+  .row .from { font-weight:600; font-size:14px; }
+  .row.unread .from::before { content:""; display:inline-block; width:7px; height:7px; border-radius:50%;
+    background:hsl(var(--brand)); margin-right:6px; vertical-align:middle; }
+  .row .time { margin-left:auto; font-size:12px; color:hsl(var(--muted-foreground)); }
+  .row .subj { font-size:13px; font-weight:500; }
+  .row .snip { font-size:12px; color:hsl(var(--muted-foreground));
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .row .tags { display:flex; gap:6px; margin-top:2px; }
+
+  /* reader */
+  .reader { display:flex; flex-direction:column; min-height:0; }
+  .reader-toolbar { height:52px; display:flex; align-items:center; gap:2px; padding:0 8px;
+    border-bottom:1px solid hsl(var(--border)); }
+  .reader-toolbar .sep { width:1px; height:20px; background:hsl(var(--border)); margin:0 6px; }
+  .reader-scroll { overflow:auto; padding:24px; }
+  .mail-head { display:flex; align-items:flex-start; gap:14px; padding-bottom:20px;
+    border-bottom:1px solid hsl(var(--border)); }
+  .mail-head .name { font-weight:600; font-size:15px; }
+  .mail-head .subj { font-size:13px; }
+  .mail-head .time { margin-left:auto; font-size:13px; color:hsl(var(--muted-foreground)); }
+  .notice { display:flex; align-items:center; gap:8px; font-size:13px; color:hsl(var(--muted-foreground));
+    background:hsl(var(--muted)); border-radius:var(--radius); padding:8px 12px; margin:20px 0; }
+  .notice a { color:hsl(var(--brand)); text-decoration:none; font-weight:500; }
+  .prose { font-size:14px; line-height:1.7; padding:4px 0; }
+  .prose p { margin:0 0 16px; }
+  .attach-card { display:inline-flex; align-items:center; gap:10px; border:1px solid hsl(var(--border));
+    border-radius:var(--radius); padding:10px 14px; font-size:13px; font-weight:500; margin-top:4px; }
+  .attach-card .muted { font-weight:400; }
+  .replybox { border:1px solid hsl(var(--border)); border-radius:var(--radius); margin-top:24px; }
+  .replybox textarea { width:100%; border:0; background:transparent; resize:none; padding:14px;
+    font-family:inherit; font-size:14px; color:hsl(var(--foreground)); outline:none; min-height:90px; }
+  .replybox-foot { display:flex; align-items:center; gap:8px; padding:10px 12px;
+    border-top:1px solid hsl(var(--border)); }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span>
+      Businessmail
+    </div>
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input class="input" placeholder="Search mail — from:jane has:attachment">
+    </div>
+    <div class="grow"></div>
+    <button class="btn btn-ghost btn-icon" title="Toggle theme" onclick="document.documentElement.classList.toggle('dark')">
+      <svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    </button>
+    <button class="btn btn-ghost btn-icon" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
+    <div class="avatar" style="width:32px;height:32px;background:#64748b">SO</div>
+  </header>
+
+  <div class="body">
+    <!-- sidebar -->
+    <aside class="sidebar">
+      <button class="btn btn-primary" style="margin-bottom:8px">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Compose
+      </button>
+      <button class="navbtn active"><svg viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.5 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.5A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.5Z"/></svg> Inbox <span class="count">12</span></button>
+      <button class="navbtn"><svg viewBox="0 0 24 24"><path d="m12 2 3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7Z"/></svg> Starred</button>
+      <button class="navbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Snoozed</button>
+      <button class="navbtn"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Sent</button>
+      <button class="navbtn"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg> Drafts <span class="count">2</span></button>
+      <button class="navbtn"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Trash</button>
+      <button class="navbtn"><svg viewBox="0 0 24 24"><path d="m21.7 16.6-9-15.5a.75.75 0 0 0-1.3 0l-9 15.5A.75.75 0 0 0 3 18h18a.75.75 0 0 0 .7-1.4Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Spam <span class="count">4</span></button>
+
+      <div class="navlabel">Labels</div>
+      <button class="navbtn"><span class="swatch" style="background:#2563eb"></span> Clients</button>
+      <button class="navbtn"><span class="swatch" style="background:#16a34a"></span> Finance</button>
+      <button class="navbtn"><span class="swatch" style="background:#d97706"></span> Invoices</button>
+      <button class="navbtn"><span class="swatch" style="background:#db2777"></span> Team</button>
+    </aside>
+
+    <!-- list -->
+    <section class="list">
+      <div class="list-head">
+        <h2>Inbox</h2>
+        <div class="tabs">
+          <button class="tab active">All mail</button>
+          <button class="tab">Unread</button>
+        </div>
+      </div>
+      <div class="rows">
+        <button class="row unread selected">
+          <div class="l1"><span class="from">Jane Afolabi</span><span class="time">9:14 AM</span></div>
+          <div class="subj">Q4 proposal — ready for your review</div>
+          <div class="snip">Hi Samuel, I've attached the revised proposal with the updated pricing table and the new timeline we discussed on Tuesday…</div>
+          <div class="tags"><span class="badge badge-sec">Clients</span><span class="badge badge-outline">attachment</span></div>
+        </button>
+        <button class="row unread">
+          <div class="l1"><span class="from">Stripe</span><span class="time">8:02 AM</span></div>
+          <div class="subj">Payout of $4,280.00 is on its way</div>
+          <div class="snip">Your payout is expected to arrive in your bank account on Thursday. Here is a summary of the transactions included…</div>
+          <div class="tags"><span class="badge badge-sec">Finance</span></div>
+        </button>
+        <button class="row">
+          <div class="l1"><span class="from">Maria, David, you</span><span class="time">Yesterday</span></div>
+          <div class="subj">Re: Onboarding flow — a couple of edge cases</div>
+          <div class="snip">Good catch. I'll handle the password-reset path this afternoon and push a fix before the demo…</div>
+        </button>
+        <button class="row">
+          <div class="l1"><span class="from">GitHub</span><span class="time">Yesterday</span></div>
+          <div class="subj">[businessmail] 3 new pull requests need review</div>
+          <div class="snip">opened by claude-agent-4: "feat: inbound mail pipeline + MIME parsing + threading"…</div>
+        </button>
+        <button class="row">
+          <div class="l1"><span class="from">Acme Corp Billing</span><span class="time">Wed</span></div>
+          <div class="subj">Invoice #2041 — paid, thank you</div>
+          <div class="snip">This is a receipt for your payment. No action is required. Amount: $1,200.00…</div>
+          <div class="tags"><span class="badge badge-sec">Clients</span><span class="badge badge-outline">attachment</span></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- reader -->
+    <section class="reader">
+      <div class="reader-toolbar">
+        <button class="btn btn-ghost btn-icon" title="Archive"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="5" rx="1"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/></svg></button>
+        <button class="btn btn-ghost btn-icon" title="Move to spam"><svg viewBox="0 0 24 24"><path d="m21.7 16.6-9-15.5a.75.75 0 0 0-1.3 0l-9 15.5A.75.75 0 0 0 3 18h18a.75.75 0 0 0 .7-1.4Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></button>
+        <button class="btn btn-ghost btn-icon" title="Delete"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        <div class="sep"></div>
+        <button class="btn btn-ghost btn-icon" title="Snooze"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></button>
+        <div class="grow"></div>
+        <button class="btn btn-ghost btn-icon" title="Reply"><svg viewBox="0 0 24 24"><path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg></button>
+        <button class="btn btn-ghost btn-icon" title="More"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+      <div class="reader-scroll">
+        <div class="mail-head">
+          <div class="avatar" style="width:40px;height:40px;background:#2563eb">JA</div>
+          <div>
+            <div class="name">Jane Afolabi</div>
+            <div class="subj muted">&lt;jane@acme.com&gt;</div>
+            <div class="subj">Q4 proposal — ready for your review</div>
+          </div>
+          <div class="time">9:14 AM</div>
+        </div>
+
+        <div class="notice">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+          Remote images are blocked to protect your privacy. <a href="#">Show images</a>
+        </div>
+
+        <div class="prose">
+          <p>Hi Samuel,</p>
+          <p>I've attached the revised Q4 proposal with the updated pricing table and the new timeline we discussed on Tuesday. The headline change: we've pulled the pilot phase forward by two weeks.</p>
+          <p>Could you review the scope section (page 3) before our call tomorrow? Happy to adjust anything.</p>
+          <p>Best,<br>Jane</p>
+        </div>
+
+        <div class="attach-card">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+          Q4-Proposal-v3.pdf <span class="muted">· 248 KB</span>
+        </div>
+
+        <div class="replybox">
+          <textarea placeholder="Reply to Jane Afolabi…">Thanks Jane — this looks great. Reviewing page 3 now and I'll send notes before the call.</textarea>
+          <div class="replybox-foot">
+            <button class="btn btn-primary btn-sm">Send
+              <svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </button>
+            <button class="btn btn-ghost btn-icon btn-sm" title="Attach"><svg viewBox="0 0 24 24"><path d="m21.4 11.1-9.2 9.2a5 5 0 0 1-7-7l9.2-9.2a3 3 0 0 1 4.3 4.3l-9.2 9.2a1 1 0 0 1-1.4-1.4l8.5-8.5"/></svg></button>
+            <div class="grow"></div>
+            <button class="btn btn-ghost btn-sm">Save draft</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>
