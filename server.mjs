@@ -10,7 +10,7 @@ import { PORT, STUDIO_HOST, STUDIO_URL, DOMAIN, APP_DIR, SECURE, APP_NAME } from
 import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
 import { mailEnabled, mailSettings, saveMailSettings, clearMailSettings, sendTestMail, sendTemplate } from './lib/mail.mjs';
-import { emailPrefs, setEmailPrefs, phonePrefs, setPhonePrefs } from './lib/notify.mjs';
+import { emailPrefs, setEmailPrefs, phonePrefs, setPhonePrefs, setWatching } from './lib/notify.mjs';
 import { listPhones, pairPhone, removePhone, testPhones, handlePhoneUpgrade, PHONE_APP_URL, markSeen } from './lib/phone.mjs';
 import { vapidPublicKey, listWebPush, subscribe, unsubscribe, webRepeat, setWebRepeat } from './lib/webpush.mjs';
 import * as P from './lib/projects.mjs';
@@ -415,6 +415,8 @@ route('GET', '/api/uploads/:id', async ({ user, params }, res) => {
     'Content-Disposition': `${image ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(u.name)}` });
   createReadStream(u.path).on('error', () => res.destroy()).pipe(res);
 });
+// The page says whether the person is looking at the end of this chat, so its finished runs don't ping them (lib/notify.mjs).
+route('POST', '/api/chats/:id/watching', async ({ user, params, body }) => { const { c } = chatFor(user, params.id); setWatching(user.id, c.id, !!body.on); return { ok: true }; });
 route('POST', '/api/chats/:id/stop', async ({ user, params }) => { const { c } = chatFor(user, params.id); return { stopped: A.stop(c.id) }; });
 route('GET', '/api/chats/:id/stream', async ({ user, params, url }, res) => {
   const { c } = chatFor(user, params.id);

@@ -249,6 +249,55 @@ await check('Board tab: Claude adds a task from a chat; tasks are added, moved, 
   await page.click('dialog button:has-text("Delete task")');
   await done.locator('.task').first().waitFor({ state: 'detached' });
   if (board().includes('logo') || !board().includes('Added meanwhile')) throw new Error('BOARD.md after deleting:\n' + board());
+}, page);
+await check('Board labels: made in the Labels dialog and on tasks, filtered by, renamed and deleted, all in BOARD.md', async () => {
+  const file = `${process.env.MOCK_ROOT}/projects/demo-site/repo/BOARD.md`;
+  const board = () => readFileSync(file, 'utf8');
+  writeFileSync(file, '# Board\n\nLabels: #infra\n\n## To do\n- Order the VPS #infra\n- Pick a logo\n- Write the docs\n\n## In progress\n\n## Done\n');
+  await page.reload();
+  const todo = page.locator('.board-col', { hasText: 'To do' });
+  await todo.locator('.task', { hasText: 'Order the VPS' }).locator('.label', { hasText: 'infra' }).waitFor();
+  // A label made in the dialog, before any task has it
+  await page.click('.board-filters button:has-text("Labels")');
+  await page.fill('dialog input[aria-label="New label"]', 'Design');
+  await page.click('dialog button:has-text("Add label")');
+  await page.locator('dialog .label-row', { hasText: 'design' }).waitFor();
+  if (!board().includes('Labels: #infra #design')) throw new Error('the new label isn’t listed in BOARD.md:\n' + board());
+  await page.click('dialog button:has-text("Done")');
+  // ...put on a task, with one made on the spot in the task's editor
+  await todo.locator('.task', { hasText: 'Pick a logo' }).locator('button[aria-label="Edit task"]').click();
+  await todo.locator('.task-edit .label-pick', { hasText: 'design' }).click();
+  await todo.locator('.task-edit input[aria-label="New label"]').fill('urgent');
+  await todo.locator('.task-edit input[aria-label="New label"]').press('Enter');
+  await todo.locator('.task-edit button:has-text("Save")').click();
+  await todo.locator('.task', { hasText: 'Pick a logo' }).locator('.label', { hasText: 'urgent' }).waitFor();
+  if (!board().includes('- Pick a logo #design #urgent') || !board().includes('Labels: #infra #design #urgent')) throw new Error('labels not saved:\n' + board());
+  // Filtering by label, then by words
+  await page.locator('.board-labels .label-pick', { hasText: 'design' }).click();
+  await todo.locator('.task', { hasText: 'Order the VPS' }).waitFor({ state: 'detached' });
+  await todo.locator('.task', { hasText: 'Pick a logo' }).waitFor();
+  await page.getByText('1 of 3 tasks').waitFor();
+  await page.screenshot({ path: `${SHOTS}/09-board-labels.png`, fullPage: true });
+  await page.reload();   // the filter is remembered
+  await page.getByText('1 of 3 tasks').waitFor();
+  await page.click('.board-filters a:has-text("Clear")');
+  await page.fill('input[aria-label="Filter tasks"]', 'docs');
+  await todo.locator('.task', { hasText: 'Write the docs' }).waitFor();
+  if (await todo.locator('.task').count() !== 1) throw new Error('the word filter shows other tasks');
+  await page.click('.board-filters a:has-text("Clear")');
+  await todo.locator('.task', { hasText: 'Order the VPS' }).waitFor();
+  // Renaming changes it on every task; deleting takes it off them
+  await page.click('.board-filters button:has-text("Labels")');
+  await page.click('dialog button[aria-label="Rename infra"]');
+  await page.fill('dialog input[aria-label="New name for infra"]', 'servers');
+  await page.click('dialog button:has-text("Rename")');
+  await page.locator('dialog .label-row', { hasText: 'servers' }).waitFor();
+  if (!board().includes('- Order the VPS #servers') || board().includes('infra')) throw new Error('rename didn’t reach the tasks:\n' + board());
+  await page.click('dialog button[aria-label="Delete urgent"]');
+  await page.locator('dialog').last().locator('button:has-text("Delete label")').click();
+  await page.locator('dialog .label-row', { hasText: 'urgent' }).first().waitFor({ state: 'detached' });
+  if (board().includes('urgent') || !board().includes('- Pick a logo #design')) throw new Error('delete didn’t take the label off its tasks:\n' + board());
+  await page.click('dialog button:has-text("Done")');
   rmSync(file);   // leave the repo as later checks expect it
 }, page);
 await check('project web address goes through the login gate', async () => {
@@ -632,9 +681,20 @@ await check('phone notifications: pair a phone, it connects, rings for a test an
   if (reminders() !== after) throw new Error('reminders went on after the message was seen');
   await card.screenshot({ path: `${SHOTS}/09d-phone-card.png` });
 
+  // Watching the end of the chat in Studio: no ring when it finishes.
   await page.goto(projectUrl + '/chat/new');
-  await page.fill('textarea', 'ring my phone when done');
+  await page.fill('textarea', 'watching this one');
   await page.keyboard.press('Enter');
+  await page.waitForURL(u => !/\/chat\/new$/.test(u.pathname));
+  const watchedId = page.url().split('/chat/')[1];
+  await page.locator('.bubble', { hasText: 'watching this one' }).waitFor();
+  for (let i = 0; i < 100 && (await (await page.request.get(`${BASE}/api/chats/${watchedId}`)).json()).chat.running; i++) await new Promise(r => setTimeout(r, 100));
+  await new Promise(r => setTimeout(r, 500));
+  if (ws.got.some(m => m.event === 'runFinished')) throw new Error('the phone rang for a chat that was being watched');
+  // Sent, then not watched: it rings.
+  await page.goto(BASE + '/account');
+  const rung = await (await page.request.post(`${BASE}/api/projects/${projectUrl.split('/p/')[1]}/chats`, { headers: { Origin: BASE }, data: {} })).json();
+  await page.request.post(`${BASE}/api/chats/${rung.id}/messages`, { headers: { Origin: BASE }, data: { prompt: 'ring my phone when done' } });
   const done = await ws.next(m => m.type === 'message' && m.event === 'runFinished', 'finished-chat message');
   for (let i = 0; i < 50 && !pushes.some(x => x.data.id === done.id); i++) await new Promise(r => setTimeout(r, 100));
   if (!pushes.some(x => x.data.id === done.id && x.data.url === done.url)) throw new Error('the finished chat wasn’t pushed');

@@ -559,12 +559,36 @@ function renderChat(ctx, el, chatId, loadList){
     };
     es.addEventListener('ping', () => { heard = Date.now(); });
     es.onerror = () => { es.close(); retry = setTimeout(connect, 2000); };
+    watch();
   }
   const watchdog = setInterval(() => { if (chat && Date.now() - heard > 50000) connect(); }, 10000);
   const wake = () => { if (chat && document.visibilityState === 'visible') connect(); };
   document.addEventListener('visibilitychange', wake);
   addEventListener('online', wake);
   onLeave(() => { es?.close(); clearTimeout(retry); clearInterval(watchdog); document.removeEventListener('visibilitychange', wake); removeEventListener('online', wake); });
+
+  // While this tab is on screen, focused and at the end of the chat, Studio doesn't send a phone notification or email
+  // when a run in it finishes. Repeated every 20 seconds, as Studio forgets after 45.
+  let watchedId = null, watchedAt = 0;
+  const tellWatching = (id, on) => fetch(`/api/chats/${id}/watching`, { method: 'POST', keepalive: true, credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on }) }).catch(() => {});
+  function watch(e){
+    const id = e?.type !== 'pagehide' && chat && el.isConnected && document.visibilityState === 'visible' && document.hasFocus() && atBottom() ? chat.id : null;
+    if (id === watchedId && (!id || Date.now() - watchedAt < 20000)) return;
+    if (watchedId && watchedId !== id) tellWatching(watchedId, false);
+    if (id){ tellWatching(id, true); watchedAt = Date.now(); }
+    watchedId = id;
+  }
+  const watchTimer = setInterval(watch, 5000);
+  transcript.addEventListener('scroll', watch, { passive: true });
+  for (const type of ['focus', 'blur', 'pagehide']) addEventListener(type, watch);
+  document.addEventListener('visibilitychange', watch);
+  onLeave(() => {
+    clearInterval(watchTimer);
+    for (const type of ['focus', 'blur', 'pagehide']) removeEventListener(type, watch);
+    document.removeEventListener('visibilitychange', watch);
+    if (watchedId) tellWatching(watchedId, false);
+  });
 
   async function load(){
     if (!chatId){ inner.append(emptyState(), working); setRunning(false); return; }
@@ -809,14 +833,29 @@ async function changesTab(ctx){
 // Board: the project's tasks, kept in BOARD.md in its repo (lib/board.mjs). Claude adds and moves them when asked in a
 // chat; people can here too. Every save sends the hash of the board it started from, so Claude's edits aren't lost.
 // =====================================================================
+// Labels: lowercase words; each gets one of eight colours from its name, the same everywhere.
+const labelName = s => { const l = String(s || '').trim().replace(/^#/, '').toLowerCase(); if (!l) return ''; if (/^\p{L}[\p{L}\p{N}_-]{0,29}$/u.test(l)) return l; toast('A label is one word: letters, numbers, - and _, starting with a letter.', true); return ''; };
+const labelChip = l => { let n = 0; for (const c of l) n = (n * 31 + c.codePointAt(0)) >>> 0; return h('span', { class: `label lc${n % 8}` }, l); };
 async function boardTab(ctx){
   const page = h('div', { class: 'page', style: { flex: 1 } });
   const inner = h('div', { class: 'page-inner wide' });
   const cols = h('div', { class: 'board' });
   page.append(inner);
   ctx.body.append(page);
+  // Filters: words to look for, and labels (a task shows if it has any of those picked). Kept per project in this browser.
+  const filterKey = `boardFilter.${ctx.id}`;
+  const filter = (() => { try { const f = JSON.parse(localStorageGet(filterKey) || '{}'); return { q: String(f.q || ''), labels: new Set(f.labels || []) }; } catch { return { q: '', labels: new Set() }; } })();
+  const keepFilter = () => localStorageSet(filterKey, JSON.stringify({ q: filter.q, labels: [...filter.labels] }));
+  const filtering = () => !!(filter.q.trim() || filter.labels.size);
+  const search = h('input', { type: 'text', placeholder: 'Filter tasks…', 'aria-label': 'Filter tasks', value: filter.q });
+  search.oninput = () => { filter.q = search.value; keepFilter(); paint(); };
+  const labelBar = h('div', { class: 'board-labels', role: 'group', 'aria-label': 'Filter by label' });
+  const filterNote = h('span', { class: 'small muted' });
   inner.append(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Board'),
-    h('p', null, 'What’s to do, in progress and done. Ask Claude in a chat to add or move tasks, or change them here. It’s kept in BOARD.md in the project, so it shows in Changes too.'))), cols);
+    h('p', null, 'What’s to do, in progress and done. Ask Claude in a chat to add or move tasks, or change them here. It’s kept in BOARD.md in the project, so it shows in Changes too.'))),
+    h('div', { class: 'board-filters' }, h('div', { class: 'input-wrap' }, ico('search'), search), labelBar, filterNote, h('div', { class: 'spacer' }),
+      h('button', { class: 'btn small', onclick: () => labelsDialog() }, 'Labels')),
+    cols);
   let data = null, saving = false, dragging = null;
   const editing = () => saving || dragging || cols.querySelector('.task-edit');
 
@@ -847,12 +886,69 @@ async function boardTab(ctx){
     col.groups[g].tasks.splice(at ?? col.groups[g].tasks.length, 0, t);
   });
   const total = c => c.groups.reduce((n, g) => n + g.tasks.length, 0);
+  const matches = t => {
+    const q = filter.q.trim().toLowerCase();
+    if (q && !`${t.text}\n${t.notes}\n${t.labels.map(l => '#' + l).join(' ')}`.toLowerCase().includes(q)) return false;
+    return !filter.labels.size || t.labels.some(l => filter.labels.has(l));
+  };
+  const forEachTask = (b, fn) => b.columns.forEach(c => c.groups.forEach(g => g.tasks.forEach(fn)));
+
+  // Labels dialog: make labels before using them, rename them (on every task too) or delete them.
+  function labelsDialog(){
+    const list = h('div', { class: 'label-admin' });
+    const name = h('input', { type: 'text', maxlength: 31, placeholder: 'New label, e.g. design', 'aria-label': 'New label' });
+    const paintList = () => {
+      const count = l => { let n = 0; forEachTask(data.board, t => { if (t.labels.includes(l)) n++; }); return n; };
+      list.replaceChildren(...data.board.labels.map(l => h('div', { class: 'label-row' }, labelChip(l), h('span', { class: 'small muted' }, `${count(l)} task${count(l) === 1 ? '' : 's'}`), h('div', { class: 'spacer' }),
+        h('button', { type: 'button', class: 'btn small ghost', 'aria-label': `Rename ${l}`, onclick: e => {
+          const row = e.currentTarget.closest('.label-row');
+          const box = h('input', { type: 'text', value: l, maxlength: 31, 'aria-label': `New name for ${l}` });
+          const rename = async () => {
+            const to = labelName(box.value);
+            if (!to || to === l) return paintList();
+            await save(b => { b.labels = b.labels.map(x => x === l ? to : x); forEachTask(b, t => { t.labels = [...new Set(t.labels.map(x => x === l ? to : x))]; }); });
+            if (filter.labels.delete(l)){ filter.labels.add(to); keepFilter(); }
+            paintList();
+          };
+          box.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); rename(); } else if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); paintList(); } });
+          row.replaceChildren(box, h('button', { type: 'button', class: 'btn small primary', onclick: rename }, 'Rename'), h('button', { type: 'button', class: 'btn small', onclick: paintList }, 'Cancel'));
+          box.select();
+        } }, ico('edit')),
+        h('button', { type: 'button', class: 'btn small ghost', 'aria-label': `Delete ${l}`, onclick: async () => {
+          if (!await confirmDialog(`Delete the label “${l}”?`, 'It’s taken off every task that has it. The tasks stay.', 'Delete label', true)) return;
+          await save(b => { b.labels = b.labels.filter(x => x !== l); forEachTask(b, t => { t.labels = t.labels.filter(x => x !== l); }); });
+          if (filter.labels.delete(l)) keepFilter();
+          paintList();
+        } }, ico('trash')))),
+        data.board.labels.length ? null : h('p', { class: 'small muted' }, 'No labels yet.'));
+    };
+    paintList();
+    dialog(close => h('form', { onsubmit: async e => {
+      e.preventDefault();
+      const l = labelName(name.value);
+      if (!l) return;
+      await save(b => { if (!b.labels.includes(l)) b.labels.push(l); });
+      name.value = ''; paintList();
+    } },
+      h('h2', null, 'Labels'), h('p', { class: 'muted', style: { margin: '0 0 12px' } }, 'Put them on tasks to sort them, then filter the board by them. Claude can use them too.'),
+      list, h('div', { class: 'row', style: { marginTop: '14px' } }, h('div', { style: { flex: 1 } }, name), h('button', { class: 'btn primary', type: 'submit' }, ico('plus'), 'Add label')),
+      h('div', { class: 'row end' }, h('button', { class: 'btn', type: 'button', onclick: () => close() }, 'Done'))));
+  }
 
   function editor(task, done){
     const text = h('input', { type: 'text', value: task?.text || '', maxlength: 500, placeholder: 'What needs doing?', 'aria-label': 'Task' });
     const notes = h('textarea', { rows: 2, placeholder: 'Notes (optional)', 'aria-label': 'Notes', value: task?.notes || '' });
-    const form = h('form', { class: 'task-edit', onsubmit: e => { e.preventDefault(); if (text.value.trim()) done({ text: text.value.trim(), notes: notes.value.trim() }); } },
-      text, notes, h('div', { class: 'row end' }, h('button', { class: 'btn small', type: 'button', onclick: () => done(null) }, 'Cancel'), h('button', { class: 'btn small primary', type: 'submit' }, task ? 'Save' : 'Add task')));
+    // Labels: the board's, to switch on and off, and a box to make a new one.
+    const chosen = new Set(task?.labels || []);
+    const picks = h('div', { class: 'label-picks', role: 'group', 'aria-label': 'Labels' });
+    const fresh = h('input', { type: 'text', class: 'label-new', maxlength: 31, placeholder: '+ label', 'aria-label': 'New label' });
+    const paintPicks = () => picks.replaceChildren(...[...new Set([...data.board.labels, ...chosen])].map(l =>
+      h('button', { type: 'button', class: 'label-pick', 'aria-pressed': String(chosen.has(l)), onclick: () => { chosen.has(l) ? chosen.delete(l) : chosen.add(l); paintPicks(); } }, labelChip(l))), fresh);
+    const addFresh = () => { const l = labelName(fresh.value); if (l){ chosen.add(l); fresh.value = ''; paintPicks(); fresh.focus(); } };
+    fresh.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ','){ e.preventDefault(); addFresh(); } });
+    paintPicks();
+    const form = h('form', { class: 'task-edit', onsubmit: e => { e.preventDefault(); if (fresh.value.trim()) addFresh(); if (text.value.trim()) done({ text: text.value.trim(), notes: notes.value.trim(), labels: [...chosen] }); } },
+      text, notes, picks, h('div', { class: 'row end' }, h('button', { class: 'btn small', type: 'button', onclick: () => done(null) }, 'Cancel'), h('button', { class: 'btn small primary', type: 'submit' }, task ? 'Save' : 'Add task')));
     form.addEventListener('keydown', e => { if (e.key === 'Escape') done(null); });
     setTimeout(() => text.focus());
     return form;
@@ -863,6 +959,7 @@ async function boardTab(ctx){
     const el = h('div', { class: 'task' + (ci === last && last > 0 ? ' done' : ''), draggable: 'true' },
       h('div', { class: 'task-text' }, t.text),
       t.notes ? h('div', { class: 'task-notes' }, t.notes) : null,
+      t.labels.length ? h('div', { class: 'task-labels' }, t.labels.map(l => labelChip(l))) : null,
       h('div', { class: 'task-actions' },
         h('button', { class: 'icon-btn', title: `Move to ${columns[ci - 1]?.name}`, 'aria-label': `Move to ${columns[ci - 1]?.name}`, hidden: ci === 0, onclick: () => move({ ci, gi, ti }, { ci: ci - 1 }) }, '←'),
         h('button', { class: 'icon-btn', title: `Move to ${columns[ci + 1]?.name}`, 'aria-label': `Move to ${columns[ci + 1]?.name}`, hidden: ci === last, onclick: () => move({ ci, gi, ti }, { ci: ci + 1 }) }, '→'),
@@ -884,19 +981,32 @@ async function boardTab(ctx){
 
   function paint(){
     const { columns } = data.board;
+    for (const l of filter.labels) if (!data.board.labels.includes(l)) filter.labels.delete(l);   // deleted meanwhile
+    labelBar.replaceChildren(...data.board.labels.map(l => h('button', { type: 'button', class: 'label-pick', 'aria-pressed': String(filter.labels.has(l)), title: `Show tasks labelled ${l}`,
+      onclick: () => { filter.labels.has(l) ? filter.labels.delete(l) : filter.labels.add(l); keepFilter(); paint(); } }, labelChip(l))));
+    const on = filtering();
+    let shown = 0, all = 0;
+    forEachTask(data.board, t => { all++; if (matches(t)) shown++; });
+    filterNote.replaceChildren(...(on ? [`${shown} of ${all} tasks`, ' · ', h('a', { href: '#', onclick: e => { e.preventDefault(); filter.q = search.value = ''; filter.labels.clear(); keepFilter(); paint(); } }, 'Clear')] : []));
     cols.style.setProperty('--cols', columns.length);
     cols.replaceChildren(...columns.map((c, ci) => {
       const add = (gi, label) => {
         const btn = h('button', { class: 'btn small ghost board-add', onclick: () => btn.replaceWith(editor(null, t => t ? save(b => b.columns[ci].groups[gi].tasks.push(t)) : paint())) }, ico('plus'), label);
         return btn;
       };
-      const groups = c.groups.map((g, gi) => g.title || g.tasks.length ? h('div', { class: 'board-group' + (g.title ? ' titled' : '') },
-        g.title ? h('div', { class: 'board-group-head' }, h('h4', null, g.title), h('span', { class: 'count' }, g.tasks.length)) : null,
-        g.text ? h('p', { class: 'board-group-text' }, g.text) : null,
-        h('div', { class: 'board-tasks' }, g.tasks.map((t, ti) => card(columns, ci, gi, ti, t))),
-        g.title ? add(gi, 'Add here') : null) : null);
+      let colShown = 0;
+      const groups = c.groups.map((g, gi) => {
+        const visible = g.tasks.map((t, ti) => [t, ti]).filter(([t]) => matches(t));
+        colShown += visible.length;
+        if (on ? !visible.length : !(g.title || g.tasks.length)) return null;   // filtering: only groups with tasks that match
+        return h('div', { class: 'board-group' + (g.title ? ' titled' : '') },
+          g.title ? h('div', { class: 'board-group-head' }, h('h4', null, g.title), h('span', { class: 'count' }, on ? `${visible.length}/${g.tasks.length}` : g.tasks.length)) : null,
+          g.text ? h('p', { class: 'board-group-text' }, g.text) : null,
+          h('div', { class: 'board-tasks' }, visible.map(([t, ti]) => card(columns, ci, gi, ti, t))),
+          g.title ? add(gi, 'Add here') : null);
+      });
       const col = h('section', { class: 'board-col', 'aria-label': c.name },
-        h('div', { class: 'board-col-head' }, h('h3', null, c.name), h('span', { class: 'count' }, total(c))),
+        h('div', { class: 'board-col-head' }, h('h3', null, c.name), h('span', { class: 'count' }, on ? `${colShown}/${total(c)}` : total(c))),
         c.intro ? h('p', { class: 'small muted board-intro' }, c.intro) : null,
         add(0, 'Add task'), ...groups);
       col.addEventListener('dragover', e => { if (dragging){ e.preventDefault(); col.classList.add('drop'); } });
