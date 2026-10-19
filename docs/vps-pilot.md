@@ -54,7 +54,9 @@ Hardening also in place: fail2ban, unattended security updates.
 | Mail data (RocksDB) | `/opt/ztdmail/data` → `/var/lib/stalwart` |
 | Logs | `/opt/ztdmail/logs` → `/var/log/stalwart` (written to files, not `docker logs`) |
 | Admin | https://mx1.ztdoffice.com/admin — user `admin@ztdoffice.com` |
+| Webmail | https://mail.ztdoffice.com (Bulwark, see below) |
 | Admin password | `/opt/ztdmail/.admin` on the VPS (root-only); rotated 2026-10-19 |
+| Licence | Stalwart **Enterprise**, domain `ztdoffice.com`, 25 mailboxes, valid to 2026-11-23 (trial; auto-renews via the API key, task `renewLicense` 2026-11-19). Keys entered in admin → Settings → Enterprise |
 | Admin 2FA | TOTP enabled 2026-10-19 (password alone is refused) |
 | Admin API key | `/opt/ztdmail/.admin-apikey` (root-only), Bearer auth, only accepted from the VPS itself (localhost + Docker network) — used for automation |
 | Mailbox passwords | `/opt/ztdmail/.mailboxes` on the VPS (root-only) |
@@ -70,7 +72,7 @@ cut -d: -f2- .admin                   # show the admin password
 cat .mailboxes                        # show mailbox passwords
 ```
 
-Listening: SMTP 25, submission 587 (STARTTLS, added 2026-10-19 as listener `submission`),
+Listening (inside the container; HTTPS is reached through nginx, see below): SMTP 25, submission 587 (STARTTLS, added 2026-10-19 as listener `submission`),
 submissions 465 (implicit TLS), IMAPS 993, POP3S 995, ManageSieve 4190, HTTPS 443, plain HTTP 8080
 (bound to localhost only).
 
@@ -122,6 +124,69 @@ domains goes through Resend:
 - Resend only accepts mail whose From domain is verified there. Each client domain must be added
   to Resend (plan limit: 3 domains on Free, 10 on Pro) until the switch to Amazon SES.
 
+## Webmail (Bulwark) and the port-443 router
+
+Webmail: **https://mail.ztdoffice.com** — Bulwark (`ghcr.io/bulwarkmail/webmail:latest`, full
+edition), branded "ZTD Office" with the Studio logo. Container `ztdmail-bulwark` in the same
+compose file, published on `127.0.0.1:3000` only. Config + secrets in `/opt/ztdmail/.bulwark.env`
+(root-only); data in `/opt/ztdmail/bulwark/{settings,admin,admin-state,telemetry}` (owned by uid
+1001); logo mounted from `/opt/ztdmail/branding/ztdoffice-logo.svg`. It talks to Stalwart at
+`JMAP_SERVER_URL=https://mx1.ztdoffice.com`.
+
+iPhone Home Screen icon: Bulwark ships its own `/apple-touch-icon.png` (red shield), which iOS uses
+instead of the manifest icon. nginx overrides `/apple-touch-icon.png` and `/apple-touch-icon-precomposed.png`
+with `/opt/ztdmail/branding/apple-touch-icon.png` (180×180, full-bleed `#00427c` background, made from
+Bulwark's generated `/api/pwa-icon/512`). iOS caches icons: remove and re-add the Home Screen shortcut
+after changing it.
+
+Bulwark admin dashboard: https://mail.ztdoffice.com/admin — password in `/opt/ztdmail/.bulwark-admin`
+(root-only; Bulwark stores only a hash in `bulwark/admin/admin.json`).
+
+Port 443 is shared, so **nginx on the host routes by hostname (SNI)**:
+
+| Port | Listener | Goes to |
+|---|---|---|
+| 443 (public) | nginx `stream` (`/etc/nginx/stream.d/ztdoffice-sni.conf`), `ssl_preread` | `mail.ztdoffice.com` → 127.0.0.1:9443; everything else → 127.0.0.1:8443 |
+| 127.0.0.1:9443 | nginx TLS site (`sites-available/ztdoffice-webmail.conf`), cert from certbot | Bulwark on 127.0.0.1:3000 |
+| 127.0.0.1:8443 | Stalwart's HTTPS (TLS **passthrough**: Stalwart keeps its own certificate and tls-alpn-01 renewals) | `mx1`, `autoconfig`, `autodiscover`, `mta-sts`, `ua-auto-config` |
+| 80 (public) | nginx (`sites-available/ztdoffice-http.conf`) | ACME http-01 for `mail.ztdoffice.com`; everything else redirects to HTTPS |
+
+nginx adds the PROXY protocol header on both paths, and Stalwart's `https` listener trusts it from
+the Docker gateway (`overrideProxyTrustedNetworks: 172.30.0.1/32`), so Stalwart still sees real
+client IPs (verified: a login from the Studio server logged `remoteIp = 129.121.95.175`).
+
+The `mail.ztdoffice.com` certificate is from certbot (webroot `/var/www/certbot`), valid to
+2027-01-17, renewed by `certbot.timer` with a deploy hook that reloads nginx. SMTP/IMAP ports are
+not behind nginx; they go straight to Stalwart.
+
+Because the webmail (`mail.`) and the JMAP server (`mx1.`) are different origins, the browser
+needs CORS on Stalwart: `x:Http.usePermissiveCors = true` (set 2026-10-19; without it, sign-in fails
+with "The server is reachable but is blocking cross-origin requests"). Credentials are still
+required for every JMAP call. Alternative for later: serve JMAP under `mail.ztdoffice.com` so it
+is same-origin and CORS isn't needed.
+
+Verified 2026-10-19: all six HTTPS names answer with valid certificates; the webmail serves the
+"ZTD Office" title, logo and PWA manifest (theme `#00427c`); Bulwark reaches Stalwart's JMAP.
+
+## Calendar invitations
+
+Stalwart sends iMIP invitations itself when the webmail saves an event with guests and "Send
+invitations" ticked (`sendSchedulingMessages`), relayed via Resend like any mail. Verified 2026-10-19:
+Gmail showed a proper invitation with Yes/No/Maybe. Notes:
+
+- **No invitations are sent for events in the past.** An event dated last week silently sends nothing.
+- **Branding (Enterprise):** invitation, RSVP-page and reminder emails use the sender domain's logo.
+  Stalwart looks up domain logo → tenant logo → global default (`x:Enterprise.logoUrl`), **downloads it
+  from a URL** (a base64/data-URI value fails silently and falls back to the Stalwart logo) and caches it
+  until restart. Use **PNG** — Gmail doesn't render SVG. Set 2026-10-19: `ztdoffice.com` logo and the
+  global default both = `https://mail.ztdoffice.com/branding/ztdoffice-email-logo.png` (760×192 wordmark,
+  served by nginx from `/opt/ztdmail/branding/`). The RSVP page fetches `https://mx1.ztdoffice.com/logo`,
+  which returns the same image. Default templates contain no other Stalwart text, so no custom
+  templates are needed. Per-client: set each client domain's (or tenant's) `logo` URL.
+- Bulwark display quirks (upstream, not server): an attendee's reply is shown as an invitation with a
+  "sender isn't the organizer" warning, and UTC times in the invitation card aren't converted to
+  local time.
+
 ## Spam filtering
 
 Stalwart's built-in filter is on with its defaults: score ≥ 5 → delivered to the **Junk Mail**
@@ -139,6 +204,12 @@ disables it. So the VPS runs **Unbound** (`/etc/unbound/unbound.conf.d/ztdmail.c
 Verified 2026-10-19: a message linking to Spamhaus' test domain `dbltest.com` scored 8.8
 (`DBL_SPAM` +4.5) and landed in Junk Mail. Note: this Stalwart version has a `GTUBE_TEST` tag but
 no rule that triggers it, so the classic GTUBE test string does **not** work as a test.
+
+**Score tuning (2026-10-19).** A Gmail calendar reply scored 6.2 and went to Junk: SenderScore
+reputation of Google's shared sending IP was 13 (`RBL_SENDERSCORE_REPUT_1`, +3.5) and Gmail puts the
+recipient's name in calendar-reply subjects (`RCPT_LOCAL_IN_SUBJECT`, +2.0). Lowered: SenderScore
+REPUT_0..7 from 4.0/3.5/3.0/2.5/2.0/1.5/1.0/0.5 to 1.5/1.25/1.0/0.75/0.5/0.25/0/0, and
+RCPT_LOCAL_IN_SUBJECT 2.0 → 1.0 (`x:SpamTag/set`, then restart).
 
 Follow-ups: Spamhaus' free public mirrors are for non-commercial / low-volume use; a commercial
 hosting service should register for Spamhaus DQS. Consider rejecting at a high score (e.g. ≥ 15)

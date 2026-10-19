@@ -7,13 +7,6 @@ Environment: **pilot mail server is live** at mx1.ztdoffice.com (see `docs/vps-p
 
 ## To do
 
-### 6. Deploy Bulwark webmail (full edition) — next
-Owner: Claude · Depends on: 5
-- Docker on the mail VPS, connected to Stalwart, served at https://mail.ztdoffice.com
-- Add mail.ztdoffice.com to the TLS certificate
-- Branding "ZTD Office" + Studio logo, including per-client (per-domain) branding
-- Enable plug-ins (needed for meetings)
-
 ### 10. Monitoring, backups and recovery — next
 Owner: Claude
 - Nightly off-site backups of /opt/ztdmail (mail, accounts, settings, DKIM keys); test a restore
@@ -41,6 +34,7 @@ Owner: Claude
 - Two-factor sign-in, strong password rules (admin: done — TOTP on admin@ztdoffice.com, password alone refused; automation uses an API key locked to the VPS)
 - Spamhaus DQS registration for commercial use of the blocklists
 - Sending limits per mailbox, alerts on spikes (Stalwart)
+- Restrict the Stalwart admin console (https://mx1.ztdoffice.com/admin) to your own connections — home + work VPN — with a Stalwart access rule; everyone else gets refused. Keep the VPS-only API key working. (Admin stays at mx1: same Stalwart service, so a separate admin hostname would only be cosmetic.)
 
 ### 7. Online meetings (Jitsi)
 Owner: Samuel (VPS) + Claude (setup) · Depends on: 6
@@ -66,7 +60,7 @@ Owner: Samuel (AWS account, registrar access) + Claude (setup, control panel)
 Owner: Samuel
 - Terms: domain/account ownership, included support, SLA
 - GDPR data processing agreement
-- Confirm Stalwart free-edition use with Stalwart Labs; AGPL obligations for Stalwart/Bulwark
+- Decided 2026-10-19: Stalwart **Enterprise** licence (see task 21); AGPL obligations for Bulwark
 - Add SIC code 63110 (data processing, hosting) at the next Companies House confirmation statement
 - Search the UK IPO trade mark register for "ZTD" (classes 38 and 42); also "ZTD Office"; register the marks once the service is taking shape (~£170 for the first class)
 - Show registered company name and number on the website, invoices and business emails
@@ -117,6 +111,25 @@ Owner: Samuel + Claude · Depends on: 11, 13, 15, 17
 - Keep Google Workspace / Microsoft 365 as a premium option
 
 ## In progress
+
+### 21. Stalwart Enterprise licence and branding
+Owner: Samuel (licence) + Claude (setup)
+- Done: Enterprise licence active for ztdoffice.com (25 mailboxes, trial to 2026-11-23, auto-renew via API key)
+- Done: ZTD Office logo on invitation/RSVP/reminder emails and the RSVP page (domain + default logo, PNG); admin console logo
+- Samuel: make sure the subscription continues after the trial so renewal on 2026-11-19 succeeds
+- Remaining: multi-tenancy — one tenant per client with its own quotas and logo (foundation for the control panel, task 8)
+- Done: Gmail RSVP loop retested — Maybe/No/Yes replies land in Inbox (score ~2) and update the organizer's calendar (attendee now accepted)
+
+
+### 6. Deploy Bulwark webmail (full edition)
+Owner: Claude + Samuel (login test) · Depends on: 5
+- Done: Bulwark full edition live at https://mail.ztdoffice.com, branded "ZTD Office" + Studio logo, connected to Stalwart
+- Done: nginx SNI router on 443 (webmail vs Stalwart passthrough), certbot certificate for mail.ztdoffice.com, real client IPs preserved
+- Done: Bulwark admin dashboard at https://mail.ztdoffice.com/admin (password root-only on the VPS)
+- Done: signed in on iPhone (inbox loads); iPhone Home Screen icon fixed to the ZTD logo
+- Remaining: Samuel tests send/search/calendar in the webmail
+- Later: per-client (per-domain) branding; enable plug-ins (needed for meetings, task 7)
+
 
 ### 3. Outgoing mail for the pilot (Resend)
 Owner: Samuel (account) + Claude (config)
