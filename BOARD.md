@@ -86,8 +86,16 @@ Owner: Samuel
 - GDPR data processing agreement
 - Confirm Stalwart free-edition use with Stalwart Labs; AGPL obligations for Stalwart/Bulwark
 
+### 19. Managed DNS (your own nameservers)
+Owner: Samuel (AWS account, registrar access) + Claude (setup, control panel)
+- Amazon Route 53 with white-label nameservers ns1–ns4.ztddevs.com (~$40/mo for 300 domains)
+- Create the reusable delegation set; add glue records at the ztddevs.com registrar
+- Control panel creates each client's zone and records via the AWS API (website, MX, SPF, DKIM, DMARC)
+- Client move process: copy existing records first, turn off DNSSEC at the old provider, then the client switches nameservers
+- Don't host nameservers on the mail VPS
+
 ### 16. Pilot
-Owner: Samuel + Claude · Depends on: 5–10, 12, 14
+Owner: Samuel + Claude · Depends on: 5–10, 12, 14, 19
 - Pilot with 10–20 willing clients for a few months
 
 ### 17. Switch outgoing mail to Amazon SES
