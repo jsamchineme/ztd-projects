@@ -25,6 +25,11 @@ const expected = [
   ['SRV', '_jmap._tcp', `0 1 443 ${MX}`],
   ['SRV', '_caldavs._tcp', `0 1 443 ${MX}`],
   ['SRV', '_carddavs._tcp', `0 1 443 ${MX}`],
+  // Resend (outgoing mail relay)
+  ['TXT', 'resend._domainkey', 'p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6LPPvpusG5FVstUCvoqzKubZuSDnhL+9pMiANzjAC3swWMxMXVqeHlE0+Ai4mdBi+LQ3sG3mMv8MxZ2CpAhisIaekZqd00be8qD7ZBb4k+s8PRg/ePS2v202uWmKfrOXAlXTyX+CYCB0aPRKOMdLhCoYVBhp3QdG27+NaiImwAwIDAQAB'],
+  ['MX', 'send', '10 feedback-smtp.eu-west-1.amazonses.com.'],
+  ['TXT', 'send', 'v=spf1 include:amazonses.com ~all'],
+  ['CNAME', 'rsend', 'send.forge.rmta.net.'],
 ];
 
 const TYPE = { A: 1, CNAME: 5, MX: 15, TXT: 16, SRV: 33 };

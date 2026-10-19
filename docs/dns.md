@@ -73,12 +73,23 @@ The MTA-STS policy (`https://mta-sts.ztdoffice.com/.well-known/mta-sts.txt`) is 
 | `_caldavs` | `_tcp` | 0 | 1 | 443 | `mx1.ztdoffice.com` |
 | `_carddavs` | `_tcp` | 0 | 1 | 443 | `mx1.ztdoffice.com` |
 
+## Resend (outgoing mail)
+
+`ztdoffice.com` was added to Resend on 2026-10-19 (sending only, region eu-west-1, domain id
+`8ae98bee-dd9a-4750-99a6-10693e07cd35`). Resend signs with its own DKIM key and uses
+`send.ztdoffice.com` as the bounce (Return-Path) domain.
+
+| Type | Host | Value | Priority |
+|---|---|---|---|
+| TXT | `resend._domainkey` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6LPPvpusG5FVstUCvoqzKubZuSDnhL+9pMiANzjAC3swWMxMXVqeHlE0+Ai4mdBi+LQ3sG3mMv8MxZ2CpAhisIaekZqd00be8qD7ZBb4k+s8PRg/ePS2v202uWmKfrOXAlXTyX+CYCB0aPRKOMdLhCoYVBhp3QdG27+NaiImwAwIDAQAB` | |
+| MX | `send` | `feedback-smtp.eu-west-1.amazonses.com` | 10 |
+| TXT | `send` | `v=spf1 include:amazonses.com ~all` | |
+| CNAME | `rsend` | `send.forge.rmta.net` | |
+
 ## Deliberately not set (yet)
 
 - **`_pop3s` SRV**: POP3 (995) isn't open in the firewall.
 - **CAA**: would pin certificates to this server's Let's Encrypt account; add once the setup is stable.
-- **Resend records** (DKIM `resend._domainkey` and the `send` subdomain): added when `ztdoffice.com`
-  is set up in Resend for outgoing mail.
 
 ## Later changes to make
 
