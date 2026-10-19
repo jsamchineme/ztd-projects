@@ -558,6 +558,24 @@ table.commits td:first-child, table.commits td:nth-child(n+3) { width: 1%; white
 .task-actions .ico { width: 16px; height: 16px; }
 .task-edit { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line-strong); border-radius: var(--r); padding: 10px; }
 .board-add { align-self: flex-start; color: var(--muted); }
+.board-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.board-filters .input-wrap { width: 240px; max-width: 100%; }
+.board-labels, .label-picks, .task-labels { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.task-labels { margin-top: 7px; }
+.label { --lc: #6b7280; display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1;
+  background: color-mix(in srgb, var(--lc) 16%, var(--panel)); color: color-mix(in srgb, var(--lc) 78%, var(--text)); border: 1px solid color-mix(in srgb, var(--lc) 30%, transparent); white-space: nowrap; }
+.label.lc0 { --lc: #2563eb; } .label.lc1 { --lc: #16a34a; } .label.lc2 { --lc: #d97706; } .label.lc3 { --lc: #dc2626; }
+.label.lc4 { --lc: #7c3aed; } .label.lc5 { --lc: #0891b2; } .label.lc6 { --lc: #db2777; } .label.lc7 { --lc: #65a30d; }
+.label-pick { all: unset; box-sizing: border-box; cursor: pointer; border-radius: 999px; opacity: .5; }
+.label-pick[aria-pressed="true"] { opacity: 1; box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent); }
+.label-pick:hover { opacity: .85; } .label-pick[aria-pressed="true"]:hover { opacity: 1; }
+.label-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.label-picks .label-new { width: 92px; min-height: 26px; height: 26px; padding: 2px 8px; font-size: 12.5px; border-radius: 999px; }
+.label-admin { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--r); max-height: 50vh; overflow-y: auto; }
+.label-admin > p { margin: 0; padding: 12px; }
+.label-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--line); }
+.label-row:last-child { border-bottom: 0; }
+.label-row input { flex: 1; min-height: 34px; }
 @media (max-width: 860px) { .board { grid-template-columns: minmax(0, 1fr); } }
 
 .files-layout { flex: 1; display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 0; }
