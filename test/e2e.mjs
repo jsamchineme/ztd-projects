@@ -211,11 +211,19 @@ await check('Board tab: Claude adds a task from a chat; tasks are added, moved, 
   await page.keyboard.press('Enter');
   await page.locator('.result-line').waitFor({ timeout: 15000 });
   await page.waitForFunction(() => !document.querySelector('.send.stop'));
+  // Claude may group tasks under ### headings, with lines about the group (owners and such) under the heading.
+  writeFileSync(file, board().replace('## In progress', '### 1. Mail server\nOwner: Samuel · Depends on: 3\n- Order the VPS\n\n## In progress'));
   await page.click('.tab:has-text("Board")');
   const todo = page.locator('.board-col', { hasText: 'To do' }), doing = page.locator('.board-col', { hasText: 'In progress' }), done = page.locator('.board-col', { hasText: 'Done' });
   await todo.locator('.task', { hasText: 'Task from the chat' }).waitFor();
   await todo.locator('.task-notes', { hasText: 'Added by the fake Claude.' }).waitFor();
-  await todo.locator('.board-add').click();
+  const group = todo.locator('.board-group', { hasText: '1. Mail server' });
+  await group.locator('.board-group-text', { hasText: 'Owner: Samuel · Depends on: 3' }).waitFor();
+  await group.locator('.task', { hasText: 'Order the VPS' }).locator('button[aria-label="Move to In progress"]').click();
+  await doing.locator('.board-group', { hasText: '1. Mail server' }).locator('.task', { hasText: 'Order the VPS' }).waitFor();
+  if (!/## In progress\n\n### 1\. Mail server\n- Order the VPS/.test(board()) || !board().includes('### 1. Mail server\nOwner: Samuel'))
+    throw new Error('the task didn’t keep its group when moved:\n' + board());
+  await todo.locator('.board-add', { hasText: 'Add task' }).click();
   await todo.locator('input[aria-label="Task"]').fill('Make the logo bigger');
   await todo.locator('textarea[aria-label="Notes"]').fill('Twice as big');
   await todo.locator('button:has-text("Add task")').click();

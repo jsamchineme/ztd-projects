@@ -818,7 +818,7 @@ async function boardTab(ctx){
   inner.append(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Board'),
     h('p', null, 'What’s to do, in progress and done. Ask Claude in a chat to add or move tasks, or change them here. It’s kept in BOARD.md in the project, so it shows in Changes too.'))), cols);
   let data = null, saving = false, dragging = null;
-  const editing = () => saving || dragging || cols.contains(document.activeElement) && document.activeElement.matches('input, textarea');
+  const editing = () => saving || dragging || cols.querySelector('.task-edit');
 
   async function load(quiet){
     try {
@@ -837,7 +837,16 @@ async function boardTab(ctx){
     finally { saving = false; }
     paint();
   }
-  const move = (from, i, to, at) => save(b => { const [t] = b.columns[from].tasks.splice(i, 1); b.columns[to].tasks.splice(at ?? b.columns[to].tasks.length, 0, t); });
+  // A task is found by its place: column, group, index. Moved to another column, it goes into the group there with the
+  // same title (made if needed), so a task keeps its heading; at: the index there to put it at, or the end.
+  const move = (from, to, at) => save(b => {
+    const [t] = b.columns[from.ci].groups[from.gi].tasks.splice(from.ti, 1);
+    const title = b.columns[from.ci].groups[from.gi].title, col = b.columns[to.ci];
+    let g = to.gi ?? col.groups.findIndex(x => x.title === title);
+    if (g < 0){ col.groups.push({ title, text: '', tasks: [] }); g = col.groups.length - 1; }
+    col.groups[g].tasks.splice(at ?? col.groups[g].tasks.length, 0, t);
+  });
+  const total = c => c.groups.reduce((n, g) => n + g.tasks.length, 0);
 
   function editor(task, done){
     const text = h('input', { type: 'text', value: task?.text || '', maxlength: 500, placeholder: 'What needs doing?', 'aria-label': 'Task' });
@@ -849,40 +858,50 @@ async function boardTab(ctx){
     return form;
   }
 
+  function card(columns, ci, gi, ti, t){
+    const last = columns.length - 1;
+    const el = h('div', { class: 'task' + (ci === last && last > 0 ? ' done' : ''), draggable: 'true' },
+      h('div', { class: 'task-text' }, t.text),
+      t.notes ? h('div', { class: 'task-notes' }, t.notes) : null,
+      h('div', { class: 'task-actions' },
+        h('button', { class: 'icon-btn', title: `Move to ${columns[ci - 1]?.name}`, 'aria-label': `Move to ${columns[ci - 1]?.name}`, hidden: ci === 0, onclick: () => move({ ci, gi, ti }, { ci: ci - 1 }) }, '←'),
+        h('button', { class: 'icon-btn', title: `Move to ${columns[ci + 1]?.name}`, 'aria-label': `Move to ${columns[ci + 1]?.name}`, hidden: ci === last, onclick: () => move({ ci, gi, ti }, { ci: ci + 1 }) }, '→'),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'icon-btn', title: 'Edit', 'aria-label': 'Edit task', onclick: () => el.replaceWith(editor(t, n => n ? save(b => { b.columns[ci].groups[gi].tasks[ti] = n; }) : paint())) }, ico('edit')),
+        h('button', { class: 'icon-btn', title: 'Delete', 'aria-label': 'Delete task', onclick: async () => { if (await confirmDialog('Delete this task?', `“${t.text}” is removed from the board.`, 'Delete task', true)) save(b => { b.columns[ci].groups[gi].tasks.splice(ti, 1); }); } }, ico('trash'))));
+    el.addEventListener('dragstart', e => { dragging = { ci, gi, ti }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', t.text); el.classList.add('dragging'); });
+    el.addEventListener('dragend', () => { dragging = null; el.classList.remove('dragging'); });
+    el.addEventListener('dragover', e => { if (dragging){ e.preventDefault(); el.classList.add('drop-before'); } });
+    el.addEventListener('dragleave', () => el.classList.remove('drop-before'));
+    el.addEventListener('drop', e => {
+      e.preventDefault(); e.stopPropagation();
+      const d = dragging; dragging = null;
+      if (!d || (d.ci === ci && d.gi === gi && d.ti === ti)) return paint();
+      move(d, { ci, gi }, d.ci === ci && d.gi === gi && d.ti < ti ? ti - 1 : ti);
+    });
+    return el;
+  }
+
   function paint(){
     const { columns } = data.board;
     cols.style.setProperty('--cols', columns.length);
     cols.replaceChildren(...columns.map((c, ci) => {
-      const list = h('div', { class: 'board-tasks' });
-      const add = h('button', { class: 'btn small ghost board-add', onclick: () => add.replaceWith(editor(null, t => t ? save(b => b.columns[ci].tasks.push(t)) : paint())) }, ico('plus'), 'Add task');
-      list.append(...c.tasks.map((t, ti) => {
-        const card = h('div', { class: 'task' + (ci === columns.length - 1 && columns.length > 1 ? ' done' : ''), draggable: 'true' },
-          h('div', { class: 'task-text' }, t.text),
-          t.notes ? h('div', { class: 'task-notes' }, t.notes) : null,
-          h('div', { class: 'task-actions' },
-            h('button', { class: 'icon-btn', title: `Move to ${columns[ci - 1]?.name}`, 'aria-label': `Move to ${columns[ci - 1]?.name}`, hidden: ci === 0, onclick: () => move(ci, ti, ci - 1) }, '←'),
-            h('button', { class: 'icon-btn', title: `Move to ${columns[ci + 1]?.name}`, 'aria-label': `Move to ${columns[ci + 1]?.name}`, hidden: ci === columns.length - 1, onclick: () => move(ci, ti, ci + 1) }, '→'),
-            h('div', { class: 'spacer' }),
-            h('button', { class: 'icon-btn', title: 'Edit', 'aria-label': 'Edit task', onclick: () => card.replaceWith(editor(t, n => n ? save(b => { b.columns[ci].tasks[ti] = n; }) : paint())) }, ico('edit')),
-            h('button', { class: 'icon-btn', title: 'Delete', 'aria-label': 'Delete task', onclick: async () => { if (await confirmDialog('Delete this task?', `“${t.text}” is removed from the board.`, 'Delete task', true)) save(b => { b.columns[ci].tasks.splice(ti, 1); }); } }, ico('trash'))));
-        card.addEventListener('dragstart', e => { dragging = { ci, ti }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', t.text); card.classList.add('dragging'); });
-        card.addEventListener('dragend', () => { dragging = null; card.classList.remove('dragging'); });
-        card.addEventListener('dragover', e => { if (dragging){ e.preventDefault(); card.classList.add('drop-before'); } });
-        card.addEventListener('dragleave', () => card.classList.remove('drop-before'));
-        card.addEventListener('drop', e => {
-          e.preventDefault(); e.stopPropagation();
-          const d = dragging; dragging = null;
-          if (d && !(d.ci === ci && d.ti === ti)) move(d.ci, d.ti, ci, d.ci === ci && d.ti < ti ? ti - 1 : ti); else paint();
-        });
-        return card;
-      }));
+      const add = (gi, label) => {
+        const btn = h('button', { class: 'btn small ghost board-add', onclick: () => btn.replaceWith(editor(null, t => t ? save(b => b.columns[ci].groups[gi].tasks.push(t)) : paint())) }, ico('plus'), label);
+        return btn;
+      };
+      const groups = c.groups.map((g, gi) => g.title || g.tasks.length ? h('div', { class: 'board-group' + (g.title ? ' titled' : '') },
+        g.title ? h('div', { class: 'board-group-head' }, h('h4', null, g.title), h('span', { class: 'count' }, g.tasks.length)) : null,
+        g.text ? h('p', { class: 'board-group-text' }, g.text) : null,
+        h('div', { class: 'board-tasks' }, g.tasks.map((t, ti) => card(columns, ci, gi, ti, t))),
+        g.title ? add(gi, 'Add here') : null) : null);
       const col = h('section', { class: 'board-col', 'aria-label': c.name },
-        h('div', { class: 'board-col-head' }, h('h3', null, c.name), h('span', { class: 'count' }, c.tasks.length)),
+        h('div', { class: 'board-col-head' }, h('h3', null, c.name), h('span', { class: 'count' }, total(c))),
         c.intro ? h('p', { class: 'small muted board-intro' }, c.intro) : null,
-        list, add);
+        add(0, 'Add task'), ...groups);
       col.addEventListener('dragover', e => { if (dragging){ e.preventDefault(); col.classList.add('drop'); } });
       col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('drop'); });
-      col.addEventListener('drop', e => { e.preventDefault(); const d = dragging; dragging = null; col.classList.remove('drop'); if (d) move(d.ci, d.ti, ci); });
+      col.addEventListener('drop', e => { e.preventDefault(); const d = dragging; dragging = null; col.classList.remove('drop'); if (d && d.ci !== ci) move(d, { ci }); else paint(); });
       return col;
     }));
   }
