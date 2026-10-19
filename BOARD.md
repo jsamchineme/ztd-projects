@@ -1,7 +1,8 @@
 # Board
 
-Stack: **Stalwart** (mail server) · **Amazon SES** (outgoing mail) · **Bulwark** (webmail) · **Jitsi Meet** (meetings) · this app (**control panel**).
+Stack: **Stalwart** (mail server) · **Resend** for outgoing mail during the pilot, **Amazon SES** before rollout · **Bulwark** (webmail) · **Jitsi Meet** (meetings) · this app (**control panel**).
 Owner: **Samuel** = needs your accounts/decisions · **Claude** = build/config work.
+Environment: **develop and test locally on the Mac** (Stalwart + Bulwark in Docker, outbound via Resend SMTP). Real inbound mail from the internet needs the VPS, which comes at pilot time.
 
 ## To do
 
@@ -15,22 +16,30 @@ Owner: Samuel
 - Choose product name
 - Buy a dedicated platform domain (not ztddevs.com) for mail hostnames, e.g. mail.<platform-domain>
 
-### 3. Amazon SES setup
+### 3. Outgoing mail for the pilot (Resend)
 Owner: Samuel (account) + Claude (config)
-- Create AWS account, verify sending domain (Easy DKIM), create SMTP credentials
-- Request production access (takes ~1 day; start early)
-- Set up tenants (one per client) with automatic reputation policy
+- Upgrade Resend to Pro + 100 extra domains (~$40/mo) for 10–20 pilot clients
+- Email Resend to confirm hosting client mailboxes is within their usage policy
+- Verify each pilot client domain in Resend
+- Request SES production access now so it's ready before rollout (see 17)
 
-### 4. Mail server VPS
-Owner: Samuel (order) + Claude (setup)
+### 4. Local dev environment (Mac)
+Owner: Claude · Needs: Docker Desktop running
+- Stalwart + Bulwark via docker-compose in the repo (data volumes + secrets gitignored)
+- Outbound through Resend SMTP relay; test internal + outbound-to-real-address send
+- This is where tasks 5, 6, 8, 9 are built and tested before the VPS
+
+### 4b. Mail server VPS (pilot)
+Owner: Samuel (order) + Claude (setup) · When: pilot time
 - Ubuntu 24.04, 2 vCPU / 4 GB+ RAM, root access, UK/EU location
 - Ports 25, 443, 465, 587, 993 open; reverse DNS set to mail hostname
 - Off-site backup storage
+- Deploy the same compose stack from local dev; enables real inbound mail
 
 ### 5. Install and configure Stalwart
 Owner: Claude · Depends on: 3, 4
 - HTTPS certificate, admin console
-- Route outgoing mail through SES
+- Route outgoing mail through Resend's SMTP relay (smtp.resend.com:465)
 - DNS per domain: MX, SPF, DKIM, DMARC
 - Spam filtering, mailbox quotas
 - Test send/receive with Gmail; connect Outlook and phones
@@ -50,17 +59,15 @@ Owner: Samuel (VPS) + Claude (setup) · Depends on: 6
 
 ### 8. Control panel (this app)
 Owner: Claude · Depends on: 3, 5
-- Replace Resend with Stalwart management (JMAP) + SES API
+- Switch mailbox management to Stalwart (JMAP); keep Resend domain API for the pilot
 - Clients → domains → mailboxes (create, suspend, reset password, quotas)
 - Generate DNS records per client domain and check they're live
-- Create SES identity + tenant per client
 - Per-mailbox sending limits and volume alerts
 
 ### 9. Security and abuse protection
 Owner: Claude
 - Two-factor sign-in, strong password rules
-- Sending limits per mailbox, alerts on spikes
-- SES tenant pausing so one hacked account can't stop everyone's mail
+- Sending limits per mailbox, alerts on spikes (Stalwart)
 
 ### 10. Monitoring, backups and recovery
 Owner: Claude
@@ -68,19 +75,10 @@ Owner: Claude
 - Nightly off-site backups; test a restore
 - DMARC report monitoring
 
-### 11. Billing integration
-Owner: Samuel (choose system) + Claude
-- Link mailbox creation/suspension to your billing system
-- Pricing: base mailbox price; meetings as an add-on
-
 ### 12. Migration process
 Owner: Claude
 - Import old mail from clients' current providers (IMAP import)
 - Step-by-step switch-over checklist (DNS cutover without lost mail)
-
-### 13. Client setup guides
-Owner: Claude (drafts) + Samuel (review)
-- Outlook, iPhone/iPad, Android, Mac Mail, webmail, meetings
 
 ### 14. Legal and commercial
 Owner: Samuel
@@ -88,16 +86,49 @@ Owner: Samuel
 - GDPR data processing agreement
 - Confirm Stalwart free-edition use with Stalwart Labs; AGPL obligations for Stalwart/Bulwark
 
+### 16. Pilot
+Owner: Samuel + Claude · Depends on: 5–10, 12, 14
+- Pilot with 10–20 willing clients for a few months
+
+### 17. Switch outgoing mail to Amazon SES
+- AWS account; SES production access (requested in 3)
+
+## Before rollout
+
+### 11. Billing integration
+Owner: Samuel (choose system) + Claude
+- Pilot: invoice the 10–20 pilot clients manually
+- Link mailbox creation/suspension to your billing system
+- Pricing: base mailbox price; meetings as an add-on
+
+### 13. Client setup guides
+Owner: Claude (drafts) + Samuel (review) · Draft during the pilot from real client questions
+- Outlook, iPhone/iPad, Android, Mac Mail, webmail, meetings
+
 ### 15. Support desk
 Owner: Samuel (choose tool) + Claude
+- Pilot: handle support by email/phone
 - Ticketing system for email support
 
-### 16. Pilot and rollout
-Owner: Samuel + Claude · Depends on: 5–13
-- Pilot with 10–20 willing clients for a few months
-- Migrate the rest in batches
+### 17. Switch outgoing mail to Amazon SES
+Owner: Samuel (account) + Claude (config) · Depends on: 16
+- Add SES DNS records alongside the Resend ones ahead of time, so cutover has no downtime
+- Switch Stalwart's relay from Resend to SES
+- Control panel: create SES identity + tenant per client
+- Tenants with automatic reputation policy, so one hacked account can't stop everyone's mail
+- Cancel the Resend plan once all mail goes through SES
+- Verify each client domain in SES (Easy DKIM) and create SMTP credentials
+
+### 18. Rollout
+Owner: Samuel + Claude · Depends on: 11, 13, 15, 17
+- Migrate the remaining clients in batches
 - Keep Google Workspace / Microsoft 365 as a premium option
 
 ## In progress
+
+### 4. Local dev environment (Mac)
+Owner: Claude · Needs: Samuel to run Stalwart's 2-min first-time setup
+- Done: docker-compose stack (Stalwart + Bulwark "ZTD Mail", Studio logo), both containers running
+- Remaining: complete Stalwart initial setup in browser, add test domain + mailboxes (see dev/README.md)
 
 ## Done

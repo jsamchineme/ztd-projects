@@ -1,0 +1,44 @@
+# ZTD Mail — local development stack (Mac).
+# Stalwart (mail server) + Bulwark (webmail). Outbound relays through Resend (set in .env).
+# Data + secrets stay local (gitignored). Bring up:  cd dev && docker compose up -d
+services:
+  stalwart:
+    image: stalwartlabs/stalwart:latest
+    container_name: ztdmail-stalwart
+    restart: unless-stopped
+    # First boot prints a one-time bootstrap admin password to the logs; it persists in
+    # the ./stalwart volume afterwards. (STALWART_RECOVERY_ADMIN is NOT used — it forces
+    # recovery mode, which disables the management API and mail services.)
+    ports:
+      - "8080:8080"   # web admin + JMAP + .well-known (http, dev only)
+      - "1025:25"     # inbound SMTP (host 1025 -> container 25)
+      - "1587:587"    # submission (STARTTLS)
+      - "1465:465"    # submission (implicit TLS)
+      - "1143:143"    # IMAP
+      - "1993:993"    # IMAPS
+    volumes:
+      - ./stalwart:/opt/stalwart
+
+  bulwark:
+    image: ghcr.io/bulwarkmail/webmail:latest
+    container_name: ztdmail-bulwark
+    restart: unless-stopped
+    depends_on: [stalwart]
+    environment:
+      JMAP_SERVER_URL: "http://stalwart:8080"
+      APP_NAME: "ZTD Mail"
+      APP_SHORT_NAME: "ZTD Mail"
+      # Branding — served by the control-panel app (public, stable URL).
+      FAVICON_URL: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
+      LOGIN_LOGO_URL: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
+      LOGIN_LOGO_URL_DARK: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
+      SIDEBAR_LOGO_URL: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
+      SIDEBAR_LOGO_URL_DARK: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
+      LOGIN_COMPANY_NAME: "ZTD Devs"
+      LOGIN_COMPANY_URL: "https://ztddevs.com"
+    ports:
+      - "3000:3000"   # webmail UI -> http://localhost:3000
+    volumes:
+      - ./bulwark/settings:/app/data/settings
+      - ./bulwark/admin:/app/data/admin
+      - ./bulwark/admin-state:/app/data/admin-state

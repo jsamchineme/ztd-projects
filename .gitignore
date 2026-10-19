@@ -1,3 +1,8 @@
 node_modules/
 .env
 data/
+
+# local dev stack (Stalwart/Bulwark data + secrets)
+dev/.env
+dev/stalwart/
+dev/bulwark/
