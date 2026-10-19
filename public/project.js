@@ -1,4 +1,4 @@
-// A project: chat with Claude, running services, changes, files and settings.
+// A project: chat with Claude, its task board, running services, changes, files and settings.
 import { h, $, fill, onTap, api, toast, fail, busy, dialog, confirmDialog, field, ago, md, copy, ico, enhanceCode } from './ui.js';
 import { state, go, onLeave, refreshProjects, setTitle, setTopbar, hideTopbar, localStorageSet, localStorageGet, renderSideProjects, sideChats, projectState } from './app.js';
 import { runStudioUpdate } from './people.js';
@@ -10,7 +10,7 @@ const sizeText = n => n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024
 // A line icon in the style of Claude.ai's composer (drawn here; they take the button's text colour).
 const icon = paths => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
 const MIC_ICON = icon('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>');
-const TABS = [['chat', 'Chat', 'chat'], ['services', 'Services', 'server'], ['changes', 'Changes', 'git'], ['files', 'Files', 'folder'], ['settings', 'Settings', 'sliders']];
+const TABS = [['chat', 'Chat', 'chat'], ['board', 'Board', 'list'], ['services', 'Services', 'server'], ['changes', 'Changes', 'git'], ['files', 'Files', 'folder'], ['settings', 'Settings', 'sliders']];
 
 export async function renderProject(main, id, tab, sub){
   let project;
@@ -79,6 +79,7 @@ export async function renderProject(main, id, tab, sub){
   sideChatList(ctx);
 
   if (tab === 'chat') return chatTab(ctx, sub);
+  if (tab === 'board') return boardTab(ctx);
   if (tab === 'services') return servicesTab(ctx);
   if (tab === 'changes') return changesTab(ctx);
   if (tab === 'files') return filesTab(ctx);
@@ -802,6 +803,97 @@ async function changesTab(ctx){
     }
   }
   load().catch(e => inner.replaceChildren(h('div', { class: 'error-box' }, e.message)));
+}
+
+// =====================================================================
+// Board: the project's tasks, kept in BOARD.md in its repo (lib/board.mjs). Claude adds and moves them when asked in a
+// chat; people can here too. Every save sends the hash of the board it started from, so Claude's edits aren't lost.
+// =====================================================================
+async function boardTab(ctx){
+  const page = h('div', { class: 'page', style: { flex: 1 } });
+  const inner = h('div', { class: 'page-inner wide' });
+  const cols = h('div', { class: 'board' });
+  page.append(inner);
+  ctx.body.append(page);
+  inner.append(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Board'),
+    h('p', null, 'What’s to do, in progress and done. Ask Claude in a chat to add or move tasks, or change them here. It’s kept in BOARD.md in the project, so it shows in Changes too.'))), cols);
+  let data = null, saving = false, dragging = null;
+  const editing = () => saving || dragging || cols.contains(document.activeElement) && document.activeElement.matches('input, textarea');
+
+  async function load(quiet){
+    try {
+      const d = await api('GET', `/api/projects/${ctx.id}/board`);
+      if (quiet && (editing() || d.hash === data?.hash)) return;
+      data = d; paint();
+    } catch (e){ if (!quiet) cols.replaceChildren(h('div', { class: 'error-box' }, e.message)); }
+  }
+  // change(board) edits a copy of the board; it's saved, and painted once saved.
+  async function save(change){
+    const board = structuredClone(data.board);
+    change(board);
+    saving = true;
+    try { data = await api('PUT', `/api/projects/${ctx.id}/board`, { board, hash: data.hash }); }
+    catch (e){ fail(e); if (e.status === 409) data = await api('GET', `/api/projects/${ctx.id}/board`).catch(() => data); }
+    finally { saving = false; }
+    paint();
+  }
+  const move = (from, i, to, at) => save(b => { const [t] = b.columns[from].tasks.splice(i, 1); b.columns[to].tasks.splice(at ?? b.columns[to].tasks.length, 0, t); });
+
+  function editor(task, done){
+    const text = h('input', { type: 'text', value: task?.text || '', maxlength: 500, placeholder: 'What needs doing?', 'aria-label': 'Task' });
+    const notes = h('textarea', { rows: 2, placeholder: 'Notes (optional)', 'aria-label': 'Notes', value: task?.notes || '' });
+    const form = h('form', { class: 'task-edit', onsubmit: e => { e.preventDefault(); if (text.value.trim()) done({ text: text.value.trim(), notes: notes.value.trim() }); } },
+      text, notes, h('div', { class: 'row end' }, h('button', { class: 'btn small', type: 'button', onclick: () => done(null) }, 'Cancel'), h('button', { class: 'btn small primary', type: 'submit' }, task ? 'Save' : 'Add task')));
+    form.addEventListener('keydown', e => { if (e.key === 'Escape') done(null); });
+    setTimeout(() => text.focus());
+    return form;
+  }
+
+  function paint(){
+    const { columns } = data.board;
+    cols.style.setProperty('--cols', columns.length);
+    cols.replaceChildren(...columns.map((c, ci) => {
+      const list = h('div', { class: 'board-tasks' });
+      const add = h('button', { class: 'btn small ghost board-add', onclick: () => add.replaceWith(editor(null, t => t ? save(b => b.columns[ci].tasks.push(t)) : paint())) }, ico('plus'), 'Add task');
+      list.append(...c.tasks.map((t, ti) => {
+        const card = h('div', { class: 'task' + (ci === columns.length - 1 && columns.length > 1 ? ' done' : ''), draggable: 'true' },
+          h('div', { class: 'task-text' }, t.text),
+          t.notes ? h('div', { class: 'task-notes' }, t.notes) : null,
+          h('div', { class: 'task-actions' },
+            h('button', { class: 'icon-btn', title: `Move to ${columns[ci - 1]?.name}`, 'aria-label': `Move to ${columns[ci - 1]?.name}`, hidden: ci === 0, onclick: () => move(ci, ti, ci - 1) }, '←'),
+            h('button', { class: 'icon-btn', title: `Move to ${columns[ci + 1]?.name}`, 'aria-label': `Move to ${columns[ci + 1]?.name}`, hidden: ci === columns.length - 1, onclick: () => move(ci, ti, ci + 1) }, '→'),
+            h('div', { class: 'spacer' }),
+            h('button', { class: 'icon-btn', title: 'Edit', 'aria-label': 'Edit task', onclick: () => card.replaceWith(editor(t, n => n ? save(b => { b.columns[ci].tasks[ti] = n; }) : paint())) }, ico('edit')),
+            h('button', { class: 'icon-btn', title: 'Delete', 'aria-label': 'Delete task', onclick: async () => { if (await confirmDialog('Delete this task?', `“${t.text}” is removed from the board.`, 'Delete task', true)) save(b => { b.columns[ci].tasks.splice(ti, 1); }); } }, ico('trash'))));
+        card.addEventListener('dragstart', e => { dragging = { ci, ti }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', t.text); card.classList.add('dragging'); });
+        card.addEventListener('dragend', () => { dragging = null; card.classList.remove('dragging'); });
+        card.addEventListener('dragover', e => { if (dragging){ e.preventDefault(); card.classList.add('drop-before'); } });
+        card.addEventListener('dragleave', () => card.classList.remove('drop-before'));
+        card.addEventListener('drop', e => {
+          e.preventDefault(); e.stopPropagation();
+          const d = dragging; dragging = null;
+          if (d && !(d.ci === ci && d.ti === ti)) move(d.ci, d.ti, ci, d.ci === ci && d.ti < ti ? ti - 1 : ti); else paint();
+        });
+        return card;
+      }));
+      const col = h('section', { class: 'board-col', 'aria-label': c.name },
+        h('div', { class: 'board-col-head' }, h('h3', null, c.name), h('span', { class: 'count' }, c.tasks.length)),
+        c.intro ? h('p', { class: 'small muted board-intro' }, c.intro) : null,
+        list, add);
+      col.addEventListener('dragover', e => { if (dragging){ e.preventDefault(); col.classList.add('drop'); } });
+      col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('drop'); });
+      col.addEventListener('drop', e => { e.preventDefault(); const d = dragging; dragging = null; col.classList.remove('drop'); if (d) move(d.ci, d.ti, ci); });
+      return col;
+    }));
+  }
+
+  cols.append(h('p', { class: 'muted' }, 'Loading the board…'));
+  await load();
+  // Tasks Claude adds or moves show up by themselves.
+  const t = setInterval(() => { if (!document.hidden) load(true); }, 10000);
+  const onVisible = () => { if (!document.hidden) load(true); };
+  document.addEventListener('visibilitychange', onVisible);
+  onLeave(() => { clearInterval(t); document.removeEventListener('visibilitychange', onVisible); });
 }
 
 // =====================================================================

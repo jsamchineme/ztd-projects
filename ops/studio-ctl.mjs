@@ -325,6 +325,13 @@ WantedBy=multi-user.target
     if (r.status !== 0) die('Cannot read that file', 1);
     process.stdout.write(r.stdout);
   },
+  // The project's task board (lib/board.mjs), edited in Studio's Board tab. Only this one file can be written.
+  'board-write'(p){
+    const text = readStdin();
+    if (Buffer.byteLength(text) > 200000) die('Board too big');
+    const r = asUser(userOf(p), ['tee', join(repo(p), 'BOARD.md')], { input: text, stdio: ['pipe', 'ignore', 'pipe'] });
+    if (r.status !== 0) die('Cannot write the board: ' + String(r.stderr || '').trim(), 1);
+  },
 
   // ----- backing up every project to one GitHub repo, a branch per project (ops/github-backup.sh) -----
   'github-backup'(action = 'status', flag){

@@ -70,6 +70,13 @@ if (args[0] === 'setup-token'){
     const remembers = i < 0 ? 0 : existsSync(transcript) ? readFileSync(transcript, 'utf8').split('\n').filter(Boolean).length : 'nothing (no transcript)';
     mkdirSync(dir, { recursive: true });
     appendFileSync(transcript, JSON.stringify({ type: 'user', cwd: process.cwd(), prompt: prompt.slice(0, 200) }) + '\n');
+    // "on the board": adds a task to the project's board (BOARD.md, lib/board.mjs), as the system prompt asks.
+    if (/on the board/i.test(prompt)){
+      const board = existsSync('BOARD.md') ? readFileSync('BOARD.md', 'utf8') : '# Board\n\n## To do\n\n## In progress\n\n## Done\n';
+      writeFileSync('BOARD.md', board.replace(/^## To do\n/m, '## To do\n- Task from the chat\n  Added by the fake Claude.\n'));
+      out({ type: 'assistant', message: { content: [{ type: 'tool_use', id: 't3', name: 'Edit', input: { file_path: process.cwd() + '/BOARD.md' } }] } });
+      out({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 't3', content: 'File updated', is_error: false }] } });
+    }
     let edited = false;
     if (/edit|change|write/i.test(prompt)){
       writeFileSync('STUDIO-TEST.md', `Written by the fake Claude.\n\nPrompt: ${prompt}\n`);

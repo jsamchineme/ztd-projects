@@ -87,6 +87,7 @@ switch (cmd){
   }
   case 'ls': process.stdout.write(spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], { cwd: repo(a[0]), encoding: 'utf8' }).stdout); break;
   case 'cat': process.stdout.write(readFileSync(join(repo(a[0]), readStdin().trim()), 'utf8')); break;
+  case 'board-write': writeFileSync(join(repo(a[0]), 'BOARD.md'), readStdin()); break;
   // Studio self-update: pretend there is one new commit; "updating" finishes at once.
   case 'studio-source': console.log(JSON.stringify({ project: 'pipeline', path: 'studio', head: { hash: 'b'.repeat(40), author: 'Test', date: new Date().toISOString(), subject: 'New Studio feature' },
     pending: a[0] && a[0] !== '-' ? [{ hash: 'b'.repeat(40), author: 'Test', date: new Date().toISOString(), subject: 'New Studio feature' }] : null, dirty: ['studio/README.md'], updating: false })); break;

@@ -201,6 +201,48 @@ await check('Files tab lists and shows a file', async () => {
   await page.click('.file-tree button:has-text("server.mjs")');
   await page.locator('.file-view', { hasText: 'createServer' }).waitFor();
 }, page);
+await check('Board tab: Claude adds a task from a chat; tasks are added, moved, edited and deleted, all in BOARD.md', async () => {
+  const file = `${process.env.MOCK_ROOT}/projects/demo-site/repo/BOARD.md`;
+  const board = () => readFileSync(file, 'utf8');
+  await page.click('.tab:has-text("Board")');
+  for (const c of ['To do', 'In progress', 'Done']) await page.locator('.board-col h3', { hasText: c }).waitFor();
+  await page.goto(projectUrl + '/chat/new');
+  await page.fill('textarea', 'Put a task on the board for the contact form');
+  await page.keyboard.press('Enter');
+  await page.locator('.result-line').waitFor({ timeout: 15000 });
+  await page.waitForFunction(() => !document.querySelector('.send.stop'));
+  await page.click('.tab:has-text("Board")');
+  const todo = page.locator('.board-col', { hasText: 'To do' }), doing = page.locator('.board-col', { hasText: 'In progress' }), done = page.locator('.board-col', { hasText: 'Done' });
+  await todo.locator('.task', { hasText: 'Task from the chat' }).waitFor();
+  await todo.locator('.task-notes', { hasText: 'Added by the fake Claude.' }).waitFor();
+  await todo.locator('.board-add').click();
+  await todo.locator('input[aria-label="Task"]').fill('Make the logo bigger');
+  await todo.locator('textarea[aria-label="Notes"]').fill('Twice as big');
+  await todo.locator('button:has-text("Add task")').click();
+  await todo.locator('.task', { hasText: 'Make the logo bigger' }).waitFor();
+  if (!board().includes('- Make the logo bigger\n  Twice as big')) throw new Error('the new task isn’t in BOARD.md:\n' + board());
+  await todo.locator('.task', { hasText: 'Make the logo bigger' }).locator('button[aria-label="Move to In progress"]').click();
+  await doing.locator('.task', { hasText: 'Make the logo bigger' }).waitFor();
+  await doing.locator('.task', { hasText: 'Make the logo bigger' }).locator('button[aria-label="Move to Done"]').click();
+  await done.locator('.task', { hasText: 'Make the logo bigger' }).waitFor();
+  if (!/## Done\n- Make the logo bigger/.test(board())) throw new Error('the task wasn’t moved to Done in BOARD.md:\n' + board());
+  await done.locator('button[aria-label="Edit task"]').click();
+  await done.locator('input[aria-label="Task"]').fill('Make the logo much bigger');
+  await done.locator('button:has-text("Save")').click();
+  await done.locator('.task', { hasText: 'Make the logo much bigger' }).waitFor();
+  await page.screenshot({ path: `${SHOTS}/08-board.png`, fullPage: true });
+  // Claude edits the file while the board is open: the next save is refused instead of overwriting it.
+  writeFileSync(file, board().replace('## In progress\n', '## In progress\n- Added meanwhile\n'));
+  await done.locator('button[aria-label="Delete task"]').click();
+  await page.click('dialog button:has-text("Delete task")');
+  await page.getByText('The board changed while you were editing it').waitFor();
+  await doing.locator('.task', { hasText: 'Added meanwhile' }).waitFor();
+  await done.locator('button[aria-label="Delete task"]').click();
+  await page.click('dialog button:has-text("Delete task")');
+  await done.locator('.task').first().waitFor({ state: 'detached' });
+  if (board().includes('logo') || !board().includes('Added meanwhile')) throw new Error('BOARD.md after deleting:\n' + board());
+  rmSync(file);   // leave the repo as later checks expect it
+}, page);
 await check('project web address goes through the login gate', async () => {
   const r = await page.goto(`http://demo-site.${DOMAIN_PORT}/`);
   await page.getByText('Your new project is running').waitFor();

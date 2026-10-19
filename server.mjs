@@ -5,6 +5,7 @@ import { readFileSync, existsSync, createReadStream } from 'node:fs';
 import { join, extname } from 'node:path';
 import { toNodeHandler } from 'better-auth/node';
 import QRCode from 'qrcode';
+import { createHash } from 'node:crypto';
 import { PORT, STUDIO_HOST, STUDIO_URL, DOMAIN, APP_DIR, SECURE, APP_NAME } from './lib/config.mjs';
 import { db, audit, now, getSetting, setSetting } from './lib/db.mjs';
 import { auth, migrate, sessionFrom, recentLinks, pendingInvitation } from './lib/auth.mjs';
@@ -19,6 +20,7 @@ import * as U from './lib/uploads.mjs';
 import * as B from './lib/budget.mjs';
 import * as R from './lib/runner.mjs';
 import { requestEmailChange, confirmEmailChange } from './lib/account.mjs';
+import { BOARD_FILE, parseBoard, renderBoard, cleanBoard } from './lib/board.mjs';
 import { ctl, ctlOk, ctlJson, spawnCtl } from './lib/ctl.mjs';
 import { subdomainOf, handleProjectRequest, handleProjectUpgrade, issueGateToken, canAccessOrg } from './lib/gate.mjs';
 
@@ -339,6 +341,23 @@ route('GET', '/api/projects/:id/file', async ({ user, params, url }, res) => {
   const r = await ctl(['cat', p.slug], { stdin: url.searchParams.get('path') || '' });
   if (r.code !== 0) throw err(404, r.err || 'Cannot read that file');
   send(res, 200, r.out, 'text/plain; charset=utf-8');
+});
+
+// Task board: BOARD.md in the repo (lib/board.mjs). hash is of the file as read ('' when there's none yet), so a save
+// doesn't overwrite changes Claude made meanwhile.
+async function readBoard(p){
+  const r = await ctl(['cat', p.slug], { stdin: BOARD_FILE });
+  const text = r.code === 0 ? r.out : null;
+  return { board: parseBoard(text), hash: text === null ? '' : createHash('sha1').update(text).digest('hex') };
+}
+route('GET', '/api/projects/:id/board', async ({ user, params }) => { const p = P.getProject(params.id); projectRole(user, p); return readBoard(p); });
+route('PUT', '/api/projects/:id/board', async ({ user, params, body, req }) => {
+  const p = P.getProject(params.id); projectRole(user, p);
+  const board = cleanBoard(body.board);
+  if ((await readBoard(p)).hash !== String(body.hash ?? '')) throw err(409, 'The board changed while you were editing it, so it has been reloaded. Try again.');
+  await ctlOk(['board-write', p.slug], { stdin: renderBoard(board) });
+  audit(user.id, 'board.edit', p.slug, '', ipOf(req));
+  return readBoard(p);
 });
 
 // Chats

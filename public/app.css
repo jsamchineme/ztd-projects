@@ -527,6 +527,32 @@ table.commits td:first-child, table.commits td:nth-child(n+3) { width: 1%; white
 .hash { color: var(--accent); background: var(--accent-soft); padding: 1px 7px; border-radius: 6px; }
 
 /* ---------- files ---------- */
+/* Board: the project's tasks, a column per BOARD.md heading */
+.page-inner.wide { max-width: 1280px; }
+.board { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(240px, 1fr)); gap: 14px; align-items: start; overflow-x: auto; padding-bottom: 8px; }
+.board-col { background: var(--sunken); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.board-col.drop { border-color: var(--accent); box-shadow: var(--ring); }
+.board-col-head { display: flex; align-items: center; gap: 8px; padding: 4px 6px; }
+.board-col-head h3 { margin: 0; font-size: 1rem; }
+.board-col-head .count { min-width: 22px; height: 20px; padding: 0 7px; border-radius: 999px; background: var(--hover); color: var(--muted); font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
+.board-intro { margin: 0 6px; white-space: pre-wrap; }
+.board-tasks { display: flex; flex-direction: column; gap: 8px; min-height: 8px; }
+.task { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px 6px; box-shadow: var(--shadow-sm); cursor: grab; }
+.task.dragging { opacity: .45; }
+.task.drop-before { box-shadow: 0 -3px 0 var(--accent); }
+.task.done .task-text { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+.task-text { font-weight: 500; overflow-wrap: anywhere; }
+.task-notes { margin-top: 4px; font-size: 13.5px; color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.task-actions { display: flex; align-items: center; gap: 2px; margin-top: 6px; }
+.task-actions button { all: unset; box-sizing: border-box; display: inline-grid; place-items: center; min-width: 30px; height: 30px; border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 15px; }
+.task-actions button:hover { background: var(--hover); color: var(--text); }
+.task-actions button:focus-visible { outline: 2px solid var(--accent); }
+.task-actions button[hidden] { display: none; }
+.task-actions .ico { width: 16px; height: 16px; }
+.task-edit { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line-strong); border-radius: var(--r); padding: 10px; }
+.board-add { align-self: flex-start; color: var(--muted); }
+@media (max-width: 860px) { .board { grid-template-columns: minmax(0, 1fr); } }
+
 .files-layout { flex: 1; display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 0; }
 .tree-pane { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: color-mix(in srgb, var(--side) 45%, var(--bg)); padding: 12px 8px 0; }
 .tree-pane .input-wrap { margin: 0 4px 10px; }
