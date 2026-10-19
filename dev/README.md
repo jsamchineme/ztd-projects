@@ -1,6 +1,6 @@
-# ZTD Mail — local dev stack
+# ZTD Office — local dev stack
 
-Stalwart (mail server) + Bulwark (webmail "ZTD Mail"), via Docker Compose, on your Mac.
+Stalwart (mail server) + Bulwark (webmail "ZTD Office"), via Docker Compose, on your Mac.
 Outbound relays through Resend. Real inbound from the internet needs the VPS (pilot time).
 
 ## Run
@@ -13,7 +13,7 @@ docker compose down         # stop (keeps data in ./stalwart, ./bulwark)
 ```
 
 ## URLs
-- **ZTD Mail webmail:** http://localhost:3000
+- **ZTD Office webmail:** http://localhost:3000
 - **Stalwart admin:** http://localhost:8080/admin
 - Mail ports (host → container): SMTP 1025→25, submission 1587→587 / 1465→465, IMAP 1143→143 / 1993→993
 
@@ -25,17 +25,17 @@ complete initial setup:
    - username: `admin`
    - password: in `dev/.env` as `STALWART_ADMIN_PASSWORD` (printed once in `docker compose logs stalwart`)
 3. Complete the setup wizard (accept defaults for local dev). Stalwart then starts all mail services.
-4. **Add a domain:** Settings → Domains → add `ztdmail.test` (any test domain).
-5. **Create 2 mailboxes:** Settings → Accounts → add e.g. `sam@ztdmail.test` and `jane@ztdmail.test`, each with a password.
-6. Log into **ZTD Mail** (http://localhost:3000) as `sam@ztdmail.test`, email `jane@ztdmail.test` → confirms internal send/receive.
+4. **Add a domain:** Settings → Domains → add `ztdoffice.test` (any test domain).
+5. **Create 2 mailboxes:** Settings → Accounts → add e.g. `sam@ztdoffice.test` and `jane@ztdoffice.test`, each with a password.
+6. Log into **ZTD Office** (http://localhost:3000) as `sam@ztdoffice.test`, email `jane@ztdoffice.test` → confirms internal send/receive.
 
 ## Outbound to real addresses (optional, needs your Resend key)
 1. Put your Resend API key in `dev/.env` → `RESEND_API_KEY=...` (gitignored).
 2. In Stalwart admin → Settings → SMTP → outbound/relay, add a relay host:
    - host `smtp.resend.com`, port `465` (implicit TLS), username `resend`, password = your Resend API key.
-3. Send from ZTD Mail to a real address (e.g. your Gmail) to verify delivery.
+3. Send from ZTD Office to a real address (e.g. your Gmail) to verify delivery.
 
 ## Notes
 - Data + secrets are gitignored (`dev/stalwart/`, `dev/bulwark/`, `dev/.env`); only compose + examples are committed.
-- Branding (name "ZTD Mail", Studio logo) is set via env in `docker-compose.yml`; logo is served from
-  `https://businessmail.ztddevs.com/ztdmail-logo.svg`.
+- Branding (name "ZTD Office", Studio logo) is set via env in `docker-compose.yml`; logo is served from
+  `https://businessmail.ztddevs.com/ztdoffice-logo.svg`.

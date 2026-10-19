@@ -1,5 +1,6 @@
 # Board
 
+Product: **ZTD Office** (ztdoffice.com) — email, calendar, meetings, nameservers.
 Stack: **Stalwart** (mail server) · **Resend** for outgoing mail during the pilot, **Amazon SES** before rollout · **Bulwark** (webmail) · **Jitsi Meet** (meetings) · this app (**control panel**).
 Owner: **Samuel** = needs your accounts/decisions · **Claude** = build/config work.
 Environment: **develop and test locally on the Mac** (Stalwart + Bulwark in Docker, outbound via Resend SMTP). Real inbound mail from the internet needs the VPS, which comes at pilot time.
@@ -7,14 +8,16 @@ Environment: **develop and test locally on the Mac** (Stalwart + Bulwark in Dock
 ## To do
 
 ### 1. Branded Bulwark demo (Stage 1)
-Owner: Claude · Needs: product name + logo (placeholder OK)
+Owner: Claude
 - Bulwark Lite in demo mode at businessmail.ztddevs.com/webmail/
-- Your name, logo and colours
+- Name "ZTD Office", Studio logo and colours
 
 ### 2. Brand and platform domain
 Owner: Samuel
-- Choose product name
-- Buy a dedicated platform domain (not ztddevs.com) for mail hostnames, e.g. mail.<platform-domain>
+- Name chosen: **ZTD Office**
+- Done: **ztdoffice.com** registered at Namecheap (2026-10-19, renews 2027-10-19)
+- Still to register: ztdoffice.co.uk and ztdoffice.uk (to protect the name)
+- Used for: nameservers ns1–ns4.ztdoffice.com, mx1.ztdoffice.com (MX target), mail.ztdoffice.com (webmail, IMAP/SMTP), autoconfig/autodiscover, _spf.ztdoffice.com, bounces
 
 ### 3. Outgoing mail for the pilot (Resend)
 Owner: Samuel (account) + Claude (config)
@@ -28,13 +31,6 @@ Owner: Claude · Needs: Docker Desktop running
 - Stalwart + Bulwark via docker-compose in the repo (data volumes + secrets gitignored)
 - Outbound through Resend SMTP relay; test internal + outbound-to-real-address send
 - This is where tasks 5, 6, 8, 9 are built and tested before the VPS
-
-### 4b. Mail server VPS (pilot)
-Owner: Samuel (order) + Claude (setup) · When: pilot time
-- Ubuntu 24.04, 2 vCPU / 4 GB+ RAM, root access, UK/EU location
-- Ports 25, 443, 465, 587, 993 open; reverse DNS set to mail hostname
-- Off-site backup storage
-- Deploy the same compose stack from local dev; enables real inbound mail
 
 ### 5. Install and configure Stalwart
 Owner: Claude · Depends on: 3, 4
@@ -85,11 +81,17 @@ Owner: Samuel
 - Terms: domain/account ownership, included support, SLA
 - GDPR data processing agreement
 - Confirm Stalwart free-edition use with Stalwart Labs; AGPL obligations for Stalwart/Bulwark
+- Add SIC code 63110 (data processing, hosting) at the next Companies House confirmation statement
+- Search the UK IPO trade mark register for "ZTD" (classes 38 and 42); also "ZTD Office"; register the marks once the service is taking shape (~£170 for the first class)
+- Show registered company name and number on the website, invoices and business emails
+- Pay the ICO data protection fee (if not already); breach-response procedure
+- Check insurance (professional indemnity/cyber) covers hosting client email
+- Ask your adviser whether Ofcom customer-protection rules for email services apply
 
 ### 19. Managed DNS (your own nameservers)
 Owner: Samuel (AWS account, registrar access) + Claude (setup, control panel)
-- Amazon Route 53 with white-label nameservers ns1–ns4.ztddevs.com (~$40/mo for 300 domains)
-- Create the reusable delegation set; add glue records at the ztddevs.com registrar
+- Amazon Route 53 with white-label nameservers ns1–ns4.ztdoffice.com (~$40/mo for 300 domains)
+- Create the reusable delegation set; add glue records at the ztdoffice.com registrar
 - Control panel creates each client's zone and records via the AWS API (website, MX, SPF, DKIM, DMARC)
 - Client move process: copy existing records first, turn off DNSSEC at the old provider, then the client switches nameservers
 - Don't host nameservers on the mail VPS
@@ -136,7 +138,13 @@ Owner: Samuel + Claude · Depends on: 11, 13, 15, 17
 
 ### 4. Local dev environment (Mac)
 Owner: Claude · Needs: Samuel to run Stalwart's 2-min first-time setup
-- Done: docker-compose stack (Stalwart + Bulwark "ZTD Mail", Studio logo), both containers running
+- Done: docker-compose stack (Stalwart + Bulwark "ZTD Office", Studio logo), both containers running
 - Remaining: complete Stalwart initial setup in browser, add test domain + mailboxes (see dev/README.md)
+
+### 4b. Mail server VPS (pilot)
+Owner: Samuel (DNS) + Claude (setup)
+- Done: Hetzner ARM VPS in Helsinki (62.238.17.8), hardened (key-only SSH, firewall, auto-updates), Docker + Stalwart deployed
+- Done: DNS live (A mail + mx1 → 62.238.17.8, MX ztdoffice.com → mx1.ztdoffice.com, reverse DNS → mx1.ztdoffice.com)
+- Remaining (from the Mac): rename server to mx1.ztdoffice.com, TLS, ztdoffice.com mail domain + mailboxes, webmail, Resend relay, SPF/DKIM/DMARC
 
 ## Done

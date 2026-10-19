@@ -1,4 +1,4 @@
-# ZTD Mail — local development stack (Mac).
+# ZTD Office — local development stack (Mac).
 # Stalwart (mail server) + Bulwark (webmail). Outbound relays through Resend (set in .env).
 # Data + secrets stay local (gitignored). Bring up:  cd dev && docker compose up -d
 services:
@@ -26,14 +26,14 @@ services:
     depends_on: [stalwart]
     environment:
       JMAP_SERVER_URL: "http://stalwart:8080"
-      APP_NAME: "ZTD Mail"
-      APP_SHORT_NAME: "ZTD Mail"
+      APP_NAME: "ZTD Office"
+      APP_SHORT_NAME: "ZTD Office"
       # Branding — served by the control-panel app (public, stable URL).
-      FAVICON_URL: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
-      LOGIN_LOGO_URL: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
-      LOGIN_LOGO_URL_DARK: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
-      SIDEBAR_LOGO_URL: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
-      SIDEBAR_LOGO_URL_DARK: "https://businessmail.ztddevs.com/ztdmail-logo.svg"
+      FAVICON_URL: "https://businessmail.ztddevs.com/ztdoffice-logo.svg"
+      LOGIN_LOGO_URL: "https://businessmail.ztddevs.com/ztdoffice-logo.svg"
+      LOGIN_LOGO_URL_DARK: "https://businessmail.ztddevs.com/ztdoffice-logo.svg"
+      SIDEBAR_LOGO_URL: "https://businessmail.ztddevs.com/ztdoffice-logo.svg"
+      SIDEBAR_LOGO_URL_DARK: "https://businessmail.ztddevs.com/ztdoffice-logo.svg"
       LOGIN_COMPANY_NAME: "ZTD Devs"
       LOGIN_COMPANY_URL: "https://ztddevs.com"
     ports:
