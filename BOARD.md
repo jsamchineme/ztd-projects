@@ -24,6 +24,11 @@ Owner: Claude (setup, monitoring) + Samuel (approve each policy step)
 
 ### 8. Control panel (this app)
 Owner: Claude · Depends on: 3, 5
+- Plans (website + email included; list prices, can change): Lite £40/mo (3 inboxes, 5 aliases/groups, 5 GB) · Premium £70/mo (7 inboxes, 10 aliases/groups, 10 GB, meetings) · Business £125/mo (15 inboxes, 25 aliases/groups, 25 GB, 3 domains). Annual = 2 months free
+- Add-ons: +1 inbox £5/mo · +10 GB £3/mo · meetings on Lite £10/mo · extra domain £5/mo
+- Per-client custom price and limits (prices vary by client); panel enforces limits with an upgrade prompt
+- CHOSEN DIRECTION: design E — faithful Resend dashboard (dark, studied from Samuel's own Resend account recording). /prototype/panel5.html. Dark canvas, workspace switcher, pill tabs, green icon tiles + status pills, white primary buttons, line-chart metrics, domain event timeline, ⌘K "Ask anything" bar; extra Resend pages (Domains, Activity, Settings). Build the real control panel on this.
+- Earlier options (kept for reference): A /prototype/panel.html · B editorial /prototype/panel2.html · C light-monochrome /prototype/panel3.html · D Attio /prototype/panel4.html
 - Switch mailbox management to Stalwart (JMAP admin API, as used for setup); keep Resend domain API for the pilot
 - Clients → domains → mailboxes (create, suspend, reset password, quotas)
 - Generate DNS records per client domain (from Stalwart's per-domain zone file) and check they're live
@@ -123,27 +128,16 @@ Owner: Samuel + Claude · Depends on: 11, 13, 15, 17
 
 ### 21. Stalwart Enterprise licence and branding
 Owner: Samuel (licence) + Claude (setup)
-- Done: Enterprise licence active for ztdoffice.com (25 mailboxes, trial to 2026-11-23, auto-renew via API key)
-- Done: ZTD Office logo on invitation/RSVP/reminder emails and the RSVP page (domain + default logo, PNG); admin console logo
 - Samuel: make sure the subscription continues after the trial so renewal on 2026-11-19 succeeds
 - Remaining: multi-tenancy — one tenant per client with its own quotas and logo (foundation for the control panel, task 8)
-- Done: Gmail RSVP loop retested — Maybe/No/Yes replies land in Inbox (score ~2) and update the organizer's calendar (attendee now accepted)
-
 
 ### 6. Deploy Bulwark webmail (full edition)
 Owner: Claude + Samuel (login test) · Depends on: 5
-- Done: Bulwark full edition live at https://mail.ztdoffice.com, branded "ZTD Office" + Studio logo, connected to Stalwart
-- Done: nginx SNI router on 443 (webmail vs Stalwart passthrough), certbot certificate for mail.ztdoffice.com, real client IPs preserved
-- Done: Bulwark admin dashboard at https://mail.ztdoffice.com/admin (password root-only on the VPS)
-- Done: signed in on iPhone (inbox loads); iPhone Home Screen icon fixed to the ZTD logo
 - Remaining: Samuel tests send/search/calendar in the webmail
 - Later: per-client (per-domain) branding; enable plug-ins (needed for meetings, task 7)
 
-
 ### 3. Outgoing mail for the pilot (Resend)
 Owner: Samuel (account) + Claude (config)
-- Done: ztdoffice.com added and verified (sending only, EU region); restricted sending key on the VPS
-- Done: businessmail.ztddevs.com removed to stay within the Free plan's 3 domains
 - Remaining: upgrade to Pro + extra domains (~$40/mo) before adding pilot clients (Free: 3 domains, 100 emails/day)
 - Remaining: email Resend to confirm hosting client mailboxes is within their usage policy
 - Remaining: verify each pilot client domain in Resend
@@ -151,23 +145,32 @@ Owner: Samuel (account) + Claude (config)
 
 ### 2. Brand and platform domain
 Owner: Samuel
-- Done: name **ZTD Office**; **ztdoffice.com** registered at Namecheap (2026-10-19, renews 2027-10-19)
-- Done: in use for mx1/mail.ztdoffice.com, auto-setup names, mailboxes
 - Remaining: register ztdoffice.co.uk and ztdoffice.uk (to protect the name)
 
 ### 4. Local dev environment (Mac)
 Owner: Claude · Lower priority now the VPS is live
-- Done: docker-compose stack (Stalwart + Bulwark "ZTD Office", Studio logo); storage paths fixed for Stalwart 0.16
 - Remaining: finish Stalwart setup (can be done headlessly with `x:Bootstrap/set`, as on the VPS — needs a Mac session); add a test domain + mailboxes
 
 ## Done
 
 ### 5. Install and configure Stalwart
 Owner: Claude · Completed 2026-10-19
+- Done: ZTD Office logo on invitation/RSVP/reminder emails and the RSVP page (domain + default logo, PNG); admin console logo
+- Done: Enterprise licence active for ztdoffice.com (25 mailboxes, trial to 2026-11-23, auto-renew via API key)
 - Done: HTTPS certificate (Let's Encrypt, auto-renews) and admin console at https://mx1.ztdoffice.com/admin
 - Done: outgoing mail relayed through Resend on 587 (not 465); receiving direct on 25
 - Done: DNS for ztdoffice.com (MX, SPF, DKIM, DMARC, MTA-STS, TLS-RPT, SRV) — 24 records, `node scripts/check-dns.mjs`
 - Done: 5 GB mailbox quotas; send/receive tested with Gmail (SPF, DKIM, DMARC pass; inbox)
+- Done: Gmail RSVP loop retested — Maybe/No/Yes replies land in Inbox (score ~2) and update the organizer's calendar (attendee now accepted)
+- Done: signed in on iPhone (inbox loads); iPhone Home Screen icon fixed to the ZTD logo
+- Done: Bulwark admin dashboard at https://mail.ztdoffice.com/admin (password root-only on the VPS)
+- Done: in use for mx1/mail.ztdoffice.com, auto-setup names, mailboxes
+- Done: name **ZTD Office**; **ztdoffice.com** registered at Namecheap (2026-10-19, renews 2027-10-19)
+- Done: docker-compose stack (Stalwart + Bulwark "ZTD Office", Studio logo); storage paths fixed for Stalwart 0.16
+- Done: ztdoffice.com added and verified (sending only, EU region); restricted sending key on the VPS
+- Done: businessmail.ztddevs.com removed to stay within the Free plan's 3 domains
+- Done: nginx SNI router on 443 (webmail vs Stalwart passthrough), certbot certificate for mail.ztdoffice.com, real client IPs preserved
+- Done: Bulwark full edition live at https://mail.ztdoffice.com, branded "ZTD Office" + Studio logo, connected to Stalwart
 - Done: iPhone Gmail app over IMAP (993) + SMTP (587): logins and sending via Resend confirmed in server logs (2026-10-19)
 - Optional: also try Outlook desktop before the pilot
 - Done: spam filtering reviewed: defaults on (Junk at score 5); private Unbound resolver so Spamhaus blocklists work; verified with Spamhaus test domain (scored 8.8 → Junk)

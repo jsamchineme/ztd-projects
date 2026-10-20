@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ZTD Office — Control panel (prototype)</title>
+<link rel="icon" href="/ztdoffice-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     ZTD Office control panel — prototype. Sample data only.
+     Brand: navy #00427c, gold #ffc349 (from ztdoffice-logo.svg)
+     ============================================================ */
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --panel-2: #fafbfc; --sunk: #f1f3f6;
+    --ink: #0b1526; --ink-2: #4a5568; --ink-3: #8a94a6;
+    --line: #e5e8ee; --line-2: #eef0f4;
+    --brand: #00427c; --brand-ink: #ffffff; --brand-soft: #e8f0f8; --brand-text: #00427c;
+    --gold: #ffc349; --gold-soft: #fff6e0; --gold-text: #8a5a00;
+    --ok: #138a4b; --ok-soft: #e7f6ee;
+    --warn: #b45309; --warn-soft: #fdf3e3;
+    --bad: #c42b2b; --bad-soft: #fcebeb;
+    --radius: 14px; --radius-sm: 9px;
+    --shadow: 0 1px 2px rgba(11,21,38,.04), 0 2px 8px rgba(11,21,38,.04);
+    --shadow-lg: 0 24px 64px -12px rgba(11,21,38,.28), 0 2px 6px rgba(11,21,38,.06);
+  }
+  .dark {
+    --bg: #0b0f17; --panel: #121826; --panel-2: #151c2b; --sunk: #0e1420;
+    --ink: #eef2f8; --ink-2: #a6b0c2; --ink-3: #6b768b;
+    --line: #222b3d; --line-2: #1b2333;
+    --brand: #5aa2e6; --brand-ink: #06121f; --brand-soft: #14263c; --brand-text: #8cc0f2;
+    --gold-soft: #2a2213; --gold-text: #ffcf6b;
+    --ok: #3ccf85; --ok-soft: #10261c;
+    --warn: #f0a94b; --warn-soft: #2a1f10;
+    --bad: #f07272; --bad-soft: #2c1517;
+    --shadow: 0 1px 2px rgba(0,0,0,.3);
+    --shadow-lg: 0 24px 64px -12px rgba(0,0,0,.7);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px; line-height: 1.5; color: var(--ink); background: var(--bg);
+    -webkit-font-smoothing: antialiased; font-feature-settings: "cv11", "ss01";
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  a { color: inherit; text-decoration: none; }
+  svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- prototype ribbon ---------- */
+  .ribbon {
+    position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 40;
+    display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px;
+    background: var(--ink); color: var(--bg); border-radius: 999px; box-shadow: var(--shadow-lg);
+    font-size: 12.5px; white-space: nowrap;
+  }
+  .ribbon b { font-weight: 600; }
+  .ribbon .vlink { text-decoration: underline; text-underline-offset: 3px; opacity: .75; }
+  .ribbon .vlink:hover { opacity: 1; }
+  .ribbon .seg { display: flex; background: rgba(127,127,127,.22); border-radius: 999px; padding: 2px; }
+  .ribbon .seg button { border: 0; background: none; padding: 5px 12px; border-radius: 999px; cursor: pointer; color: inherit; opacity: .75; font-size: 12.5px; }
+  .ribbon .seg button.on { background: var(--bg); color: var(--ink); opacity: 1; font-weight: 600; }
+  .ribbon .icon-btn { color: inherit; }
+
+  /* ---------- layout ---------- */
+  .app { display: grid; grid-template-columns: 256px 1fr; min-height: 100vh; }
+  aside {
+    position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column;
+    background: var(--panel); border-right: 1px solid var(--line); padding: 18px 14px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; padding: 4px 8px 18px; }
+  .brand img { width: 34px; height: 34px; border-radius: 9px; }
+  .brand .t { font-weight: 650; letter-spacing: -.01em; font-size: 15px; line-height: 1.15; }
+  .brand .s { color: var(--ink-3); font-size: 12px; }
+  .tenant {
+    display: flex; align-items: center; gap: 10px; padding: 10px; margin: 0 0 14px;
+    border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--panel-2);
+  }
+  .tenant .n { font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .tenant .d { color: var(--ink-3); font-size: 12px; }
+  .nav-label { color: var(--ink-3); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 14px 10px 6px; }
+  nav a {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px;
+    color: var(--ink-2); font-weight: 500; margin-bottom: 1px;
+  }
+  nav a:hover { background: var(--sunk); color: var(--ink); }
+  nav a.on { background: var(--brand-soft); color: var(--brand-text); }
+  nav a .count { margin-left: auto; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .side-foot { margin-top: auto; border-top: 1px solid var(--line); padding-top: 14px; display: flex; align-items: center; gap: 10px; }
+  .side-foot .n { font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .side-foot .d { color: var(--ink-3); font-size: 12px; }
+
+  main { min-width: 0; padding: 32px 40px 110px; max-width: 1240px; width: 100%; }
+  .crumbs { display: flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: 13px; margin-bottom: 10px; }
+  .crumbs a:hover { color: var(--ink); }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
+  h1 { font-size: 26px; line-height: 1.2; letter-spacing: -.022em; font-weight: 650; margin: 0; }
+  .sub { color: var(--ink-2); margin-top: 6px; }
+  h2 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; margin: 0; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ---------- primitives ---------- */
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .card-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px 0; }
+  .card-h .sub { margin-top: 2px; font-size: 13px; }
+  .card-b { padding: 18px 20px 20px; }
+  .grid { display: grid; gap: 16px; }
+  .g4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .g2 { grid-template-columns: minmax(0,1.7fr) minmax(0,1fr); }
+  .grid > *, .stack > * { min-width: 0; }
+  .stack { display: grid; gap: 16px; align-content: start; }
+  .muted { color: var(--ink-2); } .faint { color: var(--ink-3); }
+  .small { font-size: 12.5px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px;
+    border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+    font-weight: 550; font-size: 13.5px; cursor: pointer; white-space: nowrap; transition: background .12s, border-color .12s, transform .06s;
+  }
+  .btn:hover { background: var(--sunk); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn.gold { background: var(--gold); border-color: var(--gold); color: #3b2a00; }
+  .btn.ghost { border-color: transparent; background: none; }
+  .btn.ghost:hover { background: var(--sunk); }
+  .btn.danger { color: var(--bad); }
+  .btn.sm { height: 30px; padding: 0 10px; font-size: 13px; border-radius: 8px; }
+  .icon-btn { width: 32px; height: 32px; padding: 0; display: inline-grid; place-items: center; border-radius: 8px; border: 0; background: none; color: var(--ink-2); cursor: pointer; }
+  .icon-btn:hover { background: var(--sunk); color: var(--ink); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px; border-radius: 999px;
+    font-size: 12px; font-weight: 550; background: var(--sunk); color: var(--ink-2); white-space: nowrap;
+  }
+  .badge.lite { background: var(--sunk); color: var(--ink-2); }
+  .badge.premium { background: var(--brand-soft); color: var(--brand-text); }
+  .badge.business { background: var(--gold-soft); color: var(--gold-text); }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.bad { background: var(--bad-soft); color: var(--bad); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none;
+    font-size: 12px; font-weight: 600; color: #fff; letter-spacing: .02em;
+  }
+  .avatar.sq { border-radius: 9px; }
+  .avatar.lg { width: 44px; height: 44px; font-size: 15px; border-radius: 12px; }
+
+  /* stat tiles */
+  .stat .k { color: var(--ink-2); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .stat .v { font-size: 28px; font-weight: 650; letter-spacing: -.025em; margin-top: 8px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat .v small { font-size: 15px; color: var(--ink-3); font-weight: 500; letter-spacing: 0; }
+  .stat .f { color: var(--ink-3); font-size: 12.5px; margin-top: 6px; }
+
+  /* meters */
+  .meter { height: 6px; background: var(--sunk); border-radius: 999px; overflow: hidden; }
+  .meter > i { display: block; height: 100%; border-radius: 999px; background: var(--brand); transition: width .4s cubic-bezier(.2,.8,.2,1); }
+  .meter.warn > i { background: var(--warn); }
+  .meter.full > i { background: var(--bad); }
+  .meter.lg { height: 8px; }
+  .usage { display: grid; gap: 7px; }
+  .usage .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .usage .row .muted { display: inline-flex; align-items: center; gap: 7px; }
+  .usage .row b { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .mini { display: grid; gap: 5px; min-width: 110px; }
+  .mini .t { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; font-weight: 550; color: var(--ink-3); padding: 10px 20px; border-bottom: 1px solid var(--line); white-space: nowrap; background: var(--panel-2); }
+  td { padding: 12px 20px; border-bottom: 1px solid var(--line-2); vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr.click { cursor: pointer; }
+  tbody tr.click:hover td { background: var(--panel-2); }
+  .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .who .n { font-weight: 550; line-height: 1.25; }
+  .who .d { color: var(--ink-3); font-size: 12.5px; }
+  td.r, th.r { text-align: right; }
+  .tag { font-size: 11px; font-weight: 600; color: var(--gold-text); background: var(--gold-soft); padding: 1px 6px; border-radius: 5px; margin-left: 6px; letter-spacing: .02em; }
+  tr.suspended td:not(:last-child) { opacity: .5; }
+
+  /* toolbar */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .search { position: relative; }
+  .search svg { position: absolute; left: 11px; top: 10px; color: var(--ink-3); }
+  .search input { padding-left: 34px; width: 260px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; font-size: 13px; color: var(--ink-2); font-weight: 500; }
+  .chip.on { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+
+  /* forms */
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 550; }
+  .field .hint { font-size: 12.5px; color: var(--ink-3); }
+  .input, select.input {
+    height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel);
+    outline: none; width: 100%; transition: border-color .12s, box-shadow .12s;
+  }
+  .input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent); }
+  .addon { display: flex; align-items: stretch; }
+  .addon .input { border-radius: 9px 0 0 9px; }
+  .addon span { display: grid; place-items: center; padding: 0 12px; border: 1px solid var(--line); border-left: 0; border-radius: 0 9px 9px 0; background: var(--sunk); color: var(--ink-2); font-size: 13px; white-space: nowrap; }
+  .addon.pre .input { border-radius: 0 9px 9px 0; }
+  .addon.pre span { border: 1px solid var(--line); border-right: 0; border-radius: 9px 0 0 9px; }
+  .form { display: grid; gap: 16px; }
+  .form .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 9px; height: 38px; }
+  .stepper button { width: 36px; height: 100%; border: 0; background: none; cursor: pointer; color: var(--ink-2); font-size: 16px; }
+  .stepper button:hover { background: var(--sunk); }
+  .stepper span { min-width: 38px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .checks { display: grid; gap: 2px; max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 9px; padding: 4px; }
+  .checks label { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 7px; cursor: pointer; font-weight: 450; }
+  .checks label:hover { background: var(--sunk); }
+  .checks input { accent-color: var(--brand); width: 15px; height: 15px; }
+  .seg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .opt { border: 1px solid var(--line); border-radius: 11px; padding: 12px 14px; cursor: pointer; display: grid; gap: 2px; background: var(--panel); text-align: left; }
+  .opt b { font-weight: 600; font-size: 13.5px; }
+  .opt span { color: var(--ink-3); font-size: 12.5px; }
+  .opt.on { border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 14%, transparent); }
+
+  /* lists */
+  .list { display: grid; }
+  .li { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-top: 1px solid var(--line-2); }
+  .li:first-child { border-top: 0; }
+  .li .grow { flex: 1; min-width: 0; }
+  .li .n { font-weight: 550; }
+  .li .d { color: var(--ink-3); font-size: 12.5px; }
+  .ic { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex: none; background: var(--sunk); color: var(--ink-2); }
+  .ic.warn { background: var(--warn-soft); color: var(--warn); }
+  .ic.bad { background: var(--bad-soft); color: var(--bad); }
+  .ic.ok { background: var(--ok-soft); color: var(--ok); }
+  .ic.brand { background: var(--brand-soft); color: var(--brand-text); }
+  .members { display: flex; }
+  .members .avatar { width: 24px; height: 24px; font-size: 10px; border: 2px solid var(--panel); margin-left: -6px; }
+  .members .avatar:first-child { margin-left: 0; }
+
+  /* plan cards */
+  .plans { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; align-items: stretch; }
+  .plan { position: relative; display: flex; flex-direction: column; padding: 24px; }
+  .plan.featured { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), var(--shadow); }
+  .plan .flag { position: absolute; top: -11px; left: 24px; background: var(--brand); color: var(--brand-ink); font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .plan .pn { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .plan .pb { color: var(--ink-2); font-size: 13px; margin-top: 4px; min-height: 40px; }
+  .plan .pp { margin: 18px 0 4px; display: flex; align-items: baseline; gap: 6px; }
+  .plan .pp b { font-size: 38px; letter-spacing: -.03em; font-weight: 650; line-height: 1; }
+  .plan .pp span { color: var(--ink-3); }
+  .plan .pa { color: var(--ink-3); font-size: 12.5px; }
+  .plan ul { list-style: none; padding: 0; margin: 20px 0 22px; display: grid; gap: 10px; }
+  .plan li { display: flex; gap: 10px; align-items: flex-start; color: var(--ink-2); }
+  .plan li svg { color: var(--ok); margin-top: 2px; }
+  .plan li.no { color: var(--ink-3); }
+  .plan li.no svg { color: var(--ink-3); }
+  .plan li b { color: var(--ink); font-weight: 600; }
+  .plan .btn { margin-top: auto; width: 100%; }
+  .plan.current { background: var(--panel-2); }
+
+  /* banners */
+  .banner { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; border: 1px solid; margin-bottom: 16px; }
+  .banner.warn { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+  .banner.brand { background: var(--brand-soft); border-color: color-mix(in srgb, var(--brand) 25%, transparent); }
+  .banner .grow { flex: 1; }
+  .banner b { font-weight: 600; }
+
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; font-size: 13.5px; }
+  .kv dt { color: var(--ink-3); }
+  .kv dd { margin: 0; text-align: right; font-weight: 500; }
+  .sep { height: 1px; background: var(--line); margin: 16px 0; border: 0; }
+
+  .hero {
+    background: linear-gradient(135deg, #00427c 0%, #0b5ea8 60%, #1a6fbd 100%); color: #fff; border: 0; overflow: hidden; position: relative;
+  }
+  .hero::after { content: ""; position: absolute; right: -60px; top: -60px; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(255,195,73,.35), transparent 70%); }
+  .hero .muted { color: rgba(255,255,255,.75); }
+  .hero .btn { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.12); color: #fff; }
+  .hero .btn:hover { background: rgba(255,255,255,.2); }
+  .hero .btn.gold { background: var(--gold); color: #3b2a00; border-color: var(--gold); }
+
+  .bars { display: grid; gap: 12px; }
+  .bars .b { display: grid; grid-template-columns: 76px 1fr 44px; gap: 12px; align-items: center; font-size: 13px; }
+  .bars .b .meter { height: 8px; }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--ink-3); }
+
+  /* modal + menu + toast */
+  .scrim { position: fixed; inset: 0; background: rgba(8,14,26,.42); backdrop-filter: blur(3px); display: grid; place-items: center; z-index: 60; padding: 20px; animation: fade .15s ease; }
+  .modal { width: 100%; max-width: 480px; background: var(--panel); border-radius: 18px; box-shadow: var(--shadow-lg); border: 1px solid var(--line); animation: pop .18s cubic-bezier(.2,.8,.2,1); max-height: calc(100vh - 40px); overflow: auto; }
+  .modal.wide { max-width: 620px; }
+  .modal-h { padding: 22px 24px 4px; display: flex; justify-content: space-between; gap: 12px; }
+  .modal-h h3 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.015em; }
+  .modal-h p { margin: 4px 0 0; color: var(--ink-2); font-size: 13.5px; }
+  .modal-b { padding: 18px 24px; }
+  .modal-f { padding: 14px 24px 22px; display: flex; justify-content: flex-end; gap: 8px; }
+  .menu { position: fixed; z-index: 70; min-width: 196px; background: var(--panel); border: 1px solid var(--line); border-radius: 11px; box-shadow: var(--shadow-lg); padding: 5px; animation: pop .12s ease; }
+  .menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; background: none; border-radius: 7px; cursor: pointer; text-align: left; color: var(--ink); font-size: 13.5px; }
+  .menu button:hover { background: var(--sunk); }
+  .menu button.danger { color: var(--bad); }
+  .menu hr { border: 0; height: 1px; background: var(--line); margin: 4px 0; }
+  .toasts { position: fixed; right: 20px; bottom: 20px; display: grid; gap: 8px; z-index: 80; }
+  .toast { display: flex; align-items: center; gap: 10px; background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 11px; box-shadow: var(--shadow-lg); font-size: 13.5px; animation: pop .2s cubic-bezier(.2,.8,.2,1); max-width: 380px; }
+  .toast svg { color: #4ade80; }
+  @keyframes fade { from { opacity: 0 } }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98) } }
+  .view { animation: fade .18s ease; }
+
+  .upg { display: grid; gap: 10px; }
+  .upg .opt { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+  .upg .opt .grow { flex: 1; display: grid; gap: 2px; }
+  .upg .opt .price { text-align: right; }
+  .upg .opt .price b { font-size: 16px; display: block; }
+
+  .mobile-top { display: none; }
+  .hidden-col { display: none; }
+  @media (max-width: 1100px) { .g4 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 960px) {
+    .app { grid-template-columns: 1fr; }
+    aside { position: fixed; z-index: 50; width: 272px; transform: translateX(-100%); transition: transform .2s ease; box-shadow: var(--shadow-lg); }
+    body.nav-open aside { transform: none; }
+    .mobile-top { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 30; }
+    .mobile-top img { width: 28px; height: 28px; border-radius: 7px; }
+    main { padding: 22px 16px 110px; }
+    .g2, .g3, .plans { grid-template-columns: 1fr; }
+    .search input { width: 100%; }
+    .search { flex: 1; }
+    .hide-sm { display: none; }
+  }
+  @media (max-width: 560px) { .g4 { grid-template-columns: 1fr 1fr; } .stat .v { font-size: 22px; } .form .two { grid-template-columns: 1fr; } .ribbon .lbl { display: none; } }
+</style>
+</head>
+<body>
+<div class="mobile-top">
+  <button class="icon-btn" onclick="document.body.classList.toggle('nav-open')" aria-label="Menu"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <img src="/ztdoffice-logo.svg" alt=""><b>ZTD Office</b>
+</div>
+<div class="app">
+  <aside id="side"></aside>
+  <main id="view"></main>
+</div>
+<div class="ribbon">
+  <span class="lbl"><b>Design A</b> · sample data, nothing is saved</span>
+  <a class="vlink" href="panel2.html">View design B</a>
+  <div class="seg">
+    <button data-role="staff">ZTD staff</button>
+    <button data-role="client">Client</button>
+  </div>
+  <button class="icon-btn" id="theme" title="Light / dark" aria-label="Toggle dark mode"></button>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ============================================================
+   Sample data
+   ============================================================ */
+const PLANS = {
+  lite: { id: 'lite', name: 'Lite', price: 40, inboxes: 3, aliases: 5, storage: 5, domains: 1, shared: 0, meetings: null, send: 200,
+    blurb: 'Website and business email for sole traders and small teams.', migration: 'Do-it-yourself guide', support: 'Email support' },
+  premium: { id: 'premium', name: 'Premium', price: 70, inboxes: 7, aliases: 10, storage: 10, domains: 1, shared: 1, meetings: 'Meetings up to 1 hour', send: 500,
+    blurb: 'For growing teams that meet clients online.', migration: 'We move your old email', support: 'Email and phone support' },
+  business: { id: 'business', name: 'Business', price: 125, inboxes: 15, aliases: 25, storage: 25, domains: 3, shared: 3, meetings: 'Unlimited meetings', send: 1000,
+    blurb: 'For established firms with several departments.', migration: 'Full move and DNS switch-over', support: 'Priority support, named contact' },
+};
+const ORDER = ['lite', 'premium', 'business'];
+const ADDONS = [
+  { id: 'inbox', name: 'Extra inbox', price: 5, unit: 'per inbox / month', icon: 'inbox' },
+  { id: 'storage', name: 'Extra storage', price: 3, unit: 'per 10 GB / month', icon: 'db' },
+  { id: 'meet', name: 'Meetings on Lite', price: 10, unit: 'per month', icon: 'video' },
+  { id: 'domain', name: 'Extra domain', price: 5, unit: 'per domain / month', icon: 'globe' },
+];
+const LICENCE = { seats: 25, renews: '19 Nov 2026' };
+const COLORS = ['#00427c', '#0f766e', '#7c3aed', '#b45309', '#be185d', '#2563eb', '#4d7c0f', '#9f1239', '#0e7490', '#6d28d9'];
+
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const mkInboxes = (domain, people, quota) => people.map(([name, local], i) => ({
+  id: domain + ':' + local, name, local, quota, status: 'active',
+  used: +(quota * (0.08 + rnd() * 0.7)).toFixed(1),
+  last: ['Just now', '12 min ago', '1 hour ago', 'Today, 09:14', 'Yesterday', '3 days ago'][Math.floor(rnd() * 6)],
+  admin: i === 0,
+}));
+const dnsOk = (list = []) => ['MX', 'SPF', 'DKIM', 'DMARC', 'Auto-setup', 'Website'].map(t => ({ type: t, ok: !list.includes(t) }));
+
+const clients = [
+  { id: 'harrow', name: 'Harrow & Lane Solicitors', contact: 'Priya Shah', email: 'priya@harrowlane.co.uk', plan: 'business', custom: 110,
+    extra: { inboxes: 0, aliases: 0, storage: 0 }, since: 'Oct 2026', status: 'active',
+    domains: [{ name: 'harrowlane.co.uk', dns: dnsOk() }],
+    inboxes: mkInboxes('harrowlane.co.uk', [['Priya Shah', 'priya'], ['Daniel Okafor', 'daniel'], ['Hannah Wright', 'hannah'], ['Tom Lane', 'tom'], ['Grace Harrow', 'grace'], ['Accounts', 'accounts'], ['Reception', 'reception'], ['Oliver Chen', 'oliver'], ['Amira Hassan', 'amira'], ['Lucy Patel', 'lucy'], ['James Byrne', 'james'], ['Conveyancing', 'conveyancing']], 25),
+    aliases: [
+      { local: 'info', type: 'alias', to: ['reception'] },
+      { local: 'enquiries', type: 'group', to: ['reception', 'priya', 'daniel'] },
+      { local: 'billing', type: 'alias', to: ['accounts'] },
+      { local: 'property', type: 'group', to: ['conveyancing', 'tom', 'lucy', 'james'] },
+      { local: 'family', type: 'group', to: ['hannah', 'amira'] },
+      { local: 'partners', type: 'group', to: ['priya', 'grace', 'tom'] },
+      { local: 'careers', type: 'alias', to: ['grace'] },
+    ] },
+  { id: 'bloom', name: 'Bloom & Co Florist', contact: 'Ellie Morgan', email: 'ellie@bloomandco.co.uk', plan: 'lite', custom: null,
+    extra: { inboxes: 0, aliases: 0, storage: 0 }, since: 'Oct 2026', status: 'active',
+    domains: [{ name: 'bloomandco.co.uk', dns: dnsOk() }],
+    inboxes: mkInboxes('bloomandco.co.uk', [['Ellie Morgan', 'ellie'], ['Orders', 'orders'], ['Sam Morgan', 'sam']], 5),
+    aliases: [
+      { local: 'hello', type: 'group', to: ['ellie', 'sam'] },
+      { local: 'weddings', type: 'alias', to: ['ellie'] },
+    ] },
+  { id: 'northgate', name: 'Northgate Builders', contact: 'Mark Reid', email: 'mark@northgatebuild.co.uk', plan: 'premium', custom: 60,
+    extra: { inboxes: 1, aliases: 0, storage: 0 }, since: 'Oct 2026', status: 'active',
+    domains: [{ name: 'northgatebuild.co.uk', dns: dnsOk(['DKIM', 'DMARC']) }],
+    inboxes: mkInboxes('northgatebuild.co.uk', [['Mark Reid', 'mark'], ['Office', 'office'], ['Jo Reid', 'jo'], ['Site team', 'site'], ['Kieran Doyle', 'kieran']], 10),
+    aliases: [
+      { local: 'quotes', type: 'group', to: ['mark', 'office'] },
+      { local: 'info', type: 'alias', to: ['office'] },
+      { local: 'support', type: 'group', to: ['office', 'jo', 'kieran'] },
+    ] },
+  { id: 'ztd', name: 'ZTD Office', contact: 'Samuel', email: 'samuel@ztdoffice.com', plan: 'business', custom: 0, internal: true,
+    extra: { inboxes: 0, aliases: 0, storage: 0 }, since: 'Oct 2026', status: 'active',
+    domains: [{ name: 'ztdoffice.com', dns: dnsOk() }],
+    inboxes: mkInboxes('ztdoffice.com', [['Samuel', 'samuel'], ['Hello', 'hello']], 5),
+    aliases: [{ local: 'postmaster', type: 'alias', to: ['samuel'] }] },
+];
+
+const activity = [
+  ['inbox', 'Harrow & Lane added conveyancing@', '2 hours ago'],
+  ['alert', 'Bloom & Co reached their inbox limit (3 of 3)', 'Today, 10:02'],
+  ['globe', 'northgatebuild.co.uk — waiting for DKIM and DMARC records', 'Today, 08:40'],
+  ['users', 'Northgate Builders created group support@', 'Yesterday'],
+  ['card', 'Harrow & Lane moved to Business (custom £110/mo)', '16 Oct'],
+];
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const gbp = n => '£' + (Math.round(n * 100) / 100).toLocaleString('en-GB', { minimumFractionDigits: n % 1 ? 2 : 0 });
+const initials = n => n.split(/\s+/).filter(w => /[A-Za-z]/.test(w[0])).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+const color = s => COLORS[[...s].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
+const avatar = (name, cls = '') => `<span class="avatar ${cls}" style="background:${color(name)}">${esc(initials(name))}</span>`;
+const byId = id => clients.find(c => c.id === id);
+const plan = c => PLANS[c.plan];
+const domain = c => c.domains[0].name;
+const limits = c => ({ inboxes: plan(c).inboxes + c.extra.inboxes, aliases: plan(c).aliases + c.extra.aliases, storage: plan(c).storage + c.extra.storage * 10 });
+const listPrice = c => plan(c).price + c.extra.inboxes * 5 + c.extra.storage * 3;
+const monthly = c => c.custom ?? listPrice(c);
+const dnsState = c => { const bad = c.domains.flatMap(d => d.dns).filter(r => !r.ok).length; return bad ? { cls: 'warn', text: bad + ' record' + (bad > 1 ? 's' : '') + ' pending' } : { cls: 'ok', text: 'All live' }; };
+const usedGB = c => c.inboxes.reduce((a, b) => a + b.used, 0);
+const seatsUsed = () => clients.reduce((a, c) => a + c.inboxes.length, 0);
+const meterCls = (u, l) => u >= l ? 'full' : u / l >= 0.8 ? 'warn' : '';
+const meter = (u, l, lg) => `<div class="meter ${lg ? 'lg' : ''} ${meterCls(u, l)}"><i style="width:${Math.min(100, (u / l) * 100)}%"></i></div>`;
+const mini = (u, l, unit = '') => `<div class="mini"><span class="t">${u}${unit} <span class="faint">of ${l}${unit}</span></span>${meter(u, l)}</div>`;
+const planBadge = id => `<span class="badge ${id}">${PLANS[id].name}</span>`;
+
+const ICONS = {
+  home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  layers: '<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',
+  inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  at: '<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  card: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+  key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>',
+  pause: '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+  play: '<path d="m6 3 14 9-14 9z"/>',
+  trash: '<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  db: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/>',
+  video: '<path d="m22 8-6 4 6 4V8z"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
+  arrow: '<path d="M5 12h14M12 5l7 7-7 7"/>',
+  ext: '<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+  chev: '<path d="m9 18 6-6-6-6"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  pound: '<path d="M18 7c0-5.33-8-5.33-8 0v12M6 13h8M6 19h12"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+  spark: '<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  edit: '<path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+};
+const icon = n => `<svg class="i" viewBox="0 0 24 24">${ICONS[n] || ''}</svg>`;
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = icon('check') + `<span>${esc(msg)}</span>`;
+  $('#toasts').append(el);
+  setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = 0; setTimeout(() => el.remove(), 300); }, 3200);
+}
+
+function modal(html, { wide } = {}) {
+  closeModal();
+  const s = document.createElement('div');
+  s.className = 'scrim';
+  s.id = 'scrim';
+  s.innerHTML = `<div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true">${html}</div>`;
+  s.addEventListener('mousedown', e => { if (e.target === s) closeModal(); });
+  document.body.append(s);
+  s.querySelector('input:not([type=checkbox]):not([readonly]), select')?.focus();
+  return s;
+}
+function closeModal() { $('#scrim')?.remove(); }
+const modalHead = (t, p) => `<div class="modal-h"><div><h3>${t}</h3>${p ? `<p>${p}</p>` : ''}</div><button class="icon-btn" onclick="closeModal()" aria-label="Close">${icon('x')}</button></div>`;
+
+function menu(anchor, items) {
+  closeMenu();
+  const m = document.createElement('div');
+  m.className = 'menu';
+  m.id = 'menu';
+  m.innerHTML = items.map((it, i) => it === '-' ? '<hr>' : `<button data-i="${i}" class="${it.danger ? 'danger' : ''}">${icon(it.icon)}${esc(it.label)}</button>`).join('');
+  document.body.append(m);
+  const r = anchor.getBoundingClientRect();
+  const top = Math.min(r.bottom + 6, innerHeight - m.offsetHeight - 10);
+  m.style.top = top + 'px';
+  m.style.left = Math.max(10, r.right - m.offsetWidth) + 'px';
+  m.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; closeMenu(); items[+b.dataset.i].run(); });
+  setTimeout(() => document.addEventListener('mousedown', outside), 0);
+  function outside(e) { if (!m.contains(e.target)) { closeMenu(); document.removeEventListener('mousedown', outside); } }
+}
+function closeMenu() { $('#menu')?.remove(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeMenu(); } });
+
+/* ============================================================
+   Router
+   ============================================================ */
+let role = 'staff';
+let clientId = 'bloom';
+let filter = 'all';
+let query = '';
+
+function go(hash) { location.hash = hash; }
+window.addEventListener('hashchange', render);
+
+function parse() {
+  const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  if (parts[0] === 'client') { role = 'client'; if (byId(parts[1])) clientId = parts[1]; return { area: 'client', page: parts[2] || 'overview' }; }
+  role = 'staff';
+  return { area: 'staff', page: parts[1] || 'overview', id: parts[2] };
+}
+
+function render() {
+  const r = parse();
+  document.body.classList.remove('nav-open');
+  closeMenu();
+  document.querySelectorAll('.ribbon [data-role]').forEach(b => b.classList.toggle('on', b.dataset.role === role));
+  $('#side').innerHTML = r.area === 'staff' ? staffSide(r) : clientSide(r);
+  const v = r.area === 'staff'
+    ? ({ overview: staffOverview, clients: r.id ? () => staffClient(byId(r.id)) : staffClients, plans: staffPlans }[r.page] || staffOverview)()
+    : ({ overview: clientOverview, inboxes: clientInboxes, groups: clientGroups, domain: clientDomain, plan: clientPlan }[r.page] || clientOverview)(byId(clientId));
+  $('#view').innerHTML = `<div class="view">${v}</div>`;
+  window.scrollTo(0, 0);
+}
+
+/* ============================================================
+   Sidebars
+   ============================================================ */
+function navLink(href, ic, label, on, count) {
+  return `<a href="${href}" class="${on ? 'on' : ''}">${icon(ic)}${label}${count != null ? `<span class="count">${count}</span>` : ''}</a>`;
+}
+const brand = sub => `<div class="brand"><img src="/ztdoffice-logo.svg" alt=""><div><div class="t">ZTD Office</div><div class="s">${sub}</div></div></div>`;
+
+function staffSide(r) {
+  const p = r.page;
+  return `${brand('Control panel')}
+    <nav>
+      ${navLink('#/staff', 'home', 'Overview', p === 'overview')}
+      ${navLink('#/staff/clients', 'users', 'Clients', p === 'clients', clients.filter(c => !c.internal).length)}
+      ${navLink('#/staff/plans', 'layers', 'Plans & pricing', p === 'plans')}
+      <div class="nav-label">Services</div>
+      <a href="https://mail.ztdoffice.com" target="_blank" rel="noopener">${icon('mail')}Webmail<span class="count">${icon('ext')}</span></a>
+      <a href="https://mx1.ztdoffice.com/admin" target="_blank" rel="noopener">${icon('shield')}Mail server<span class="count">${icon('ext')}</span></a>
+    </nav>
+    <div class="side-foot">${avatar('Samuel')}<div><div class="n">Samuel</div><div class="d">ZTD staff · owner</div></div></div>`;
+}
+
+function clientSide(r) {
+  const c = byId(clientId), p = r.page, base = '#/client/' + c.id;
+  return `${brand('Client portal')}
+    <div class="tenant">${avatar(c.name, 'sq')}<div style="min-width:0"><div class="n">${esc(c.name)}</div><div class="d">${esc(domain(c))}</div></div></div>
+    <nav>
+      ${navLink(base, 'home', 'Overview', p === 'overview')}
+      ${navLink(base + '/inboxes', 'inbox', 'Inboxes', p === 'inboxes', `${c.inboxes.length}/${limits(c).inboxes}`)}
+      ${navLink(base + '/groups', 'at', 'Groups & aliases', p === 'groups', `${c.aliases.length}/${limits(c).aliases}`)}
+      ${navLink(base + '/domain', 'globe', 'Domain', p === 'domain')}
+      ${navLink(base + '/plan', 'card', 'Plan & billing', p === 'plan')}
+      <div class="nav-label">Apps</div>
+      <a href="https://mail.ztdoffice.com" target="_blank" rel="noopener">${icon('mail')}Open webmail<span class="count">${icon('ext')}</span></a>
+    </nav>
+    <div class="side-foot">${avatar(c.contact)}<div style="min-width:0"><div class="n">${esc(c.contact)}</div><div class="d">${esc(c.email)}</div></div></div>`;
+}
+
+/* ============================================================
+   Staff views
+   ============================================================ */
+function staffOverview() {
+  const paying = clients.filter(c => !c.internal);
+  const mrr = paying.reduce((a, c) => a + monthly(c), 0);
+  const seats = seatsUsed(), left = LICENCE.seats - seats;
+  const domains = clients.flatMap(c => c.domains);
+  const healthy = domains.filter(d => d.dns.every(r => r.ok)).length;
+  const attention = [];
+  paying.forEach(c => {
+    const l = limits(c);
+    if (c.inboxes.length >= l.inboxes) {
+      const next = ORDER[ORDER.indexOf(c.plan) + 1];
+      attention.push(['alert', 'warn', `${c.name} is at their inbox limit`, `${c.inboxes.length} of ${l.inboxes} on ${plan(c).name}${next ? ` · upgrade to ${PLANS[next].name} = +${gbp(PLANS[next].price - monthly(c))}/mo` : ''}`, `#/staff/clients/${c.id}`]);
+    }
+    c.domains.forEach(d => { const bad = d.dns.filter(r => !r.ok); if (bad.length) attention.push(['globe', 'warn', `${d.name} isn't fully set up`, `Waiting for ${bad.map(r => r.type).join(' and ')} at the client's DNS provider`, `#/staff/clients/${c.id}`]); });
+  });
+  if (left <= 5) attention.unshift(['key', 'bad', `Only ${left} mail licence seats left`, `${seats} of ${LICENCE.seats} used · add seats in the Stalwart portal before the next client`, 'https://stalw.art/pricing']);
+  const mix = ORDER.map(id => [id, paying.filter(c => c.plan === id).length]);
+
+  return `
+    <div class="head"><div><h1>Good evening, Samuel</h1><div class="sub">Here's how ZTD Office is doing today.</div></div>
+      <div class="actions"><button class="btn primary" onclick="newClient()">${icon('plus')}New client</button></div></div>
+
+    <div class="grid g4" style="margin-bottom:16px">
+      <div class="card card-b stat"><div class="k">${icon('pound')}Monthly revenue</div><div class="v">${gbp(mrr)}</div><div class="f">${gbp(mrr * 12)} a year · ${paying.length} paying clients</div></div>
+      <div class="card card-b stat"><div class="k">${icon('users')}Clients</div><div class="v">${paying.length}</div><div class="f">${mix.map(([id, n]) => `${n} ${PLANS[id].name}`).join(' · ')}</div></div>
+      <div class="card card-b stat"><div class="k">${icon('key')}Licence seats</div><div class="v">${seats}<small> / ${LICENCE.seats}</small></div><div style="margin-top:10px">${meter(seats, LICENCE.seats)}</div></div>
+      <div class="card card-b stat"><div class="k">${icon('globe')}Domains live</div><div class="v">${healthy}<small> / ${domains.length}</small></div><div class="f">MX, SPF, DKIM, DMARC checked hourly</div></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><div><h2>Needs attention</h2><div class="sub muted">Things that cost you money or mail if ignored</div></div></div>
+          <div class="list" style="margin-top:10px">
+            ${attention.length ? attention.map(([ic, cls, t, d, href]) => `
+              <a class="li" href="${href}" ${href.startsWith('http') ? 'target="_blank" rel="noopener"' : ''}><span class="ic ${cls}">${icon(ic)}</span><div class="grow"><div class="n">${esc(t)}</div><div class="d">${esc(d)}</div></div><span class="faint">${icon('chev')}</span></a>`).join('')
+              : `<div class="empty">${icon('check')} All clear</div>`}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Clients</h2><a class="btn sm ghost" href="#/staff/clients">View all ${icon('arrow')}</a></div>
+          <div class="table-wrap" style="margin-top:12px">${clientTable(paying, { compact: true })}</div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card card-b">
+          <h2>Mail licence</h2>
+          <div class="sub muted small">Stalwart Enterprise · ztdoffice.com</div>
+          <div class="usage" style="margin-top:16px"><div class="row"><span class="muted">Mailboxes</span><b>${seats} of ${LICENCE.seats}</b></div>${meter(seats, LICENCE.seats, true)}</div>
+          <dl class="kv" style="margin-top:16px"><dt>Renews</dt><dd>${LICENCE.renews}</dd><dt>Cost per seat</dt><dd>≈ €2 / year</dd><dt>Aliases & groups</dt><dd>Free, not counted</dd></dl>
+        </div>
+        <div class="card card-b">
+          <h2>Plan mix</h2>
+          <div class="bars" style="margin-top:16px">${mix.map(([id, n]) => `<div class="b"><span>${PLANS[id].name}</span>${meter(n, Math.max(1, paying.length))}<span class="num r faint" style="text-align:right">${n}</span></div>`).join('')}</div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Recent activity</h2></div>
+          <div class="list" style="margin-top:8px">${activity.map(([ic, t, w]) => `<div class="li"><span class="ic">${icon(ic)}</span><div class="grow"><div style="font-size:13.5px">${esc(t)}</div><div class="d">${w}</div></div></div>`).join('')}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function clientTable(list, { compact } = {}) {
+  if (!list.length) return `<div class="empty">No clients match.</div>`;
+  const wide = compact ? 'hidden-col' : 'hide-sm';
+  return `<table><thead><tr><th>Client</th><th>Plan</th><th class="hide-sm">Inboxes</th><th class="${wide}">Groups & aliases</th><th class="${wide}">Domain</th><th class="r">Price</th></tr></thead><tbody>
+    ${list.map(c => { const l = limits(c), d = dnsState(c); return `
+      <tr class="click ${c.status === 'suspended' ? 'suspended' : ''}" onclick="go('#/staff/clients/${c.id}')">
+        <td><div class="who">${avatar(c.name, 'sq')}<div style="min-width:0"><div class="n">${esc(c.name)}</div><div class="d">${esc(domain(c))}</div></div></div></td>
+        <td>${planBadge(c.plan)}${c.status === 'suspended' ? ' <span class="badge bad">Suspended</span>' : ''}</td>
+        <td class="hide-sm">${mini(c.inboxes.length, l.inboxes)}</td>
+        <td class="${wide}">${mini(c.aliases.length, l.aliases)}</td>
+        <td class="${wide}"><span class="badge ${d.cls}"><span class="dot"></span>${d.text}</span></td>
+        <td class="r num"><b>${gbp(monthly(c))}</b><span class="faint">/mo</span>${c.custom != null && !c.internal ? '<span class="tag">CUSTOM</span>' : ''}</td>
+      </tr>`; }).join('')}
+  </tbody></table>`;
+}
+
+function staffClients() {
+  const list = clients.filter(c => !c.internal)
+    .filter(c => filter === 'all' || c.plan === filter)
+    .filter(c => !query || (c.name + ' ' + domain(c) + ' ' + c.contact).toLowerCase().includes(query.toLowerCase()));
+  return `
+    <div class="head"><div><h1>Clients</h1><div class="sub">Every business you host, their plan and what they've used.</div></div>
+      <div class="actions"><button class="btn primary" onclick="newClient()">${icon('plus')}New client</button></div></div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="search">${icon('search')}<input class="input" placeholder="Search clients, domains, contacts" value="${esc(query)}" oninput="query=this.value; refreshClients()"></div>
+        <div class="chips">${['all', ...ORDER].map(f => `<button class="chip ${filter === f ? 'on' : ''}" onclick="filter='${f}'; render()">${f === 'all' ? 'All plans' : PLANS[f].name}</button>`).join('')}</div>
+      </div>
+      <div class="table-wrap" id="ctable">${clientTable(list)}</div>
+    </div>`;
+}
+function refreshClients() {
+  const list = clients.filter(c => !c.internal).filter(c => filter === 'all' || c.plan === filter)
+    .filter(c => !query || (c.name + ' ' + domain(c) + ' ' + c.contact).toLowerCase().includes(query.toLowerCase()));
+  $('#ctable').innerHTML = clientTable(list);
+}
+
+function staffClient(c) {
+  if (!c) return `<div class="empty">Client not found.</div>`;
+  const l = limits(c), p = plan(c);
+  return `
+    <div class="crumbs"><a href="#/staff/clients">Clients</a>${icon('chev')}<span>${esc(c.name)}</span></div>
+    <div class="head">
+      <div class="who">${avatar(c.name, 'lg')}<div><h1>${esc(c.name)}</h1><div class="sub">${planBadge(c.plan)} &nbsp;${esc(domain(c))} · ${esc(c.contact)} · client since ${c.since}</div></div></div>
+      <div class="actions">
+        <button class="btn" onclick="go('#/client/${c.id}')">${icon('ext')}Open client view</button>
+        <button class="btn icon-btn" style="width:36px;height:36px;border:1px solid var(--line)" onclick="clientMenu(this,'${c.id}')" aria-label="More">${icon('more')}</button>
+      </div>
+    </div>
+    ${c.status === 'suspended' ? `<div class="banner warn"><span class="ic warn">${icon('pause')}</span><div class="grow"><b>Account suspended.</b> Mail is still received and kept for 30 days; nobody can sign in.</div><button class="btn sm" onclick="toggleSuspend('${c.id}')">Resume</button></div>` : ''}
+    <div class="grid g4" style="margin-bottom:16px">
+      <div class="card card-b"><div class="usage"><div class="row"><span class="muted">Inboxes</span><b>${c.inboxes.length} / ${l.inboxes}</b></div>${meter(c.inboxes.length, l.inboxes, true)}</div></div>
+      <div class="card card-b"><div class="usage"><div class="row"><span class="muted">Groups & aliases</span><b>${c.aliases.length} / ${l.aliases}</b></div>${meter(c.aliases.length, l.aliases, true)}</div></div>
+      <div class="card card-b"><div class="usage"><div class="row"><span class="muted">Storage</span><b>${usedGB(c).toFixed(0)} GB</b></div>${meter(usedGB(c), c.inboxes.length * l.storage || 1, true)}<span class="faint small">${l.storage} GB per inbox</span></div></div>
+      <div class="card card-b"><div class="usage"><div class="row"><span class="muted">Price</span><b>${gbp(monthly(c))}/mo</b></div><span class="faint small">${c.custom != null ? `Custom · list price ${gbp(listPrice(c))}` : 'List price'}</span></div></div>
+    </div>
+    <div class="grid g2">
+      <div class="stack">${inboxCard(c)}${groupsCard(c)}</div>
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><div><h2>Plan & price</h2><div class="sub muted">Only ZTD staff can change this</div></div></div>
+          <div class="card-b form" id="planform">
+            <div class="field"><label>Plan</label>
+              <select class="input" id="pf-plan">${ORDER.map(id => `<option value="${id}" ${id === c.plan ? 'selected' : ''}>${PLANS[id].name} — ${gbp(PLANS[id].price)}/mo · ${PLANS[id].inboxes} inboxes</option>`).join('')}</select></div>
+            <div class="field"><label>Extra inboxes</label>
+              <div style="display:flex;align-items:center;gap:12px"><div class="stepper"><button onclick="step('pf-extra',-1)">−</button><span id="pf-extra">${c.extra.inboxes}</span><button onclick="step('pf-extra',1)">+</button></div><span class="faint small">£5 each, on top of the plan</span></div></div>
+            <div class="field"><label>Monthly price</label>
+              <div class="addon pre"><span>£</span><input class="input" id="pf-price" inputmode="decimal" placeholder="${listPrice(c)}" value="${c.custom != null ? c.custom : ''}"></div>
+              <span class="hint">Leave empty to charge the list price.</span></div>
+            <button class="btn primary" onclick="savePlan('${c.id}')">Save changes</button>
+          </div>
+        </div>
+        ${dnsCard(c)}
+        <div class="card card-b">
+          <h2>Contact</h2>
+          <dl class="kv" style="margin-top:14px"><dt>Name</dt><dd>${esc(c.contact)}</dd><dt>Email</dt><dd>${esc(c.email)}</dd><dt>Annual value</dt><dd>${gbp(monthly(c) * 12)}</dd></dl>
+        </div>
+      </div>
+    </div>`;
+}
+
+function staffPlans() {
+  return `
+    <div class="head"><div><h1>Plans & pricing</h1><div class="sub">List prices shown on the website. Every client can also have a custom price and limits.</div></div>
+      <div class="actions"><span class="badge">Annual billing = 2 months free</span></div></div>
+    <div class="plans" style="margin-top:12px">${ORDER.map(id => planCard(PLANS[id], { featured: id === 'premium', staff: true })).join('')}</div>
+    <h2 style="margin:36px 0 14px">Add-ons</h2>
+    <div class="grid g4">${ADDONS.map(a => `<div class="card card-b"><span class="ic brand">${icon(a.icon)}</span><div style="font-weight:600;margin-top:12px">${a.name}</div><div style="margin-top:4px"><b style="font-size:20px;letter-spacing:-.02em">${gbp(a.price)}</b> <span class="faint small">${a.unit}</span></div></div>`).join('')}</div>
+    <h2 style="margin:36px 0 14px">Compare</h2>
+    <div class="card table-wrap">${compareTable()}</div>`;
+}
+
+function planFeatures(p) {
+  return [
+    [true, `Website hosting & care`],
+    [true, `<b>${p.inboxes}</b> email inboxes`],
+    [true, `<b>${p.aliases}</b> groups & aliases`],
+    [true, `<b>${p.storage} GB</b> per inbox`],
+    [true, p.domains > 1 ? `<b>${p.domains}</b> domains` : '1 domain'],
+    [true, 'Webmail, calendar & contacts'],
+    [!!p.meetings, p.meetings || 'Online meetings (add-on)'],
+    [p.shared > 0, p.shared ? `${p.shared} shared inbox${p.shared > 1 ? 'es' : ''}` : 'Shared inboxes'],
+    [true, p.migration],
+    [true, p.support],
+  ];
+}
+function planCard(p, { featured, staff, current, client } = {}) {
+  const feats = planFeatures(p);
+  let action = '';
+  if (staff) action = `<button class="btn" onclick="toast('Editing plans comes with the real build')">${icon('edit')}Edit plan</button>`;
+  else if (current) action = `<button class="btn" disabled style="opacity:.6;cursor:default">Your current plan</button>`;
+  else if (client) action = `<button class="btn ${featured ? 'primary' : ''}" onclick="changePlan('${client.id}','${p.id}')">${ORDER.indexOf(p.id) > ORDER.indexOf(client.plan) ? 'Upgrade to ' : 'Switch to '}${p.name}</button>`;
+  return `<div class="card plan ${featured && !current ? 'featured' : ''} ${current ? 'current' : ''}">
+    ${featured && !current ? '<span class="flag">Most popular</span>' : ''}${current ? '<span class="flag" style="background:var(--ink);color:var(--panel)">Current plan</span>' : ''}
+    <div class="pn">${p.name}</div><div class="pb">${p.blurb}</div>
+    <div class="pp"><b>${gbp(p.price)}</b><span>/ month</span></div>
+    <div class="pa">or ${gbp(p.price * 10)} a year · email included free</div>
+    <ul>${feats.map(([on, t]) => `<li class="${on ? '' : 'no'}">${icon(on ? 'check' : 'x')}<span>${t}</span></li>`).join('')}</ul>
+    ${action}
+  </div>`;
+}
+function compareTable() {
+  const rows = [
+    ['Price / month', p => gbp(p.price)], ['Website', () => icon('check')], ['Inboxes', p => p.inboxes], ['Groups & aliases', p => p.aliases],
+    ['Storage per inbox', p => p.storage + ' GB'], ['Domains', p => p.domains], ['Shared inboxes', p => p.shared || '—'],
+    ['Online meetings', p => p.meetings ? p.meetings.replace('Meetings ', '').replace(' meetings', '') : 'Add-on'], ['Sending limit / inbox / day', p => p.send.toLocaleString()],
+    ['Moving old email', p => p.migration], ['Support', p => p.support],
+  ];
+  return `<table><thead><tr><th></th>${ORDER.map(id => `<th>${planBadge(id)}</th>`).join('')}</tr></thead><tbody>
+    ${rows.map(([k, f]) => `<tr><td class="muted">${k}</td>${ORDER.map(id => `<td class="num">${f(PLANS[id])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+/* ============================================================
+   Shared cards (staff + client)
+   ============================================================ */
+function inboxCard(c, { full } = {}) {
+  const l = limits(c), at = c.inboxes.length >= l.inboxes;
+  const list = full ? c.inboxes : c.inboxes.slice(0, 6);
+  return `<div class="card">
+    <div class="card-h"><div><h2>Inboxes</h2><div class="sub muted">${c.inboxes.length} of ${l.inboxes} used${at ? ' · limit reached' : ''}</div></div>
+      <div class="actions">${!full ? `<a class="btn sm ghost" href="${role === 'staff' ? `#/client/${c.id}/inboxes` : `#/client/${c.id}/inboxes`}">View all</a>` : ''}<button class="btn sm ${at ? '' : 'primary'}" onclick="newInbox('${c.id}')">${icon('plus')}New inbox</button></div></div>
+    <div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Person</th><th class="hide-sm">Storage</th><th class="hide-sm">Last sign-in</th><th></th></tr></thead><tbody>
+      ${list.map(m => `<tr class="${m.status === 'suspended' ? 'suspended' : ''}">
+        <td><div class="who">${avatar(m.name)}<div style="min-width:0"><div class="n">${esc(m.name)} ${m.admin ? '<span class="badge" style="height:19px;font-size:11px">Admin</span>' : ''}${m.status === 'suspended' ? '<span class="badge bad" style="height:19px;font-size:11px">Suspended</span>' : ''}</div><div class="d">${esc(m.local)}@${esc(domain(c))}</div></div></div></td>
+        <td class="hide-sm">${mini(m.used, m.quota, ' GB')}</td>
+        <td class="hide-sm muted small">${m.last}</td>
+        <td class="r"><button class="icon-btn" onclick="inboxMenu(this,'${c.id}','${esc(m.local)}')" aria-label="Actions">${icon('more')}</button></td>
+      </tr>`).join('')}
+    </tbody></table></div>
+    ${!full && c.inboxes.length > list.length ? `<div class="faint small" style="padding:10px 20px 14px">+ ${c.inboxes.length - list.length} more</div>` : ''}
+  </div>`;
+}
+
+function groupsCard(c, { full } = {}) {
+  const l = limits(c);
+  const nameOf = local => c.inboxes.find(m => m.local === local)?.name || local;
+  return `<div class="card">
+    <div class="card-h"><div><h2>Groups & aliases</h2><div class="sub muted">${c.aliases.length} of ${l.aliases} used · don't use an inbox</div></div>
+      <button class="btn sm" onclick="newAlias('${c.id}')">${icon('plus')}New</button></div>
+    <div class="list" style="margin-top:12px">
+      ${c.aliases.length ? c.aliases.map((a, i) => `<div class="li">
+        <span class="ic ${a.type === 'group' ? 'brand' : ''}">${icon(a.type === 'group' ? 'users' : 'at')}</span>
+        <div class="grow"><div class="n">${esc(a.local)}@${esc(domain(c))}</div>
+          <div class="d">${a.type === 'group' ? `Group · sends a copy to ${a.to.length} people` : `Alias · delivered to ${esc(nameOf(a.to[0]))}`}</div></div>
+        <div class="members hide-sm">${a.to.slice(0, 4).map(t => avatar(nameOf(t))).join('')}</div>
+        <button class="icon-btn" onclick="aliasMenu(this,'${c.id}',${i})" aria-label="Actions">${icon('more')}</button>
+      </div>`).join('') : `<div class="empty">No groups or aliases yet. Try info@ or support@.</div>`}
+    </div></div>`;
+}
+
+function dnsCard(c) {
+  return c.domains.map(d => { const bad = d.dns.filter(r => !r.ok).length; return `<div class="card">
+    <div class="card-h"><div><h2>${esc(d.name)}</h2><div class="sub muted">${bad ? `${bad} record${bad > 1 ? 's' : ''} still to add` : 'Mail and website records are live'}</div></div>
+      <span class="badge ${bad ? 'warn' : 'ok'}"><span class="dot"></span>${bad ? 'Pending' : 'Live'}</span></div>
+    <div class="list" style="margin-top:10px">${d.dns.map(r => `<div class="li" style="padding:9px 20px"><span class="grow">${r.type}</span>${r.ok ? `<span class="badge ok">${icon('check')}Live</span>` : `<span class="badge warn">Waiting</span>`}</div>`).join('')}</div>
+  </div>`; }).join('');
+}
+
+/* ============================================================
+   Client views
+   ============================================================ */
+function clientOverview(c) {
+  const l = limits(c), p = plan(c), next = PLANS[ORDER[ORDER.indexOf(c.plan) + 1]];
+  const at = c.inboxes.length >= l.inboxes;
+  return `
+    <div class="card hero card-b" style="padding:28px 28px;margin-bottom:16px">
+      <div style="position:relative;z-index:1;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-end">
+        <div><div class="muted small" style="font-weight:500">${esc(c.name)} · ${p.name} plan</div>
+          <h1 style="color:#fff;margin-top:6px">Welcome back, ${esc(c.contact.split(' ')[0])}</h1>
+          <div class="muted" style="margin-top:6px">Your email on <b style="color:#fff">${esc(domain(c))}</b> is running smoothly.</div></div>
+        <div class="actions"><a class="btn" href="https://mail.ztdoffice.com" target="_blank" rel="noopener">${icon('mail')}Open webmail</a><button class="btn gold" onclick="newInbox('${c.id}')">${icon('plus')}Add a person</button></div>
+      </div>
+    </div>
+    ${at && next ? `<div class="banner brand"><span class="ic brand">${icon('spark')}</span><div class="grow"><b>You're using all ${l.inboxes} inboxes.</b> <span class="muted">${next.name} gives you ${next.inboxes} inboxes, ${next.aliases} groups and online meetings.</span></div><a class="btn sm primary" href="#/client/${c.id}/plan">See plans</a></div>` : ''}
+    <div class="grid g3" style="margin-bottom:16px">
+      <div class="card card-b"><div class="usage"><div class="row"><span class="muted">${icon('inbox')} Inboxes</span><b>${c.inboxes.length} of ${l.inboxes}</b></div>${meter(c.inboxes.length, l.inboxes, true)}<span class="faint small">${at ? 'Limit reached' : `${l.inboxes - c.inboxes.length} left on your plan`}</span></div></div>
+      <div class="card card-b"><div class="usage"><div class="row"><span class="muted">${icon('at')} Groups & aliases</span><b>${c.aliases.length} of ${l.aliases}</b></div>${meter(c.aliases.length, l.aliases, true)}<span class="faint small">${l.aliases - c.aliases.length} left</span></div></div>
+      <div class="card card-b"><div class="usage"><div class="row"><span class="muted">${icon('db')} Storage</span><b>${usedGB(c).toFixed(1)} GB</b></div>${meter(usedGB(c), c.inboxes.length * l.storage, true)}<span class="faint small">${l.storage} GB per inbox</span></div></div>
+    </div>
+    <div class="grid g2">
+      <div class="stack">${inboxCard(c)}${groupsCard(c)}</div>
+      <div class="stack">
+        <div class="card card-b">
+          <h2>Set up a mail app</h2><div class="sub muted small">Outlook, iPhone, Android, Mac Mail</div>
+          <dl class="kv" style="margin-top:16px">
+            <dt>Incoming (IMAP)</dt><dd class="mono">mx1.ztdoffice.com · 993</dd>
+            <dt>Outgoing (SMTP)</dt><dd class="mono">mx1.ztdoffice.com · 587</dd>
+            <dt>Security</dt><dd>SSL / STARTTLS</dd>
+            <dt>Username</dt><dd>Full email address</dd>
+          </dl>
+          <hr class="sep"><button class="btn sm" style="width:100%" onclick="navigator.clipboard?.writeText('IMAP mx1.ztdoffice.com:993 SSL\\nSMTP mx1.ztdoffice.com:587 STARTTLS\\nUsername: full email address'); toast('Settings copied')">${icon('copy')}Copy settings</button>
+        </div>
+        ${dnsCard(c)}
+        <div class="card card-b">
+          <div style="display:flex;justify-content:space-between;align-items:center"><h2>Your plan</h2>${planBadge(c.plan)}</div>
+          <dl class="kv" style="margin-top:14px"><dt>Monthly</dt><dd>${gbp(monthly(c))}</dd><dt>Includes</dt><dd>Website + email</dd><dt>Next invoice</dt><dd>1 Nov 2026</dd></dl>
+          <hr class="sep"><a class="btn sm" style="width:100%" href="#/client/${c.id}/plan">Compare plans</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+const clientHead = (t, s, act = '') => `<div class="head"><div><h1>${t}</h1><div class="sub">${s}</div></div><div class="actions">${act}</div></div>`;
+
+function clientInboxes(c) {
+  const l = limits(c);
+  return clientHead('Inboxes', `Each person gets their own inbox, calendar and contacts. ${c.inboxes.length} of ${l.inboxes} used.`)
+    + inboxCard(c, { full: true });
+}
+function clientGroups(c) {
+  return clientHead('Groups & aliases', 'Extra addresses that deliver into existing inboxes. They don\'t use up an inbox.')
+    + `<div class="grid g3" style="margin-bottom:16px">
+        <div class="card card-b"><span class="ic">${icon('at')}</span><div style="font-weight:600;margin-top:10px">Alias</div><div class="muted small">info@ goes straight into one person's inbox.</div></div>
+        <div class="card card-b"><span class="ic brand">${icon('users')}</span><div style="font-weight:600;margin-top:10px">Group</div><div class="muted small">support@ sends a copy to everyone in the group. Reply-all keeps the team in the loop.</div></div>
+        <div class="card card-b"><span class="ic warn">${icon('inbox')}</span><div style="font-weight:600;margin-top:10px">Shared inbox</div><div class="muted small">One inbox the team works from together. Uses an inbox on your plan${plan(c).shared ? '' : ' (Premium and up)'}.</div></div>
+      </div>` + groupsCard(c, { full: true });
+}
+function clientDomain(c) {
+  const d = c.domains[0], bad = d.dns.filter(r => !r.ok);
+  const vals = { MX: ['MX', '@', '10 mx1.ztdoffice.com'], SPF: ['TXT', '@', 'v=spf1 mx include:amazonses.com ~all'], DKIM: ['TXT', 'ztd._domainkey', 'v=DKIM1; k=rsa; p=MIIBIjANBgkq…'], DMARC: ['TXT', '_dmarc', 'v=DMARC1; p=none; rua=mailto:dmarc@ztdoffice.com'], 'Auto-setup': ['CNAME', 'autodiscover', 'mx1.ztdoffice.com'], Website: ['A', '@', '62.238.17.10'] };
+  return clientHead('Domain', `DNS records for ${esc(d.name)}. We check them every hour.`, `<button class="btn" onclick="toast('Checked just now — ${bad.length ? bad.length + ' still waiting' : 'all records live'}')">${icon('spark')}Check now</button>`)
+    + (bad.length ? `<div class="banner warn"><span class="ic warn">${icon('alert')}</span><div class="grow"><b>${bad.length} record${bad.length > 1 ? 's' : ''} still to add.</b> <span class="muted">Mail may land in spam until ${bad.map(r => r.type).join(' and ')} ${bad.length > 1 ? 'are' : 'is'} in place. Send this page to whoever manages your domain, or ask us to do it.</span></div></div>` : '')
+    + `<div class="card table-wrap"><table><thead><tr><th>Record</th><th>Type</th><th>Name</th><th>Value</th><th class="r">Status</th></tr></thead><tbody>
+      ${d.dns.map(r => { const [t, n, v] = vals[r.type]; return `<tr><td><b style="font-weight:600">${r.type}</b></td><td class="mono">${t}</td><td class="mono">${n}</td><td class="mono" style="max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v)}</td><td class="r">${r.ok ? `<span class="badge ok">${icon('check')}Live</span>` : `<span class="badge warn">Waiting</span>`}</td></tr>`; }).join('')}
+      </tbody></table></div>`;
+}
+function clientPlan(c) {
+  return clientHead('Plan & billing', `You're on <b>${plan(c).name}</b> at ${gbp(monthly(c))} a month. Website and email are included.`)
+    + `<div class="plans" style="margin-top:12px">${ORDER.map(id => planCard(PLANS[id], { featured: id === 'premium', current: id === c.plan, client: c })).join('')}</div>
+      <h2 style="margin:36px 0 14px">Need a little more?</h2>
+      <div class="grid g4">${ADDONS.map(a => `<div class="card card-b"><span class="ic brand">${icon(a.icon)}</span><div style="font-weight:600;margin-top:12px">${a.name}</div><div style="margin-top:2px"><b>${gbp(a.price)}</b> <span class="faint small">${a.unit}</span></div><button class="btn sm" style="margin-top:12px;width:100%" onclick="${a.id === 'inbox' ? `addExtraInbox('${c.id}')` : `toast('Request sent to ZTD Office')`}">Add</button></div>`).join('')}</div>`;
+}
+
+/* ============================================================
+   Actions (prototype: change in-memory data only)
+   ============================================================ */
+function newInbox(id) {
+  const c = byId(id), l = limits(c);
+  if (c.inboxes.length >= l.inboxes) return upgradePrompt(c);
+  const s = modal(`${modalHead('Add a person', `Creates an inbox, calendar and contacts. ${l.inboxes - c.inboxes.length} of ${l.inboxes} inboxes left.`)}
+    <div class="modal-b form">
+      <div class="field"><label>Full name</label><input class="input" id="ni-name" placeholder="Jane Smith" autocomplete="off"></div>
+      <div class="field"><label>Email address</label><div class="addon"><input class="input" id="ni-local" placeholder="jane" autocomplete="off"><span>@${esc(domain(c))}</span></div></div>
+      <div class="field"><label>First sign-in</label>
+        <div class="seg2"><button class="opt on" data-v="invite" onclick="pick(this)"><b>Email an invite</b><span>They choose their own password</span></button><button class="opt" data-v="pw" onclick="pick(this)"><b>Set a password</b><span>You give it to them</span></button></div></div>
+      <div class="field" id="ni-invite-f"><label>Send the invite to</label><input class="input" id="ni-invite" placeholder="their personal email"></div>
+      <div class="hint faint small">${l.storage} GB storage · two-step sign-in required on first login</div>
+    </div>
+    <div class="modal-f"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="ni-go">Create inbox</button></div>`);
+  const name = s.querySelector('#ni-name'), local = s.querySelector('#ni-local');
+  name.addEventListener('input', () => { if (!local.dataset.touched) local.value = name.value.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9.]/g, ''); });
+  local.addEventListener('input', () => local.dataset.touched = 1);
+  s.querySelector('#ni-go').onclick = () => {
+    const n = name.value.trim(), lp = local.value.trim().toLowerCase();
+    if (!n || !/^[a-z0-9][a-z0-9._-]*$/.test(lp)) return toast('Add a name and a valid address');
+    if (c.inboxes.some(m => m.local === lp) || c.aliases.some(a => a.local === lp)) return toast(`${lp}@ is already in use`);
+    c.inboxes.push({ id: domain(c) + ':' + lp, name: n, local: lp, quota: l.storage, used: 0, status: 'active', last: 'Never' });
+    closeModal(); render(); toast(`${lp}@${domain(c)} created`);
+  };
+}
+function pick(btn) { btn.parentElement.querySelectorAll('.opt').forEach(b => b.classList.toggle('on', b === btn)); const f = $('#ni-invite-f'); if (f) f.style.display = btn.dataset.v === 'invite' ? '' : 'none'; }
+
+function upgradePrompt(c) {
+  const l = limits(c), next = PLANS[ORDER[ORDER.indexOf(c.plan) + 1]];
+  const s = modal(`${modalHead(`You've used all ${l.inboxes} inboxes`, `Your ${plan(c).name} plan includes ${l.inboxes}. Pick how you'd like to add more.`)}
+    <div class="modal-b upg">
+      ${next ? `<button class="opt on" data-v="up"><span class="ic brand">${icon('spark')}</span><span class="grow"><b>Upgrade to ${next.name}</b><span>${next.inboxes} inboxes, ${next.aliases} groups & aliases, ${next.storage} GB each${next.meetings ? ', ' + next.meetings.toLowerCase() : ''}</span></span><span class="price"><b>${gbp(next.price)}</b><span class="faint small">/mo</span></span></button>` : ''}
+      <button class="opt ${next ? '' : 'on'}" data-v="one"><span class="ic">${icon('plus')}</span><span class="grow"><b>Add one inbox</b><span>Stay on ${plan(c).name}, add a single extra inbox</span></span><span class="price"><b>+£5</b><span class="faint small">/mo</span></span></button>
+    </div>
+    <div class="modal-f"><button class="btn" onclick="closeModal()">Not now</button><button class="btn primary" id="up-go">Continue</button></div>`);
+  s.querySelectorAll('.opt').forEach(o => o.onclick = () => s.querySelectorAll('.opt').forEach(x => x.classList.toggle('on', x === o)));
+  s.querySelector('#up-go').onclick = () => {
+    const v = s.querySelector('.opt.on').dataset.v;
+    closeModal();
+    if (v === 'up') { c.plan = next.id; if (c.custom != null && !c.internal) c.custom = null; render(); toast(`Upgraded to ${next.name}`); }
+    else addExtraInbox(c.id);
+  };
+}
+function addExtraInbox(id) { const c = byId(id); c.extra.inboxes++; if (c.custom != null && !c.internal) c.custom += 5; render(); toast('One extra inbox added (+£5/mo)'); }
+function changePlan(id, to) {
+  const c = byId(id), p = PLANS[to], up = ORDER.indexOf(to) > ORDER.indexOf(c.plan);
+  if (!up && c.inboxes.length > p.inboxes + c.extra.inboxes) return toast(`Remove ${c.inboxes.length - p.inboxes - c.extra.inboxes} inbox(es) before moving to ${p.name}`);
+  modal(`${modalHead(`${up ? 'Upgrade' : 'Switch'} to ${p.name}?`, `${gbp(p.price)} a month from today. We'll adjust your next invoice for the days left this month.`)}
+    <div class="modal-b"><dl class="kv"><dt>Inboxes</dt><dd>${limits(c).inboxes} → ${p.inboxes + c.extra.inboxes}</dd><dt>Groups & aliases</dt><dd>${limits(c).aliases} → ${p.aliases}</dd><dt>Storage per inbox</dt><dd>${limits(c).storage} GB → ${p.storage} GB</dd><dt>Monthly</dt><dd>${gbp(monthly(c))} → ${gbp(p.price + c.extra.inboxes * 5)}</dd></dl></div>
+    <div class="modal-f"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="byId('${id}').plan='${to}'; byId('${id}').custom=null; closeModal(); render(); toast('You are now on ${p.name}')">Confirm</button></div>`);
+}
+
+function newAlias(id) {
+  const c = byId(id), l = limits(c);
+  if (c.aliases.length >= l.aliases) return modal(`${modalHead(`You've used all ${l.aliases} groups & aliases`, 'Upgrade your plan for more, or remove one you no longer need.')}<div class="modal-f"><button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="closeModal(); go('#/client/${c.id}/plan')">See plans</button></div>`);
+  const s = modal(`${modalHead('New group or alias', `${l.aliases - c.aliases.length} of ${l.aliases} left. These don't use an inbox.`)}
+    <div class="modal-b form">
+      <div class="seg2"><button class="opt on" data-v="group"><b>Group</b><span>Copies to several people</span></button><button class="opt" data-v="alias"><b>Alias</b><span>Into one person's inbox</span></button></div>
+      <div class="field"><label>Address</label><div class="addon"><input class="input" id="na-local" placeholder="support" autocomplete="off"><span>@${esc(domain(c))}</span></div></div>
+      <div class="field"><label id="na-who">Who gets the email</label><div class="checks">${c.inboxes.map(m => `<label><input type="checkbox" value="${esc(m.local)}">${avatar(m.name)}<span>${esc(m.name)} <span class="faint">${esc(m.local)}@</span></span></label>`).join('')}</div></div>
+      <div class="hint faint small" id="na-hint">Tip: members can reply as support@ so customers always write back to the group.</div>
+    </div>
+    <div class="modal-f"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="na-go">Create</button></div>`);
+  let type = 'group';
+  s.querySelectorAll('.seg2 .opt').forEach(o => o.onclick = () => {
+    type = o.dataset.v; s.querySelectorAll('.seg2 .opt').forEach(x => x.classList.toggle('on', x === o));
+    s.querySelector('#na-who').textContent = type === 'group' ? 'Who gets the email' : 'Deliver to';
+    s.querySelector('#na-hint').style.display = type === 'group' ? '' : 'none';
+    if (type === 'alias') { const ch = [...s.querySelectorAll('.checks input:checked')]; ch.slice(1).forEach(x => x.checked = false); }
+  });
+  s.querySelector('.checks').addEventListener('change', e => { if (type === 'alias' && e.target.checked) s.querySelectorAll('.checks input').forEach(x => { if (x !== e.target) x.checked = false; }); });
+  s.querySelector('#na-go').onclick = () => {
+    const lp = s.querySelector('#na-local').value.trim().toLowerCase();
+    const to = [...s.querySelectorAll('.checks input:checked')].map(x => x.value);
+    if (!/^[a-z0-9][a-z0-9._-]*$/.test(lp)) return toast('Enter a valid address');
+    if (!to.length) return toast('Choose at least one person');
+    if (c.inboxes.some(m => m.local === lp) || c.aliases.some(a => a.local === lp)) return toast(`${lp}@ is already in use`);
+    c.aliases.push({ local: lp, type, to });
+    closeModal(); render(); toast(`${lp}@${domain(c)} created`);
+  };
+}
+
+function inboxMenu(btn, id, local) {
+  const c = byId(id), m = c.inboxes.find(x => x.local === local);
+  menu(btn, [
+    { icon: 'key', label: 'Reset password', run: () => toast(`Reset link sent for ${local}@${domain(c)}`) },
+    { icon: 'db', label: 'Change storage', run: () => toast('Storage options come with the real build') },
+    { icon: 'at', label: 'Add an alias for this person', run: () => newAlias(id) },
+    '-',
+    { icon: m.status === 'active' ? 'pause' : 'play', label: m.status === 'active' ? 'Suspend sign-in' : 'Resume sign-in', run: () => { m.status = m.status === 'active' ? 'suspended' : 'active'; render(); toast(`${local}@ ${m.status === 'active' ? 'resumed' : 'suspended'}`); } },
+    { icon: 'trash', label: 'Delete inbox', danger: true, run: () => confirmDelete(`Delete ${local}@${domain(c)}?`, 'All email, calendars and contacts in this inbox are removed after 30 days. Groups that include this person are updated.', () => { c.inboxes = c.inboxes.filter(x => x !== m); c.aliases.forEach(a => a.to = a.to.filter(t => t !== local)); c.aliases = c.aliases.filter(a => a.to.length); render(); toast('Inbox deleted'); }) },
+  ]);
+}
+function aliasMenu(btn, id, i) {
+  const c = byId(id), a = c.aliases[i];
+  menu(btn, [
+    { icon: 'edit', label: a.type === 'group' ? 'Edit members' : 'Change who gets it', run: () => toast('Editing comes with the real build') },
+    '-',
+    { icon: 'trash', label: 'Delete', danger: true, run: () => confirmDelete(`Delete ${a.local}@${domain(c)}?`, 'Email sent to this address will bounce.', () => { c.aliases.splice(i, 1); render(); toast('Deleted'); }) },
+  ]);
+}
+function clientMenu(btn, id) {
+  const c = byId(id);
+  menu(btn, [
+    { icon: 'mail', label: 'Email the client', run: () => toast(`Opening email to ${c.email}`) },
+    { icon: 'globe', label: 'Re-check DNS', run: () => toast('DNS checked just now') },
+    '-',
+    { icon: c.status === 'active' ? 'pause' : 'play', label: c.status === 'active' ? 'Suspend account' : 'Resume account', run: () => toggleSuspend(id) },
+  ]);
+}
+function toggleSuspend(id) { const c = byId(id); c.status = c.status === 'active' ? 'suspended' : 'active'; render(); toast(`${c.name} ${c.status === 'active' ? 'resumed' : 'suspended'}`); }
+function confirmDelete(t, p, run) {
+  const s = modal(`${modalHead(t, p)}<div class="modal-f"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" style="background:var(--bad);border-color:var(--bad);color:#fff" id="cd-go">Delete</button></div>`);
+  s.querySelector('#cd-go').onclick = () => { closeModal(); run(); };
+}
+
+function step(elId, d) { const el = $('#' + elId); el.textContent = Math.max(0, +el.textContent + d); }
+function savePlan(id) {
+  const c = byId(id);
+  c.plan = $('#pf-plan').value;
+  c.extra.inboxes = +$('#pf-extra').textContent;
+  const v = $('#pf-price').value.trim();
+  c.custom = v === '' ? null : Math.max(0, parseFloat(v) || 0);
+  render(); toast(`${c.name}: ${plan(c).name}, ${gbp(monthly(c))}/mo`);
+}
+
+function newClient() {
+  const s = modal(`${modalHead('New client', 'Sets up their domain and a first inbox for the main contact.')}
+    <div class="modal-b form">
+      <div class="field"><label>Business name</label><input class="input" id="nc-name" placeholder="Acme Ltd"></div>
+      <div class="two"><div class="field"><label>Contact name</label><input class="input" id="nc-contact" placeholder="Jane Smith"></div>
+      <div class="field"><label>Their domain</label><input class="input" id="nc-domain" placeholder="acme.co.uk"></div></div>
+      <div class="field"><label>Plan</label><div class="seg2" style="grid-template-columns:repeat(3,1fr)">${ORDER.map(id => `<button class="opt ${id === 'premium' ? 'on' : ''}" data-v="${id}"><b>${PLANS[id].name}</b><span>${gbp(PLANS[id].price)}/mo · ${PLANS[id].inboxes} inboxes</span></button>`).join('')}</div></div>
+      <div class="field"><label>Custom monthly price <span class="faint" style="font-weight:400">(optional)</span></label><div class="addon pre"><span>£</span><input class="input" id="nc-price" inputmode="decimal" placeholder="List price"></div></div>
+    </div>
+    <div class="modal-f"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="nc-go">Create client</button></div>`, { wide: true });
+  let pl = 'premium';
+  s.querySelectorAll('.opt').forEach(o => o.onclick = () => { pl = o.dataset.v; s.querySelectorAll('.opt').forEach(x => x.classList.toggle('on', x === o)); });
+  s.querySelector('#nc-go').onclick = () => {
+    const name = s.querySelector('#nc-name').value.trim(), contact = s.querySelector('#nc-contact').value.trim(), dom = s.querySelector('#nc-domain').value.trim().toLowerCase();
+    if (!name || !contact || !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(dom)) return toast('Fill in the name, contact and a valid domain');
+    if (LICENCE.seats - seatsUsed() < 1) return toast('No licence seats left — add seats first');
+    const id = dom.replace(/[^a-z0-9]/g, '');
+    const local = contact.split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9]/g, '') || 'admin';
+    const price = s.querySelector('#nc-price').value.trim();
+    clients.push({ id, name, contact, email: `${local}@${dom}`, plan: pl, custom: price ? parseFloat(price) || 0 : null, extra: { inboxes: 0, aliases: 0, storage: 0 }, since: 'Oct 2026', status: 'active',
+      domains: [{ name: dom, dns: dnsOk(['MX', 'SPF', 'DKIM', 'DMARC', 'Auto-setup', 'Website']) }],
+      inboxes: [{ id: dom + ':' + local, name: contact, local, quota: PLANS[pl].storage, used: 0, status: 'active', last: 'Never', admin: true }], aliases: [] });
+    closeModal(); go('#/staff/clients/' + id); toast(`${name} created · DNS records ready to send`);
+  };
+}
+
+/* ============================================================
+   Boot
+   ============================================================ */
+document.querySelectorAll('.ribbon [data-role]').forEach(b => b.onclick = () => go(b.dataset.role === 'staff' ? '#/staff' : '#/client/' + clientId));
+function setTheme(dark) {
+  document.documentElement.classList.toggle('dark', dark);
+  $('#theme').innerHTML = icon(dark ? 'sun' : 'moon');
+  try { localStorage.setItem('ztd-proto-theme', dark ? 'dark' : 'light'); } catch {}
+}
+$('#theme').onclick = () => setTheme(!document.documentElement.classList.contains('dark'));
+setTheme((() => { try { return localStorage.getItem('ztd-proto-theme') === 'dark'; } catch { return false; } })());
+if (!location.hash) location.hash = '#/staff';
+render();
+</script>
+</body>
+</html>
