@@ -1,0 +1,11 @@
+# Keeps the CI actions patched (ISO 27001 Annex A 8.8, technical vulnerabilities).
+# Dependabot opens PRs; they go through the same review and checks as any other change.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies]
+    open-pull-requests-limit: 5
