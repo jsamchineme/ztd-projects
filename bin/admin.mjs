@@ -73,6 +73,16 @@ if (cmd === 'bootstrap'){
 } else if (cmd === 'make-admin'){
   db.prepare("UPDATE user SET role = 'admin' WHERE lower(email) = lower(?)").run(a[0]);
   console.log('ok');
+} else if (cmd === 'reapply-services'){
+  // Rewrites every project's systemd units from the database. Units live on disk, not in the DB, so after a move
+  // to a new server (ops/migrate-server.sh) they're gone until this recreates them. Safe to re-run any time.
+  const projects = db.prepare('SELECT * FROM project').all();
+  let ok = 0, failed = 0;
+  for (const p of projects){
+    try { await P.applyServices(p); ok++; console.log(`applied ${p.slug}`); }
+    catch (e){ failed++; console.error(`failed ${p.slug}: ${e.message}`); }
+  }
+  console.log(JSON.stringify({ projects: projects.length, applied: ok, failed }));
 } else if (cmd === 'import-project'){
   // For a project folder that already exists in /srv/projects/<slug>/repo.
   const [slug, name, teamSlug, file] = a;
@@ -94,6 +104,6 @@ if (cmd === 'bootstrap'){
   await P.applyServices(p);
   console.log(JSON.stringify({ project: p.slug, services: P.listServices(p.id).map(s => `${s.name}:${s.port}:${s.subdomain || '-'}`) }));
 } else {
-  console.log('Commands: bootstrap, reset-link, make-admin, import-project');
+  console.log('Commands: bootstrap, reset-link, add-user, delete-user, make-admin, import-project, reapply-services');
 }
 process.exit(0);

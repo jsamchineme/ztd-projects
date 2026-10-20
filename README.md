@@ -43,6 +43,7 @@ Studio (user "studio") ──sudo──> studio-ctl (root, validates every argum
 | `ops/backup.sh` | Nightly backup (03:30) to `/var/backups/ztd`, kept for 14 days |
 | `ops/isolate-studio.sh` | One-off: moves the Studio source into its own project, `studio-src`, run as the user `studiodev` (see Security model) |
 | `ops/migrate-pipeline.sh` | Copies this repo and its board data from a Mac to the server, then registers it as the Pipeline project |
+| `ops/migrate-server.sh` | Moves a whole Studio install to another server (new domain included): `snapshot` on the old box, `restore` on the new one. See "Moving Studio to another server". |
 | `ops/fake-claude.mjs` | Stand-in for the `claude` CLI for tests. Turn it on with `"fakeClaude"` in `/etc/studio/ctl.json`. |
 | `bin/admin.mjs` | `studio-admin` on the server: `bootstrap`, `reset-link`, `import-project`, `make-admin`, `add-user`, `delete-user` |
 | `mobile/` | The phone app (Expo, React Native) that rings for phone notifications. See `mobile/README.md`. Not installed on the server. |
@@ -122,6 +123,27 @@ Restarting Studio stops any Claude runs in progress.
 2. In Teams and people, create a team, for example "Studio", with only Studio admins in it.
 3. On the server, as root: `bash /srv/studio/app/ops/isolate-studio.sh <that team's slug>`. It copies `studio/` (with its history) as of the installed commit into `/srv/projects/studio-src/repo`, sets `projectUsers` and `studioSource` in `ctl.json`, and adds the **Studio** project to that team.
 4. Delete `studio/` from the pipeline project and commit that. From then on, change Studio in the Studio project.
+
+**Moving Studio to another server** (`ops/migrate-server.sh`). Carries the whole install — accounts, teams, projects, chats, uploads, secrets — to a new machine, a new domain included. The database stores only bare subdomains and builds URLs from the domain at runtime, so it moves as-is; `STUDIO_SECRET` is carried over verbatim because it's the key that encrypts stored Claude tokens, TOTP secrets, the SMTP password and the push keys (change it and all of those become unreadable). Apache sites and Let's Encrypt certificates are *not* copied — they belong to the old domain — so the restore regenerates them for the new domain with certbot.
+
+1. **New server:** an Ubuntu box with Apache. Open ports 80 and 443.
+2. **DNS:** point `studio.<new-domain>` and a wildcard `*.<new-domain>` (or each project's subdomain) at the new server's IP, and wait for it to take effect. certbot needs this to issue certificates.
+3. **On the old server**, as root, make the bundle and copy it over:
+   ```sh
+   bash /srv/studio/app/ops/migrate-server.sh snapshot            # writes /var/backups/ztd/migrate
+   rsync -az /var/backups/ztd/migrate/ root@<new-ip>:/root/migrate/
+   ```
+   The bundle holds secrets: move it over a private channel and delete it from both machines afterwards.
+4. **On the new server**, as root, get this repo (e.g. `git clone` the Studio source), then:
+   ```sh
+   bash ops/install.sh <new-domain>
+   bash ops/migrate-server.sh restore <new-domain> /root/migrate
+   ```
+   The restore recreates each project's own user, re-chowns its files, grafts the old `STUDIO_SECRET` and project-user map onto the fresh config, restores per-user Claude sessions and git deploy keys, recreates the project services' systemd units (`studio-admin reapply-services`), and provisions the Apache site and certificate for Studio and every project subdomain.
+5. **Check:** `systemctl status studio`, `studio-ctl status`, and sign in at `https://studio.<new-domain>`. Everyone signs in again (the session cookies were for the old host) and re-pairs any phones. Project git remotes and runners keep working; people's own-computer runners point at the new URL once they update.
+6. **Cut over and clean up:** once the new server checks out, stop Studio on the old one (`systemctl stop studio`) so nothing writes to its database, leave DNS on the new server, and delete the bundle from both machines.
+
+If a new server is enough but the domain stays the same, it's the same steps with `<new-domain>` set to the old domain — DNS just moves the existing names to the new IP, and certbot reissues the same certificates there.
 
 **Turn on email** (password resets and invites). The easy way: Admin page → Email. Enter the settings, then press Check and save. Studio signs in to the mail server before saving, and stores the password encrypted in its database. Settings saved there replace any in the server file. Or add these to `/etc/studio/studio.env`, then run `systemctl restart studio`:
 
