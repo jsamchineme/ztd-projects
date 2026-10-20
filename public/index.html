@@ -2,18 +2,166 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>New project</title>
-<style>
-  body { font: 18px/1.6 system-ui, sans-serif; margin: 0; color: #1d1d1b; background: #faf8f4; }
-  main { max-width: 38rem; margin: 18vh auto; padding: 0 16px; }
-  h1 { font-size: 2rem; line-height: 1.2; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Didit · Obim's little reminders ❤️</title>
+<meta name="description" content="Gentle reminders for your daily meds and vitamins, that keep nudging until you've done it.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://didit.ztddevs.com/">
+<meta property="og:title" content="Didit · Obim's little reminders ❤️">
+<meta property="og:description" content="Your vitamins and meds, with gentle nudges until you've taken them. Open on your phone and add it to your Home Screen.">
+<meta property="og:image" content="https://didit.ztddevs.com/icons/share-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FBF6F1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Didit">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<main>
-  <h1>Your new project is running</h1>
-  <p>Open it in Studio and tell Claude what to build.</p>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<main id="app">
+  <!-- TODAY -->
+  <section class="view" id="view-today">
+    <header class="hello">
+      <p class="date" id="todayDate"></p>
+      <h1 id="greeting">Hello, Obim ❤️</h1>
+    </header>
+
+    <article class="card bump" id="bumpCard"></article>
+
+    <div id="installCard"></div>
+    <div id="notifyCard"></div>
+
+    <div class="progress card" id="progressCard">
+      <div class="ring" id="ring"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" class="track"/><circle cx="22" cy="22" r="19" class="bar" id="ringBar"/></svg><span id="ringText">0/0</span></div>
+      <div class="progress-copy">
+        <h2 id="progressTitle">Today</h2>
+        <p id="progressSub"></p>
+      </div>
+      <div class="streak" id="streak" hidden></div>
+    </div>
+
+    <h3 class="section-title">Today's list</h3>
+    <ul class="slots" id="slots"></ul>
+    <div class="empty card" id="emptyToday" hidden>
+      <div class="empty-emoji">🌷</div>
+      <h2>Nothing on the list yet</h2>
+      <p>Add your vitamins and medicines and I'll keep nudging you until each one is done.</p>
+      <button class="btn primary" data-add>Add the first one</button>
+      <p class="quick-label">Or start with one of these</p>
+      <div class="quick" id="quickAdd"></div>
+    </div>
+
+    <h3 class="section-title" id="weekTitle">This week</h3>
+    <div class="week" id="week"></div>
+  </section>
+
+  <!-- TASKS -->
+  <section class="view" id="view-tasks" hidden>
+    <header class="hello">
+      <p class="date">Your little rituals</p>
+      <h1>Meds &amp; vitamins</h1>
+    </header>
+    <ul class="tasks" id="taskList"></ul>
+    <div class="empty card" id="emptyTasks" hidden>
+      <div class="empty-emoji">💊</div>
+      <h2>No reminders yet</h2>
+      <p>Tap the + button to add a vitamin, a medicine, or anything else you want to remember.</p>
+    </div>
+  </section>
+
+  <!-- ME -->
+  <section class="view" id="view-me" hidden>
+    <header class="hello">
+      <p class="date">Just for you</p>
+      <h1>Settings</h1>
+    </header>
+    <form class="card form" id="meForm">
+      <label>What should I call you?
+        <input name="name" placeholder="Obim" maxlength="30" autocomplete="given-name">
+      </label>
+      <label>Due date
+        <input type="date" name="due">
+        <small>Used to show how many weeks along you are and how big the baby is.</small>
+      </label>
+    </form>
+
+    <div class="card stack">
+      <h2>Notifications</h2>
+      <p id="notifyStatus" class="muted"></p>
+      <div class="row">
+        <button class="btn primary" id="enableNotify">Turn on reminders</button>
+        <button class="btn" id="testNotify">Send a test</button>
+      </div>
+    </div>
+
+    <div class="card stack" id="installHelp"></div>
+
+    <div class="card stack">
+      <h2>Your data</h2>
+      <p class="muted">Your list and history are stored on this phone. When reminders are on, the reminder names and times are also shared with the Didit server so it can nudge you when the app is closed. Nothing else is sent.</p>
+      <button class="btn danger" id="eraseAll">Erase everything on this phone</button>
+    </div>
+    <p class="made">Made with love for you and the bump 💕</p>
+  </section>
 </main>
+
+<button class="fab" id="fab" data-add aria-label="Add a reminder">
+  <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="today" class="on"><span>🌸</span>Today</button>
+  <button data-tab="tasks"><span>💊</span>My list</button>
+  <button data-tab="me"><span>🤍</span>Me</button>
+</nav>
+
+<!-- EDITOR SHEET -->
+<div class="sheet-wrap" id="sheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <form class="sheet" id="taskForm" autocomplete="off">
+    <div class="grab"></div>
+    <h2 id="sheetTitle">New reminder</h2>
+    <div class="emoji-pick" id="emojiPick"></div>
+    <label>Name
+      <input name="name" required maxlength="60" placeholder="Prenatal vitamin">
+    </label>
+    <label>Note <span class="opt">(optional)</span>
+      <input name="note" maxlength="100" placeholder="With breakfast">
+    </label>
+    <div class="field">
+      <span class="field-label">Times</span>
+      <div class="times" id="times"></div>
+      <button type="button" class="btn small" id="addTime">+ Add another time</button>
+    </div>
+    <div class="field">
+      <span class="field-label">Days</span>
+      <div class="days" id="days"></div>
+    </div>
+    <div class="field">
+      <span class="field-label">Until it's done, remind me every</span>
+      <div class="chips" id="nag"></div>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="btn danger ghost" id="deleteTask" hidden>Delete</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn" data-close>Cancel</button>
+      <button type="submit" class="btn primary">Save</button>
+    </div>
+  </form>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script src="/db.js"></script>
+<script src="/app.js" type="module"></script>
 </body>
 </html>

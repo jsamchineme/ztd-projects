@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Visa Plan · Mum’s UK visit</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F5F4F0">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- sign in / set up -->
+<section id="gate" class="gate" hidden>
+  <form class="gate-card" id="gate-form">
+    <div class="logo">✈︎</div>
+    <h1 id="gate-title">Visa Plan</h1>
+    <p id="gate-sub" class="muted">Enter the passcode to see the documents.</p>
+    <input id="gate-pass" type="password" autocomplete="current-password" placeholder="Passcode" required minlength="6">
+    <input id="gate-pass2" type="password" autocomplete="new-password" placeholder="Type it again" minlength="6" hidden>
+    <p id="gate-err" class="err" hidden></p>
+    <button class="btn primary wide" id="gate-btn">Open</button>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="brand"><span class="logo sm">✈︎</span><div><b>Visa Plan</b><small id="brand-sub">Mum’s UK visit</small></div></div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="docs" class="on">Documents</button>
+      <button data-tab="plan">Timeline</button>
+      <button data-tab="details">Details</button>
+      <button data-tab="letter">Letter</button>
+    </nav>
+    <div class="top-actions">
+      <a class="btn ghost" id="zip" href="/api/pack.zip" title="Download everything as a ZIP, sorted into folders">⇩ <span>Download all</span></a>
+      <button class="btn ghost icon" id="menu-btn" title="More">⋯</button>
+      <div class="menu" id="menu" hidden>
+        <button id="change-pass">Change passcode</button>
+        <button id="logout">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- overview, always visible -->
+    <section class="hero">
+      <div class="hero-main">
+        <p class="eyebrow" id="hero-eyebrow">UK Standard Visitor visa</p>
+        <h1 id="hero-title">Getting Mum here for the baby</h1>
+        <p class="muted" id="hero-next"></p>
+        <div class="chips" id="hero-chips"></div>
+      </div>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120" class="ring"><circle cx="60" cy="60" r="52" class="track"/><circle cx="60" cy="60" r="52" class="bar" id="ring-bar"/></svg>
+        <div class="ring-label"><b id="ring-pct">0%</b><small id="ring-sub">ready</small></div>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-docs">
+      <div class="toolbar">
+        <div class="seg" id="filter">
+          <button data-f="all" class="on">All</button>
+          <button data-f="todo">Still needed</button>
+          <button data-f="ready">Ready</button>
+        </div>
+        <input id="search" type="search" placeholder="Search documents…">
+      </div>
+      <div id="sections"></div>
+    </section>
+
+    <section class="tab" id="tab-plan" hidden>
+      <div class="grid2">
+        <div class="card">
+          <h2>Key dates</h2>
+          <div id="dates"></div>
+        </div>
+        <div class="card">
+          <h2>Application steps</h2>
+          <ol class="steps" id="steps"></ol>
+        </div>
+      </div>
+      <div class="card tips">
+        <h2>Good to know</h2>
+        <ul>
+          <li><b>Fee:</b> £135 for a visit of up to 6 months. She can stay up to 6 months on it.</li>
+          <li><b>When:</b> the earliest she can apply is <b>3 months before she travels</b>. Decisions usually take about <b>3 weeks</b> after the biometrics appointment, so leave a buffer before Christmas flights.</li>
+          <li><b>Purpose:</b> say it plainly: visiting her child and family to support around the birth of her grandchild. She can’t do paid work while here.</li>
+          <li><b>Money:</b> big unexplained deposits into her account just before applying are a common reason for refusal. Your sponsorship evidence covers the gap.</li>
+          <li><b>Healthcare:</b> visitors are usually charged for NHS hospital treatment, so get travel medical insurance for the whole stay.</li>
+          <li><b>Translations:</b> anything not in English needs a full translation with the translator’s confirmation, date, name, signature and contact details.</li>
+          <li><b>Honesty:</b> answers on the form must match the documents exactly (names, dates, amounts). Any past refusal must be declared.</li>
+        </ul>
+        <p class="muted small">Always check the latest rules on <a href="https://www.gov.uk/standard-visitor" target="_blank" rel="noopener">gov.uk/standard-visitor</a> and the <a href="https://www.gov.uk/government/publications/visitor-visa-guide-to-supporting-documents" target="_blank" rel="noopener">guide to supporting documents</a> before she applies.</p>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-details" hidden>
+      <form class="card form" id="details-form">
+        <h2>Mum</h2>
+        <div class="fields">
+          <label>Full name (as on passport)<input name="mumName"></label>
+          <label>Date of birth<input name="mumDob" type="date"></label>
+          <label>Country she’s applying from<input name="mumCountry" placeholder="e.g. Nigeria"></label>
+          <label>City<input name="mumCity"></label>
+          <label>Passport number<input name="mumPassport"></label>
+        </div>
+        <h2>You (sponsor)</h2>
+        <div class="fields">
+          <label>Your full name<input name="sponsorName"></label>
+          <label>Your wife’s full name<input name="wifeName"></label>
+          <label class="span2">UK address where Mum will stay<textarea name="address" rows="2"></textarea></label>
+          <label>Phone<input name="phone" type="tel"></label>
+          <label>Email<input name="email" type="email"></label>
+        </div>
+        <h2>Dates</h2>
+        <div class="fields">
+          <label>Baby due date<input name="dueDate" type="date"></label>
+          <label>Mum arrives<input name="travelDate" type="date"></label>
+          <label>Mum leaves<input name="returnDate" type="date"></label>
+        </div>
+        <h2>Application</h2>
+        <div class="fields">
+          <label>GWF reference number<input name="gwf" placeholder="GWF0…"></label>
+          <label>Biometrics appointment<input name="appointment" type="datetime-local"></label>
+          <label class="span2">Visa application centre<input name="centre" placeholder="e.g. VFS Lagos"></label>
+          <label class="span2">Notes<textarea name="notes" rows="4" placeholder="Anything to remember…"></textarea></label>
+        </div>
+        <p class="muted small" id="saved-msg">Changes save automatically.</p>
+      </form>
+    </section>
+
+    <section class="tab" id="tab-letter" hidden>
+      <div class="card">
+        <div class="letter-head">
+          <div>
+            <h2>Invitation & sponsorship letter</h2>
+            <p class="muted small">Filled in from the Details tab. Edit anything below, then print or save as PDF, sign it, and upload the signed copy to “Invitation & sponsorship letter”.</p>
+          </div>
+          <div class="row">
+            <button class="btn ghost" id="letter-reset">Rebuild from details</button>
+            <button class="btn primary" id="letter-print">Print / PDF</button>
+          </div>
+        </div>
+        <div class="letter" id="letter" contenteditable="true" spellcheck="true"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- viewer -->
+<div class="viewer" id="viewer" hidden>
+  <div class="viewer-bar">
+    <b id="viewer-name"></b>
+    <div class="row">
+      <a class="btn ghost" id="viewer-dl">Download</a>
+      <button class="btn ghost" id="viewer-close">Close</button>
+    </div>
+  </div>
+  <div class="viewer-body" id="viewer-body"></div>
+</div>
+
+<div class="drop-hint" id="drop-hint" hidden><div>Drop on a document card to upload</div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>
