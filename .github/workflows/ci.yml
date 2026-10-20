@@ -17,8 +17,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run tests (in-memory fake mail server, no secrets needed)
-        run: node --test
+      - name: Run tests (legacy root app; in-memory fake mail server)
+        run: node --test 'test/**/*.test.mjs'
 
   secret-scan:
     runs-on: ubuntu-latest
