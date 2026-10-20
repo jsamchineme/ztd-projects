@@ -7,6 +7,15 @@ Environment: **pilot mail server is live** at mx1.ztdoffice.com (see `docs/vps-p
 
 ## To do
 
+### 23. ISO/IEC 27001 readiness
+Owner: Samuel (decisions, approvals) + Claude (docs, setup) · Docs in `docs/security/`
+- Done: change-management procedure, secure development policy, GitHub/Vercel settings, PR template with security checklist, CI (tests + secret scan), incident log
+- Samuel: create a private GitHub repo (e.g. ztddevs/ztdoffice), add the Studio deploy key (write access) and the `protect-main` ruleset from `docs/security/github-setup.md`; turn on 2FA for GitHub, Vercel, Neon
+- Then: Claude pushes this repo and from then on works only through PRs; Studio commits go on branches, not `main`
+- ISMS: scope statement, risk assessment, Statement of Applicability, policies (access control, backups, incidents, suppliers: Hetzner, Vercel, Neon, Resend/SES, Stalwart), staff awareness, internal audit, management review
+- Mail server in scope too: backups and restore tests (task 10), admin access restriction (task 9), logging and monitoring
+- Choose a certification body (UKAS-accredited) once the ISMS has run for ~3 months of evidence
+
 ### 10. Monitoring, backups and recovery — next
 Owner: Claude
 - Nightly off-site backups of /opt/ztdmail (mail, accounts, settings, DKIM keys); test a restore
@@ -124,7 +133,7 @@ Owner: Claude · Depends on: 3, 5 · Details in `docs/control-panel.md`
 - Remaining: add each client domain to Resend from the panel (Resend API) instead of by hand
 - Remaining: shared inboxes (Stalwart Group accounts) from the panel; one Stalwart tenant per client (task 21)
 - Remaining: two-factor sign-in for panel logins (task 9); email invite links instead of copy-paste
-- Remaining: move the panel to its own address (e.g. admin.ztdoffice.com) and retire the old webmail pages
+- Next: rebuild as Next.js (App Router, TypeScript) + Neon Postgres, hosted on Vercel at my.ztdoffice.com, through PRs (task 23); needs a restricted Stalwart API key usable from Vercel. Then retire the old webmail pages and /panel/ here
 - Remaining: per-mailbox sending limits and volume alerts
 - Prototypes kept for reference: /prototype/panel.html (A) … panel5.html (E)
 
