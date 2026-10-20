@@ -10,8 +10,8 @@ Environment: **pilot mail server is live** at mx1.ztdoffice.com (see `docs/vps-p
 ### 23. ISO/IEC 27001 readiness
 Owner: Samuel (decisions, approvals) + Claude (docs, setup) · Docs in `docs/security/`
 - Done: change-management procedure, secure development policy, GitHub/Vercel settings, PR template with security checklist, CI (tests + secret scan), incident log
-- Samuel: create a private GitHub repo (e.g. ztddevs/ztdoffice), add the Studio deploy key (write access) and the `protect-main` ruleset from `docs/security/github-setup.md`; turn on 2FA for GitHub, Vercel, Neon
-- Then: Claude pushes this repo and from then on works only through PRs; Studio commits go on branches, not `main`
+- Done: private repo ZTD-Devs/ztdoffice; GitHub App `ztd-devs-studio` for Claude; `protect-main` ruleset tested (direct push refused); squash + auto-merge; LICENSE (ZTD Devs LTD); first PRs reviewed and merged
+- Samuel: confirm 2FA is required for the ZTD-Devs organisation, and on Vercel and Neon
 - ISMS: scope statement, risk assessment, Statement of Applicability, policies (access control, backups, incidents, suppliers: Hetzner, Vercel, Neon, Resend/SES, Stalwart), staff awareness, internal audit, management review
 - Mail server in scope too: backups and restore tests (task 10), admin access restriction (task 9), logging and monitoring
 - Choose a certification body (UKAS-accredited) once the ISMS has run for ~3 months of evidence
