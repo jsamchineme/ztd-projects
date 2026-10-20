@@ -22,18 +22,6 @@ Owner: Claude (setup, monitoring) + Samuel (approve each policy step)
 - Then switch MTA-STS from testing to enforce (bump the `_mta-sts` id)
 - Repeat per client domain during the pilot; the control panel should show each domain's DMARC status
 
-### 8. Control panel (this app)
-Owner: Claude · Depends on: 3, 5
-- Plans (website + email included; list prices, can change): Lite £40/mo (3 inboxes, 5 aliases/groups, 5 GB) · Premium £70/mo (7 inboxes, 10 aliases/groups, 10 GB, meetings) · Business £125/mo (15 inboxes, 25 aliases/groups, 25 GB, 3 domains). Annual = 2 months free
-- Add-ons: +1 inbox £5/mo · +10 GB £3/mo · meetings on Lite £10/mo · extra domain £5/mo
-- Per-client custom price and limits (prices vary by client); panel enforces limits with an upgrade prompt
-- CHOSEN DIRECTION: design E — faithful Resend dashboard (dark, studied from Samuel's own Resend account recording). /prototype/panel5.html. Dark canvas, workspace switcher, pill tabs, green icon tiles + status pills, white primary buttons, line-chart metrics, domain event timeline, ⌘K "Ask anything" bar; extra Resend pages (Domains, Activity, Settings). Build the real control panel on this.
-- Earlier options (kept for reference): A /prototype/panel.html · B editorial /prototype/panel2.html · C light-monochrome /prototype/panel3.html · D Attio /prototype/panel4.html
-- Switch mailbox management to Stalwart (JMAP admin API, as used for setup); keep Resend domain API for the pilot
-- Clients → domains → mailboxes (create, suspend, reset password, quotas)
-- Generate DNS records per client domain (from Stalwart's per-domain zone file) and check they're live
-- Per-mailbox sending limits and volume alerts
-
 ### 9. Security and abuse protection
 Owner: Claude
 - Two-factor sign-in, strong password rules (admin: done — TOTP on admin@ztdoffice.com, password alone refused; automation uses an API key locked to the VPS)
@@ -125,6 +113,20 @@ Owner: Samuel + Claude · Depends on: 11, 13, 15, 17
 - Keep Google Workspace / Microsoft 365 as a premium option
 
 ## In progress
+
+### 8. Control panel (this app)
+Owner: Claude · Depends on: 3, 5 · Details in `docs/control-panel.md`
+- Done: live at https://businessmail.ztddevs.com/panel/ in design E (Resend-style, dark); staff + client-admin logins by invite link
+- Done: clients with plan, custom price and extra inboxes/groups; inboxes (create, rename, reset password, suspend, delete), groups (mailing lists) and aliases created live on Stalwart; plan limits enforced with upgrade requests; suspend a whole client
+- Done: per-domain DNS records (DKIM from Stalwart's zone + Resend records) checked live and hourly; Domains, Activity, Plans, Settings pages; ⌘K "Ask anything"
+- Plans: Lite £40 (3 inboxes, 5 groups/aliases, 5 GB) · Premium £70 (7, 10, 10 GB) · Business £125 (15, 25, 25 GB, 3 domains) — edit in `src/panel/plans.mjs`. Add-ons: +1 inbox £5 · +5 groups/aliases £2 · +10 GB £3 · extra domain £5
+- Samuel: set your password with the invite link, then add the first real client
+- Remaining: add each client domain to Resend from the panel (Resend API) instead of by hand
+- Remaining: shared inboxes (Stalwart Group accounts) from the panel; one Stalwart tenant per client (task 21)
+- Remaining: two-factor sign-in for panel logins (task 9); email invite links instead of copy-paste
+- Remaining: move the panel to its own address (e.g. admin.ztdoffice.com) and retire the old webmail pages
+- Remaining: per-mailbox sending limits and volume alerts
+- Prototypes kept for reference: /prototype/panel.html (A) … panel5.html (E)
 
 ### 21. Stalwart Enterprise licence and branding
 Owner: Samuel (licence) + Claude (setup)

@@ -14,6 +14,7 @@ import { register as registerMail } from './src/feature/mail.mjs';
 import { register as registerInbound } from './src/feature/inbound.mjs';
 import { register as registerAdmin } from './src/feature/admin.mjs';
 import { register as registerSettings } from './src/feature/settings.mjs';
+import { register as registerPanel } from './src/panel/routes.mjs';
 
 const PUBLIC = new URL('./public', import.meta.url).pathname;
 const TYPES = {
@@ -30,6 +31,7 @@ registerMail(router, deps);
 registerInbound(router, deps);
 registerAdmin(router, deps);
 registerSettings(router, deps);
+registerPanel(router, deps);
 
 async function serveStatic(req, res, pathname) {
   let rel = normalize(decodeURIComponent(pathname)).replace(/^(\.\.[\/\\])+/, '');
